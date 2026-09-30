@@ -1,0 +1,39 @@
+{
+  "project_id": "roleta",
+  "as_of": "2026-09-30",
+  "primary_objective_status": "ACTIVE",
+  "milestones": [
+    {
+      "id": "RLT-M0",
+      "name": "Canonical governance and SFJM bootstrap",
+      "status": "COMPLETE"
+    },
+    {
+      "id": "RLT-M1",
+      "name": "Forensic numeric dataset baseline",
+      "status": "COMPLETE_WITH_QUARANTINE"
+    },
+    {
+      "id": "RLT-M2",
+      "name": "Broker identity layer and broker rankings",
+      "status": "ACTIVE"
+    },
+    {
+      "id": "RLT-M3",
+      "name": "Prospective statistical monitoring",
+      "status": "PLANNED"
+    },
+    {
+      "id": "RLT-M4",
+      "name": "Operational product specification and verifiable draw architecture",
+      "status": "PLANNED"
+    }
+  ],
+  "current_gate": "RLT-M2 identity normalization",
+  "next_safe_action": "Normalize broker names/aliases on audited events and produce auditable broker rankings.",
+  "blocked": [
+    "infer illegible names",
+    "infer missing draw numbers by mathematical complement",
+    "claim predictive advantage without prospective evidence"
+  ]
+}
