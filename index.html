@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>Roleta Intelligence</title>
+  <meta name="description" content="Dashboard auditável da roleta do plantão: histórico, tendências, segmentos e sugestões contextuais.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">ROLETA · INTELLIGENCE</div>
+        <h1>Radar de posições</h1>
+        <p class="lede">Histórico auditado, tendência, ausência e contexto do próximo sorteio.</p>
+      </div>
+      <div class="status-stack">
+        <span class="status live">Base canônica</span>
+        <span id="datasetStamp" class="status">carregando…</span>
+      </div>
+    </header>
+
+    <section class="notice">
+      <strong>Leitura estatística, não previsão.</strong>
+      Frequência histórica não altera, por si só, a probabilidade matemática do próximo sorteio se o mecanismo for justo.
+    </section>
+
+    <section class="control-panel card">
+      <div class="control">
+        <label for="objective">Objetivo</label>
+        <select id="objective">
+          <option value="n1">Nº 1</option>
+          <option value="n1last" selected>Nº 1 ou Último</option>
+          <option value="premium">Premium: Nº 1 + Cortesia + Último</option>
+          <option value="n2">Nº 2</option>
+          <option value="courtesy">Cortesia</option>
+          <option value="last">Último de vez</option>
+        </select>
+      </div>
+      <div class="control">
+        <label for="scenarioPeriod">Período do próximo sorteio</label>
+        <select id="scenarioPeriod">
+          <option value="manha" selected>Manhã</option>
+          <option value="tarde">Tarde</option>
+          <option value="weekend">Sábado / Domingo / Integral</option>
+          <option value="all">Geral</option>
+        </select>
+      </div>
+      <div class="control">
+        <label for="participantCount">Participantes estimados</label>
+        <div class="number-control">
+          <input id="participantCount" type="number" min="2" max="40" value="18">
+          <span>corretores</span>
+        </div>
+      </div>
+      <div class="scenario-meta"><span id="scenarioBasis">—</span></div>
+    </section>
+
+    <section class="hero-grid">
+      <article class="hero-card primary"><span class="kicker">Sugestão do cenário</span><div id="scenarioPick" class="big-number">—</div><p id="scenarioPickMeta">—</p></article>
+      <article class="hero-card"><span class="kicker">Alternativa</span><div id="scenarioAlt" class="big-number">—</div><p id="scenarioAltMeta">—</p></article>
+      <article class="hero-card"><span class="kicker">Campeão absoluto</span><div id="absoluteChampion" class="big-number">—</div><p id="absoluteChampionMeta">—</p></article>
+      <article class="hero-card accent"><span class="kicker">Coringa histórico</span><div id="wildcard" class="big-number">—</div><p id="wildcardMeta">—</p></article>
+    </section>
+
+    <section class="dashboard-grid">
+      <article class="card span-2">
+        <div class="section-head"><div><span class="eyebrow">RANKING</span><h2>Campeão e perseguidores</h2></div><span id="rankingSubtitle" class="muted">—</span></div>
+        <div id="rankingBars" class="ranking-bars"></div>
+      </article>
+
+      <article class="card">
+        <div class="section-head"><div><span class="eyebrow">MOMENTUM</span><h2>Em ascensão</h2></div></div>
+        <div id="momentumList" class="list"></div>
+      </article>
+
+      <article class="card">
+        <div class="section-head"><div><span class="eyebrow">AUSÊNCIA</span><h2>Nunca apareceu</h2></div></div>
+        <p class="small muted">Ordenado por oportunidades sem atingir o objetivo selecionado.</p>
+        <div id="neverList" class="list"></div>
+      </article>
+
+      <article class="card span-2">
+        <div class="section-head"><div><span class="eyebrow">ÚLTIMO EVENTO</span><h2>Mapa-chave da última roleta</h2></div><span id="latestEventTitle" class="muted">—</span></div>
+        <div id="latestEvent" class="last-grid"></div>
+      </article>
+
+      <article class="card span-2">
+        <div class="section-head"><div><span class="eyebrow">PERÍODO</span><h2>Sugestões por período</h2></div><span class="muted">mesmo objetivo selecionado</span></div>
+        <div id="periodCards" class="mini-grid"></div>
+      </article>
+
+      <article class="card span-2">
+        <div class="section-head"><div><span class="eyebrow">TAMANHO DA ROLETA</span><h2>Sugestões por faixa de participantes</h2></div><span class="muted">faixas exibem tamanho da amostra</span></div>
+        <div id="rangeCards" class="mini-grid five"></div>
+      </article>
+
+      <article class="card span-2">
+        <div class="section-head"><div><span class="eyebrow">RECÊNCIA</span><h2>Últimas roletas</h2></div><span class="muted">posição física que atingiu o objetivo</span></div>
+        <div id="recentTimeline" class="timeline"></div>
+      </article>
+
+      <article class="card methodology span-2">
+        <div class="section-head"><div><span class="eyebrow">MÉTODO</span><h2>Como a V1 escolhe</h2></div></div>
+        <p>O campeão absoluto usa contagem histórica, desempate por observado/esperado e exposição. A sugestão contextual procura o mesmo período e um N semelhante; se a amostra for pequena, amplia automaticamente a janela. O coringa favorece posições consistentes em múltiplos contextos. Nunca apareceu só considera posições com oportunidades reais.</p>
+        <p class="small muted">Posição física escolhida ≠ ordem efetiva ≠ número sorteado. Esta versão recomenda a <strong>posição física da primeira coluna</strong>. Nº 3 será habilitado quando o mapeamento completo de cada sorteio estiver versionado.</p>
+      </article>
+    </section>
+
+    <footer><span>Roleta V1 · fonte: data/events.csv</span><span>SFJM · estado versionado no GitHub</span></footer>
+  </div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
