@@ -21,15 +21,31 @@
 - testes globais atuais não sustentam vantagem preditiva robusta;
 - backtest cronológico não demonstrou estratégia preditiva superior ao acaso de forma estatisticamente convincente.
 
-### Frente ativa
+### RLT-M2 — Broker Identity Layer
 
-`RLT-M2 — Broker Identity Layer`
+STATUS: ACTIVE
 
-Objetivo: normalizar nomes/aliases e calcular ranking de corretores sem contaminar a base numérica auditada.
+Objetivo:
+normalizar nomes/aliases e calcular ranking de corretores sem contaminar a base numérica auditada.
 
-### Frentes futuras
+### RLT-M3A — Decision Dashboard V1
 
-- validação prospectiva contínua;
-- dashboard de tendências;
-- especificação do produto operacional da roleta/recepção;
-- arquitetura auditável para sorteio verificável.
+STATUS: RELEASED / PRODUCTION / ACCEPTANCE_PENDING
+
+Vercel project: `roleta`
+
+Production alias:
+`https://roleta-six-lime.vercel.app`
+
+Funções publicadas:
+- ranking geral;
+- perseguidores;
+- momentum;
+- nunca apareceu;
+- última roleta;
+- recomendações por período;
+- recomendações por faixa de participantes;
+- cenário por N estimado;
+- coringa histórico.
+
+O dashboard lê `data/events.csv` diretamente e não substitui a metodologia forense canônica.
