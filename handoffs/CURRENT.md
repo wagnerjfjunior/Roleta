@@ -11,6 +11,12 @@ quality B = 4
 quarantine/unavailable source records = 10
 duplicates removed = 3
 partial report excluded from inference = 1
+
+dashboard V1 = RELEASED / PRODUCTION
+vercel project = roleta
+production alias = roleta-six-lime.vercel.app
+dashboard source = index.html + app.js + styles.css
+dataset source = data/events.csv
 ```
 
 ## Modelo operacional confirmado
@@ -31,15 +37,23 @@ No Caminhos da Lapa a primeira coluna é livre: o corretor pode escolher qualque
 - após múltiplos testes e backtest, nenhum padrão demonstra vantagem preditiva robusta;
 - dados novos devem ser avaliados prospectivamente, sem recalibrar hipótese depois do resultado.
 
+## Dashboard V1
+
+Entregue em produção com:
+- objetivo selecionável: Nº1, Nº1+Último, Premium, Nº2, Cortesia, Último;
+- campeão absoluto e perseguidores;
+- momentum recente;
+- posições que nunca apareceram, ajustadas por exposição;
+- mapa-chave da última roleta;
+- sugestões por manhã, tarde e fim de semana/integral;
+- sugestões por faixas de participantes;
+- sugestão contextual por período + N estimado;
+- coringa histórico multi-contexto.
+
 ## Current work
 
-Construir a camada nominal por corretor sobre a base auditada para produzir ranking por:
-- Nº1;
-- Nº2;
-- Nº3;
-- cortesia;
-- último de vez;
-- Top-3;
-- Premium = Nº1 + cortesia + último.
+RLT-M2 continua ativo:
+normalizar nomes/aliases e produzir ranking auditável de corretores.
 
-Não inferir nomes ilegíveis ou aliases sem evidência.
+RLT-M3A — Decision Dashboard V1:
+RELEASED / PRODUCTION / ACCEPTANCE_PENDING.
