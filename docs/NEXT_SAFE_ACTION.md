@@ -2,11 +2,22 @@
 
 ## Autoridade atual
 
-A única próxima ação segura é:
+A próxima ação segura é dupla, sem dependência de conversa:
 
-**Normalizar a camada nominal dos corretores sobre as 75 roletas utilizáveis e publicar um ranking auditável de Nº1, Nº2, Nº3, Cortesia e Último, mantendo aliases incertos separados até confirmação.**
+1. **validar a V1 do dashboard em produção e corrigir apenas defeitos de apresentação/cálculo identificados na aceitação;**
+2. **continuar RLT-M2, normalizando a camada nominal dos corretores e publicando ranking auditável de Nº1, Nº2, Nº3, Cortesia e Último.**
 
-### Critérios de aceite
+### Critérios de aceite do dashboard
+
+- carrega `data/events.csv` em produção;
+- exibe 75 eventos, 71 A e 4 B;
+- última roleta corresponde ao evento canônico mais recente;
+- recomendações deixam claro que são históricas, não preditivas;
+- posição física não é confundida com ordem efetiva;
+- filtros por período/N não usam eventos inexistentes;
+- “nunca apareceu” exige exposição real.
+
+### Critérios de aceite da camada nominal
 
 1. cada ocorrência nominal aponta para evento/data/período;
 2. nomes ilegíveis não são inferidos;
