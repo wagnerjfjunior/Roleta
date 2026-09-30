@@ -1,0 +1,71 @@
+{
+  "project_id": "roleta",
+  "graph_version": 1,
+  "nodes": [
+    {
+      "id": "RLT-M0",
+      "type": "milestone",
+      "status": "COMPLETE",
+      "children": [
+        "RLT-M0-01"
+      ]
+    },
+    {
+      "id": "RLT-M0-01",
+      "type": "task",
+      "status": "COMPLETE",
+      "title": "Canonical repo + SFJM bootstrap"
+    },
+    {
+      "id": "RLT-M1",
+      "type": "milestone",
+      "status": "COMPLETE_WITH_QUARANTINE",
+      "children": [
+        "RLT-M1-01",
+        "RLT-M1-02"
+      ]
+    },
+    {
+      "id": "RLT-M1-01",
+      "type": "task",
+      "status": "COMPLETE",
+      "title": "Consolidate 75 usable roulette events"
+    },
+    {
+      "id": "RLT-M1-02",
+      "type": "task",
+      "status": "COMPLETE",
+      "title": "Forensic statistics and chronological backtest"
+    },
+    {
+      "id": "RLT-M2",
+      "type": "milestone",
+      "status": "ACTIVE",
+      "children": [
+        "RLT-M2-01"
+      ]
+    },
+    {
+      "id": "RLT-M2-01",
+      "type": "task",
+      "status": "NEXT_SAFE_ACTION",
+      "title": "Normalize broker identities and rank outcomes"
+    },
+    {
+      "id": "RLT-M3",
+      "type": "milestone",
+      "status": "PLANNED",
+      "depends_on": [
+        "RLT-M2"
+      ]
+    },
+    {
+      "id": "RLT-M4",
+      "type": "milestone",
+      "status": "PLANNED",
+      "depends_on": [
+        "RLT-M1"
+      ]
+    }
+  ]
+}
