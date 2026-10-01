@@ -60,3 +60,26 @@ O dashboard lê `data/events.csv` diretamente e não substitui a metodologia for
 - manhã, alvo Nº1 ou Último: posição 14 é líder descritiva, sem significância global;
 - tarde, alvo Nº1 ou Último: posição 22 é líder descritiva, sem significância global;
 - metodologia V2 publicada em docs/METHODOLOGY.md.
+
+
+## RLT-M3B — Weekend Qualification & Family Portfolio
+
+STATUS: RELEASED / PRODUCTION_PENDING_ACCEPTANCE
+
+Operational rule:
+- 10 weekday periods: Monday–Friday, morning and afternoon;
+- minimum 5 completed periods per broker;
+- 5/10 unlocks Saturday/Sunday roulette eligibility.
+
+Canonical weekend portfolio:
+- Wagner: physical 14 — primary;
+- Sabrina: physical 12 — primary;
+- Laura: physical 21 — secondary;
+- Helena (Lívia): physical 8 — secondary.
+
+The dashboard stores each broker's weekly attendance locally in the browser and shows PENDING/LIBERADO automatically.
+
+Statistical status:
+- weekend sample currently small (14 events);
+- assignments are exploratory historical candidates, not proven predictive advantages;
+- portfolio is frozen for the cycle and reviewed only after new weekend data is incorporated.
