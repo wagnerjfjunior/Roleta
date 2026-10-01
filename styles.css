@@ -138,3 +138,42 @@ footer{display:flex;justify-content:space-between;gap:16px;margin-top:18px;paddi
 .afternoon-picks>div{background:#091523;border:1px solid #20344b;border-radius:14px;padding:10px 12px}
 .pick-label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
 .afternoon-picks strong{font-size:44px;line-height:1}
+
+/* V2 weekend planning + model laboratory */
+.weekend-plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.weekend-day-block{background:#091523;border:1px solid #20344b;border-radius:18px;padding:16px}
+.weekend-day-block.saturday{border-color:rgba(66,215,255,.30)}
+.weekend-day-block.sunday{border-color:rgba(255,207,92,.28)}
+.compact-head{margin-bottom:12px}
+.forecast-badge{display:inline-flex;align-items:center;border:1px solid rgba(255,207,92,.35);color:var(--amber);background:rgba(255,207,92,.07);padding:6px 9px;border-radius:999px;font-size:10px;font-weight:850;letter-spacing:.06em}
+.saturday-badge{border-color:rgba(66,215,255,.34);color:var(--cyan);background:rgba(66,215,255,.07)}
+.assignment-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.assignment-card{background:#0f1d30;border:1px solid #20344b;border-radius:14px;padding:12px;display:grid;gap:5px}
+.assignment-card strong{font-size:35px;line-height:1;color:var(--cyan)}
+.assignment-card.sun strong{color:var(--amber)}
+.assignment-name{font-size:11px;font-weight:850}
+.assignment-role{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.model-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.model-card{background:#091523;border:1px solid #20344b;border-radius:17px;padding:16px;min-height:180px}
+.model-card.champion{border-color:rgba(78,230,166,.38);box-shadow:inset 0 0 0 1px rgba(78,230,166,.06)}
+.model-card-head{display:flex;justify-content:space-between;gap:8px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.model-card-head b{color:var(--green)}
+.model-card h3{margin:13px 0 5px;font-size:16px}
+.model-index{font-size:44px;font-weight:900;letter-spacing:-.04em;margin:7px 0 14px}
+.model-card.champion .model-index{color:var(--green)}
+.model-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.model-metrics span{font-size:11px;color:var(--text)}
+.model-metrics b{display:block;font-size:9px;color:var(--muted);margin-bottom:3px}
+.model-leaderboard{display:grid;gap:8px}
+.model-rank-row{display:grid;grid-template-columns:34px 1.2fr 1fr 80px;gap:12px;align-items:center;background:#091523;border:1px solid #20344b;border-radius:13px;padding:11px 13px}
+.model-place{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#13243a;font-weight:900}
+.model-rank-row span{font-size:12px;color:var(--muted)}
+.model-rank-row b{text-align:right}
+.viability{border-color:rgba(255,207,92,.28)}
+.viability-state{border:1px solid rgba(255,207,92,.36);color:var(--amber);background:rgba(255,207,92,.07);padding:7px 10px;border-radius:999px;font-size:10px;font-weight:850}
+.viability-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.viability-grid>div{background:#091523;border:1px solid #20344b;border-radius:14px;padding:13px}
+.viability-grid span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+.viability-grid strong{display:block;font-size:27px;margin-top:4px}
+@media(max-width:980px){.model-grid{grid-template-columns:1fr 1fr}.assignment-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){.weekend-plan-grid,.model-grid,.viability-grid{grid-template-columns:1fr}.model-rank-row{grid-template-columns:30px 1fr 70px}.model-rank-row span:nth-of-type(2){display:none}}

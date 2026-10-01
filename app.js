@@ -1,4 +1,4 @@
-const state={events:[],weekendPolicy:null,presence:null};
+const state={events:[],weekendPolicy:null,presence:null,modelLab:null};
 const OBJ='n1last';
 
 function parseCSV(text){
@@ -82,7 +82,7 @@ function renderHero(){
   document.querySelector('#afternoonPickMeta').textContent=afternoon.length
     ? 'principal #'+afternoon[0].pos+(afternoon[1]?' · reserva #'+afternoon[1].pos:'')
     : 'amostra insuficiente';
-  const p=state.weekendPolicy?.family_assignments||[];
+  const p=state.weekendPolicy?.saturday?.assignments||state.weekendPolicy?.family_assignments||[];
   document.querySelector('#weekendSummary').innerHTML=p.map(x=>'<span><b>'+x.broker.split(' ')[0]+'</b> '+x.physical_position+'</span>').join('');
 }
 function renderRanking(){
@@ -173,22 +173,97 @@ function renderWeekendFamily(){
       '</div>';
   }).join('');
 }
+
+function assignmentCard(a,mode){
+  const fallback=a.fallback_position?' · reserva '+a.fallback_position:'';
+  return '<div class="assignment-card '+mode+'">'+
+    '<span class="assignment-name">'+a.broker+'</span>'+
+    '<strong>'+a.physical_position+'</strong>'+
+    '<span class="assignment-role">'+a.role+fallback+'</span>'+
+    '</div>';
+}
+function renderWeekendPlans(){
+  const policy=state.weekendPolicy;
+  if(!policy)return;
+  const sat=document.querySelector('#saturdayAssignments');
+  const sun=document.querySelector('#sundayAssignments');
+  if(sat)sat.innerHTML=(policy.saturday?.assignments||[]).map(a=>assignmentCard(a,'sat')).join('');
+  if(sun)sun.innerHTML=(policy.sunday?.assignments||[]).map(a=>assignmentCard(a,'sun')).join('');
+}
+function pct(v,d=0){
+  return Number.isFinite(v)?(v*100).toFixed(d).replace('.',',')+'%':'—';
+}
+function renderModelLab(){
+  const lab=state.modelLab;
+  if(!lab)return;
+  const models=[...(lab.models||[])];
+  const cards=document.querySelector('#modelCards');
+  if(cards){
+    cards.innerHTML=models.map(m=>{
+      const champion=m.id===lab.champion_id;
+      const idx=Number.isFinite(m.relative_index)?format(m.relative_index,1)+'%':'—';
+      const oos=m.oos;
+      const pros=m.prospective||{};
+      return '<div class="model-card '+(champion?'champion':'')+'">'+
+        '<div class="model-card-head"><span>'+(champion?'CHAMPION':'CHALLENGER')+'</span><b>'+m.status+'</b></div>'+
+        '<h3>'+m.name+'</h3>'+
+        '<div class="model-index">'+idx+'</div>'+
+        '<div class="model-metrics">'+
+          '<span><b>OOS</b>'+(oos?oos.hits+'/'+oos.n:'—')+'</span>'+
+          '<span><b>PROS</b>'+((pros.n||0)>0?pros.hits+'/'+pros.n:'0/0')+'</span>'+
+          '<span><b>p</b>'+(oos&&Number.isFinite(oos.p_value)?format(oos.p_value,3):'—')+'</span>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+  }
+
+  const board=document.querySelector('#modelLeaderboard');
+  if(board){
+    const ranked=models.filter(m=>m.oos).sort((a,b)=>
+      (b.relative_index??-Infinity)-(a.relative_index??-Infinity)
+    );
+    board.innerHTML=ranked.map((m,i)=>
+      '<div class="model-rank-row">'+
+        '<span class="model-place">'+(i+1)+'</span>'+
+        '<strong>'+m.name+'</strong>'+
+        '<span>'+m.oos.hits+'/'+m.oos.n+' acertos OOS</span>'+
+        '<b>'+format(m.relative_index,1)+'%</b>'+
+      '</div>'
+    ).join('');
+  }
+
+  const v=lab.viability;
+  const stateEl=document.querySelector('#viabilityState');
+  if(stateEl)stateEl.textContent=v?.state||'—';
+  const metrics=document.querySelector('#viabilityMetrics');
+  if(metrics&&v){
+    metrics.innerHTML=
+      '<div><span>Acertos OOS</span><strong>'+v.observed_hits+'</strong></div>'+
+      '<div><span>Esperado ao acaso</span><strong>'+format(v.expected_hits,2)+'</strong></div>'+
+      '<div><span>Lift</span><strong>'+pct(v.lift_vs_random,1)+'</strong></div>'+
+      '<div><span>p-value</span><strong>'+format(v.p_value,3)+'</strong></div>';
+  }
+  const note=document.querySelector('#viabilityNote');
+  if(note)note.textContent=v?.rule||'';
+}
 function render(){
   document.querySelector('#datasetStamp').textContent=state.events.length+' roletas · '+
     state.events.filter(e=>e.quality==='A').length+' A / '+state.events.filter(e=>e.quality==='B').length+' B';
-  renderHero();renderWeekendFamily();renderRanking();renderMomentum();renderNever();renderPreviousDay();renderRecent();
+  renderHero();renderWeekendFamily();renderWeekendPlans();renderRanking();renderMomentum();renderNever();renderPreviousDay();renderRecent();renderModelLab();
 }
 async function init(){
   try{
-    const [mr,wr,pr]=await Promise.all([
+    const [mr,wr,pr,lr]=await Promise.all([
       fetch('/data/manifest.json',{cache:'no-store'}),
       fetch('/data/weekend-policy.json',{cache:'no-store'}),
-      fetch('/data/presence-current-week.json',{cache:'no-store'})
+      fetch('/data/presence-current-week.json',{cache:'no-store'}),
+      fetch('/data/model-lab.json',{cache:'no-store'})
     ]);
-    if(!mr.ok||!wr.ok||!pr.ok)throw new Error('Falha ao carregar dados canônicos do painel');
+    if(!mr.ok||!wr.ok||!pr.ok||!lr.ok)throw new Error('Falha ao carregar dados canônicos do painel');
     const manifest=await mr.json();
     state.weekendPolicy=await wr.json();
     state.presence=await pr.json();
+    state.modelLab=await lr.json();
     const chunks=await Promise.all(manifest.sources.map(async s=>{
       const r=await fetch(s.path,{cache:'no-store'});
       if(!r.ok)throw new Error('Falha ao carregar '+s.path);

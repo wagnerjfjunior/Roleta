@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07111f">
-  <title>Roleta Intelligence</title>
+  <title>Roleta Intelligence V2</title>
   <meta name="description" content="Painel único e auditável da roleta: histórico, tendência, fim de semana e liberação semanal.">
   <link rel="stylesheet" href="/styles.css">
 </head>
@@ -13,7 +13,7 @@
     <header class="topbar">
       <div>
         <div class="eyebrow">ROLETA · INTELLIGENCE</div>
-        <h1>Painel da roleta</h1>
+        <h1>Painel da roleta V2</h1>
         <p class="lede">Objetivo fixo: <strong>Nº 1 ou Último de vez</strong>. Sem controles manuais.</p>
       </div>
       <div class="status-stack">
@@ -42,9 +42,9 @@
         <p id="afternoonPickMeta">duas posições independentes para o objetivo Nº1 ou Último</p>
       </article>
       <article class="hero-card accent">
-        <span class="kicker">Fim de semana · carteira</span>
+        <span class="kicker">Fim de semana · sábado</span>
         <div id="weekendSummary" class="portfolio-inline">—</div>
-        <p>Wagner e Sabrina principais; Laura e Helena secundárias.</p>
+        <p>Números de sábado. Domingo permanece como previsão até a roleta de sábado.</p>
       </article>
     </section>
 
@@ -58,6 +58,26 @@
       </div>
       <p class="small muted">O painel conta apenas presença confirmada nas folhas já incorporadas. Nenhuma ausência é inferida quando a folha daquele período ainda não está disponível.</p>
       <div id="weekendFamily" class="family-grid compact"></div>
+
+      <div class="weekend-plan-grid">
+        <div class="weekend-day-block saturday">
+          <div class="section-head compact-head">
+            <div><span class="eyebrow">SÁBADO</span><h2>Números do ciclo</h2></div>
+            <span class="forecast-badge saturday-badge">PRÉVIA ATUAL</span>
+          </div>
+          <div id="saturdayAssignments" class="assignment-grid"></div>
+          <p class="small muted">Base principal: todas as roletas canônicas. Estes números ficam como prévia até a análise final após a última roleta de sexta-feira.</p>
+        </div>
+
+        <div class="weekend-day-block sunday">
+          <div class="section-head compact-head">
+            <div><span class="eyebrow">DOMINGO</span><h2>Previsão provisória</h2></div>
+            <span class="forecast-badge">AGUARDA SÁBADO</span>
+          </div>
+          <div id="sundayAssignments" class="assignment-grid"></div>
+          <p class="small muted">A foto/resultado da roleta de sábado será incorporada antes do fechamento definitivo de domingo.</p>
+        </div>
+      </div>
     </section>
 
     <section class="dashboard-grid">
@@ -96,9 +116,35 @@
         <div id="recentTimeline" class="timeline"></div>
       </article>
 
+      <article class="card span-2 model-lab">
+        <div class="section-head">
+          <div><span class="eyebrow">LABORATÓRIO V2</span><h2>Champion vs challengers</h2></div>
+          <span class="muted">Champion = 100%</span>
+        </div>
+        <p class="small muted">Cada modelo é comparado fora da amostra e, a partir da V2, também em previsões prospectivas congeladas. Nenhum challenger é promovido por resultado retrospectivo.</p>
+        <div id="modelCards" class="model-grid"></div>
+      </article>
+
+      <article class="card span-2">
+        <div class="section-head">
+          <div><span class="eyebrow">RANKING DOS MODELOS</span><h2>Acertos contabilizados</h2></div>
+          <span class="muted">ordenado pelo desempenho OOS atual</span>
+        </div>
+        <div id="modelLeaderboard" class="model-leaderboard"></div>
+      </article>
+
+      <article class="card viability span-2">
+        <div class="section-head">
+          <div><span class="eyebrow">VIABILIDADE</span><h2>Vale a pena continuar?</h2></div>
+          <span id="viabilityState" class="viability-state">—</span>
+        </div>
+        <div id="viabilityMetrics" class="viability-grid"></div>
+        <p id="viabilityNote" class="small muted"></p>
+      </article>
+
       <article class="card methodology span-2">
         <div class="section-head"><div><span class="eyebrow">MÉTODO V2</span><h2>Como interpretar</h2></div></div>
-        <p>O painel é fixo em Nº1 ou Último. N de participantes é tratado como fator estrutural principal; período e calendário são contexto secundário e só ganham peso se mostrarem valor fora da amostra. A validação usa Poisson-binomial, BH-FDR, teste global, backtest cronológico e previsões congeladas.</p>
+        <p>O painel é fixo em Nº1 ou Último. Toda a base canônica alimenta o modelo. N de participantes é tratado como fator estrutural principal; período e calendário são contexto secundário e só ganham peso se mostrarem valor fora da amostra. A validação usa Poisson-binomial, BH-FDR, teste global, backtest cronológico e previsões congeladas.</p>
       </article>
     </section>
 

@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-01T08:44-03:00-r2",
+  "version": "2026-10-01T08:44-03:00-r3",
   "week_start": "2026-09-28",
   "week_end": "2026-10-02",
   "required_periods": 5,
@@ -61,6 +61,46 @@
       "present": true,
       "source": "user-confirmed: selected physical position 14 before 08:46 draw",
       "confidence": "confirmed_user"
+    },
+    {
+      "date": "2026-09-28",
+      "period": "tarde",
+      "broker": "Sabrina",
+      "present": true,
+      "physical_position": 14,
+      "drawn_number": 4,
+      "source": "user-confirmed 2026-10-01",
+      "confidence": "confirmed_user"
+    },
+    {
+      "date": "2026-09-29",
+      "period": "manha",
+      "broker": "Sabrina",
+      "present": true,
+      "physical_position": 9,
+      "drawn_number": 17,
+      "source": "user-confirmed 2026-10-01",
+      "confidence": "confirmed_user"
+    },
+    {
+      "date": "2026-09-29",
+      "period": "tarde",
+      "broker": "Sabrina",
+      "present": true,
+      "physical_position": 2,
+      "drawn_number": 12,
+      "source": "user-confirmed 2026-10-01",
+      "confidence": "confirmed_user"
+    },
+    {
+      "date": "2026-09-30",
+      "period": "tarde",
+      "broker": "Sabrina",
+      "present": true,
+      "physical_position": 5,
+      "drawn_number": 15,
+      "source": "user-confirmed 2026-10-01",
+      "confidence": "confirmed_user"
     }
   ],
   "note": "Count overrides are canonical when explicitly confirmed by the user. Missing exact counts are shown as under reconciliation, never as zero.",
@@ -71,10 +111,10 @@
       "status": "confirmed"
     },
     "Sabrina": {
-      "count": null,
-      "source": "user-correction-2026-10-01",
-      "status": "needs_exact_count",
-      "note": "User confirmed Sabrina has more periods than dashboard showed; exact count not yet stated."
+      "count": 4,
+      "source": "user-confirmed-2026-10-01",
+      "status": "confirmed",
+      "note": "28/09 T, 29/09 M, 29/09 T, 30/09 T."
     },
     "Laura": {
       "count": 1,
@@ -91,13 +131,14 @@
     "Wagner": {
       "count": 6,
       "source": "user-confirmed 2026-10-01",
-      "note": "User corrected dashboard: Wagner has 6 periods this week."
+      "note": "User confirmed Wagner has 6 completed weekday periods."
     }
   },
   "notes": [
     "Only confirmed presences are counted.",
     "Wagner aggregate count is user-confirmed at 6.",
-    "Sabrina count remains under reconciliation until source sheets for missing periods are recovered; do not display 0 as a factual absence.",
-    "Laura is identified as a broker in the afternoon; future/current attendance is not counted as completed until the corresponding period is confirmed."
+    "Sabrina has 4 confirmed periods: 28/09 T, 29/09 M, 29/09 T, 30/09 T.",
+    "Laura current-week completed count remains based only on confirmed completed sheets; being scheduled/present for a future ongoing period is not counted until completion.",
+    "Helena current-week count remains unresolved until evidence is supplied."
   ]
 }
