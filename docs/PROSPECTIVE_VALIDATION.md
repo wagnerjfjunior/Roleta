@@ -80,3 +80,15 @@ Required dashboard improvement:
 - separate "primary display order" from statistical score;
 - report Top-1 / Top-2 / candidate-cluster hit rates prospectively;
 - never count retrospective re-ranking as a predictive hit.
+
+
+## 01/10/2026 — morning frozen pick
+
+Pre-result state:
+- user selected physical position **14**;
+- period: morning;
+- target: Nº1 or Último;
+- selection basis: Methodology V2 descriptive leader for morning;
+- status: **FROZEN BEFORE RESULT**.
+
+This entry must not be changed after the draw except to append the observed outcome and validation result.
