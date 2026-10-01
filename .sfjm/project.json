@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "project": "Roleta",
+  "repository": {
+    "fullName": "wagnerjfjunior/Roleta",
+    "defaultBranch": "main"
+  },
+  "local": {
+    "preferredPort": 8082,
+    "route": "/"
+  },
+  "runtime": {
+    "mode": "auto"
+  },
+  "validation": {
+    "commands": []
+  },
+  "promotion": {
+    "policy": "local-first-remote-on-promotion",
+    "remoteIterationAllowed": false,
+    "pushRequiresExplicitIntent": true,
+    "deployRequiresExplicitIntent": true
+  }
+}
