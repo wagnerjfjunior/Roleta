@@ -104,8 +104,8 @@
 
       <article class="card methodology span-2">
         <div class="section-head"><div><span class="eyebrow">MÉTODO</span><h2>Como a V1 escolhe</h2></div></div>
-        <p>O campeão absoluto usa contagem histórica, desempate por observado/esperado e exposição. A sugestão contextual procura o mesmo período e um N semelhante; se a amostra for pequena, amplia automaticamente a janela. O coringa favorece posições consistentes em múltiplos contextos. Nunca apareceu só considera posições com oportunidades reais.</p>
-        <p class="small muted">Posição física escolhida ≠ ordem efetiva ≠ número sorteado. Esta versão recomenda a <strong>posição física da primeira coluna</strong>. Nº 3 será habilitado quando o mapeamento completo de cada sorteio estiver versionado.</p>
+        <p>A V2 separa descrição de inferência. O painel mostra frequência, exposição e observado/esperado, mas a validação usa Poisson-binomial, correção BH-FDR, teste global por simulação, backtest cronológico e validação prospectiva congelada. Segmentação por período/N é exploratória e não cria vantagem preditiva quando o backtest não confirma sinal.</p>
+        <p class="small muted">Posição física escolhida ≠ ordem efetiva ≠ número sorteado. As “sugestões” são candidatos históricos, não probabilidades futuras superiores. Empates e diferenças pequenas devem ser tratados como grupos equivalentes. A base lógica canônica é definida por data/manifest.json.</p>
       </article>
     </section>
 
