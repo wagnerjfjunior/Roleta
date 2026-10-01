@@ -1,25 +1,30 @@
 # Data
 
-## Canonical tabular baseline
+## Canonical logical dataset
 
-`data/events.csv` is the version-control-friendly canonical export of the audited event table.
+The canonical dataset is append-only and resolved through:
 
-Current baseline:
-- 75 usable events;
-- 71 quality A;
+`data/manifest.json`
+
+Current logical state:
+- 77 usable events;
+- 73 quality A;
 - 4 quality B;
-- cut-off: 29/09/2026.
+- cut-off: 30/09/2026.
 
-The CSV preserves event source, date/period, N, occupied physical positions, physical/effective locations for Nº1, Nº2, Cortesia and Último, quality class and notes.
+Sources:
+- `data/events.csv` — immutable 75-event baseline;
+- `data/incoming/2026-09-30.csv` — 2-event append ledger.
 
-## Derived workbook
-
-The analytical workbook `roleta_forensic_consolidado_75_roletas_ate_29-09-2026.xlsx` is a derived analysis artifact. Its logic is documented in `docs/METHODOLOGY.md`; all canonical event inputs required to reconstruct the analysis are preserved in `data/events.csv`.
+Consumers must deduplicate by `Evento` and must not silently rewrite historical rows.
 
 ## Update rule
 
-1. append a new validated event;
-2. preserve source/provenance;
-3. classify A/B/quarantine;
-4. never infer missing values merely to complete a permutation;
-5. recalculate rankings and tests from the canonical event table.
+1. validate the new source;
+2. write a dated append-only ledger;
+3. add it to `data/manifest.json`;
+4. preserve quarantine/duplicate evidence;
+5. recalculate descriptive and inferential statistics;
+6. freeze prospective predictions before looking at the new outcome.
+
+The dashboard loads the manifest rather than assuming a single CSV.
