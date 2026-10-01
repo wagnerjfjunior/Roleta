@@ -28,3 +28,27 @@ Participantes abaixo da linha não participam da roleta regular. Podem contar pr
 
 ### Multiempresa / recepção
 Cada empresa pode produzir sua lista interna; a recepção consolida uma fila canônica intercalada conforme a ordem sorteada das empresas. A plataforma futura deve aceitar entradas digitais, planilha, API, foto/PDF ou lista manual sem exigir adoção digital uniforme.
+
+
+## Qualificação para fim de semana
+
+- existem 10 períodos úteis por semana: segunda a sexta, manhã e tarde;
+- o corretor precisa cumprir pelo menos 5 períodos para participar das roletas de sábado/domingo;
+- a contagem do painel usa somente presença confirmada;
+- ausência não é inferida quando a folha/evidência do período não está disponível.
+
+## Fechamento das escolhas de fim de semana
+
+### Sábado
+Os números permanecem como **prévia** durante a semana.
+
+Fechamento:
+após a última roleta de sexta-feira, incorporar a evidência nova, executar a análise final e congelar os números de sábado.
+
+### Domingo
+Os números permanecem como **previsão provisória**.
+
+Fechamento:
+após receber a foto/resultado da roleta de sábado, incorporar o evento, recalcular uma única vez e congelar os números de domingo.
+
+A base principal é sempre o dataset canônico global; fim de semana é contexto secundário.

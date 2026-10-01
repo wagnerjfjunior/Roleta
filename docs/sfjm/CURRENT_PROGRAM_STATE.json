@@ -1,6 +1,6 @@
 {
   "project_id": "roleta",
-  "as_of": "2026-09-30",
+  "as_of": "2026-10-01",
   "primary_objective_status": "ACTIVE",
   "milestones": [
     {
@@ -16,12 +16,12 @@
     {
       "id": "RLT-M2",
       "name": "Broker identity layer and broker rankings",
-      "status": "ACTIVE"
+      "status": "ACTIVE_PARALLEL"
     },
     {
       "id": "RLT-M3",
-      "name": "Prospective statistical monitoring",
-      "status": "PLANNED"
+      "name": "Prospective statistical monitoring and model competition",
+      "status": "ACTIVE"
     },
     {
       "id": "RLT-M4",
@@ -29,11 +29,37 @@
       "status": "PLANNED"
     }
   ],
-  "current_gate": "RLT-M2 identity normalization",
-  "next_safe_action": "Normalize broker names/aliases on audited events and produce auditable broker rankings.",
+  "current_gate": "RLT-M3-02 champion-vs-challengers prospective validation",
+  "next_safe_action": "Append the observed 01/10 morning result to the frozen position-14 prediction, adjudicate HIT/MISS without hindsight, then continue parallel prospective predictions for champion and challengers.",
+  "dashboard": {
+    "version": "V2",
+    "status": "RELEASED_PRODUCTION"
+  },
+  "model_lab": {
+    "status": "ACTIVE",
+    "champion": "context_raw",
+    "champion_index": 100,
+    "viability": "EVIDENCIA_INSUFICIENTE",
+    "promotion_requires": [
+      "oos_above_champion",
+      "prospective_above_champion",
+      "sufficient_sample",
+      "sustained_advantage",
+      "random_baseline_check"
+    ]
+  },
+  "weekend_cycle": {
+    "sample_policy": "all_77_primary_weekend_secondary",
+    "saturday": "FORECAST_UNTIL_FRIDAY_CLOSE",
+    "sunday": "FORECAST_UNTIL_SATURDAY_RESULT"
+  },
   "blocked": [
     "infer illegible names",
     "infer missing draw numbers by mathematical complement",
-    "claim predictive advantage without prospective evidence"
+    "claim predictive advantage without prospective evidence",
+    "assign retrospective hits to challengers",
+    "use Vercel Preview",
+    "remote development iteration",
+    "push or deploy without explicit intent"
   ]
 }

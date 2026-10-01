@@ -1,6 +1,6 @@
 {
   "project_id": "roleta",
-  "graph_version": 1,
+  "graph_version": 2,
   "nodes": [
     {
       "id": "RLT-M0",
@@ -29,7 +29,7 @@
       "id": "RLT-M1-01",
       "type": "task",
       "status": "COMPLETE",
-      "title": "Consolidate 75 usable roulette events"
+      "title": "Consolidate canonical numeric roulette dataset"
     },
     {
       "id": "RLT-M1-02",
@@ -40,7 +40,7 @@
     {
       "id": "RLT-M2",
       "type": "milestone",
-      "status": "ACTIVE",
+      "status": "ACTIVE_PARALLEL",
       "children": [
         "RLT-M2-01"
       ]
@@ -48,16 +48,39 @@
     {
       "id": "RLT-M2-01",
       "type": "task",
-      "status": "NEXT_SAFE_ACTION",
+      "status": "ACTIVE",
       "title": "Normalize broker identities and rank outcomes"
     },
     {
       "id": "RLT-M3",
       "type": "milestone",
-      "status": "PLANNED",
+      "status": "ACTIVE",
+      "children": [
+        "RLT-M3-01",
+        "RLT-M3-02",
+        "RLT-M3-03"
+      ],
       "depends_on": [
-        "RLT-M2"
+        "RLT-M1"
       ]
+    },
+    {
+      "id": "RLT-M3-01",
+      "type": "task",
+      "status": "COMPLETE",
+      "title": "Release Dashboard V2 and Model Lab"
+    },
+    {
+      "id": "RLT-M3-02",
+      "type": "task",
+      "status": "NEXT_SAFE_ACTION",
+      "title": "Prospective Champion vs Challengers validation"
+    },
+    {
+      "id": "RLT-M3-03",
+      "type": "task",
+      "status": "ACTIVE_WAITING_EVIDENCE",
+      "title": "Weekend forecast cycle: Friday closes Saturday; Saturday closes Sunday"
     },
     {
       "id": "RLT-M4",

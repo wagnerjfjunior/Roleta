@@ -8,15 +8,29 @@
   "status": "docs/PROJECT_STATUS.md",
   "next_safe_action": "docs/NEXT_SAFE_ACTION.md",
   "blocked_actions": "docs/BLOCKED_ACTIONS.md",
-  "primary_objective": "Preservar e analisar de forma auditável a operação de roleta/plantão e evoluir para um sistema verificável sem depender de contexto de conversa.",
+  "primary_objective": "Preservar e analisar de forma auditável a operação de roleta/plantão e testar prospectivamente se existe edge real sobre o acaso, sem depender de contexto de conversa.",
   "state": {
     "usable_events": 77,
     "quality_A": 73,
     "quality_B": 4,
     "quarantine_or_unavailable": 10,
-    "duplicates_removed": 3
+    "duplicates_removed": 3,
+    "dashboard_version": "V2",
+    "dashboard_status": "RELEASED_PRODUCTION",
+    "model_lab_status": "ACTIVE",
+    "champion": "context_raw",
+    "viability": "EVIDENCIA_INSUFICIENTE"
   },
-  "active_workstream": "RLT-M2 Broker Identity Layer",
+  "active_workstream": "RLT-M3 Prospective Statistical Monitoring",
+  "parallel_workstream": "RLT-M2 Broker Identity Layer",
+  "current_gate": "RLT-M3-02 Champion vs Challengers prospective validation",
+  "delivery_policy": {
+    "mode": "local-first-remote-on-promotion",
+    "preview": false,
+    "remote_iteration": false,
+    "push_requires_explicit_intent": true,
+    "deploy_requires_explicit_intent": true
+  },
   "authority": {
     "project": "wagnerjfjunior/Roleta",
     "sfjm_protocol": "wagnerjfjunior/StopJuniorMode",

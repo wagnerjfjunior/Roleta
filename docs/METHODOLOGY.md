@@ -205,3 +205,68 @@ Uma posição só pode ser chamada de sinal preditivo se houver, cumulativamente
 6. ausência de dependência de um único recorte arbitrário.
 
 Até lá, o painel é um sistema de **apoio descritivo à decisão**, não um preditor.
+
+
+## 12. Model Lab V2 — Champion vs Challengers
+
+A partir de 01/10/2026, os modelos são comparados em regime Champion vs Challengers.
+
+### Champion
+
+`context_raw` é o champion atual e define o índice relativo 100%.
+
+Benchmark OOS Top-2 atual:
+- 13 acertos / 48 testes;
+- esperado sob acaso: 9.4348;
+- p = 0.13018.
+
+Este resultado é o melhor entre os modelos comparados até aqui, mas ainda não comprova edge.
+
+### Challengers
+
+Com benchmark OOS existente:
+- Global raw: 9/49; índice 67.82;
+- EB + kernel N: 8/48; índice 61.54;
+- EB + N + recência: 7/48; índice 53.85.
+
+Em laboratório, sem benchmark publicado:
+- Bayes hierárquico;
+- Logístico hierárquico.
+
+### Regra do índice
+
+O índice 100% representa o desempenho do champion, não 100% de taxa de acerto.
+
+Um challenger acima de 100% apenas supera o champion na métrica comparada; isso não implica automaticamente superioridade estatística nem promoção.
+
+### Promoção
+
+Um challenger só pode virar champion quando:
+
+1. superar 100% em backtest cronológico comparável;
+2. superar o champion também em previsões prospectivas congeladas;
+3. acumular amostra suficiente;
+4. manter vantagem sem depender de janela curta;
+5. continuar competitivo contra o baseline aleatório ajustado por N.
+
+### Viabilidade do projeto
+
+O Model Lab também existe para testar a hipótese de que o projeto possui valor preditivo real.
+
+Estado atual:
+`EVIDÊNCIA INSUFICIENTE`.
+
+O projeto continua como experimento controlado. Se a validação prospectiva suficiente permanecer indistinguível do acaso, a decisão correta pode ser simplificar ou encerrar a linha preditiva.
+
+## 13. Amostragem de fim de semana
+
+A análise de sábado/domingo **não** usa apenas eventos de fim de semana como amostra principal.
+
+Hierarquia atual:
+
+1. toda a base canônica de 77 eventos;
+2. ajuste estrutural por N;
+3. período e calendário como contexto secundário;
+4. recorte de fim de semana apenas se demonstrar valor incremental fora da amostra.
+
+Essa regra evita reduzir artificialmente a amostra principal de 77 para 14 eventos.

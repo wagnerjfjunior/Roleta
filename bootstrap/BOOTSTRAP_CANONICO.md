@@ -38,16 +38,22 @@ READY != MERGE_AUTHORITY
 TOOL_CAPABILITY != MUTATION_AUTHORITY
 ```
 
-## 4. Estado atual resumido
+## 4. Estado atual resumido — 01/10/2026
 
-- 75 roletas utilizáveis;
-- 71 qualidade A;
+- dataset lógico canônico: 77 roletas utilizáveis;
+- 73 qualidade A;
 - 4 qualidade B;
 - 10 registros-fonte em quarentena/indisponíveis;
 - 3 duplicatas removidas;
 - 1 relato parcial fora da inferência;
 - posição física, ordem efetiva e número sorteado são variáveis distintas;
-- nenhum padrão atual prova vantagem preditiva global a 5%.
+- Dashboard V2 está em produção;
+- RLT-M3 Prospective Statistical Monitoring está ACTIVE;
+- Model Lab opera em regime Champion vs Challengers;
+- champion atual: `context_raw`, indexado em 100%;
+- nenhum modelo atual prova vantagem preditiva global a 5%;
+- fim de semana usa toda a base canônica como amostra principal; sábado/domingo são contexto secundário;
+- desenvolvimento é LOCAL-FIRST: sem Preview e sem iteração remota; push/deploy exigem intenção explícita.
 
 ## 5. Falha fechada
 

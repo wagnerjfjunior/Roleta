@@ -1,13 +1,13 @@
 # Roleta — Project Status
 
-## Estado canônico — 2026-09-30
+## Estado canônico — 2026-10-01
 
 ### Dados
 
 | Métrica | Estado |
 |---|---:|
-| Roletas utilizáveis |Roletas utilizáveis | 77 |
-| Qualidade A |Qualidade A | 73 |
+| Roletas utilizáveis | 77 |
+| Qualidade A | 73 |
 | Qualidade B | 4 |
 | Quarentena/indisponíveis | 10 |
 | Duplicatas removidas | 3 |
@@ -15,71 +15,89 @@
 
 ### Resultados estatísticos atuais
 
-- posição física 9 lidera Nº1 historicamente;
-- ordem efetiva 9 lidera Nº1;
-- ordem efetiva 12 permanece relevante, mas perdeu significância após backfill histórico;
-- testes globais atuais não sustentam vantagem preditiva robusta;
-- backtest cronológico não demonstrou estratégia preditiva superior ao acaso de forma estatisticamente convincente.
+- nenhum método testado demonstrou vantagem preditiva estatisticamente convincente;
+- `context_raw` permanece champion operacional de benchmark;
+- benchmark champion Top-2 OOS: 13/48, esperado 9.4348, p=0.13018;
+- modelos mais sofisticados testados até aqui não superaram o champion;
+- Bayes hierárquico e logístico hierárquico estão cadastrados como challengers em laboratório;
+- frequência, O/E e excesso observado permanecem descritivos até confirmação prospectiva;
+- o projeto continua como experimento controlado para responder se existe edge real sobre o acaso.
 
 ### RLT-M2 — Broker Identity Layer
 
-STATUS: ACTIVE
+STATUS: ACTIVE / PARALLEL
 
 Objetivo:
 normalizar nomes/aliases e calcular ranking de corretores sem contaminar a base numérica auditada.
 
-### RLT-M3A — Decision Dashboard V1
+### RLT-M3 — Prospective Statistical Monitoring
 
-STATUS: RELEASED / PRODUCTION / ACCEPTANCE_PENDING
+STATUS: ACTIVE
 
-Vercel project: `roleta`
+#### RLT-M3-01 — Dashboard V2 + Model Lab
 
-Production alias:
-`https://roleta-six-lime.vercel.app`
+STATUS: COMPLETE / RELEASED / PRODUCTION
 
 Funções publicadas:
-- ranking geral;
-- perseguidores;
+- objetivo fixo Nº1 ou Último;
+- ranking histórico;
 - momentum;
-- nunca apareceu;
-- última roleta;
-- recomendações por período;
-- recomendações por faixa de participantes;
-- cenário por N estimado;
-- coringa histórico.
+- zerados;
+- manhã/tarde;
+- recência;
+- qualificação 5/10;
+- sábado separado de domingo;
+- Model Lab Champion vs Challengers;
+- ranking de acertos OOS;
+- viabilidade versus acaso.
 
-O dashboard lê `data/events.csv` diretamente e não substitui a metodologia forense canônica.
+#### RLT-M3-02 — Champion vs Challengers
 
+STATUS: NEXT_SAFE_ACTION
 
-## Red-team estatístico V2 — 01/10/2026
+Champion:
+- `context_raw` = índice 100.
 
-- dataset lógico canônico: 77 eventos;
-- metodologia V1 reavaliada por rolling-origin;
-- nenhum método testado demonstrou vantagem preditiva significativa;
-- contextual raw Top-2 foi o melhor entre os testados, porém p=0.130;
-- manhã, alvo Nº1 ou Último: posição 14 é líder descritiva, sem significância global;
-- tarde, alvo Nº1 ou Último: posição 22 é líder descritiva, sem significância global;
-- metodologia V2 publicada em docs/METHODOLOGY.md.
+Challengers com OOS existente:
+- Global raw = 67.82;
+- EB + kernel N = 61.54;
+- EB + N + recência = 53.85.
 
+Challengers ainda sem benchmark:
+- Bayes hierárquico;
+- Logístico hierárquico.
 
-## RLT-M3B — Weekend Qualification & Family Portfolio
+Regra de promoção:
+um challenger só substitui o champion após superar 100% no backtest cronológico e também em previsões prospectivas congeladas, com vantagem sustentada e amostra suficiente.
 
-STATUS: RELEASED / PRODUCTION_PENDING_ACCEPTANCE
+#### RLT-M3-03 — Weekend Forecast Cycle
 
-Operational rule:
-- 10 weekday periods: Monday–Friday, morning and afternoon;
-- minimum 5 completed periods per broker;
-- 5/10 unlocks Saturday/Sunday roulette eligibility.
+STATUS: ACTIVE
 
-Canonical weekend portfolio:
-- Wagner: physical 14 — primary;
-- Sabrina: physical 12 — primary;
-- Laura: physical 21 — secondary;
-- Helena (Lívia): physical 8 — secondary.
+Regra:
+- base principal = todas as 77 roletas;
+- sábado/domingo = contexto secundário;
+- sábado fecha após a última roleta de sexta-feira;
+- domingo fecha após incorporar foto/resultado de sábado.
 
-The dashboard stores each broker's weekly attendance locally in the browser and shows PENDING/LIBERADO automatically.
+Prévia atual de sábado:
+- Wagner 9;
+- Sabrina 3;
+- Laura 22, fallback 13;
+- Helena (Lívia) 14.
 
-Statistical status:
-- weekend sample currently small (14 events);
-- assignments are exploratory historical candidates, not proven predictive advantages;
-- portfolio is frozen for the cycle and reviewed only after new weekend data is incorporated.
+### Viabilidade
+
+Estado atual: **EVIDÊNCIA INSUFICIENTE**.
+
+O melhor modelo atual apresenta lift descritivo sobre o acaso no backtest, mas sem significância suficiente para declarar vantagem preditiva. O projeto deve continuar apenas como experimento controlado até acumular evidência prospectiva suficiente para decidir CONTINUAR / OBSERVAR / ENCERRAR.
+
+### Delivery policy
+
+A política canônica é:
+- LOCAL-FIRST;
+- NO PREVIEW;
+- NO REMOTE ITERATION;
+- push somente com intenção explícita;
+- deploy somente com intenção explícita;
+- documentação-only pode ser versionada sem gerar deploy material quando coberta pelo gate do `vercel.json`.
