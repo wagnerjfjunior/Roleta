@@ -5,8 +5,8 @@
 ```text
 canonical repo = wagnerjfjunior/Roleta
 canonical ref = main / RESOLVE LIVE
-dataset usable = 75
-quality A = 71
+dataset usable = 77
+quality A = 73
 quality B = 4
 quarantine/unavailable source records = 10
 duplicates removed = 3
