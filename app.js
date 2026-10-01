@@ -80,7 +80,7 @@ function renderHero(){
   document.querySelector('#afternoonPick1').textContent=afternoon[0]?.pos??'—';
   document.querySelector('#afternoonPick2').textContent=afternoon[1]?.pos??'—';
   document.querySelector('#afternoonPickMeta').textContent=afternoon.length
-    ? afternoon.map(x=>'#'+x.pos+' O/E '+format(x.oe)).join(' · ')
+    ? 'principal #'+afternoon[0].pos+(afternoon[1]?' · reserva #'+afternoon[1].pos:'')
     : 'amostra insuficiente';
   const p=state.weekendPolicy?.family_assignments||[];
   document.querySelector('#weekendSummary').innerHTML=p.map(x=>'<span><b>'+x.broker.split(' ')[0]+'</b> '+x.physical_position+'</span>').join('');
