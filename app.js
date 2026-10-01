@@ -287,10 +287,17 @@ function bind(){
 
 async function init(){
   try{
-    const res=await fetch('/data/events.csv',{cache:'no-store'});
-    if(!res.ok)throw new Error('Falha ao carregar data/events.csv');
-    const text=await res.text();
-    state.events=parseCSV(text).map(eventFromRow).filter(e=>e.N>0);
+    const mr=await fetch('/data/manifest.json',{cache:'no-store'});
+    if(!mr.ok)throw new Error('Falha ao carregar data/manifest.json');
+    const manifest=await mr.json();
+    const chunks=await Promise.all(manifest.sources.map(async s=>{
+      const r=await fetch(s.path,{cache:'no-store'});
+      if(!r.ok)throw new Error('Falha ao carregar '+s.path);
+      return parseCSV(await r.text()).map(eventFromRow).filter(e=>e.N>0);
+    }));
+    const byId=new Map();
+    chunks.flat().forEach(e=>byId.set(e.id,e));
+    state.events=[...byId.values()];
     bind();render();
   }catch(err){
     document.querySelector('#datasetStamp').textContent='erro de dados';
