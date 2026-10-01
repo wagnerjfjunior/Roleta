@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-01T08:44-03:00",
+  "version": "2026-10-01T08:44-03:00-r2",
   "week_start": "2026-09-28",
   "week_end": "2026-10-02",
   "required_periods": 5,
@@ -63,5 +63,28 @@
       "confidence": "confirmed_user"
     }
   ],
-  "note": "Only confirmed presences are counted. Missing source sheets for 28/09 and 29/09 are not treated as absences. Future roulette images should update this ledger automatically."
+  "note": "Count overrides are canonical when explicitly confirmed by the user. Missing exact counts are shown as under reconciliation, never as zero.",
+  "count_overrides": {
+    "Wagner": {
+      "count": 6,
+      "source": "user-correction-2026-10-01",
+      "status": "confirmed"
+    },
+    "Sabrina": {
+      "count": null,
+      "source": "user-correction-2026-10-01",
+      "status": "needs_exact_count",
+      "note": "User confirmed Sabrina has more periods than dashboard showed; exact count not yet stated."
+    },
+    "Laura": {
+      "count": 1,
+      "source": "user-correction-2026-10-01",
+      "status": "confirmed_correct"
+    },
+    "Helena": {
+      "count": 0,
+      "source": "current-evidence",
+      "status": "no_confirmed_periods_in_ledger"
+    }
+  }
 }
