@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-01T08:44-03:00-r2",
+  "version": "2026-10-01T08:44-03:00-r3",
   "week_start": "2026-09-28",
   "week_end": "2026-10-02",
   "required_periods": 5,
@@ -111,10 +111,10 @@
       "status": "confirmed"
     },
     "Sabrina": {
-      "count": null,
-      "source": "user-correction-2026-10-01",
-      "status": "needs_exact_count",
-      "note": "User confirmed Sabrina has more periods than dashboard showed; exact count not yet stated."
+      "count": 4,
+      "source": "user-confirmed-2026-10-01",
+      "status": "confirmed",
+      "note": "28/09 T, 29/09 M, 29/09 T, 30/09 T."
     },
     "Laura": {
       "count": 1,
