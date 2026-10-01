@@ -1,4 +1,4 @@
-const state={events:[],objective:'n1last',period:'manha',n:18};
+const state={events:[],objective:'n1last',period:'manha',n:18,weekendPolicy:null};
 
 const objectiveMap={
   n1:{label:'Nº 1',keys:['first'],chance:n=>1/n},
@@ -250,6 +250,51 @@ function renderRecent(events,obj){
   }).join('');
 }
 
+
+function weekendStorageKey(){return 'roleta-weekend-eligibility-v1'}
+function loadEligibility(){
+  try{return JSON.parse(localStorage.getItem(weekendStorageKey())||'{}')}catch{return{}}
+}
+function saveEligibility(v){localStorage.setItem(weekendStorageKey(),JSON.stringify(v))}
+function renderWeekendFamily(){
+  const host=document.querySelector('#weekendFamily');
+  const policy=state.weekendPolicy;
+  if(!host||!policy)return;
+  const saved=loadEligibility();
+  const days=[['seg','Seg'],['ter','Ter'],['qua','Qua'],['qui','Qui'],['sex','Sex']];
+  host.innerHTML=policy.family_assignments.map(a=>{
+    const key=a.broker;
+    const rec=saved[key]||{};
+    let count=0;
+    for(const [d] of days){
+      if(rec[d+'-m'])count++;
+      if(rec[d+'-t'])count++;
+    }
+    const ok=count>=policy.qualification.required_weekday_periods;
+    const checks=days.map(([d,label])=>{
+      const cm=rec[d+'-m']?'checked':'',ct=rec[d+'-t']?'checked':'';
+      return '<div class="period-day"><b>'+label+'</b>'+
+        '<label class="period-check"><input type="checkbox" data-broker="'+key+'" data-slot="'+d+'-m" '+cm+'>M</label>'+
+        '<label class="period-check"><input type="checkbox" data-broker="'+key+'" data-slot="'+d+'-t" '+ct+'>T</label></div>';
+    }).join('');
+    return '<div class="family-card '+(a.role==='principal'?'primary':'secondary')+'">'+
+      '<div class="family-head"><div><div class="family-name">'+a.broker+'</div><div class="family-role">'+a.role+'</div></div>'+
+      '<div class="family-role">posição</div></div>'+
+      '<div class="family-number">'+a.physical_position+'</div>'+
+      '<div class="eligibility"><span class="counter">'+count+'/10 períodos · mínimo 5</span>'+
+      '<span class="flag '+(ok?'ok':'')+'">'+(ok?'LIBERADO':'PENDENTE')+'</span></div>'+
+      '<div class="period-grid">'+checks+'</div>'+
+      '<div class="family-note">'+a.rationale+'</div></div>';
+  }).join('');
+  host.querySelectorAll('input[type=checkbox]').forEach(el=>el.addEventListener('change',()=>{
+    const data=loadEligibility();
+    data[el.dataset.broker]=data[el.dataset.broker]||{};
+    data[el.dataset.broker][el.dataset.slot]=el.checked;
+    saveEligibility(data);
+    renderWeekendFamily();
+  }));
+}
+
 function render(){
   const events=state.events,obj=state.objective;
   const overall=rank(events,obj,{minExposure:5});
@@ -274,6 +319,7 @@ function render(){
   renderPeriods(events,obj);
   renderRanges(events,obj);
   renderRecent(events,obj);
+  renderWeekendFamily();
 }
 
 function bind(){
@@ -287,9 +333,14 @@ function bind(){
 
 async function init(){
   try{
-    const mr=await fetch('/data/manifest.json',{cache:'no-store'});
+    const [mr,wr]=await Promise.all([
+      fetch('/data/manifest.json',{cache:'no-store'}),
+      fetch('/data/weekend-policy.json',{cache:'no-store'})
+    ]);
     if(!mr.ok)throw new Error('Falha ao carregar data/manifest.json');
+    if(!wr.ok)throw new Error('Falha ao carregar data/weekend-policy.json');
     const manifest=await mr.json();
+    state.weekendPolicy=await wr.json();
     const chunks=await Promise.all(manifest.sources.map(async s=>{
       const r=await fetch(s.path,{cache:'no-store'});
       if(!r.ok)throw new Error('Falha ao carregar '+s.path);
