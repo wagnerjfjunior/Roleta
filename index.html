@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#07111f">
   <title>Roleta Intelligence</title>
-  <meta name="description" content="Dashboard auditável da roleta do plantão: histórico, tendências, segmentos e sugestões contextuais.">
+  <meta name="description" content="Painel único e auditável da roleta: histórico, tendência, fim de semana e liberação semanal.">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -13,8 +13,8 @@
     <header class="topbar">
       <div>
         <div class="eyebrow">ROLETA · INTELLIGENCE</div>
-        <h1>Radar de posições</h1>
-        <p class="lede">Histórico auditado, tendência, ausência e contexto do próximo sorteio.</p>
+        <h1>Painel da roleta</h1>
+        <p class="lede">Objetivo fixo: <strong>Nº 1 ou Último de vez</strong>. Sem controles manuais.</p>
       </div>
       <div class="status-stack">
         <span class="status live">Base canônica</span>
@@ -23,63 +23,46 @@
     </header>
 
     <section class="notice">
-      <strong>Leitura estatística, não previsão.</strong>
-      Frequência histórica não altera, por si só, a probabilidade matemática do próximo sorteio se o mecanismo for justo.
+      <strong>Leitura histórica, não previsão garantida.</strong>
+      O painel organiza os melhores candidatos descritivos e valida o desempenho prospectivamente.
     </section>
 
-    <section class="control-panel card">
-      <div class="control">
-        <label for="objective">Objetivo</label>
-        <select id="objective">
-          <option value="n1">Nº 1</option>
-          <option value="n1last" selected>Nº 1 ou Último</option>
-          <option value="premium">Premium: Nº 1 + Cortesia + Último</option>
-          <option value="n2">Nº 2</option>
-          <option value="courtesy">Cortesia</option>
-          <option value="last">Último de vez</option>
-        </select>
-      </div>
-      <div class="control">
-        <label for="scenarioPeriod">Período do próximo sorteio</label>
-        <select id="scenarioPeriod">
-          <option value="manha" selected>Manhã</option>
-          <option value="tarde">Tarde</option>
-          <option value="weekend">Sábado / Domingo / Integral</option>
-          <option value="all">Geral</option>
-        </select>
-      </div>
-      <div class="control">
-        <label for="participantCount">Participantes estimados</label>
-        <div class="number-control">
-          <input id="participantCount" type="number" min="2" max="40" value="18">
-          <span>corretores</span>
-        </div>
-      </div>
-      <div class="scenario-meta"><span id="scenarioBasis">—</span></div>
-    </section>
-
-    <section class="hero-grid">
-      <article class="hero-card primary"><span class="kicker">Sugestão do cenário</span><div id="scenarioPick" class="big-number">—</div><p id="scenarioPickMeta">—</p></article>
-      <article class="hero-card"><span class="kicker">Alternativa</span><div id="scenarioAlt" class="big-number">—</div><p id="scenarioAltMeta">—</p></article>
-      <article class="hero-card"><span class="kicker">Campeão absoluto</span><div id="absoluteChampion" class="big-number">—</div><p id="absoluteChampionMeta">—</p></article>
-      <article class="hero-card accent"><span class="kicker">Coringa histórico</span><div id="wildcard" class="big-number">—</div><p id="wildcardMeta">—</p></article>
+    <section class="hero-grid hero-grid-3">
+      <article class="hero-card primary">
+        <span class="kicker">Hoje · manhã</span>
+        <div id="morningPick" class="big-number">—</div>
+        <p id="morningPickMeta">—</p>
+      </article>
+      <article class="hero-card">
+        <span class="kicker">Hoje · tarde</span>
+        <div class="dual-number"><span id="afternoonPick1">—</span><span class="slash">/</span><span id="afternoonPick2">—</span></div>
+        <p id="afternoonPickMeta">—</p>
+      </article>
+      <article class="hero-card accent">
+        <span class="kicker">Fim de semana · carteira</span>
+        <div id="weekendSummary" class="portfolio-inline">—</div>
+        <p>Wagner e Sabrina principais; Laura e Helena secundárias.</p>
+      </article>
     </section>
 
     <section class="card weekend-module">
       <div class="section-head">
         <div>
           <span class="eyebrow">FIM DE SEMANA</span>
-          <h2>Carteira familiar + liberação 5/10</h2>
+          <h2>Liberação automática 5/10</h2>
         </div>
-        <span class="muted">objetivo: Nº1 ou Último</span>
+        <span class="muted">presença lida das roletas recebidas</span>
       </div>
-      <p class="small muted">Cada corretor precisa cumprir pelo menos 5 dos 10 períodos úteis (segunda a sexta, manhã/tarde) para ficar liberado no sábado e domingo.</p>
-      <div id="weekendFamily" class="family-grid"></div>
+      <p class="small muted">O painel conta apenas presença confirmada nas folhas já incorporadas. Nenhuma ausência é inferida quando a folha daquele período ainda não está disponível.</p>
+      <div id="weekendFamily" class="family-grid compact"></div>
     </section>
 
     <section class="dashboard-grid">
       <article class="card span-2">
-        <div class="section-head"><div><span class="eyebrow">RANKING</span><h2>Campeão e perseguidores</h2></div><span id="rankingSubtitle" class="muted">—</span></div>
+        <div class="section-head">
+          <div><span class="eyebrow">RANKING</span><h2>Campeão e perseguidores</h2></div>
+          <span class="muted">Nº 1 ou Último · posição física</span>
+        </div>
         <div id="rankingBars" class="ranking-bars"></div>
       </article>
 
@@ -89,39 +72,42 @@
       </article>
 
       <article class="card">
-        <div class="section-head"><div><span class="eyebrow">AUSÊNCIA</span><h2>Nunca apareceu</h2></div></div>
-        <p class="small muted">Ordenado por oportunidades sem atingir o objetivo selecionado.</p>
+        <div class="section-head"><div><span class="eyebrow">ZERADOS</span><h2>Ainda nunca atingiram o alvo</h2></div></div>
+        <p class="small muted"><strong>Alvo fixo: Nº 1 ou Último.</strong> Uma posição só entra aqui se teve oportunidades reais e zero acertos. O 9, por exemplo, não pode aparecer nesta lista porque já tem ocorrências no alvo.</p>
         <div id="neverList" class="list"></div>
       </article>
 
       <article class="card span-2">
-        <div class="section-head"><div><span class="eyebrow">ÚLTIMO EVENTO</span><h2>Mapa-chave da última roleta</h2></div><span id="latestEventTitle" class="muted">—</span></div>
-        <div id="latestEvent" class="last-grid"></div>
+        <div class="section-head">
+          <div><span class="eyebrow">DIA ANTERIOR</span><h2>Manhã e tarde lado a lado</h2></div>
+          <span id="previousDayTitle" class="muted">—</span>
+        </div>
+        <div id="previousDayEvents" class="day-pair"></div>
       </article>
 
       <article class="card span-2">
-        <div class="section-head"><div><span class="eyebrow">PERÍODO</span><h2>Sugestões por período</h2></div><span class="muted">mesmo objetivo selecionado</span></div>
-        <div id="periodCards" class="mini-grid"></div>
-      </article>
-
-      <article class="card span-2">
-        <div class="section-head"><div><span class="eyebrow">TAMANHO DA ROLETA</span><h2>Sugestões por faixa de participantes</h2></div><span class="muted">faixas exibem tamanho da amostra</span></div>
+        <div class="section-head">
+          <div><span class="eyebrow">TAMANHO DA ROLETA</span><h2>Mapa por quantidade de participantes</h2></div>
+          <span class="muted">N é o principal fator estrutural</span>
+        </div>
         <div id="rangeCards" class="mini-grid five"></div>
       </article>
 
       <article class="card span-2">
-        <div class="section-head"><div><span class="eyebrow">RECÊNCIA</span><h2>Últimas roletas</h2></div><span class="muted">posição física que atingiu o objetivo</span></div>
+        <div class="section-head">
+          <div><span class="eyebrow">RECÊNCIA</span><h2>Últimas roletas</h2></div>
+          <span class="muted">Nº 1 / Último por posição física</span>
+        </div>
         <div id="recentTimeline" class="timeline"></div>
       </article>
 
       <article class="card methodology span-2">
-        <div class="section-head"><div><span class="eyebrow">MÉTODO</span><h2>Como a V1 escolhe</h2></div></div>
-        <p>A V2 separa descrição de inferência. O painel mostra frequência, exposição e observado/esperado, mas a validação usa Poisson-binomial, correção BH-FDR, teste global por simulação, backtest cronológico e validação prospectiva congelada. Segmentação por período/N é exploratória e não cria vantagem preditiva quando o backtest não confirma sinal.</p>
-        <p class="small muted">Posição física escolhida ≠ ordem efetiva ≠ número sorteado. As “sugestões” são candidatos históricos, não probabilidades futuras superiores. Empates e diferenças pequenas devem ser tratados como grupos equivalentes. A base lógica canônica é definida por data/manifest.json.</p>
+        <div class="section-head"><div><span class="eyebrow">MÉTODO V2</span><h2>Como interpretar</h2></div></div>
+        <p>O painel é fixo em Nº1 ou Último. N de participantes é tratado como fator estrutural principal; período e calendário são contexto secundário e só ganham peso se mostrarem valor fora da amostra. A validação usa Poisson-binomial, BH-FDR, teste global, backtest cronológico e previsões congeladas.</p>
       </article>
     </section>
 
-    <footer><span>Roleta V1 · fonte: data/events.csv</span><span>SFJM · estado versionado no GitHub</span></footer>
+    <footer><span>Roleta V2 · dataset lógico via data/manifest.json</span><span>SFJM · estado versionado no GitHub</span></footer>
   </div>
   <script src="/app.js" defer></script>
 </body>
