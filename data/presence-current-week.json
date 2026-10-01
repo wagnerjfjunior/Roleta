@@ -86,5 +86,18 @@
       "source": "current-evidence",
       "status": "no_confirmed_periods_in_ledger"
     }
-  }
+  },
+  "confirmed_periods_override": {
+    "Wagner": {
+      "count": 6,
+      "source": "user-confirmed 2026-10-01",
+      "note": "User corrected dashboard: Wagner has 6 periods this week."
+    }
+  },
+  "notes": [
+    "Only confirmed presences are counted.",
+    "Wagner aggregate count is user-confirmed at 6.",
+    "Sabrina count remains under reconciliation until source sheets for missing periods are recovered; do not display 0 as a factual absence.",
+    "Laura is identified as a broker in the afternoon; future/current attendance is not counted as completed until the corresponding period is confirmed."
+  ]
 }
