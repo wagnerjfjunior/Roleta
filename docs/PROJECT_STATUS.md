@@ -6,8 +6,8 @@
 
 | Métrica | Estado |
 |---|---:|
-| Roletas utilizáveis | 75 |
-| Qualidade A | 71 |
+| Roletas utilizáveis |Roletas utilizáveis | 77 |
+| Qualidade A |Qualidade A | 73 |
 | Qualidade B | 4 |
 | Quarentena/indisponíveis | 10 |
 | Duplicatas removidas | 3 |
@@ -49,3 +49,14 @@ Funções publicadas:
 - coringa histórico.
 
 O dashboard lê `data/events.csv` diretamente e não substitui a metodologia forense canônica.
+
+
+## Red-team estatístico V2 — 01/10/2026
+
+- dataset lógico canônico: 77 eventos;
+- metodologia V1 reavaliada por rolling-origin;
+- nenhum método testado demonstrou vantagem preditiva significativa;
+- contextual raw Top-2 foi o melhor entre os testados, porém p=0.130;
+- manhã, alvo Nº1 ou Último: posição 14 é líder descritiva, sem significância global;
+- tarde, alvo Nº1 ou Último: posição 22 é líder descritiva, sem significância global;
+- metodologia V2 publicada em docs/METHODOLOGY.md.
