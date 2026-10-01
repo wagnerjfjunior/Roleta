@@ -1,0 +1,55 @@
+{
+  "version": "2026-10-01-v1",
+  "objective": "n1_or_last",
+  "qualification": {
+    "required_weekday_periods": 5,
+    "available_weekday_periods": 10,
+    "weekdays": [
+      "segunda",
+      "terca",
+      "quarta",
+      "quinta",
+      "sexta"
+    ],
+    "periods_per_day": [
+      "manha",
+      "tarde"
+    ],
+    "rule": "Cada corretor precisa cumprir pelo menos 5 dos 10 períodos úteis da semana para participar das roletas do fim de semana."
+  },
+  "weekend_baseline": {
+    "logical_events_total": 77,
+    "weekend_events": 14,
+    "observed_N_min": 16,
+    "observed_N_max": 35,
+    "evidence_level": "exploratory_only"
+  },
+  "family_assignments": [
+    {
+      "broker": "Wagner",
+      "role": "principal",
+      "physical_position": 14,
+      "rationale": "2 hits em 14 exposições de fim de semana; 1 Nº1 + 1 Último; exposição ampla."
+    },
+    {
+      "broker": "Sabrina",
+      "role": "principal",
+      "physical_position": 12,
+      "rationale": "2 hits em 14 exposições; ambos como Nº1; exposição ampla."
+    },
+    {
+      "broker": "Laura",
+      "role": "secundario",
+      "physical_position": 21,
+      "rationale": "2 hits em 10 exposições; ambos como Último; O/E descritivo mais alto entre candidatos com amostra útil, porém posição inexiste quando N<21."
+    },
+    {
+      "broker": "Helena (Lívia)",
+      "role": "secundario",
+      "physical_position": 8,
+      "rationale": "2 hits em 14 exposições; ambos como Último; exposição ampla e resultado recente."
+    }
+  ],
+  "interpretation": "Carteira familiar histórica para organização operacional. Não implica vantagem futura comprovada sob sorteio justo.",
+  "review_rule": "Revisar somente após incorporar novas roletas de fim de semana; não trocar números retrospectivamente dentro do mesmo ciclo de validação."
+}
