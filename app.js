@@ -141,20 +141,6 @@ function renderPreviousDay(){
       '</div></div>';
   }).join('');
 }
-function renderRanges(){
-  const segs=[
-    ['1–10',e=>e.N<=10],
-    ['11–15',e=>e.N>=11&&e.N<=15],
-    ['16–20',e=>e.N>=16&&e.N<=20],
-    ['21–25',e=>e.N>=21&&e.N<=25],
-    ['26+',e=>e.N>=26]
-  ];
-  document.querySelector('#rangeCards').innerHTML=segs.map(([name,fn])=>{
-    const data=state.events.filter(fn),b=bestFor(data,1)[0];
-    return '<div class="mini-card"><h3>'+name+' participantes</h3><div class="choice">'+(b?.pos??'—')+
-      '</div><div class="sub">'+data.length+' roletas · '+(b?(b.hits+'/'+b.exposure+' · O/E '+format(b.oe)):'amostra baixa')+'</div></div>';
-  }).join('');
-}
 function renderRecent(){
   const es=[...state.events].filter(e=>parseDateBR(e.date)).sort((a,b)=>dateKey(b)-dateKey(a)).slice(0,14);
   document.querySelector('#recentTimeline').innerHTML=es.map(e=>
@@ -171,21 +157,26 @@ function renderWeekendFamily(){
   for(const r of pres.records||[])if(r.present&&counts[r.broker]!==undefined)counts[r.broker]++;
   host.innerHTML=policy.family_assignments.map(a=>{
     const canonical=a.broker.startsWith('Helena')?'Helena':a.broker;
-    const count=counts[canonical]||0;
-    const ok=count>=policy.qualification.required_weekday_periods;
+    const override=pres.count_overrides?.[canonical];
+    const exact=override&&Number.isFinite(override.count)?override.count:null;
+    const count=exact!==null?exact:(counts[canonical]||0);
+    const unresolved=override&&override.status==='needs_exact_count';
+    const ok=!unresolved&&count>=policy.qualification.required_weekday_periods;
+    const numberText=unresolved?'—':String(count);
+    const flagText=unresolved?'CONTAGEM A RECONCILIAR':(ok?'APTO':'AINDA NÃO APTO');
     return '<div class="family-card '+(a.role==='principal'?'primary':'secondary')+'">'+
       '<div class="family-head"><div><div class="family-name">'+a.broker+'</div><div class="family-role">'+a.role+'</div></div>'+
       '<div class="family-role">posição '+a.physical_position+'</div></div>'+
-      '<div class="family-number">'+count+'<span class="family-denom">/5</span></div>'+
-      '<div class="eligibility"><span class="counter">períodos confirmados nesta semana</span>'+
-      '<span class="flag '+(ok?'ok':'')+'">'+(ok?'APTO':'AINDA NÃO APTO')+'</span></div>'+
+      '<div class="family-number">'+numberText+'<span class="family-denom">/5</span></div>'+
+      '<div class="eligibility"><span class="counter">'+(unresolved?'aguardando contagem exata':'períodos confirmados nesta semana')+'</span>'+
+      '<span class="flag '+(ok?'ok':'')+'">'+flagText+'</span></div>'+
       '</div>';
   }).join('');
 }
 function render(){
   document.querySelector('#datasetStamp').textContent=state.events.length+' roletas · '+
     state.events.filter(e=>e.quality==='A').length+' A / '+state.events.filter(e=>e.quality==='B').length+' B';
-  renderHero();renderWeekendFamily();renderRanking();renderMomentum();renderNever();renderPreviousDay();renderRanges();renderRecent();
+  renderHero();renderWeekendFamily();renderRanking();renderMomentum();renderNever();renderPreviousDay();renderRecent();
 }
 async function init(){
   try{
