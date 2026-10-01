@@ -10,8 +10,8 @@
   "blocked_actions": "docs/BLOCKED_ACTIONS.md",
   "primary_objective": "Preservar e analisar de forma auditável a operação de roleta/plantão e evoluir para um sistema verificável sem depender de contexto de conversa.",
   "state": {
-    "usable_events": 75,
-    "quality_A": 71,
+    "usable_events": 77,
+    "quality_A": 73,
     "quality_B": 4,
     "quarantine_or_unavailable": 10,
     "duplicates_removed": 3
