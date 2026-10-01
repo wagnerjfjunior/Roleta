@@ -1,0 +1,120 @@
+{
+  "version": "2026-10-01-v2",
+  "objective": "n1_or_last",
+  "benchmark": "top2_chronological_out_of_sample",
+  "champion_id": "context_raw",
+  "promotion_rule": "Challenger só pode substituir o champion após superar 100% no backtest cronológico e também em previsões prospectivas congeladas, com vantagem sustentada e amostra suficiente.",
+  "models": [
+    {
+      "id": "context_raw",
+      "name": "Contextual raw",
+      "role": "champion",
+      "status": "CHAMPION",
+      "oos": {
+        "hits": 13,
+        "n": 48,
+        "hit_rate": 0.2708333333,
+        "expected_hits": 9.4348,
+        "p_value": 0.13018
+      },
+      "relative_index": 100,
+      "prospective": {
+        "hits": 0,
+        "n": 0,
+        "status": "starts_with_v2"
+      }
+    },
+    {
+      "id": "global_raw",
+      "name": "Global raw",
+      "role": "challenger",
+      "status": "EM TESTE",
+      "oos": {
+        "hits": 9,
+        "n": 49,
+        "hit_rate": 0.1836734694,
+        "expected_hits": 9.6296,
+        "p_value": 0.6489
+      },
+      "relative_index": 67.82,
+      "prospective": {
+        "hits": 0,
+        "n": 0,
+        "status": "starts_with_v2"
+      }
+    },
+    {
+      "id": "eb_kernel",
+      "name": "EB + kernel N",
+      "role": "challenger",
+      "status": "EM TESTE",
+      "oos": {
+        "hits": 8,
+        "n": 48,
+        "hit_rate": 0.1666666667,
+        "expected_hits": 9.517,
+        "p_value": 0.76593
+      },
+      "relative_index": 61.54,
+      "prospective": {
+        "hits": 0,
+        "n": 0,
+        "status": "starts_with_v2"
+      }
+    },
+    {
+      "id": "eb_kernel_recency",
+      "name": "EB + N + recência",
+      "role": "challenger",
+      "status": "EM TESTE",
+      "oos": {
+        "hits": 7,
+        "n": 48,
+        "hit_rate": 0.1458333333,
+        "expected_hits": 9.517,
+        "p_value": 0.86896
+      },
+      "relative_index": 53.85,
+      "prospective": {
+        "hits": 0,
+        "n": 0,
+        "status": "starts_with_v2"
+      }
+    },
+    {
+      "id": "bayes_hierarchical",
+      "name": "Bayes hierárquico",
+      "role": "challenger",
+      "status": "LABORATÓRIO",
+      "oos": null,
+      "relative_index": null,
+      "prospective": {
+        "hits": 0,
+        "n": 0,
+        "status": "not_started"
+      }
+    },
+    {
+      "id": "logistic_hierarchical",
+      "name": "Logístico hierárquico",
+      "role": "challenger",
+      "status": "LABORATÓRIO",
+      "oos": null,
+      "relative_index": null,
+      "prospective": {
+        "hits": 0,
+        "n": 0,
+        "status": "not_started"
+      }
+    }
+  ],
+  "viability": {
+    "observed_hits": 13,
+    "expected_hits": 9.4348,
+    "lift_vs_random": 0.3779,
+    "p_value": 0.13018,
+    "state": "EVIDÊNCIA INSUFICIENTE",
+    "rule": "Continuar como experimento controlado; não declarar edge enquanto a vantagem não se sustentar prospectivamente."
+  },
+  "prospective_note": "A competição prospectiva entre todos os modelos começa na V2. Resultados anteriores não são atribuídos retrospectivamente a challengers."
+}
