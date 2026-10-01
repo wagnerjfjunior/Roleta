@@ -1,0 +1,67 @@
+{
+  "version": "2026-10-01T08:44-03:00",
+  "week_start": "2026-09-28",
+  "week_end": "2026-10-02",
+  "required_periods": 5,
+  "brokers": [
+    "Wagner",
+    "Sabrina",
+    "Laura",
+    "Helena"
+  ],
+  "aliases": {
+    "Wagner": [
+      "WAGNER",
+      "Wagner"
+    ],
+    "Sabrina": [
+      "SABRINA",
+      "Sabrina"
+    ],
+    "Laura": [
+      "LAURA",
+      "Laura"
+    ],
+    "Helena": [
+      "HELENA",
+      "Helena",
+      "LIVIA",
+      "Lívia"
+    ]
+  },
+  "records": [
+    {
+      "date": "2026-09-30",
+      "period": "manha",
+      "broker": "Wagner",
+      "present": true,
+      "source": "IMG_1643.jpeg",
+      "confidence": "confirmed_visual"
+    },
+    {
+      "date": "2026-09-30",
+      "period": "tarde",
+      "broker": "Wagner",
+      "present": true,
+      "source": "IMG_1644.jpeg",
+      "confidence": "confirmed_visual"
+    },
+    {
+      "date": "2026-09-30",
+      "period": "tarde",
+      "broker": "Laura",
+      "present": true,
+      "source": "IMG_1644.jpeg",
+      "confidence": "confirmed_visual"
+    },
+    {
+      "date": "2026-10-01",
+      "period": "manha",
+      "broker": "Wagner",
+      "present": true,
+      "source": "user-confirmed: selected physical position 14 before 08:46 draw",
+      "confidence": "confirmed_user"
+    }
+  ],
+  "note": "Only confirmed presences are counted. Missing source sheets for 28/09 and 29/09 are not treated as absences. Future roulette images should update this ledger automatically."
+}
