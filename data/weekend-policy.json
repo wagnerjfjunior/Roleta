@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-01-v1",
+  "version": "2026-10-01-v2",
   "objective": "n1_or_last",
   "qualification": {
     "required_weekday_periods": 5,
@@ -27,29 +27,86 @@
   "family_assignments": [
     {
       "broker": "Wagner",
-      "role": "principal",
-      "physical_position": 14,
-      "rationale": "2 hits em 14 exposições de fim de semana; 1 Nº1 + 1 Último; exposição ampla."
+      "physical_position": 9,
+      "role": "principal"
     },
     {
       "broker": "Sabrina",
-      "role": "principal",
-      "physical_position": 12,
-      "rationale": "2 hits em 14 exposições; ambos como Nº1; exposição ampla."
+      "physical_position": 3,
+      "role": "principal"
     },
     {
       "broker": "Laura",
+      "physical_position": 22,
       "role": "secundario",
-      "physical_position": 21,
-      "rationale": "2 hits em 10 exposições; ambos como Último; O/E descritivo mais alto entre candidatos com amostra útil, porém posição inexiste quando N<21."
+      "fallback_position": 13
     },
     {
       "broker": "Helena (Lívia)",
-      "role": "secundario",
-      "physical_position": 8,
-      "rationale": "2 hits em 14 exposições; ambos como Último; exposição ampla e resultado recente."
+      "physical_position": 14,
+      "role": "secundario"
     }
   ],
-  "interpretation": "Carteira familiar histórica para organização operacional. Não implica vantagem futura comprovada sob sorteio justo.",
-  "review_rule": "Revisar somente após incorporar novas roletas de fim de semana; não trocar números retrospectivamente dentro do mesmo ciclo de validação."
+  "interpretation": "Carteira operacional baseada na amostra global de 77 roletas. Fim de semana é covariável contextual, não uma base isolada. Não implica vantagem futura comprovada sob sorteio justo.",
+  "review_rule": "Sábado permanece congelado durante o ciclo. Domingo fica como previsão até a foto/resultado de sábado; após incorporar sábado, recalcular uma única vez e congelar domingo.",
+  "methodology": {
+    "primary_sample": "all_77_canonical_events",
+    "weekend_context": "secondary_only",
+    "rationale": "Toda a base alimenta o modelo; sábado/domingo são contexto secundário para evitar perda severa de amostra."
+  },
+  "saturday": {
+    "status": "PRELIMINARY_FIXED_FOR_CURRENT_CYCLE",
+    "note": "Números operacionais de sábado baseados na amostra global. Permanecem estáveis até revisão explícita antes do plantão.",
+    "assignments": [
+      {
+        "broker": "Wagner",
+        "physical_position": 9,
+        "role": "principal"
+      },
+      {
+        "broker": "Sabrina",
+        "physical_position": 3,
+        "role": "principal"
+      },
+      {
+        "broker": "Laura",
+        "physical_position": 22,
+        "role": "secundario",
+        "fallback_position": 13
+      },
+      {
+        "broker": "Helena (Lívia)",
+        "physical_position": 14,
+        "role": "secundario"
+      }
+    ]
+  },
+  "sunday": {
+    "status": "FORECAST_ONLY",
+    "note": "Prévia somente. Será recalculada e fechada após incorporar a foto/resultado da roleta de sábado.",
+    "assignments": [
+      {
+        "broker": "Wagner",
+        "physical_position": 9,
+        "role": "previsao"
+      },
+      {
+        "broker": "Sabrina",
+        "physical_position": 3,
+        "role": "previsao"
+      },
+      {
+        "broker": "Laura",
+        "physical_position": 22,
+        "role": "previsao",
+        "fallback_position": 13
+      },
+      {
+        "broker": "Helena (Lívia)",
+        "physical_position": 14,
+        "role": "previsao"
+      }
+    ],
+    "close_trigger": "after_saturday_roulette_photo"
+  }
 }
