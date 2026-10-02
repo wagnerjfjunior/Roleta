@@ -272,9 +272,141 @@ async function init(){
     const byId=new Map();chunks.flat().forEach(e=>byId.set(e.id,e));
     state.events=[...byId.values()];
     render();
+    await upgradeWorkspace();
   }catch(err){
     document.querySelector('#datasetStamp').textContent='erro de dados';
     document.body.insertAdjacentHTML('beforeend','<div class="error">'+err.message+'</div>');
   }
 }
+
+async function upgradeWorkspace(){
+  if(document.querySelector('.workspace-root'))return;
+  let brokerStats=null;
+  try{
+    const r=await fetch('/data/broker-stats-v3.json',{cache:'no-store'});
+    if(r.ok)brokerStats=await r.json();
+  }catch(_){}
+
+  const shell=document.querySelector('.shell');
+  if(!shell)return;
+
+  const root=document.createElement('div');
+  root.className='workspace-root';
+  shell.parentNode.insertBefore(root,shell);
+
+  const sidebar=document.createElement('aside');
+  sidebar.className='workspace-sidebar';
+  sidebar.innerHTML=
+    '<div class="workspace-brand"><b>Roleta Intelligence</b><span>WORKSPACE V3</span></div>'+
+    '<nav class="workspace-nav">'+
+      '<button class="active" data-workspace-page="overview">Visão geral</button>'+
+      '<button data-workspace-page="family">Minha família</button>'+
+      '<button data-workspace-page="ranking">Ranking</button>'+
+      '<button data-workspace-page="weekend">Fim de semana</button>'+
+      '<button data-workspace-page="models">Modelos & estatística</button>'+
+    '</nav>';
+
+  root.appendChild(sidebar);
+  root.appendChild(shell);
+  shell.classList.add('workspace-main');
+
+  const overview=document.createElement('section');
+  const family=document.createElement('section');
+  const ranking=document.createElement('section');
+  const weekend=document.createElement('section');
+  const models=document.createElement('section');
+  overview.id='workspace-overview'; family.id='workspace-family'; ranking.id='workspace-ranking';
+  weekend.id='workspace-weekend'; models.id='workspace-models';
+  [overview,family,ranking,weekend,models].forEach((p,idx)=>{p.className='workspace-page'+(idx===0?' active':'')});
+
+  const first=shell.firstChild;
+  shell.insertBefore(models,first); shell.insertBefore(weekend,models); shell.insertBefore(ranking,weekend);
+  shell.insertBefore(family,ranking); shell.insertBefore(overview,family);
+
+  const move=(el,to)=>{if(el)to.appendChild(el)};
+  move(shell.querySelector('.topbar'),overview);
+  move(shell.querySelector('.notice'),overview);
+
+  const hero=shell.querySelector('.hero-grid');
+  if(hero){
+    const duplicateSaturday=hero.querySelector('.hero-card.accent');
+    if(duplicateSaturday)duplicateSaturday.remove();
+    hero.classList.add('workspace-hero');
+    move(hero,overview);
+  }
+
+  const weekendModule=shell.querySelector('.weekend-module');
+  move(weekendModule,weekend);
+
+  const dashboard=shell.querySelector('.dashboard-grid');
+  if(dashboard){
+    [...dashboard.children].forEach(card=>{
+      if(card.querySelector('#rankingBars')||card.querySelector('#momentumList')||card.querySelector('#neverList'))move(card,ranking);
+      else if(card.querySelector('#previousDayEvents')||card.querySelector('#recentTimeline'))move(card,overview);
+      else if(card.querySelector('#modelCards')||card.querySelector('#modelLeaderboard')||card.querySelector('#viabilityState')||card.classList.contains('methodology'))move(card,models);
+    });
+    if(!dashboard.children.length)dashboard.remove();
+  }
+
+  const pageHead=(eyebrow,title,desc)=>{
+    const h=document.createElement('div'); h.className='workspace-page-head';
+    h.innerHTML='<div><span class="eyebrow">'+eyebrow+'</span><h2>'+title+'</h2><p>'+desc+'</p></div>';
+    return h;
+  };
+  family.prepend(pageHead('MINHA FAMÍLIA','Histórico individual','Nº1, Nº2, Cortesia e Último por pessoa nas roletas com permutação completa validada.'));
+  ranking.prepend(pageHead('RANKING','Estatística de corretores','Top 5 por resultado especial e ranking histórico de posições.'));
+  weekend.prepend(pageHead('FIM DE SEMANA','Sábado e domingo','Elegibilidade 5/10, prévia de sábado e fechamento de domingo após o resultado de sábado.'));
+  models.prepend(pageHead('MODEL LAB','Modelos & estatística','Champion, challengers, backtest, viabilidade e auditoria estatística.'));
+
+  if(brokerStats){
+    const familyCard=document.createElement('article');
+    familyCard.className='card workspace-family-module';
+    familyCard.innerHTML='<div class="section-head"><div><span class="eyebrow">RESULTADOS DA FAMÍLIA</span><h2>Números especiais</h2></div><span class="muted">'+brokerStats.validated_events+' roletas completas</span></div>'+
+      '<div class="workspace-family-grid">'+brokerStats.family.map(x=>
+        '<div class="workspace-family-card">'+
+          '<div class="workspace-family-name">'+x.display_name+'</div>'+
+          '<div class="workspace-family-exp">'+x.participations+' participações</div>'+
+          '<div class="workspace-family-stats">'+
+            '<div><span>Nº1</span><b>'+x.number1+'</b></div>'+
+            '<div><span>Nº2</span><b>'+x.number2+'</b></div>'+
+            '<div><span>Cortesia</span><b>'+x.courtesy+'</b></div>'+
+            '<div><span>Último</span><b>'+x.last+'</b></div>'+
+          '</div>'+
+          '<div class="workspace-family-total">Total especial: <b>'+x.total_special+'</b></div>'+
+        '</div>'
+      ).join('')+
+      '<p class="small muted workspace-data-note">'+brokerStats.note+'</p>';
+    family.appendChild(familyCard);
+
+    const labels={number1:'Nº 1',number2:'Nº 2',courtesy:'Cortesia',last:'Último'};
+    const topCard=document.createElement('article');
+    topCard.className='card workspace-top5-module';
+    topCard.innerHTML='<div class="section-head"><div><span class="eyebrow">TOP 5 CORRETORES</span><h2>Nº1, Nº2, Cortesia e Último</h2></div><span class="muted">contagem observada</span></div>'+
+      '<div class="workspace-top5-grid">'+Object.entries(brokerStats.top5).map(([key,rows])=>
+        '<div class="workspace-top5-card"><div class="workspace-top5-title">'+labels[key]+'</div>'+
+        rows.map((r,idx)=>'<div class="workspace-top5-row"><span>'+(idx+1)+'º</span><strong>'+r.broker+'</strong><em><b>'+r.hits+'</b> / '+r.participations+'</em></div>').join('')+
+        '</div>'
+      ).join('')+'</div>';
+    ranking.insertBefore(topCard,ranking.children[1]||null);
+
+    const familySummary=document.createElement('article');
+    familySummary.className='card workspace-overview-family';
+    familySummary.innerHTML='<div class="section-head"><div><span class="eyebrow">MINHA FAMÍLIA</span><h2>Resumo histórico</h2></div><button class="workspace-link-button" data-open-workspace="family">ver detalhes</button></div>'+
+      '<div class="workspace-family-mini">'+brokerStats.family.slice(0,3).map(x=>'<div><strong>'+x.display_name+'</strong><span>'+x.total_special+' resultados especiais · '+x.participations+' participações</span></div>').join('')+'</div>';
+    const anchor=overview.querySelector('.workspace-hero');
+    if(anchor)anchor.insertAdjacentElement('afterend',familySummary);
+  }
+
+  const footer=shell.querySelector('footer');
+  if(footer)shell.appendChild(footer);
+
+  function openPage(name){
+    document.querySelectorAll('.workspace-page').forEach(p=>p.classList.toggle('active',p.id==='workspace-'+name));
+    document.querySelectorAll('.workspace-nav button').forEach(b=>b.classList.toggle('active',b.dataset.workspacePage===name));
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  document.querySelectorAll('.workspace-nav button').forEach(b=>b.addEventListener('click',()=>openPage(b.dataset.workspacePage)));
+  document.querySelectorAll('[data-open-workspace]').forEach(b=>b.addEventListener('click',()=>openPage(b.dataset.openWorkspace)));
+}
+
 init();
