@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-01T08:44-03:00-r3",
+  "version": "2026-10-02T20:20-03:00-week-close",
   "week_start": "2026-09-28",
   "week_end": "2026-10-02",
   "required_periods": 5,
@@ -16,7 +16,8 @@
     ],
     "Sabrina": [
       "SABRINA",
-      "Sabrina"
+      "Sabrina",
+      "Brenda"
     ],
     "Laura": [
       "LAURA",
@@ -59,8 +60,30 @@
       "period": "manha",
       "broker": "Wagner",
       "present": true,
-      "source": "user-confirmed: selected physical position 14 before 08:46 draw",
-      "confidence": "confirmed_user"
+      "physical_position": 14,
+      "drawn_number": 7,
+      "source": "IMG_1645.jpeg",
+      "confidence": "confirmed_visual"
+    },
+    {
+      "date": "2026-10-02",
+      "period": "manha",
+      "broker": "Wagner",
+      "present": true,
+      "physical_position": 14,
+      "drawn_number": 8,
+      "source": "IMG_1664.jpeg",
+      "confidence": "confirmed_visual"
+    },
+    {
+      "date": "2026-10-02",
+      "period": "tarde",
+      "broker": "Wagner",
+      "present": true,
+      "physical_position": 14,
+      "drawn_number": 13,
+      "source": "IMG_1663.jpeg",
+      "confidence": "confirmed_visual"
     },
     {
       "date": "2026-09-28",
@@ -106,8 +129,8 @@
   "note": "Count overrides are canonical when explicitly confirmed by the user. Missing exact counts are shown as under reconciliation, never as zero.",
   "count_overrides": {
     "Wagner": {
-      "count": 6,
-      "source": "user-correction-2026-10-01",
+      "count": 8,
+      "source": "user-confirmed week close + IMG_1664/IMG_1663",
       "status": "confirmed"
     },
     "Sabrina": {
@@ -129,16 +152,16 @@
   },
   "confirmed_periods_override": {
     "Wagner": {
-      "count": 6,
-      "source": "user-confirmed 2026-10-01",
-      "note": "User confirmed Wagner has 6 completed weekday periods."
+      "count": 8,
+      "source": "week-close-2026-10-02",
+      "note": "6 períodos já confirmados antes de 02/10 + manhã e tarde de 02/10."
     }
   },
   "notes": [
     "Only confirmed presences are counted.",
-    "Wagner aggregate count is user-confirmed at 6.",
-    "Sabrina has 4 confirmed periods: 28/09 T, 29/09 M, 29/09 T, 30/09 T.",
-    "Laura current-week completed count remains based only on confirmed completed sheets; being scheduled/present for a future ongoing period is not counted until completion.",
-    "Helena current-week count remains unresolved until evidence is supplied."
+    "Wagner week-close count is 8 and is APTO for the weekend.",
+    "Sabrina/Brenda has 4 confirmed periods and is not yet eligible under the 5/10 rule.",
+    "Laura has 1 confirmed period.",
+    "Helena has 0 confirmed periods in the current ledger; absence beyond available evidence is not inferred."
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-01-v2",
+  "version": "2026-10-02-week-close-v3",
   "objective": "n1_or_last",
   "qualification": {
     "required_weekday_periods": 5,
@@ -18,94 +18,50 @@
     "rule": "Cada corretor precisa cumprir pelo menos 5 dos 10 períodos úteis da semana para participar das roletas do fim de semana."
   },
   "weekend_baseline": {
-    "logical_events_total": 77,
-    "weekend_events": 14,
-    "observed_N_min": 16,
-    "observed_N_max": 35,
+    "logical_events_total": 80,
+    "full_permutation_events": 79,
     "evidence_level": "exploratory_only"
   },
   "family_assignments": [
     {
       "broker": "Wagner",
       "physical_position": 9,
-      "role": "principal"
-    },
-    {
-      "broker": "Sabrina",
-      "physical_position": 3,
-      "role": "principal"
-    },
-    {
-      "broker": "Laura",
-      "physical_position": 22,
-      "role": "secundario",
-      "fallback_position": 13
-    },
-    {
-      "broker": "Helena (Lívia)",
-      "physical_position": 14,
-      "role": "secundario"
+      "role": "principal",
+      "fallback_position": 22
     }
   ],
-  "interpretation": "Carteira operacional baseada na amostra global de 77 roletas. Fim de semana é covariável contextual, não uma base isolada. Não implica vantagem futura comprovada sob sorteio justo.",
-  "review_rule": "Sábado permanece como prévia até a última roleta de sexta-feira, quando é fechado uma única vez. Domingo permanece como previsão até a foto/resultado de sábado; depois é recalculado uma única vez e congelado.",
+  "interpretation": "Sábado fechado após a última roleta de sexta-feira. Posição 9 é o líder histórico descritivo 2X; 22 é reserva. A posição 3 permanece candidato contextual de sábado. Não implica vantagem futura comprovada.",
+  "review_rule": "Sábado está congelado após o fechamento de sexta. Domingo permanece provisório até incorporar o resultado de sábado, quando será recalculado uma única vez e congelado.",
   "methodology": {
-    "primary_sample": "all_77_canonical_events",
+    "primary_sample": "all_80_canonical_events",
+    "full_permutation_sample": 79,
     "weekend_context": "secondary_only",
     "rationale": "Toda a base alimenta o modelo; sábado/domingo são contexto secundário para evitar perda severa de amostra."
   },
   "saturday": {
-    "status": "FORECAST_UNTIL_FRIDAY_CLOSE",
-    "note": "Prévia atual de sábado baseada na amostra global. Fechamento definitivo após incorporar a última roleta de sexta-feira.",
+    "status": "FROZEN_AFTER_FRIDAY_CLOSE",
+    "note": "Fechado após incorporar as roletas de 02/10 manhã e tarde.",
     "assignments": [
       {
         "broker": "Wagner",
         "physical_position": 9,
-        "role": "principal"
-      },
-      {
-        "broker": "Sabrina",
-        "physical_position": 3,
-        "role": "principal"
-      },
-      {
-        "broker": "Laura",
-        "physical_position": 22,
-        "role": "secundario",
-        "fallback_position": 13
-      },
-      {
-        "broker": "Helena (Lívia)",
-        "physical_position": 14,
-        "role": "secundario"
+        "role": "principal",
+        "fallback_position": 22,
+        "context_position": 3
       }
     ],
-    "close_trigger": "after_friday_last_roulette"
+    "close_trigger": "completed_2026-10-02"
   },
   "sunday": {
     "status": "FORECAST_ONLY_UNTIL_SATURDAY_RESULT",
-    "note": "Prévia somente. Será recalculada e fechada após incorporar a foto/resultado da roleta de sábado.",
+    "note": "Prévia somente. Será recalculada e congelada após incorporar a foto/resultado da roleta de sábado.",
     "assignments": [
       {
         "broker": "Wagner",
         "physical_position": 9,
-        "role": "previsao"
-      },
-      {
-        "broker": "Sabrina",
-        "physical_position": 3,
-        "role": "previsao"
-      },
-      {
-        "broker": "Laura",
-        "physical_position": 22,
         "role": "previsao",
-        "fallback_position": 13
-      },
-      {
-        "broker": "Helena (Lívia)",
-        "physical_position": 14,
-        "role": "previsao"
+        "fallback_position": 22,
+        "context_position": 3
       }
     ],
     "close_trigger": "after_saturday_roulette_photo"

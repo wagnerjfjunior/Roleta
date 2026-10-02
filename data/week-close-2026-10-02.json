@@ -1,0 +1,50 @@
+{
+  "version": "2026-10-02-week-close",
+  "observed": [
+    {
+      "event": "01-10-M",
+      "model_2x_pick": 14,
+      "model_result": "MISS",
+      "wagner_actual_position": 14,
+      "wagner_drawn_number": 7,
+      "wagner_result": "MISS"
+    },
+    {
+      "event": "02-10-M",
+      "model_2x_pick": 14,
+      "model_result": "MISS",
+      "wagner_actual_position": 14,
+      "wagner_drawn_number": 8,
+      "wagner_result": "MISS"
+    },
+    {
+      "event": "02-10-T",
+      "model_2x_pick": 9,
+      "model_result": "MISS",
+      "wagner_actual_position": 14,
+      "wagner_drawn_number": 13,
+      "wagner_result": "HIT_LAST"
+    }
+  ],
+  "score": {
+    "frozen_model_2x": {
+      "hits": 0,
+      "tests": 3
+    },
+    "wagner_operational": {
+      "hits": 1,
+      "tests": 3
+    }
+  },
+  "saturday": {
+    "status": "FROZEN",
+    "Wagner": {
+      "primary": 9,
+      "reserve": 22,
+      "context": 3
+    }
+  },
+  "sunday": {
+    "status": "PROVISIONAL_UNTIL_SATURDAY_RESULT"
+  }
+}
