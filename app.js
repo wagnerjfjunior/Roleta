@@ -156,17 +156,18 @@ function renderWeekendFamily(){
   for(const broker of pres.brokers)counts[broker]=0;
   for(const r of pres.records||[])if(r.present&&counts[r.broker]!==undefined)counts[r.broker]++;
   host.innerHTML=policy.family_assignments.map(a=>{
-    const canonical=a.broker.startsWith('Helena')?'Helena':a.broker;
+    const canonical=a.presence_key||(a.broker.startsWith('Helena')?'Helena':a.broker);
     const override=pres.count_overrides?.[canonical];
     const exact=override&&Number.isFinite(override.count)?override.count:null;
     const count=exact!==null?exact:(counts[canonical]||0);
     const unresolved=override&&override.status==='needs_exact_count';
     const ok=!unresolved&&count>=policy.qualification.required_weekday_periods;
     const numberText=unresolved?'—':String(count);
-    const flagText=unresolved?'CONTAGEM A RECONCILIAR':(ok?'APTO':'AINDA NÃO APTO');
+    const missing=Math.max(0,policy.qualification.required_weekday_periods-count);
+    const flagText=unresolved?'CONTAGEM A RECONCILIAR':(ok?'APTO':('PENDENTE · FALTA '+missing));
     return '<div class="family-card '+(a.role==='principal'?'primary':'secondary')+'">'+
       '<div class="family-head"><div><div class="family-name">'+a.broker+'</div><div class="family-role">'+a.role+'</div></div>'+
-      '<div class="family-role">posição '+a.physical_position+'</div></div>'+
+      '<div class="family-role">posição '+a.physical_position+(a.fallback_position?' · reserva '+a.fallback_position:'')+'</div></div>'+
       '<div class="family-number">'+numberText+'<span class="family-denom">/5</span></div>'+
       '<div class="eligibility"><span class="counter">'+(unresolved?'aguardando contagem exata':'períodos confirmados nesta semana')+'</span>'+
       '<span class="flag '+(ok?'ok':'')+'">'+flagText+'</span></div>'+
@@ -176,10 +177,17 @@ function renderWeekendFamily(){
 
 function assignmentCard(a,mode){
   const fallback=a.fallback_position?' · reserva '+a.fallback_position:'';
+  const key=a.presence_key||a.broker;
+  const override=state.presence?.count_overrides?.[key];
+  const count=override&&Number.isFinite(override.count)?override.count:null;
+  const required=state.weekendPolicy?.qualification?.required_weekday_periods||5;
+  const eligible=count!==null&&count>=required;
+  const eligibility=count===null?'contagem pendente':(eligible?'APTO '+count+'/'+required:'PENDENTE '+count+'/'+required);
   return '<div class="assignment-card '+mode+'">'+
     '<span class="assignment-name">'+a.broker+'</span>'+
     '<strong>'+a.physical_position+'</strong>'+
     '<span class="assignment-role">'+a.role+fallback+'</span>'+
+    '<span class="assignment-role '+(eligible?'pill-up':'pill-cold')+'">'+eligibility+'</span>'+
     '</div>';
 }
 function renderWeekendPlans(){
