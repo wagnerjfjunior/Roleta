@@ -6,8 +6,8 @@ self.onmessage=function(event){
   try{
     const result=self.RoletaSimulationEngine.run({
       ...msg.config,
-      onProgress:(done,total)=>{
-        self.postMessage({type:'progress',done,total,pct:total?done/total:0});
+      onProgress:progress=>{
+        self.postMessage({type:'progress',...progress});
       }
     });
     self.postMessage({type:'complete',result});
