@@ -75,3 +75,9 @@ Sabrina/Brenda and Laura counts for 28/09–02/10 remain contested. Original she
   - afternoon: 22 / 18 / 16 / 20;
   - integral: 21 / 4 / 8 / 12;
 - scorecard remains AMOSTRA_INICIAL until real target events are adjudicated.
+
+
+## RLT-M4-07
+Weekly Frozen vs Current paired-week laboratory is implemented on the active branch.
+It compares fixed weekly predictions, continuously recalculated Current suggestions and a random control on the same synthetic weeks.
+This is simulation-only and cannot mutate the frozen real prospective week.
