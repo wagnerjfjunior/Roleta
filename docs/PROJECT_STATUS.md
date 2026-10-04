@@ -1,45 +1,54 @@
 # Roleta — Project Status
 
-## Estado canônico — 2026-10-04
+## State — 2026-10-04
 
-- main atual: `4b4f3b5a1d752b6f78f59d45f09820c13759d20d`.
-- 81 eventos lógicos.
-- 80 permutações completas validadas.
-- 77 qualidade A / 4 qualidade B.
-- 1 evento parcial fora dos testes integrais.
-- Workspace V3 em produção.
-- Responsividade mobile RLT-M3-04: CORRIGIDA / VALIDADA LOCALMENTE / MERGEADA / PRODUÇÃO READY.
-- RED TEAM V3: targets 2X, 3X, 4X e Sequential Draw Audit.
-- Nenhum modelo demonstrou vantagem preditiva robusta.
-- Estado de viabilidade: EVIDÊNCIA INSUFICIENTE.
-- RLT-M2 Broker Identity Layer: ACTIVE_PARALLEL.
-- RLT-M3 Prospective Statistical Monitoring: ACTIVE.
-- RLT-M3-04: CLOSED_DELIVERED.
-- RLT-M3-05: ACTIVE / ELECTION_SUNDAY_DUAL_DRAW.
+- canonical repository: `wagnerjfjunior/Roleta`.
+- canonical production branch: `main`.
+- resolved main HEAD for this work: `71f3b06425cb7cf8ccfbc82c779aefce8b389037`.
+- active development branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`.
+- branch was created from and remains based on current main; no remote preview is used.
+- 81 logical canonical events.
+- 80 validated complete permutations.
+- 77 quality A / 4 quality B.
+- 1 partial event outside complete-permutation tests.
+- Workspace V3 is production-delivered on main.
+- current viability state: EVIDÊNCIA INSUFICIENTE.
+- no model has demonstrated robust real predictive edge.
 
-### Sábado 03/10 observado
-- evento único integral.
-- N=29.
-- Nº1 p23.
-- Nº2 p9.
-- Cortesia p16.
-- Último p4.
-- Wagner p9 -> nº2.
+## RLT-M4 Simulation Lab
+- Monte Carlo laboratory remains isolated from canonical real data.
+- RLT-M4-06 Adaptive Meta is implemented on the active branch.
+- simulations validate methodology/robustness only and are not real predictive evidence.
 
-### Domingo 04/10 — exceção eleitoral
-- não é roleta integral única;
-- há duas roletas: manhã e tarde;
-- registrar cada folha como evento separado;
-- não usar hindsight para alterar escolhas depois do resultado;
-- eventual 2º turno de 25/10/2026 segue a mesma estrutura de manhã + tarde.
+## RLT-M5-01 Prospective Recommendation Ledger
+- statistical gate: PASS_WITH_RESIDUAL_RISK.
+- architecture gate: PASS_WITH_RESIDUAL_RISK.
+- protocol canonicalized in `docs/PROSPECTIVE_LEDGER.md`.
+- first UI/data-contract prototype implemented on the active branch.
+- prototype uses `data/prospective/prototype-week.json`.
+- prototype deliberately contains no invented recommendation numbers.
+- Overview prototype replaces the redundant family summary card; the dedicated Family page remains unchanged.
+- planned tracks: WEEKLY_FROZEN, CURRENT, EXECUTED_CHOICE, RANDOM_SHADOW, plus theoretical chance.
+- primary confirmatory endpoint: 2X = Nº1 OR Último.
+- 3X/4X are exploratory in V1.
+- recommendation history is append-only; result never rewrites a frozen prediction.
+- each new canonical roulette may recalculate all future unresolved events, including weekend.
+- material model/policy changes require a new version/epoch.
 
-### Presença semanal
-As contagens atuais de Sabrina/Brenda e Laura estão contestadas e devem ser reconciliadas diretamente das folhas/fontes originais. Não usar overrides antigos como autoridade.
+## Real-event calendar
+- weekdays: morning + afternoon.
+- normal weekends: one integral event per day.
+- 04/10/2026 election Sunday: morning + afternoon, not integral.
+- 25/10/2026 uses the same exception only if there is a second round.
 
-### Delivery
-- LOCAL-FIRST / LVR.
-- `.sfjm/project.json`: porta 8082, rota `/`, `remoteIterationAllowed=false`.
+## Presence
+Sabrina/Brenda and Laura counts for 28/09–02/10 remain contested. Original sheets/sources are authoritative; old overrides are not.
+
+## Delivery / SFJM
+- `.sfjm/project.json`: preferred port 8082, route `/`.
+- policy: LOCAL-FIRST / LVR.
+- `remoteIterationAllowed=false`.
 - NO PREVIEW / NO REMOTE ITERATION.
-- push/deploy somente com intenção explícita.
-- PR #2 mergeado em main.
-- produção Vercel verificada READY para o commit `4b4f3b5a1d752b6f78f59d45f09820c13759d20d`.
+- corrections remain on the active branch.
+- merge requires explicit user approval.
+- production requires explicit user approval.
