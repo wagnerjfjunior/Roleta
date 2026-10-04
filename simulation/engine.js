@@ -47,7 +47,7 @@
   }
 
   function createStats(){
-    return {global:new Map(),contexts:new Map()};
+    return {global:new Map(),periods:new Map(),contexts:new Map()};
   }
 
   function statFor(map,pos){
@@ -57,13 +57,18 @@
 
   function updateStats(stats,e){
     const ctx=contextKey(e);
+    const period=e.period||'desconhecido';
     if(!stats.contexts.has(ctx))stats.contexts.set(ctx,new Map());
+    if(!stats.periods.has(period))stats.periods.set(period,new Map());
     const cm=stats.contexts.get(ctx);
+    const pm=stats.periods.get(period);
     for(const pos of e.occupied){
       const isHit=(e.first===pos||e.last===pos)?1:0;
       const expected=Math.min(1,2/e.N);
       const g=statFor(stats.global,pos);
       g.exp++;g.hits+=isHit;g.expected+=expected;
+      const p=statFor(pm,pos);
+      p.exp++;p.hits+=isHit;p.expected+=expected;
       const c=statFor(cm,pos);
       c.exp++;c.hits+=isHit;c.expected+=expected;
     }
@@ -94,6 +99,11 @@
 
   function chooseContextual(stats,template){
     const map=stats.contexts.get(contextKey(template))||new Map();
+    return topEligible(map,template.occupied,2);
+  }
+
+  function choosePeriod(stats,template){
+    const map=stats.periods.get(template.period||'desconhecido')||new Map();
     return topEligible(map,template.occupied,2);
   }
 
@@ -257,6 +267,7 @@
     const stats=seedStats(realEvents);
     const metrics={
       context_raw:metricSlices(),
+      period_raw:metricSlices(),
       global_raw:metricSlices(),
       random_baseline:metricSlices(),
       fixed_baseline:metricSlices()
@@ -266,6 +277,7 @@
       const template=templates[Math.floor(rng()*templates.length)];
       const picks={
         context_raw:chooseContextual(stats,template),
+        period_raw:choosePeriod(stats,template),
         global_raw:chooseGlobal(stats,template),
         random_baseline:chooseRandom(template,rng),
         fixed_baseline:chooseFixed(template,fixed)
@@ -281,6 +293,8 @@
   function aggregate(universeResults,eventsPerUniverse,years,seed,templatesCount,signal){
     const ids=Object.keys(universeResults[0]||{});
     const models={};
+    const universe_oe_2x={};
+
     for(const id of ids){
       const slices={};
       for(const key of ['all','morning','afternoon','signal_eligible']){
@@ -292,9 +306,44 @@
         ...slices.all,
         slices
       };
+      universe_oe_2x[id]=universeResults.map(u=>{
+        const r=u[id].signal_eligible;
+        return r.exp2?r.hit2/r.exp2:null;
+      });
     }
+
+    function paired(a,b){
+      const deltas=[];
+      let aWins=0,bWins=0,ties=0;
+      for(let i=0;i<universeResults.length;i++){
+        const ar=universeResults[i][a].signal_eligible;
+        const br=universeResults[i][b].signal_eligible;
+        if(!ar.exp2||!br.exp2)continue;
+        const aoe=ar.hit2/ar.exp2,boe=br.hit2/br.exp2,d=aoe-boe;
+        deltas.push(d);
+        if(Math.abs(d)<1e-12)ties++;
+        else if(d>0)aWins++;
+        else bWins++;
+      }
+      return {
+        slice:'signal_eligible',
+        metric:'oe_2x',
+        universes:deltas.length,
+        model_a:a,
+        model_b:b,
+        a_wins:aWins,
+        b_wins:bWins,
+        ties,
+        a_win_rate:deltas.length?aWins/deltas.length:0,
+        mean_delta:deltas.length?deltas.reduce((s,v)=>s+v,0)/deltas.length:0,
+        delta_p05:pct(deltas,.05),
+        delta_p50:pct(deltas,.50),
+        delta_p95:pct(deltas,.95)
+      };
+    }
+
     return {
-      version:'RLT-M4-03-v1',
+      version:'RLT-M4-04-v1',
       mode:signal&&signal.type!=='null'?'HISTORICAL_SEEDED_SIGNAL_INJECTION':'HISTORICAL_SEEDED_NULL_STRUCTURAL_BOOTSTRAP',
       signal:signal||{type:'null',strength:0,position:null},
       evaluation_slices:['all','morning','afternoon','signal_eligible'],
@@ -304,7 +353,13 @@
       events_per_universe:eventsPerUniverse,
       total_synthetic_events:eventsPerUniverse*universeResults.length,
       structural_templates:templatesCount,
-      models
+      models,
+      paired_comparisons:{
+        period_vs_global:paired('period_raw','global_raw'),
+        period_vs_context:paired('period_raw','context_raw'),
+        context_vs_global:paired('context_raw','global_raw')
+      },
+      universe_oe_2x_signal_eligible:universe_oe_2x
     };
   }
 
