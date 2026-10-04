@@ -35,6 +35,28 @@ Allowed execution origins:
 
 For two distinct selected positions in an event with N occupied positions, the null chance is evaluated event by event. The system must not replace varying event-specific probabilities with a single fixed hit-rate baseline.
 
+## Locked V1 policy before the 04/10 cutoff
+
+The real prospective V1 policy is locked before the 04/10/2026 evening results are incorporated.
+
+- policy version: `PROSPECTIVE-V1.0.0`;
+- model family: `period_raw_global_fallback`;
+- model version: `RLT-M5-WEEKLY-V1`;
+- policy blob SHA: `965a06b358d504325e87076e09fb9dff12862ca3`;
+- primary endpoint: 2X = Nº1 OR Último;
+- weekday context: period only;
+- weekend context: integral when sufficient, otherwise global fallback;
+- minimum exposure: 3;
+- score: observed hits minus event-specific expected hits;
+- family allocation order: Wagner, Laura, Brenda, Helena;
+- primaries are distinct within the same target event;
+- two deterministic fallbacks are frozen with each primary;
+- WEEKLY_FROZEN and CURRENT use the same policy; only their data cutoff differs;
+- Adaptive Meta remains LAB ONLY and cannot be selected after seeing 04/10 results;
+- Context Raw is not used for weekly freeze because future target N is unknown at weekly freeze time.
+
+This resolves the model-selection decision before the real cutoff and prevents retrospective model shopping.
+
 ## Core invariants
 - position física != ordem efetiva != número sorteado;
 - recommendation != execution != outcome;
@@ -253,3 +275,21 @@ Statistical review: `PASS_WITH_RESIDUAL_RISK`.
 Software Systems Architecture review: `PASS_WITH_RESIDUAL_RISK`.
 
 Implementation is authorized only within the invariants above.
+
+## Dry-run anti-hindsight verification
+
+The prospective ledger core was executed in a synthetic dry-run before the 04/10 real cutoff.
+
+Result: `PASS`.
+
+Verified invariants:
+- distinct family primary allocation;
+- frozen recommendation immutability;
+- target/outcome event identity guard;
+- adjudication only from a frozen recommendation;
+- deterministic Random Shadow generation.
+
+Core blob SHA: `6650d9bdc4b6cbf43890c94ff0b4c271ac8ca2b0`.
+Batch generator blob SHA: `3b7aac2b076e2e26c400f490a2ab3bfd819f5c93`.
+
+At the 20:00+ cutoff, no statistical or model-selection decision remains open. The remaining operation is data ingestion, validation, batch generation and freeze.
