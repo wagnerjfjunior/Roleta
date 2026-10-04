@@ -28,3 +28,23 @@ Consumers must deduplicate by `Evento` and must not silently rewrite historical 
 6. freeze prospective predictions before looking at the new outcome.
 
 The dashboard loads the manifest rather than assuming a single CSV.
+
+
+## Full-sheet transcription rule
+
+New roulette sheets are ingested in two layers:
+
+1. **Primary transcription layer** — every visible roulette row is transcribed from the source sheet, preserving:
+   - physical position;
+   - broker name as written;
+   - drawn number;
+   - manager;
+   - empty/crossed rows;
+   - divider/bar;
+   - annotations below the bar, explicitly excluded from N/permutation.
+2. **Derived event layer** — `data/incoming/YYYY-MM-DD.csv` stores N, occupied physical positions, Nº1, Nº2, Cortesia and Último derived from the full transcription.
+
+The derived event row must never replace the full-sheet transcription. Full transcription is the source for broker participation, drawn-number history, presence and broker-level statistics.
+
+For 04/10/2026 the primary source is:
+`data/transcriptions/2026-10-04.csv`.
