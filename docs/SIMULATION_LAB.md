@@ -119,3 +119,40 @@ A injeção ocorre somente na geração do resultado, depois que os modelos cong
 - SIGNAL LAB: modelos sensíveis ao contexto devem detectar sinais contextualizados melhor que baselines incompatíveis;
 - Random Baseline permanece como controle negativo;
 - um O/E alto isolado não promove um modelo; é necessário comparar distribuição entre universos e falso positivo no NULL.
+
+
+## JSON auditável — contrato de exportação
+
+Cada arquivo exportado deve ser autossuficiente e conter dois blocos principais:
+
+### `test`
+Define o experimento executado:
+- ID e nome do teste;
+- objetivo;
+- hipótese esperada antes da execução;
+- cenário e target;
+- posição do sinal e intensidade;
+- quantidade de universos;
+- anos por universo;
+- eventos planejados;
+- seed;
+- fonte estrutural;
+- mecânica do motor;
+- métrica primária;
+- métricas secundárias;
+- baselines de controle;
+- regra anti-hindsight.
+
+### `result`
+Registra o que efetivamente aconteceu:
+- versão do motor;
+- modo;
+- sinal aplicado;
+- seed;
+- universos processados;
+- horizonte;
+- total de eventos sintéticos;
+- quantidade de moldes estruturais;
+- métricas por modelo.
+
+Regra: o JSON deve permitir reconstruir a pergunta experimental e interpretar o resultado sem depender do dashboard ou da conversa que originou o run.
