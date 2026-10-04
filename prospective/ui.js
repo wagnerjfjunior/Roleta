@@ -1,135 +1,22 @@
 (function(){
-  'use strict';
-
-  const DATA_URL='/data/prospective/prototype-week.json';
-  const RECOMMENDATIONS_URL='/data/prospective/recommendations.jsonl';
-  const EXECUTIONS_URL='/data/prospective/executions.jsonl';
-  const ADJUDICATIONS_URL='/data/prospective/adjudications.jsonl';
-  const SCORECARD_URL='/data/prospective/scorecard.json';
-
-  function parseJsonl(text){
-    return String(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean)
-      .map(line=>JSON.parse(line)).filter(x=>x.record_type!=='LEDGER_INIT');
-  }
-
-  function byId(list,id){return (list||[]).filter(x=>x.target_event_id===id)}
-  function recommendationFor(data,eventId,person,strategy){
-    const rows=byId(data.recommendations,eventId)
-      .filter(x=>x.person_id===person&&x.strategy===strategy)
-      .sort((a,b)=>(a.revision_number||0)-(b.revision_number||0));
-    return rows.length?rows[rows.length-1]:null;
-  }
-  function trajectory(data,eventId,person){
-    const rows=byId(data.recommendations,eventId)
-      .filter(x=>x.person_id===person&&x.strategy==='CURRENT')
-      .sort((a,b)=>(a.revision_number||0)-(b.revision_number||0));
-    const values=rows.map(x=>x.physical_position).filter(Number.isFinite);
-    return values.length?values.join(' → '):'—';
-  }
-  function executionFor(data,eventId,person){
-    return (data.executions||[]).find(x=>x.target_event_id===eventId&&x.person_id===person)||null;
-  }
-  function adjudicationFor(data,recommendationId){
-    return (data.adjudications||[]).find(x=>x.recommendation_id===recommendationId)||null;
-  }
-  function mark(adj){
-    if(!adj)return '<span class="prospective-status pending">⏳</span>';
-    return adj.hit_2x
-      ? '<span class="prospective-status hit" title="HIT 2X">✓</span>'
-      : '<span class="prospective-status miss" title="MISS 2X">×</span>';
-  }
-  function number(v){return Number.isFinite(v)?String(v):'—'}
-
-  function personRow(data,event,person){
-    const weekly=recommendationFor(data,event.id,person,'WEEKLY_FROZEN');
-    const current=recommendationFor(data,event.id,person,'CURRENT');
-    const executed=executionFor(data,event.id,person);
-    const currentAdj=current?adjudicationFor(data,current.recommendation_id):null;
-    return '<div class="prospective-person-row">'+
-      '<strong>'+person+'</strong>'+
-      '<span><small>Pré</small><b>'+number(weekly?.physical_position)+'</b></span>'+
-      '<span><small>Atual</small><b>'+number(current?.physical_position)+'</b></span>'+
-      '<span class="prospective-trajectory"><small>Histórico</small><b>'+trajectory(data,event.id,person)+'</b></span>'+
-      '<span><small>Usado</small><b>'+number(executed?.physical_position)+'</b></span>'+
-      mark(currentAdj)+
-    '</div>';
-  }
-
-  function eventCard(data,event){
-    return '<article class="prospective-event-card">'+
-      '<div class="prospective-event-head">'+
-        '<div><span>'+event.weekday+' · '+event.date+'</span><strong>'+event.period+'</strong></div>'+
-        '<span class="prospective-event-state">PENDENTE</span>'+
-      '</div>'+
-      '<div class="prospective-person-list">'+data.people.map(p=>personRow(data,event,p)).join('')+'</div>'+
-    '</article>';
-  }
-
-  function scorecard(data){
-    return '<div class="prospective-scorecard">'+(data.scorecard||[]).map(s=>
-      '<div><span>'+s.label+'</span><strong>'+s.hits+'/'+s.events+'</strong>'+
-      '<small>O/E '+(Number.isFinite(s.oe)?s.oe.toFixed(2).replace('.',','):'—')+' · '+s.state.replaceAll('_',' ')+'</small></div>'
-    ).join('')+'</div>';
-  }
-
-  async function render(){
-    const existing=document.querySelector('.workspace-overview-family');
-    if(!existing)return;
-
-    let data;
-    try{
-      const [sr,rr,er,ar,cr]=await Promise.all([
-        fetch(DATA_URL,{cache:'no-store'}),
-        fetch(RECOMMENDATIONS_URL,{cache:'no-store'}),
-        fetch(EXECUTIONS_URL,{cache:'no-store'}),
-        fetch(ADJUDICATIONS_URL,{cache:'no-store'}),
-        fetch(SCORECARD_URL,{cache:'no-store'})
-      ]);
-      if(!sr.ok||!rr.ok||!er.ok||!ar.ok||!cr.ok)throw new Error('Falha ao carregar ledger prospectivo');
-      data=await sr.json();
-      data.recommendations=parseJsonl(await rr.text());
-      data.executions=parseJsonl(await er.text());
-      data.adjudications=parseJsonl(await ar.text());
-      const score=await cr.json();
-      data.scorecard=Object.entries(score.strategies||{}).map(([strategy,s])=>({
-        strategy,
-        label:strategy==='WEEKLY_FROZEN'?'Pré-cravado':strategy==='CURRENT'?'Sugestão atual':strategy==='EXECUTED_CHOICE'?'Utilizado':'Acaso sombra',
-        hits:s.hits||0,events:s.events||0,expected:s.expected||0,oe:s.oe,
-        state:s.interpretation||score.evidence_state||'AMOSTRA_INICIAL'
-      }));
-    }catch(err){
-      existing.innerHTML='<div class="section-head"><div><span class="eyebrow">RLT-M5-01</span><h2>Pré-cravados da semana</h2></div></div>'+
-        '<p class="small error">'+err.message+'</p>';
-      return;
-    }
-
-    existing.className='card workspace-prospective';
-    existing.innerHTML=
-      '<div class="section-head">'+
-        '<div><span class="eyebrow">RLT-M5-01 · PROSPECTIVO</span><h2>Pré-cravados da semana</h2>'+
-        '<p class="small muted">Pré = número congelado no início da semana · Atual = última recomendação antes do evento · Usado = posição realmente escolhida.</p></div>'+
-        '<span class="prospective-week">'+data.week.label+'</span>'+
-      '</div>'+
-      '<div class="prospective-warning">'+
-        (data.recommendations.length
-          ? '<strong>Ledger ativo.</strong> Os valores exibidos vêm de recomendações prospectivas versionadas e congeladas.'
-          : '<strong>Protótipo auditável.</strong> Nenhum número ainda foi congelado para esta semana; “—” não é previsão.')+
-      '</div>'+
-      '<div class="prospective-events">'+data.events.map(e=>eventCard(data,e)).join('')+'</div>'+
-      '<div class="sim-context-head"><span class="eyebrow">VALIDAÇÃO PROSPECTIVA</span><h3>Modelo × execução × acaso</h3></div>'+
-      scorecard(data)+
-      '<p class="small muted prospective-note">'+data.note+'</p>';
-  }
-
-  document.addEventListener('roleta:workspace-ready',()=>{
-    const core=window.RoletaProspectiveLedger;
-    const gen=window.RoletaProspectiveGenerator;
-    if(core&&gen){
-      const a=core.selfTest();
-      const b=gen.selfTest(core);
-      if(!a.pass||!b.pass)throw new Error('Prospective self-test failed.');
-    }
-    render();
-  },{once:true});
-  if(document.querySelector('.workspace-overview-family'))render();
+'use strict';
+const DATA_URL='/data/prospective/prototype-week.json';
+const BATCH_URL='/data/prospective/frozen-week-2026-10-05.json';
+const EXECUTIONS_URL='/data/prospective/executions.jsonl';
+const ADJUDICATIONS_URL='/data/prospective/adjudications.jsonl';
+const SCORECARD_URL='/data/prospective/scorecard.json';
+function parseJsonl(t){return String(t||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(JSON.parse).filter(x=>x.record_type!=='LEDGER_INIT')}
+function expandBatch(batch){const out=[];for(const e of batch.events||[])for(const p of e.people||[]){for(const [strategy,key] of [['WEEKLY_FROZEN','weekly_frozen'],['CURRENT','current']]){const x=p[key];out.push({recommendation_id:['REC',e.target_event_id,p.person_id,strategy,'0'].join('-'),person_id:p.person_id,target_event_id:e.target_event_id,target_date:e.target_date,target_period:e.target_period,strategy,physical_position:x.physical_position,fallback_positions:x.fallback_positions||[],revision_number:x.revision_number||0,generated_at:batch.generated_at,data_cutoff:batch.data_cutoff,trigger_event_id:batch.trigger_event_id,model_family:batch.model_family,model_version:batch.model_version,policy_version:batch.policy_version,config_hash:batch.config_hash,status:'FROZEN',is_frozen:true,frozen_at:batch.frozen_at,ranking_source:e.ranking_source})}}return out}
+function byId(a,id){return(a||[]).filter(x=>x.target_event_id===id)}
+function recFor(d,id,p,s){const a=byId(d.recommendations,id).filter(x=>x.person_id===p&&x.strategy===s).sort((a,b)=>(a.revision_number||0)-(b.revision_number||0));return a.length?a[a.length-1]:null}
+function trajectory(d,id,p){const a=byId(d.recommendations,id).filter(x=>x.person_id===p&&x.strategy==='CURRENT').sort((a,b)=>(a.revision_number||0)-(b.revision_number||0)).map(x=>x.physical_position).filter(Number.isFinite);return a.length?a.join(' → '):'—'}
+function executionFor(d,id,p){return(d.executions||[]).find(x=>x.target_event_id===id&&x.person_id===p)||null}
+function adjFor(d,id){return(d.adjudications||[]).find(x=>x.recommendation_id===id)||null}
+function mark(a){if(!a)return'<span class="prospective-status pending">⏳</span>';return a.hit_2x?'<span class="prospective-status hit" title="HIT 2X">✓</span>':'<span class="prospective-status miss" title="MISS 2X">×</span>'}
+function number(v){return Number.isFinite(v)?String(v):'—'}
+function personRow(d,e,p){const w=recFor(d,e.id,p,'WEEKLY_FROZEN'),c=recFor(d,e.id,p,'CURRENT'),x=executionFor(d,e.id,p),a=c?adjFor(d,c.recommendation_id):null;return'<div class="prospective-person-row"><strong>'+p+'</strong><span><small>Pré</small><b>'+number(w?.physical_position)+'</b></span><span><small>Atual</small><b>'+number(c?.physical_position)+'</b></span><span class="prospective-trajectory"><small>Histórico</small><b>'+trajectory(d,e.id,p)+'</b></span><span><small>Usado</small><b>'+number(x?.physical_position)+'</b></span>'+mark(a)+'</div>'}
+function eventCard(d,e){return'<article class="prospective-event-card"><div class="prospective-event-head"><div><span>'+e.weekday+' · '+e.date+'</span><strong>'+e.period+'</strong></div><span class="prospective-event-state">PENDENTE</span></div><div class="prospective-person-list">'+d.people.map(p=>personRow(d,e,p)).join('')+'</div></article>'}
+function scorecard(d){return'<div class="prospective-scorecard">'+(d.scorecard||[]).map(s=>'<div><span>'+s.label+'</span><strong>'+s.hits+'/'+s.events+'</strong><small>O/E '+(Number.isFinite(s.oe)?s.oe.toFixed(2).replace('.',','):'—')+' · '+s.state.replaceAll('_',' ')+'</small></div>').join('')+'</div>'}
+async function render(){const existing=document.querySelector('.workspace-overview-family');if(!existing)return;let d;try{const[sr,br,er,ar,cr]=await Promise.all([fetch(DATA_URL,{cache:'no-store'}),fetch(BATCH_URL,{cache:'no-store'}),fetch(EXECUTIONS_URL,{cache:'no-store'}),fetch(ADJUDICATIONS_URL,{cache:'no-store'}),fetch(SCORECARD_URL,{cache:'no-store'})]);if(!sr.ok||!br.ok||!er.ok||!ar.ok||!cr.ok)throw new Error('Falha ao carregar freeze prospectivo');d=await sr.json();const batch=await br.json();d.recommendations=expandBatch(batch);d.executions=parseJsonl(await er.text());d.adjudications=parseJsonl(await ar.text());const score=await cr.json();d.scorecard=Object.entries(score.strategies||{}).map(([strategy,s])=>({strategy,label:strategy==='WEEKLY_FROZEN'?'Pré-cravado':strategy==='CURRENT'?'Sugestão atual':strategy==='EXECUTED_CHOICE'?'Utilizado':'Acaso sombra',hits:s.hits||0,events:s.events||0,expected:s.expected||0,oe:s.oe,state:s.interpretation||score.evidence_state||'AMOSTRA_INICIAL'}))}catch(err){existing.innerHTML='<div class="section-head"><div><span class="eyebrow">RLT-M5-01</span><h2>Pré-cravados da semana</h2></div></div><p class="small error">'+err.message+'</p>';return}existing.className='card workspace-prospective';existing.innerHTML='<div class="section-head"><div><span class="eyebrow">RLT-M5-01 · PROSPECTIVO</span><h2>Pré-cravados da semana</h2><p class="small muted">Pré = número congelado no início da semana · Atual = última recomendação antes do evento · Usado = posição realmente escolhida.</p></div><span class="prospective-week">'+d.week.label+'</span></div><div class="prospective-warning"><strong>Freeze ativo.</strong> Valores congelados após o cutoff canônico de 04/10-T sob PROSPECTIVE-V1.0.0.</div><div class="prospective-events">'+d.events.map(e=>eventCard(d,e)).join('')+'</div><div class="sim-context-head"><span class="eyebrow">VALIDAÇÃO PROSPECTIVA</span><h3>Modelo × execução × acaso</h3></div>'+scorecard(d)+'<p class="small muted prospective-note">'+d.note+'</p>'}
+document.addEventListener('roleta:workspace-ready',()=>{const c=window.RoletaProspectiveLedger,g=window.RoletaProspectiveGenerator;if(c&&g){if(!c.selfTest().pass||!g.selfTest(c).pass)throw new Error('Prospective self-test failed.')}render()},{once:true});if(document.querySelector('.workspace-overview-family'))render();
 })();
