@@ -392,14 +392,20 @@ async function upgradeWorkspace(){
   const simControls=document.createElement('article');
   simControls.className='card simulation-controls';
   simControls.innerHTML=
-    '<div class="section-head"><div><span class="eyebrow">RLT-M4-01</span><h2>Configuração da simulação</h2></div><span class="simulation-separation">SIMULATION DATA</span></div>'+
+    '<div class="section-head"><div><span class="eyebrow">RLT-M4-02</span><h2>Configuração da simulação</h2></div><span class="simulation-separation">SIMULATION DATA</span></div>'+
     '<div class="simulation-control-grid">'+
-      '<label><span>Universos</span><select id="simUniversesInput"><option>50</option><option selected>100</option><option>250</option><option>500</option></select></label>'+
+      '<label><span>Universos</span><select id="simUniversesInput"><option>50</option><option selected>100</option><option>250</option><option>500</option><option>1000</option></select></label>'+
       '<label><span>Anos por universo</span><select id="simYearsInput"><option>1</option><option>5</option><option selected>10</option><option>20</option></select></label>'+
+      '<label><span>Cenário</span><select id="simScenarioInput"><option value="null">NULL · acaso puro</option><option value="fixed_2x">Bias 2X · posição fixa</option><option value="morning_2x">Bias 2X · somente manhã</option><option value="high_n_2x">Bias 2X · N alto</option></select></label>'+
+      '<label><span>Posição do sinal</span><input id="simPositionInput" type="number" min="1" value="14"></label>'+
+      '<label><span>Força do sinal</span><select id="simStrengthInput"><option value="0.01">1%</option><option value="0.03" selected>3%</option><option value="0.05">5%</option><option value="0.10">10%</option></select></label>'+
       '<label><span>Seed</span><input id="simSeedInput" value="roleta-2026"></label>'+
       '<button id="runSimulation" class="simulation-run">Rodar simulação</button>'+
+      '<button id="cancelSimulation" class="simulation-run simulation-cancel" disabled>Cancelar</button>'+
     '</div>'+
-    '<p id="simStatus" class="small muted">Pronto. A base real é usada somente como estrutura e estado inicial.</p>';
+    '<div class="simulation-progress"><i id="simProgressBar"></i></div>'+
+    '<p id="simStatus" class="small muted">Pronto. A base real é usada somente como estrutura e estado inicial.</p>'+
+    '<div class="simulation-audit-actions"><button id="exportSimulation" class="workspace-link-button" disabled>Exportar JSON</button><span id="simSavedRuns" class="small muted">0 runs auditáveis salvos localmente</span></div>';
   simulation.appendChild(simControls);
 
   const simSummary=document.createElement('article');
