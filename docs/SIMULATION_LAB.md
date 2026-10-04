@@ -219,3 +219,48 @@ Critério interpretativo:
 - se Period Raw superar consistentemente Period+N em sinais puramente por período, a faixa de N está provavelmente fragmentando a amostra;
 - se Period+N superar Period Raw em sinais dependentes de N, a granularidade adicional está agregando informação útil;
 - decisão de champion não deve ser tomada por uma única média agregada; usar taxa de vitória pareada, deltas e controles NULL.
+
+
+## RLT-M4-05 — N Decomposition
+
+Objetivo: isolar o efeito de N sem misturá-lo com período, após o cenário `high_n_2x` mostrar que o Global Raw superou o Contextual Period+N.
+
+### Novo modelo
+
+- `N Raw · Faixa de N`: usa somente a faixa de N como contexto;
+- a faixa é a mesma discretização já usada pelo Contextual Raw: N arredondado para o múltiplo de 5 mais próximo;
+- não segmenta por manhã/tarde;
+- usa o mesmo score Raw por excesso observado sobre esperado.
+
+O conjunto passa a ser:
+- Global Raw;
+- Period Raw;
+- N Raw;
+- Contextual Raw · Period+N;
+- Random Baseline;
+- Fixed Baseline.
+
+### N mínimo configurável
+
+No cenário `Bias 2X · N alto`, o front exibe `N mínimo do sinal`.
+Valor padrão: 25.
+
+Exemplo:
+- minN 25 => sinal elegível somente quando N >= 25;
+- minN 30 => sinal elegível somente quando N >= 30.
+
+O valor configurado entra no JSON auditável em `test.scenario.minN` e `result.signal.minN`.
+
+### Comparações pareadas adicionais
+
+No corte `signal_eligible`:
+- N Raw vs Global Raw;
+- N Raw vs Period Raw;
+- N Raw vs Contextual Raw · Period+N.
+
+As comparações anteriores permanecem para continuidade histórica.
+
+Hipótese do cenário `high_n_2x`:
+- N Raw deve explorar melhor um sinal definido apenas por N do que modelos que ignoram N ou fragmentam o histórico também por período.
+
+A versão do motor e o ID do teste passam a ser `RLT-M4-05`.
