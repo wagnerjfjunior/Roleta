@@ -4,7 +4,7 @@
 
 canonical repo: wagnerjfjunior/Roleta
 canonical ref: main / resolve live
-last resolved head: dabe609ea295b2f537084d7389f71adee422f320
+last resolved head: b678d04edb3f5b860ad0ec242c6e87136005026c
 
 Dataset:
 - 81 eventos lógicos;
@@ -56,3 +56,7 @@ Delivery:
 
 NEXT SAFE ACTION:
 RLT-M3-04 — reconciliar presença semanal, corrigir responsividade mobile localmente e preservar os números de domingo congelados até o resultado.
+
+
+## Bootstrap para nova conversa
+Use: `Ative o SFJM do projeto Roleta, resolva main ao vivo em wagnerjfjunior/Roleta e continue pela próxima ação segura de handoffs/CURRENT.md e docs/NEXT_SAFE_ACTION.md.`
