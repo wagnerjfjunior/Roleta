@@ -125,9 +125,30 @@
     return out;
   }
 
-  function simulateEvent(template,rng,index){
-    const permutation=shuffle(template.N,rng);
+  function signalApplies(template,signal){
+    if(!signal||signal.type==='null'||!Number(signal.strength))return false;
+    if(!template.occupied.includes(Number(signal.position)))return false;
+    if(signal.type==='morning_2x'&&template.period!=='manha')return false;
+    if(signal.type==='high_n_2x'&&template.N<Number(signal.minN||25))return false;
+    return ['fixed_2x','morning_2x','high_n_2x'].includes(signal.type);
+  }
+
+  function applySignal(permutation,occupied,template,rng,signal){
+    if(!signalApplies(template,signal))return permutation;
+    const strength=Math.max(0,Math.min(.5,Number(signal.strength)||0));
+    if(rng()>=strength)return permutation;
+    const targetPos=Number(signal.position);
+    const targetIndex=occupied.indexOf(targetPos);
+    if(targetIndex<0)return permutation;
+    const desired=rng()<.5?1:template.N;
+    const desiredIndex=permutation.indexOf(desired);
+    [permutation[targetIndex],permutation[desiredIndex]]=[permutation[desiredIndex],permutation[targetIndex]];
+    return permutation;
+  }
+
+  function simulateEvent(template,rng,index,signal){
     const occupied=[...template.occupied].sort((a,b)=>a-b);
+    const permutation=applySignal(shuffle(template.N,rng),occupied,template,rng,signal);
     const byNumber=new Map();
     for(let i=0;i<occupied.length;i++)byNumber.set(permutation[i],occupied[i]);
     return {
@@ -191,7 +212,7 @@
     return a[idx];
   }
 
-  function runUniverse(realEvents,templates,eventsCount,seed,fixed){
+  function runUniverse(realEvents,templates,eventsCount,seed,fixed,signal){
     const rng=mulberry32(seed);
     const stats=seedStats(realEvents);
     const metrics={
@@ -210,14 +231,14 @@
         fixed_baseline:chooseFixed(template,fixed)
       };
 
-      const e=simulateEvent(template,rng,i+1);
+      const e=simulateEvent(template,rng,i+1,signal);
       for(const id of Object.keys(metrics))observeMetric(metrics[id],picks[id],e);
       updateStats(stats,e);
     }
     return metrics;
   }
 
-  function aggregate(universeResults,eventsPerUniverse,years,seed,templatesCount){
+  function aggregate(universeResults,eventsPerUniverse,years,seed,templatesCount,signal){
     const ids=Object.keys(universeResults[0]||{});
     const models={};
     for(const id of ids){
@@ -246,8 +267,9 @@
       };
     }
     return {
-      version:'RLT-M4-01-v1',
-      mode:'HISTORICAL_SEEDED_NULL_STRUCTURAL_BOOTSTRAP',
+      version:'RLT-M4-02-v1',
+      mode:signal&&signal.type!=='null'?'HISTORICAL_SEEDED_SIGNAL_INJECTION':'HISTORICAL_SEEDED_NULL_STRUCTURAL_BOOTSTRAP',
+      signal:signal||{type:'null',strength:0,position:null},
       seed:String(seed),
       universes:universeResults.length,
       years,
@@ -265,17 +287,26 @@
     });
     const templates=completeTemplates(realEvents);
     if(!templates.length)throw new Error('Nenhuma roleta completa disponível para bootstrap estrutural.');
-    const universes=Math.max(1,Math.min(1000,Number(config.universes)||100));
-    const years=Math.max(1,Math.min(25,Number(config.years)||10));
+    const universes=Math.max(1,Math.min(5000,Number(config.universes)||100));
+    const years=Math.max(1,Math.min(50,Number(config.years)||10));
     const eventsPerYear=Math.max(1,Number(config.eventsPerYear)||624);
     const eventsPerUniverse=years*eventsPerYear;
-    const baseSeed=hashSeed(config.seed||'roleta-2026');
+    const seedText=config.seed||'roleta-2026';
+    const baseSeed=hashSeed(seedText);
     const fixed=fixedLeaders(realEvents);
+    const signal=config.signal||{type:'null',strength:0,position:null};
     const results=[];
     for(let u=0;u<universes;u++){
-      results.push(runUniverse(realEvents,templates,eventsPerUniverse,(baseSeed+Math.imul(u+1,2654435761))>>>0,fixed));
+      results.push(runUniverse(
+        realEvents,templates,eventsPerUniverse,
+        (baseSeed+Math.imul(u+1,2654435761))>>>0,
+        fixed,signal
+      ));
+      if(typeof config.onProgress==='function'&&(u===universes-1||u%Math.max(1,Math.floor(universes/100))===0)){
+        config.onProgress(u+1,universes);
+      }
     }
-    return aggregate(results,eventsPerUniverse,years,config.seed||'roleta-2026',templates.length);
+    return aggregate(results,eventsPerUniverse,years,seedText,templates.length,signal);
   }
 
   function selfTest(realEvents){
@@ -297,4 +328,4 @@
   }
 
   global.RoletaSimulationEngine={run,simulateEvent,completeTemplates,hashSeed,selfTest};
-})(window);
+})(globalThis);
