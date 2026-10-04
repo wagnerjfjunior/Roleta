@@ -38,11 +38,12 @@ New roulette sheets are ingested in two layers:
    - physical position;
    - broker name as written;
    - drawn number;
-   - manager;
-   - empty/crossed rows;
+      - empty/crossed rows;
    - divider/bar;
    - annotations below the bar, explicitly excluded from N/permutation.
 2. **Derived event layer** — `data/incoming/YYYY-MM-DD.csv` stores N, occupied physical positions, Nº1, Nº2, Cortesia and Último derived from the full transcription.
+
+Manager is not part of the canonical roulette transcription and is intentionally excluded.
 
 The derived event row must never replace the full-sheet transcription. Full transcription is the source for broker participation, drawn-number history, presence and broker-level statistics.
 
