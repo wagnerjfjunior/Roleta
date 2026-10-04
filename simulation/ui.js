@@ -3,6 +3,7 @@
 
   const STORAGE_KEY='roleta.simulation.runs.v1';
   const labels={
+    adaptive_meta:'Adaptive Meta · Walk-forward',
     context_raw:'Contextual Raw · Period+N',
     period_raw:'Period Raw · Manhã/Tarde',
     n_raw:'N Raw · Faixa de N',
@@ -42,9 +43,9 @@
       high_n_2x:'N Raw deve explorar melhor um sinal restrito a N alto do que Global Raw, Period Raw, Contextual Period+N e baselines.'
     };
     return {
-      id:'RLT-M4-05',
+      id:'RLT-M4-06',
       name:scenarioNames[config.signal.type]||config.signal.type,
-      objective:'Validar capacidade de distinguir sinal real de acaso em regime walk-forward sem hindsight.',
+      objective:'Validar um meta-modelo adaptativo que escolhe entre Global, Period, N e Period+N usando somente evidência anterior ao sorteio.'
       hypothesis:expectations[config.signal.type]||'Avaliar comportamento do modelo no cenário configurado.',
       scenario:{
         type:config.signal.type,
@@ -68,7 +69,7 @@
         primary_metric:'O/E 2X',
         secondary_metrics:['hit_rate_2x','O/E 3X','O/E 4X','P05-P95 O/E 2X','max_losing_p95','O/E 2X morning','O/E 2X afternoon','O/E 2X signal_eligible'],
         controls:['Random Baseline','Fixed Baseline'],
-        challengers:['Global Raw','Period Raw','N Raw','Contextual Raw · Period+N'],
+        challengers:['Adaptive Meta · Walk-forward','Global Raw','Period Raw','N Raw','Contextual Raw · Period+N'],
         rule:'Escolhas são congeladas antes de cada sorteio sintético; resultado só entra no histórico após adjudicação.'
       }
     };
@@ -141,6 +142,22 @@
             '<span>'+fmt(s.signal_eligible?.oe_2x,3)+'</span>'+
           '</div>';
         }).join('');
+    }
+
+    const metaHost=document.querySelector('#simMetaPolicy');
+    if(metaHost&&result.adaptive_meta_policy){
+      const p=result.adaptive_meta_policy;
+      const shares=p.selection_share||{};
+      metaHost.innerHTML=
+        '<div class="sim-context-head"><span class="eyebrow">ADAPTIVE META</span><h3>Seleção de arquitetura em walk-forward</h3></div>'+
+        '<div class="sim-pair-grid">'+
+          Object.keys(shares).map(id=>
+            '<div class="sim-pair-card"><strong>'+labels[id]+'</strong>'+
+            '<span>Selecionado em <b>'+fmtPct(shares[id])+'</b> dos eventos</span>'+
+            '<small>'+Number(p.selection_counts?.[id]||0).toLocaleString('pt-BR')+' escolhas</small></div>'
+          ).join('')+
+        '</div>'+
+        '<p class="small muted">Fallback: '+labels[p.fallback]+' · mínimo '+p.min_prior_events+' eventos anteriores · limiar z &gt; '+fmt(p.z_threshold,1)+'.</p>';
     }
 
     const pairHost=document.querySelector('#simPairwise');
