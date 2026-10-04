@@ -7,9 +7,9 @@
 - resolved main HEAD for this work: `71f3b06425cb7cf8ccfbc82c779aefce8b389037`.
 - active development branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`.
 - branch was created from and remains based on current main; no remote preview is used.
-- 81 logical canonical events.
-- 80 validated complete permutations.
-- 77 quality A / 4 quality B.
+- 83 logical canonical events.
+- 82 validated complete permutations.
+- 79 quality A / 4 quality B.
 - 1 partial event outside complete-permutation tests.
 - Workspace V3 is production-delivered on main.
 - current viability state: EVIDÊNCIA INSUFICIENTE.
@@ -52,3 +52,12 @@ Sabrina/Brenda and Laura counts for 28/09–02/10 remain contested. Original she
 - corrections remain on the active branch.
 - merge requires explicit user approval.
 - production requires explicit user approval.
+
+
+## Nominal ledger consolidation
+- `data/full_draws_reconstructed.csv` is now the GitHub-hosted consolidated nominal ledger available to this project.
+- current imported nominal coverage: 48 events / 1022 participant rows, including 04/10 morning and afternoon.
+- this nominal ledger is auxiliary and does NOT replace the 83-event canonical result ledger in `data/manifest.json`.
+- 02/10 and 03/10 do not yet have full nominal transcription in the imported legacy source; their canonical event results remain valid in the 83-event ledger.
+- no global model/statistical aggregate may be recomputed from the 48-event nominal subset as though it were complete.
+- 04/10 afternoon correction: positions 12 and 13 excluded; Sabrina p11 → nº12 → Último; Wagner p14 → nº9.
