@@ -30,9 +30,12 @@
     return a;
   }
 
+  function nKey(e){
+    return Math.max(1,Math.round(e.N/5)*5);
+  }
+
   function contextKey(e){
-    const bucket=Math.max(1,Math.round(e.N/5)*5);
-    return (e.period||'desconhecido')+'|'+bucket;
+    return (e.period||'desconhecido')+'|'+nKey(e);
   }
 
   function completeTemplates(events){
@@ -47,7 +50,7 @@
   }
 
   function createStats(){
-    return {global:new Map(),periods:new Map(),contexts:new Map()};
+    return {global:new Map(),periods:new Map(),nBuckets:new Map(),contexts:new Map()};
   }
 
   function statFor(map,pos){
@@ -58,10 +61,13 @@
   function updateStats(stats,e){
     const ctx=contextKey(e);
     const period=e.period||'desconhecido';
+    const nk=nKey(e);
     if(!stats.contexts.has(ctx))stats.contexts.set(ctx,new Map());
     if(!stats.periods.has(period))stats.periods.set(period,new Map());
+    if(!stats.nBuckets.has(nk))stats.nBuckets.set(nk,new Map());
     const cm=stats.contexts.get(ctx);
     const pm=stats.periods.get(period);
+    const nm=stats.nBuckets.get(nk);
     for(const pos of e.occupied){
       const isHit=(e.first===pos||e.last===pos)?1:0;
       const expected=Math.min(1,2/e.N);
@@ -69,6 +75,8 @@
       g.exp++;g.hits+=isHit;g.expected+=expected;
       const p=statFor(pm,pos);
       p.exp++;p.hits+=isHit;p.expected+=expected;
+      const n=statFor(nm,pos);
+      n.exp++;n.hits+=isHit;n.expected+=expected;
       const c=statFor(cm,pos);
       c.exp++;c.hits+=isHit;c.expected+=expected;
     }
@@ -104,6 +112,11 @@
 
   function choosePeriod(stats,template){
     const map=stats.periods.get(template.period||'desconhecido')||new Map();
+    return topEligible(map,template.occupied,2);
+  }
+
+  function chooseN(stats,template){
+    const map=stats.nBuckets.get(nKey(template))||new Map();
     return topEligible(map,template.occupied,2);
   }
 
@@ -268,6 +281,7 @@
     const metrics={
       context_raw:metricSlices(),
       period_raw:metricSlices(),
+      n_raw:metricSlices(),
       global_raw:metricSlices(),
       random_baseline:metricSlices(),
       fixed_baseline:metricSlices()
@@ -278,6 +292,7 @@
       const picks={
         context_raw:chooseContextual(stats,template),
         period_raw:choosePeriod(stats,template),
+        n_raw:chooseN(stats,template),
         global_raw:chooseGlobal(stats,template),
         random_baseline:chooseRandom(template,rng),
         fixed_baseline:chooseFixed(template,fixed)
@@ -344,7 +359,7 @@
     }
 
     return {
-      version:'RLT-M4-04-v1',
+      version:'RLT-M4-05-v1',
       mode:signal&&signal.type!=='null'?'HISTORICAL_SEEDED_SIGNAL_INJECTION':'HISTORICAL_SEEDED_NULL_STRUCTURAL_BOOTSTRAP',
       signal:signal||{type:'null',strength:0,position:null},
       evaluation_slices:['all','morning','afternoon','signal_eligible'],
@@ -356,6 +371,9 @@
       structural_templates:templatesCount,
       models,
       paired_comparisons:{
+        n_vs_global:paired('n_raw','global_raw'),
+        n_vs_period:paired('n_raw','period_raw'),
+        n_vs_context:paired('n_raw','context_raw'),
         period_vs_global:paired('period_raw','global_raw'),
         period_vs_context:paired('period_raw','context_raw'),
         context_vs_global:paired('context_raw','global_raw')
