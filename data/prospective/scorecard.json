@@ -1,0 +1,38 @@
+{
+  "version": "PROSPECTIVE-V1.0.0",
+  "derived_from": [
+    "recommendations.jsonl",
+    "executions.jsonl",
+    "adjudications.jsonl"
+  ],
+  "primary_endpoint": "2X_N1_OR_LAST",
+  "evidence_state": "AMOSTRA_INICIAL",
+  "strategies": {
+    "WEEKLY_FROZEN": {
+      "events": 0,
+      "hits": 0,
+      "expected": 0,
+      "oe": null
+    },
+    "CURRENT": {
+      "events": 0,
+      "hits": 0,
+      "expected": 0,
+      "oe": null
+    },
+    "EXECUTED_CHOICE": {
+      "events": 0,
+      "hits": 0,
+      "expected": 0,
+      "oe": null,
+      "interpretation": "OBSERVATIONAL"
+    },
+    "RANDOM_SHADOW": {
+      "events": 0,
+      "hits": 0,
+      "expected": 0,
+      "oe": null,
+      "interpretation": "CONTROL"
+    }
+  }
+}
