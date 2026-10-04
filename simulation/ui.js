@@ -40,7 +40,7 @@
       high_n_2x:'Modelos sensíveis ao contexto de N devem capturar melhor um sinal restrito a N alto do que baselines não contextuais.'
     };
     return {
-      id:'RLT-M4-02',
+      id:'RLT-M4-03',
       name:scenarioNames[config.signal.type]||config.signal.type,
       objective:'Validar capacidade de distinguir sinal real de acaso em regime walk-forward sem hindsight.',
       hypothesis:expectations[config.signal.type]||'Avaliar comportamento do modelo no cenário configurado.',
@@ -64,7 +64,7 @@
       },
       evaluation:{
         primary_metric:'O/E 2X',
-        secondary_metrics:['hit_rate_2x','O/E 3X','O/E 4X','P05-P95 O/E 2X','max_losing_p95'],
+        secondary_metrics:['hit_rate_2x','O/E 3X','O/E 4X','P05-P95 O/E 2X','max_losing_p95','O/E 2X morning','O/E 2X afternoon','O/E 2X signal_eligible'],
         controls:['Random Baseline','Fixed Baseline'],
         rule:'Escolhas são congeladas antes de cada sorteio sintético; resultado só entra no histórico após adjudicação.'
       }
@@ -121,6 +121,24 @@
         '<span><b>Lose p95</b> '+m.max_losing_p95+'</span>'+
       '</div>'
     ).join('');
+
+    const contextHost=document.querySelector('#simContextTable');
+    if(contextHost){
+      contextHost.innerHTML=
+        '<div class="sim-context-row sim-context-header">'+
+          '<strong>Modelo</strong><span>GERAL</span><span>MANHÃ</span><span>TARDE</span><span>SIGNAL-ELIGIBLE</span>'+
+        '</div>'+
+        rows.map(m=>{
+          const s=m.slices||{};
+          return '<div class="sim-context-row">'+
+            '<strong>'+labels[m.id]+'</strong>'+
+            '<span>'+fmt(s.all?.oe_2x,3)+'</span>'+
+            '<span>'+fmt(s.morning?.oe_2x,3)+'</span>'+
+            '<span>'+fmt(s.afternoon?.oe_2x,3)+'</span>'+
+            '<span>'+fmt(s.signal_eligible?.oe_2x,3)+'</span>'+
+          '</div>';
+        }).join('');
+    }
 
     const title=document.querySelector('#simNullBands')?.previousElementSibling?.querySelector('h2');
     if(title)title.textContent=result.mode.includes('SIGNAL')?'Faixa no cenário com sinal':'Faixa esperada sob acaso';
