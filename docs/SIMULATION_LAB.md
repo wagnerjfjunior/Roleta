@@ -156,3 +156,31 @@ Registra o que efetivamente aconteceu:
 - métricas por modelo.
 
 Regra: o JSON deve permitir reconstruir a pergunta experimental e interpretar o resultado sem depender do dashboard ou da conversa que originou o run.
+
+
+## RLT-M4-03 — Context-Aware Evaluation
+
+Objetivo: avaliar corretamente modelos contextuais quando o sinal sintético existe apenas em parte dos eventos.
+
+Cada modelo passa a registrar quatro cortes simultâneos:
+- `all`: todos os eventos;
+- `morning`: somente período da manhã;
+- `afternoon`: somente período da tarde;
+- `signal_eligible`: somente eventos em que o cenário configurado permitia a aplicação do sinal.
+
+Cada corte mantém:
+- eventos;
+- hit rate 2X, 3X e 4X;
+- esperado 2X, 3X e 4X;
+- O/E 2X, 3X e 4X;
+- P05 e P95 do O/E 2X entre universos;
+- losing streak p95.
+
+O placar geral continua existindo por compatibilidade, mas a comparação entre Contextual Raw e Global Raw em cenários contextuais deve usar prioritariamente `signal_eligible` e o corte específico correspondente.
+
+Exemplo:
+- em `morning_2x`, comparar especialmente `morning` e `signal_eligible`;
+- `afternoon` funciona como controle interno sem sinal;
+- Random Baseline deve permanecer aproximadamente em O/E 1 nos cortes relevantes.
+
+O JSON auditável passa a identificar o teste como `RLT-M4-03` e inclui os novos cortes dentro de cada modelo.
