@@ -10,6 +10,7 @@
   };
   let worker=null;
   let lastResult=null;
+  let lastTest=null;
 
   function fmtPct(x){return Number.isFinite(x)?(x*100).toFixed(2).replace('.',',')+'%':'—'}
   function fmt(x,d=3){return Number.isFinite(x)?x.toFixed(d).replace('.',','):'—'}
@@ -25,12 +26,58 @@
     const el=document.querySelector('#simSavedRuns');
     if(el)el.textContent=readRuns().length+' runs auditáveis salvos localmente';
   }
-  function saveRun(result){
+  function buildTestDefinition(config){
+    const scenarioNames={
+      null:'NULL · acaso puro',
+      fixed_2x:'Bias 2X · posição fixa',
+      morning_2x:'Bias 2X · somente manhã',
+      high_n_2x:'Bias 2X · N alto'
+    };
+    const expectations={
+      null:'Modelos devem convergir para O/E próximo de 1 e permanecer compatíveis com o Random Baseline.',
+      fixed_2x:'Modelos adaptativos devem aprender o sinal global; Global Raw tende a capturar melhor um efeito não contextual.',
+      morning_2x:'Contextual Raw deve explorar melhor um sinal restrito ao período da manhã do que Global Raw e Random Baseline.',
+      high_n_2x:'Modelos sensíveis ao contexto de N devem capturar melhor um sinal restrito a N alto do que baselines não contextuais.'
+    };
+    return {
+      id:'RLT-M4-02',
+      name:scenarioNames[config.signal.type]||config.signal.type,
+      objective:'Validar capacidade de distinguir sinal real de acaso em regime walk-forward sem hindsight.',
+      hypothesis:expectations[config.signal.type]||'Avaliar comportamento do modelo no cenário configurado.',
+      scenario:{
+        type:config.signal.type,
+        target:'2X = Nº1 ou Último',
+        position:config.signal.position,
+        strength:config.signal.strength,
+        minN:config.signal.minN
+      },
+      workload:{
+        universes:config.universes,
+        years_per_universe:config.years,
+        events_per_year:config.eventsPerYear,
+        planned_synthetic_events:config.universes*config.years*config.eventsPerYear
+      },
+      reproducibility:{
+        seed:config.seed,
+        structural_source:'81 eventos canônicos; somente permutações completas são elegíveis como moldes/estado inicial',
+        engine_protocol:'posição física -> gaps preservados -> ordem efetiva -> permutação 1..N sem reposição -> resultado final'
+      },
+      evaluation:{
+        primary_metric:'O/E 2X',
+        secondary_metrics:['hit_rate_2x','O/E 3X','O/E 4X','P05-P95 O/E 2X','max_losing_p95'],
+        controls:['Random Baseline','Fixed Baseline'],
+        rule:'Escolhas são congeladas antes de cada sorteio sintético; resultado só entra no histórico após adjudicação.'
+      }
+    };
+  }
+
+  function saveRun(test,result){
     const runs=readRuns();
     runs.unshift({
       saved_at:new Date().toISOString(),
-      engine_version:result.version,
-      ...result
+      source:'Roleta Intelligence Simulation Lab',
+      test,
+      result
     });
     localStorage.setItem(STORAGE_KEY,JSON.stringify(runs.slice(0,25)));
     updateSavedCount();
@@ -40,6 +87,7 @@
     const payload={
       exported_at:new Date().toISOString(),
       source:'Roleta Intelligence Simulation Lab',
+      test:lastTest,
       result:lastResult
     };
     const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
@@ -138,6 +186,8 @@
         signal
       };
       const total=config.universes*config.years*624;
+      const testDefinition=buildTestDefinition(config);
+      lastTest=testDefinition;
       status.textContent='Executando '+compact(total)+' roletas sintéticas em worker…';
 
       worker.onmessage=e=>{
@@ -149,7 +199,7 @@
         }
         if(msg.type==='complete'){
           renderSummary(msg.result);
-          saveRun(msg.result);
+          saveRun(testDefinition,msg.result);
           bar.style.width='100%';
           status.textContent='Concluído · run salvo localmente · dados sintéticos não alteraram a base real.';
           worker.terminate();worker=null;finishUi();
