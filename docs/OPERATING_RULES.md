@@ -52,3 +52,15 @@ Fechamento:
 após receber a foto/resultado da roleta de sábado, incorporar o evento, recalcular uma única vez e congelar os números de domingo.
 
 A base principal é sempre o dataset canônico global; fim de semana é contexto secundário.
+
+
+## Exceções eleitorais de 2026
+
+Regra geral de fim de semana:
+- sábado e domingo operam como uma única roleta integral por dia.
+
+Exceções:
+- 04/10/2026 — 1º turno das Eleições Gerais: duas roletas, manhã e tarde;
+- 25/10/2026 — eventual 2º turno das Eleições Gerais: duas roletas, manhã e tarde.
+
+Estas exceções são datadas e não alteram a regra geral dos demais fins de semana.
