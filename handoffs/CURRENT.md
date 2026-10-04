@@ -8,10 +8,17 @@ last resolved main HEAD: `71f3b06425cb7cf8ccfbc82c779aefce8b389037`
 active development branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`
 
 ## Canonical data
-- 81 logical events;
-- 80 complete validated permutations;
-- 77 quality A / 4 quality B;
+- 83 logical events;
+- 82 complete validated permutations;
+- 79 quality A / 4 quality B;
 - one partial event excluded from complete-permutation tests.
+
+## Nominal ledger
+- GitHub consolidated nominal file: `data/full_draws_reconstructed.csv`.
+- imported coverage: 48 events / 1022 participant rows.
+- canonical result ledger remains 83 events and is authoritative for model generation.
+- 02/10 and 03/10 nominal full-sheet backfill remains a data-quality follow-up, not a blocker for the prospective weekly freeze.
+- 04/10-T corrected: p12/p13 crossed out; Sabrina p11 drew 12 = Último; Wagner p14 drew 9.
 
 ## Production
 Workspace V3 remains production-delivered from main. No RLT-M4/RLT-M5 work in this active branch is merged or deployed.
