@@ -42,7 +42,7 @@
   "frozen_week": "2026-10-05/2026-10-11",
   "frozen_recommendations": {
     "WEEKLY_FROZEN": 48,
-    "CURRENT": 48,
     "RANDOM_SHADOW": 48
-  }
+  },
+  "open_current_recommendations": 48
 }
