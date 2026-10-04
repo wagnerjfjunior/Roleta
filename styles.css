@@ -551,3 +551,42 @@ body{overflow-x:hidden}
     flex-direction:column;
   }
 }
+
+
+/* RLT-M4-03 context-aware evaluation */
+.sim-context-head{
+  margin-top:22px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.sim-context-head h3{margin:5px 0 0}
+.sim-context-table{display:grid;gap:7px;margin-top:12px}
+.sim-context-row{
+  display:grid;
+  grid-template-columns:minmax(180px,1.4fr) repeat(4,minmax(92px,1fr));
+  gap:10px;
+  align-items:center;
+  background:#091523;
+  border:1px solid #20344b;
+  border-radius:12px;
+  padding:10px 12px;
+}
+.sim-context-row span{
+  font-size:12px;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.sim-context-header{
+  background:#0f1d30;
+  color:var(--muted);
+}
+.sim-context-header span{
+  font-size:9px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+@media(max-width:680px){
+  .sim-context-table{overflow-x:auto}
+  .sim-context-row{min-width:620px}
+}
