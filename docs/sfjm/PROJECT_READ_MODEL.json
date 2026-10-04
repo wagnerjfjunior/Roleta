@@ -8,32 +8,32 @@
   "status": "docs/PROJECT_STATUS.md",
   "next_safe_action": "docs/NEXT_SAFE_ACTION.md",
   "blocked_actions": "docs/BLOCKED_ACTIONS.md",
-  "primary_objective": "Preservar e analisar de forma auditável a operação de roleta/plantão e testar prospectivamente se existe edge real sobre o acaso, sem depender de contexto de conversa.",
   "state": {
-    "usable_events": 77,
-    "quality_A": 73,
+    "usable_events": 81,
+    "full_permutation_events": 80,
+    "quality_A": 77,
     "quality_B": 4,
-    "quarantine_or_unavailable": 10,
-    "duplicates_removed": 3,
-    "dashboard_version": "V2",
+    "dashboard_version": "V3_WORKSPACE",
     "dashboard_status": "RELEASED_PRODUCTION",
-    "model_lab_status": "ACTIVE",
-    "champion": "context_raw",
-    "viability": "EVIDENCIA_INSUFICIENTE"
+    "viability": "EVIDENCIA_INSUFICIENTE",
+    "presence_status": "RECONCILIATION_REQUIRED"
   },
   "active_workstream": "RLT-M3 Prospective Statistical Monitoring",
   "parallel_workstream": "RLT-M2 Broker Identity Layer",
-  "current_gate": "RLT-M3-02 Champion vs Challengers prospective validation",
+  "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
+  "frozen_context": {
+    "sunday": {
+      "Wagner": 9,
+      "Brenda": 5,
+      "Laura": 25,
+      "Helena": 23
+    }
+  },
   "delivery_policy": {
     "mode": "local-first-remote-on-promotion",
     "preview": false,
     "remote_iteration": false,
     "push_requires_explicit_intent": true,
     "deploy_requires_explicit_intent": true
-  },
-  "authority": {
-    "project": "wagnerjfjunior/Roleta",
-    "sfjm_protocol": "wagnerjfjunior/StopJuniorMode",
-    "workspace": "wagnerjfjunior/sfjm-workspace"
   }
 }

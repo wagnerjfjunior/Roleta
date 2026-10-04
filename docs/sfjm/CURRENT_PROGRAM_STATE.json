@@ -1,65 +1,46 @@
 {
   "project_id": "roleta",
-  "as_of": "2026-10-01",
+  "as_of": "2026-10-04",
   "primary_objective_status": "ACTIVE",
-  "milestones": [
-    {
-      "id": "RLT-M0",
-      "name": "Canonical governance and SFJM bootstrap",
-      "status": "COMPLETE"
-    },
-    {
-      "id": "RLT-M1",
-      "name": "Forensic numeric dataset baseline",
-      "status": "COMPLETE_WITH_QUARANTINE"
-    },
-    {
-      "id": "RLT-M2",
-      "name": "Broker identity layer and broker rankings",
-      "status": "ACTIVE_PARALLEL"
-    },
-    {
-      "id": "RLT-M3",
-      "name": "Prospective statistical monitoring and model competition",
-      "status": "ACTIVE"
-    },
-    {
-      "id": "RLT-M4",
-      "name": "Operational product specification and verifiable draw architecture",
-      "status": "PLANNED"
-    }
-  ],
-  "current_gate": "RLT-M3-02 champion-vs-challengers prospective validation",
-  "next_safe_action": "Append the observed 01/10 morning result to the frozen position-14 prediction, adjudicate HIT/MISS without hindsight, then continue parallel prospective predictions for champion and challengers.",
+  "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
+  "next_safe_action": "Reconcile disputed weekly presence from original evidence, fix mobile responsiveness locally, preserve frozen Sunday picks, then adjudicate Sunday without hindsight.",
+  "data": {
+    "logical_events": 81,
+    "full_permutation_events": 80,
+    "quality_A": 77,
+    "quality_B": 4
+  },
   "dashboard": {
-    "version": "V2",
-    "status": "RELEASED_PRODUCTION"
+    "version": "V3_WORKSPACE",
+    "status": "RELEASED_PRODUCTION",
+    "known_issue": "MOBILE_RESPONSIVENESS"
   },
   "model_lab": {
     "status": "ACTIVE",
-    "champion": "context_raw",
-    "champion_index": 100,
-    "viability": "EVIDENCIA_INSUFICIENTE",
-    "promotion_requires": [
-      "oos_above_champion",
-      "prospective_above_champion",
-      "sufficient_sample",
-      "sustained_advantage",
-      "random_baseline_check"
-    ]
+    "viability": "EVIDENCIA_INSUFICIENTE"
   },
   "weekend_cycle": {
-    "sample_policy": "all_77_primary_weekend_secondary",
-    "saturday": "FORECAST_UNTIL_FRIDAY_CLOSE",
-    "sunday": "FORECAST_UNTIL_SATURDAY_RESULT"
+    "saturday": "OBSERVED_COMPLETE",
+    "sunday": "FROZEN_AFTER_SATURDAY_RESULT",
+    "sunday_assignments": {
+      "Wagner": 9,
+      "Brenda": 5,
+      "Laura": 25,
+      "Helena": 23
+    }
   },
-  "blocked": [
-    "infer illegible names",
-    "infer missing draw numbers by mathematical complement",
-    "claim predictive advantage without prospective evidence",
-    "assign retrospective hits to challengers",
-    "use Vercel Preview",
-    "remote development iteration",
-    "push or deploy without explicit intent"
-  ]
+  "presence": {
+    "status": "RECONCILIATION_REQUIRED",
+    "disputed": [
+      "Sabrina/Brenda",
+      "Laura"
+    ]
+  },
+  "delivery_policy": {
+    "mode": "LOCAL_FIRST",
+    "preview": false,
+    "remote_iteration": false,
+    "push_requires_explicit_intent": true,
+    "deploy_requires_explicit_intent": true
+  }
 }

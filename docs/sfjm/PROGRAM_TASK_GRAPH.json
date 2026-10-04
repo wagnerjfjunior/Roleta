@@ -1,48 +1,24 @@
 {
   "project_id": "roleta",
-  "graph_version": 2,
+  "graph_version": 3,
   "nodes": [
     {
       "id": "RLT-M0",
       "type": "milestone",
-      "status": "COMPLETE",
-      "children": [
-        "RLT-M0-01"
-      ]
-    },
-    {
-      "id": "RLT-M0-01",
-      "type": "task",
-      "status": "COMPLETE",
-      "title": "Canonical repo + SFJM bootstrap"
+      "status": "COMPLETE"
     },
     {
       "id": "RLT-M1",
       "type": "milestone",
-      "status": "COMPLETE_WITH_QUARANTINE",
-      "children": [
-        "RLT-M1-01",
-        "RLT-M1-02"
-      ]
-    },
-    {
-      "id": "RLT-M1-01",
-      "type": "task",
-      "status": "COMPLETE",
-      "title": "Consolidate canonical numeric roulette dataset"
-    },
-    {
-      "id": "RLT-M1-02",
-      "type": "task",
-      "status": "COMPLETE",
-      "title": "Forensic statistics and chronological backtest"
+      "status": "COMPLETE_WITH_QUARANTINE"
     },
     {
       "id": "RLT-M2",
       "type": "milestone",
       "status": "ACTIVE_PARALLEL",
       "children": [
-        "RLT-M2-01"
+        "RLT-M2-01",
+        "RLT-M2-02"
       ]
     },
     {
@@ -52,43 +28,50 @@
       "title": "Normalize broker identities and rank outcomes"
     },
     {
+      "id": "RLT-M2-02",
+      "type": "task",
+      "status": "NEXT_SAFE_ACTION",
+      "title": "Reconcile weekly presence from original evidence"
+    },
+    {
       "id": "RLT-M3",
       "type": "milestone",
       "status": "ACTIVE",
       "children": [
         "RLT-M3-01",
         "RLT-M3-02",
-        "RLT-M3-03"
-      ],
-      "depends_on": [
-        "RLT-M1"
+        "RLT-M3-03",
+        "RLT-M3-04"
       ]
     },
     {
       "id": "RLT-M3-01",
       "type": "task",
       "status": "COMPLETE",
-      "title": "Release Dashboard V2 and Model Lab"
+      "title": "Release Workspace V3 dashboard"
     },
     {
       "id": "RLT-M3-02",
       "type": "task",
-      "status": "NEXT_SAFE_ACTION",
+      "status": "ACTIVE",
       "title": "Prospective Champion vs Challengers validation"
     },
     {
       "id": "RLT-M3-03",
       "type": "task",
-      "status": "ACTIVE_WAITING_EVIDENCE",
-      "title": "Weekend forecast cycle: Friday closes Saturday; Saturday closes Sunday"
+      "status": "ACTIVE_SUNDAY_FROZEN",
+      "title": "Weekend forecast cycle"
+    },
+    {
+      "id": "RLT-M3-04",
+      "type": "task",
+      "status": "NEXT_SAFE_ACTION",
+      "title": "Presence reconciliation + Workspace V3 mobile stabilization"
     },
     {
       "id": "RLT-M4",
       "type": "milestone",
-      "status": "PLANNED",
-      "depends_on": [
-        "RLT-M1"
-      ]
+      "status": "PLANNED"
     }
   ]
 }
