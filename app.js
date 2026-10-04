@@ -426,8 +426,9 @@ async function upgradeWorkspace(){
   simModels.innerHTML=
     '<div class="section-head"><div><span class="eyebrow">CHAMPION vs BASELINES</span><h2>Placar Monte Carlo</h2></div><span class="muted">Top-2 congelado antes de cada sorteio</span></div>'+
     '<div id="simModelTable" class="sim-model-table"><div class="muted small">Rode a simulação para gerar o placar.</div></div>'+
-    '<div class="sim-context-head"><span class="eyebrow">RLT-M4-03</span><h3>Avaliação por contexto · O/E 2X</h3></div>'+
-    '<div id="simContextTable" class="sim-context-table"><div class="muted small">Geral, manhã, tarde e signal-eligible serão comparados após a execução.</div></div>';
+    '<div class="sim-context-head"><span class="eyebrow">RLT-M4-04</span><h3>Decomposição de contexto · O/E 2X</h3></div>'+
+    '<div id="simContextTable" class="sim-context-table"><div class="muted small">Geral, manhã, tarde e signal-eligible serão comparados após a execução.</div></div>'+
+    '<div id="simPairwise" class="sim-pairwise"><div class="muted small">Aguardando comparação pareada entre universos.</div></div>';
   simulation.appendChild(simModels);
 
   const simBands=document.createElement('article');
