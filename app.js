@@ -357,6 +357,14 @@ async function upgradeWorkspace(){
   move(shell.querySelector('.topbar'),overview);
   move(shell.querySelector('.notice'),overview);
 
+  const prospectiveMount=document.createElement('article');
+  prospectiveMount.id='prospectiveOverview';
+  prospectiveMount.className='card workspace-prospective';
+  prospectiveMount.innerHTML=
+    '<div class="section-head"><div><span class="eyebrow">RLT-M5-01 · PROSPECTIVO</span><h2>Pré-cravados da semana</h2></div></div>'+
+    '<div class="muted small">Carregando ledger prospectivo…</div>';
+  overview.appendChild(prospectiveMount);
+
   const hero=shell.querySelector('.hero-grid');
   if(hero){
     const duplicateSaturday=hero.querySelector('.hero-card.accent');
@@ -486,12 +494,6 @@ async function upgradeWorkspace(){
       ).join('')+'</div>';
     ranking.insertBefore(topCard,ranking.children[1]||null);
 
-    const familySummary=document.createElement('article');
-    familySummary.className='card workspace-overview-family';
-    familySummary.innerHTML='<div class="section-head"><div><span class="eyebrow">MINHA FAMÍLIA</span><h2>Resumo histórico</h2></div><button class="workspace-link-button" data-open-workspace="family">ver detalhes</button></div>'+
-      '<div class="workspace-family-mini">'+brokerStats.family.slice(0,3).map(x=>'<div><strong>'+x.display_name+'</strong><span>'+x.total_special+' resultados especiais · '+x.participations+' participações</span></div>').join('')+'</div>';
-    const anchor=overview.querySelector('.workspace-hero');
-    if(anchor)anchor.insertAdjacentElement('afterend',familySummary);
   }
 
   const footer=shell.querySelector('footer');
