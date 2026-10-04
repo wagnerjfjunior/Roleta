@@ -89,34 +89,25 @@ Sabrina/Brenda and Laura 28/09–02/10 remain contested. Reconcile from original
 - merge only after explicit approval;
 - production only after explicit approval.
 
-## 20:00 READINESS
-The prospective pipeline is READY before the 04/10 results cutoff.
+## PROSPECTIVE WEEK 05–11/10 — FROZEN
+Freeze timestamp: `2026-10-04T20:04:19-03:00`.
+Cutoff: `04-10-T`.
 
-Locked policy:
-- PROSPECTIVE-V1.0.0;
-- period_raw_global_fallback;
-- RLT-M5-WEEKLY-V1;
-- 2X primary endpoint;
-- policy blob 965a06b358d504325e87076e09fb9dff12862ca3;
-- Adaptive Meta remains lab-only;
-- no post-result model switching.
+Generated from 83 canonical events:
+- 48 WEEKLY_FROZEN — immutable;
+- 48 CURRENT initial — DRAFT/revisable;
+- 48 RANDOM_SHADOW deterministic chains — frozen.
 
-Infrastructure active on branch:
-- recommendations.jsonl;
-- executions.jsonl;
-- adjudications.jsonl;
-- scorecard.json;
-- prospective/ledger.js;
-- prospective/generator.js;
-- Overview connected to canonical prospective ledgers.
+Initial allocations in order Wagner / Laura / Brenda / Helena:
+- morning: 14 / 3 / 5 / 4;
+- afternoon: 22 / 18 / 16 / 20;
+- integral: 21 / 4 / 8 / 12.
 
-Dry-run anti-hindsight: PASS.
-
-After 20:00 the only required sequence is:
-04/10 morning + afternoon ingestion -> validation -> final cutoff -> batch generation -> freeze -> scorecard/UI validation.
+Important correction:
+CURRENT is not frozen for the entire week. It remains revisable and is frozen only before the operational choice for its own target event.
 
 ## NEXT SAFE ACTION
-Receive and incorporate the two 04/10 real roulettes after 20:00, then execute the already-locked weekly batch. No methodology/model decision remains pending.
+Validate the frozen RLT-M5-01 weekly panel locally via SFJM/LVR. Then continue event-by-event adjudication/recalculation with no hindsight.
 
 ## Bootstrap
 `Ative o SFJM do projeto Roleta, resolva main ao vivo em wagnerjfjunior/Roleta, leia .sfjm/project.json, handoffs/CURRENT.md, docs/NEXT_SAFE_ACTION.md e docs/PROSPECTIVE_LEDGER.md, recupere a branch ativa e continue somente pela próxima ação segura canônica.`
