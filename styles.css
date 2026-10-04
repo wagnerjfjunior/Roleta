@@ -613,3 +613,19 @@ body{overflow-x:hidden}
 .sim-pair-card span b{color:var(--text)}
 .sim-pair-card small{color:var(--muted)}
 @media(max-width:980px){.sim-pair-grid{grid-template-columns:1fr}}
+
+.simulation-progress-wrap{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 64px;
+  gap:10px;
+  align-items:center;
+  margin:14px 0 10px;
+}
+.simulation-progress-wrap .simulation-progress{margin:0}
+#simProgressText{
+  font-size:12px;
+  font-weight:850;
+  color:var(--cyan);
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
