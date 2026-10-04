@@ -184,3 +184,38 @@ Exemplo:
 - Random Baseline deve permanecer aproximadamente em O/E 1 nos cortes relevantes.
 
 O JSON auditável passa a identificar o teste como `RLT-M4-03` e inclui os novos cortes dentro de cada modelo.
+
+
+## RLT-M4-04 — Context Decomposition
+
+Objetivo: decompor o contexto para verificar se adicionar a faixa de N melhora a detecção ou fragmenta excessivamente a amostra.
+
+Modelos comparados:
+- `Global Raw`: histórico global;
+- `Period Raw`: histórico separado somente por período (manhã/tarde);
+- `Contextual Raw · Period+N`: histórico separado por período + faixa de N;
+- `Random Baseline`;
+- `Fixed Baseline`.
+
+O `Period Raw` usa exatamente o mesmo ranking por excesso observado sobre esperado dos demais modelos Raw, mas sua chave contextual contém apenas o período.
+
+### Comparação pareada por universo
+
+Além das métricas agregadas, o resultado passa a registrar, no corte `signal_eligible`:
+- O/E 2X de cada modelo para cada universo;
+- quantidade de universos em que A vence B;
+- quantidade de universos em que B vence A;
+- empates;
+- taxa de vitória de A;
+- delta médio de O/E;
+- P05, P50 e P95 do delta.
+
+Comparações canônicas:
+- Period Raw vs Global Raw;
+- Period Raw vs Contextual Raw · Period+N;
+- Contextual Raw · Period+N vs Global Raw.
+
+Critério interpretativo:
+- se Period Raw superar consistentemente Period+N em sinais puramente por período, a faixa de N está provavelmente fragmentando a amostra;
+- se Period+N superar Period Raw em sinais dependentes de N, a granularidade adicional está agregando informação útil;
+- decisão de champion não deve ser tomada por uma única média agregada; usar taxa de vitória pareada, deltas e controles NULL.
