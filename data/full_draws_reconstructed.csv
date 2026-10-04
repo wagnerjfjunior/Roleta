@@ -1,0 +1,1023 @@
+index,event_id,date,period,N,physical_position,effective_order,drawn_number,broker_name_raw,broker_name_normalized,is_family,transcription_confidence,source,row_status,event_status
+0,P01,03/09/2026,desconhecido,23,1,1,12,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+1,P01,03/09/2026,desconhecido,23,2,2,21,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+2,P01,03/09/2026,desconhecido,23,3,3,4,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+3,P01,03/09/2026,desconhecido,23,4,4,13,Gelasio,Gelasio,False,medium,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+4,P01,03/09/2026,desconhecido,23,5,5,20,Antonia,Antonia,False,medium,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+5,P01,03/09/2026,desconhecido,23,6,6,18,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+6,P01,03/09/2026,desconhecido,23,7,7,9,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+7,P01,03/09/2026,desconhecido,23,8,8,16,Barba,Barba,False,medium,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+8,P01,03/09/2026,desconhecido,23,9,9,10,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+9,P01,03/09/2026,desconhecido,23,10,10,7,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+10,P01,03/09/2026,desconhecido,23,11,11,11,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+11,P01,03/09/2026,desconhecido,23,12,12,22,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+12,P01,03/09/2026,desconhecido,23,13,13,17,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+13,P01,03/09/2026,desconhecido,23,14,14,15,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+14,P01,03/09/2026,desconhecido,23,15,15,19,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+15,P01,03/09/2026,desconhecido,23,16,16,6,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+16,P01,03/09/2026,desconhecido,23,17,17,1,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+17,P01,03/09/2026,desconhecido,23,18,18,5,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+18,P01,03/09/2026,desconhecido,23,19,19,23,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+19,P01,03/09/2026,desconhecido,23,20,20,14,Luzona,Luzona,False,low,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+20,P01,03/09/2026,desconhecido,23,21,21,8,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+21,P01,03/09/2026,desconhecido,23,22,22,2,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+22,P01,03/09/2026,desconhecido,23,23,23,3,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+23,P02,01/09/2025,desconhecido,17,1,1,11,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+24,P02,01/09/2025,desconhecido,17,2,2,4,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+25,P02,01/09/2025,desconhecido,17,3,3,14,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+26,P02,01/09/2025,desconhecido,17,4,4,12,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+27,P02,01/09/2025,desconhecido,17,5,5,8,Prina,Prina,False,medium,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+28,P02,01/09/2025,desconhecido,17,6,6,13,Monarca,Monarca,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+29,P02,01/09/2025,desconhecido,17,7,7,16,Benedito,Benedito,False,medium,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+30,P02,01/09/2025,desconhecido,17,8,8,9,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+31,P02,01/09/2025,desconhecido,17,9,9,6,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+32,P02,01/09/2025,desconhecido,17,10,10,3,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+33,P02,01/09/2025,desconhecido,17,11,11,2,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+34,P02,01/09/2025,desconhecido,17,12,12,15,Luma,Luma,False,medium,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+35,P02,01/09/2025,desconhecido,17,13,13,7,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+36,P02,01/09/2025,desconhecido,17,14,14,17,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+37,P02,01/09/2025,desconhecido,17,16,15,10,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+38,P02,01/09/2025,desconhecido,17,17,16,1,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+39,P02,01/09/2025,desconhecido,17,21,17,5,Aline,Aline,False,medium,Roleta Agosto Setembro.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+40,P03,31/08/2026,tarde,22,1,1,10,Turmalina,Turmalina,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+41,P03,31/08/2026,tarde,22,2,2,22,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+42,P03,31/08/2026,tarde,22,3,3,1,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+43,P03,31/08/2026,tarde,22,4,4,19,Antonio,Antonio,False,medium,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+44,P03,31/08/2026,tarde,22,5,5,14,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+45,P03,31/08/2026,tarde,22,6,6,5,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+46,P03,31/08/2026,tarde,22,7,7,17,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+47,P03,31/08/2026,tarde,22,8,8,15,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+48,P03,31/08/2026,tarde,22,9,9,6,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+49,P03,31/08/2026,tarde,22,10,10,8,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+50,P03,31/08/2026,tarde,22,11,11,11,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+51,P03,31/08/2026,tarde,22,12,12,21,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+52,P03,31/08/2026,tarde,22,13,13,12,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+53,P03,31/08/2026,tarde,22,14,14,3,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+54,P03,31/08/2026,tarde,22,15,15,4,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+55,P03,31/08/2026,tarde,22,16,16,20,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+56,P03,31/08/2026,tarde,22,17,17,9,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+57,P03,31/08/2026,tarde,22,18,18,18,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+58,P03,31/08/2026,tarde,22,19,19,7,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+59,P03,31/08/2026,tarde,22,21,20,2,Amora,Amora,False,medium,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+60,P03,31/08/2026,tarde,22,22,21,13,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+61,P03,31/08/2026,tarde,22,23,22,16,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+62,P04,03/09/2026,tarde,30,1,1,30,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+63,P04,03/09/2026,tarde,30,2,2,9,Bela,Bela,False,low,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+64,P04,03/09/2026,tarde,30,3,3,12,Prina,Prina,False,medium,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+65,P04,03/09/2026,tarde,30,4,4,24,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+66,P04,03/09/2026,tarde,30,5,5,2,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+67,P04,03/09/2026,tarde,30,6,6,13,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+68,P04,03/09/2026,tarde,30,7,7,6,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+69,P04,03/09/2026,tarde,30,8,8,25,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+70,P04,03/09/2026,tarde,30,9,9,4,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+71,P04,03/09/2026,tarde,30,10,10,29,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+72,P04,03/09/2026,tarde,30,11,11,3,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+73,P04,03/09/2026,tarde,30,12,12,1,Aline,Aline,False,medium,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+74,P04,03/09/2026,tarde,30,14,13,21,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+75,P04,03/09/2026,tarde,30,15,14,7,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+76,P04,03/09/2026,tarde,30,16,15,10,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+77,P04,03/09/2026,tarde,30,17,16,15,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+78,P04,03/09/2026,tarde,30,18,17,27,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+79,P04,03/09/2026,tarde,30,19,18,19,Aline,Aline,False,low,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+80,P04,03/09/2026,tarde,30,20,19,18,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+81,P04,03/09/2026,tarde,30,21,20,8,Arabella,Arabella,False,medium,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+82,P04,03/09/2026,tarde,30,22,21,17,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+83,P04,03/09/2026,tarde,30,23,22,23,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+84,P04,03/09/2026,tarde,30,24,23,14,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+85,P04,03/09/2026,tarde,30,25,24,11,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+86,P04,03/09/2026,tarde,30,26,25,20,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+87,P04,03/09/2026,tarde,30,27,26,5,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+88,P04,03/09/2026,tarde,30,28,27,26,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+89,P04,03/09/2026,tarde,30,29,28,16,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+90,P04,03/09/2026,tarde,30,30,29,22,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=4,VERIFIED_NUMBER,PARTIAL_SOURCE_CROP
+91,P05,24/08/2026,tarde,25,1,1,9,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+92,P05,24/08/2026,tarde,25,2,2,20,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+93,P05,24/08/2026,tarde,25,3,3,13,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+94,P05,24/08/2026,tarde,25,4,4,6,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+95,P05,24/08/2026,tarde,25,5,5,16,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+96,P05,24/08/2026,tarde,25,6,6,19,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+97,P05,24/08/2026,tarde,25,7,7,11,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+98,P05,24/08/2026,tarde,25,8,8,10,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+99,P05,24/08/2026,tarde,25,9,9,5,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+100,P05,24/08/2026,tarde,25,10,10,3,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+101,P05,24/08/2026,tarde,25,11,11,12,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+102,P05,24/08/2026,tarde,25,12,12,24,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+103,P05,24/08/2026,tarde,25,13,13,15,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+104,P05,24/08/2026,tarde,25,14,14,14,Jose,Jose,False,medium,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+105,P05,24/08/2026,tarde,25,15,15,23,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+106,P05,24/08/2026,tarde,25,16,16,2,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+107,P05,24/08/2026,tarde,25,17,17,4,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+108,P05,24/08/2026,tarde,25,18,18,25,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+109,P05,24/08/2026,tarde,25,19,19,17,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+110,P05,24/08/2026,tarde,25,20,20,18,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+111,P05,24/08/2026,tarde,25,21,21,21,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+112,P05,24/08/2026,tarde,25,22,22,1,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+113,P05,24/08/2026,tarde,25,23,23,8,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+114,P05,24/08/2026,tarde,25,24,24,7,Juliano,Juliano,False,medium,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+115,P05,24/08/2026,tarde,25,25,25,22,,,False,low,Roleta Agosto Setembro.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+116,P06,02/09/2026,tarde,33,1,1,25,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+117,P06,02/09/2026,tarde,33,2,2,29,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+118,P06,02/09/2026,tarde,33,3,3,28,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+119,P06,02/09/2026,tarde,33,4,4,19,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+120,P06,02/09/2026,tarde,33,5,5,10,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+121,P06,02/09/2026,tarde,33,6,6,8,Antonia,Antonia,False,medium,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+122,P06,02/09/2026,tarde,33,7,7,13,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+123,P06,02/09/2026,tarde,33,8,8,31,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+124,P06,02/09/2026,tarde,33,9,9,21,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+125,P06,02/09/2026,tarde,33,10,10,3,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+126,P06,02/09/2026,tarde,33,11,11,4,Nain,Nain,False,low,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+127,P06,02/09/2026,tarde,33,12,12,30,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+128,P06,02/09/2026,tarde,33,13,13,20,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+129,P06,02/09/2026,tarde,33,14,14,26,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+130,P06,02/09/2026,tarde,33,15,15,11,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+131,P06,02/09/2026,tarde,33,16,16,6,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+132,P06,02/09/2026,tarde,33,17,17,7,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+133,P06,02/09/2026,tarde,33,18,18,12,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+134,P06,02/09/2026,tarde,33,19,19,1,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+135,P06,02/09/2026,tarde,33,20,20,18,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+136,P06,02/09/2026,tarde,33,21,21,27,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+137,P06,02/09/2026,tarde,33,22,22,22,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+138,P06,02/09/2026,tarde,33,23,23,23,Barba,Barba,False,medium,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+139,P06,02/09/2026,tarde,33,24,24,17,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+140,P06,02/09/2026,tarde,33,25,25,2,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+141,P06,02/09/2026,tarde,33,26,26,32,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+142,P06,02/09/2026,tarde,33,27,27,33,Guilherme,Guilherme,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+143,P06,02/09/2026,tarde,33,28,28,16,Mate,Mate,False,medium,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+144,P06,02/09/2026,tarde,33,29,29,15,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+145,P06,02/09/2026,tarde,33,30,30,9,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+146,P06,02/09/2026,tarde,33,31,31,14,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+147,P06,02/09/2026,tarde,33,32,32,24,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+148,P06,02/09/2026,tarde,33,33,33,5,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+149,P08,28/08/2026,tarde,17,1,1,7,Nain,Nain,False,low,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+150,P08,28/08/2026,tarde,17,2,2,15,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+151,P08,28/08/2026,tarde,17,3,3,16,Suzete,Suzete,False,medium,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+152,P08,28/08/2026,tarde,17,4,4,17,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+153,P08,28/08/2026,tarde,17,5,5,13,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+154,P08,28/08/2026,tarde,17,6,6,2,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+155,P08,28/08/2026,tarde,17,7,7,10,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+156,P08,28/08/2026,tarde,17,8,8,4,Barba,Barba,False,medium,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+157,P08,28/08/2026,tarde,17,9,9,3,Luma,Luma,False,medium,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+158,P08,28/08/2026,tarde,17,10,10,8,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+159,P08,28/08/2026,tarde,17,11,11,6,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+160,P08,28/08/2026,tarde,17,12,12,9,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+161,P08,28/08/2026,tarde,17,13,13,11,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+162,P08,28/08/2026,tarde,17,14,14,5,Helena,Helena,True,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+163,P08,28/08/2026,tarde,17,15,15,14,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+164,P08,28/08/2026,tarde,17,16,16,12,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+165,P08,28/08/2026,tarde,17,17,17,1,Jorge,Jorge,False,medium,Roleta Agosto Setembro.pdf#page=8,VERIFIED_NUMBER,VERIFIED_FULL
+166,P09,28/08/2026,desconhecido,11,1,1,9,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+167,P09,28/08/2026,desconhecido,11,2,2,6,Jorge,Jorge,False,medium,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+168,P09,28/08/2026,desconhecido,11,3,3,11,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+169,P09,28/08/2026,desconhecido,11,4,4,8,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+170,P09,28/08/2026,desconhecido,11,5,5,10,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+171,P09,28/08/2026,desconhecido,11,6,6,2,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+172,P09,28/08/2026,desconhecido,11,7,7,7,Milena,Milena,False,high,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+173,P09,28/08/2026,desconhecido,11,8,8,5,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+174,P09,28/08/2026,desconhecido,11,9,9,3,Barba,Barba,False,medium,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+175,P09,28/08/2026,desconhecido,11,10,10,1,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+176,P09,28/08/2026,desconhecido,11,11,11,4,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=9,VERIFIED_NUMBER,VERIFIED_FULL
+177,P10,não preenchida,desconhecido,16,1,1,6,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+178,P10,não preenchida,desconhecido,16,2,2,7,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+179,P10,não preenchida,desconhecido,16,3,3,4,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+180,P10,não preenchida,desconhecido,16,4,4,15,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+181,P10,não preenchida,desconhecido,16,5,5,11,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+182,P10,não preenchida,desconhecido,16,6,6,16,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+183,P10,não preenchida,desconhecido,16,7,7,12,Suzete,Suzete,False,medium,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+184,P10,não preenchida,desconhecido,16,8,8,5,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+185,P10,não preenchida,desconhecido,16,10,9,2,Furlan,Furlan,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+186,P10,não preenchida,desconhecido,16,11,10,8,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+187,P10,não preenchida,desconhecido,16,12,11,10,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+188,P10,não preenchida,desconhecido,16,13,12,14,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+189,P10,não preenchida,desconhecido,16,14,13,13,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+190,P10,não preenchida,desconhecido,16,15,14,1,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+191,P10,não preenchida,desconhecido,16,16,15,3,Helena,Helena,True,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+192,P10,não preenchida,desconhecido,16,17,16,9,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=10,VERIFIED_NUMBER,VERIFIED_FULL
+193,P11,30/08/2026,integral,30,1,1,8,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+194,P11,30/08/2026,integral,30,2,2,7,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+195,P11,30/08/2026,integral,30,3,3,19,Monarca,Monarca,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+196,P11,30/08/2026,integral,30,4,4,16,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+197,P11,30/08/2026,integral,30,5,5,3,Prina,Prina,False,medium,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+198,P11,30/08/2026,integral,30,6,6,9,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+199,P11,30/08/2026,integral,30,7,7,13,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+200,P11,30/08/2026,integral,30,8,8,15,Antonia,Antonia,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+201,P11,30/08/2026,integral,30,9,9,12,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+202,P11,30/08/2026,integral,30,10,10,21,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+203,P11,30/08/2026,integral,30,11,11,4,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+204,P11,30/08/2026,integral,30,12,12,1,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+205,P11,30/08/2026,integral,30,13,13,10,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+206,P11,30/08/2026,integral,30,14,14,29,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+207,P11,30/08/2026,integral,30,15,15,26,Luma,Luma,False,medium,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+208,P11,30/08/2026,integral,30,16,16,6,Paola,Paola,False,medium,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+209,P11,30/08/2026,integral,30,17,17,18,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+210,P11,30/08/2026,integral,30,18,18,14,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+211,P11,30/08/2026,integral,30,19,19,5,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+212,P11,30/08/2026,integral,30,20,20,22,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+213,P11,30/08/2026,integral,30,21,21,30,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+214,P11,30/08/2026,integral,30,22,22,23,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+215,P11,30/08/2026,integral,30,23,23,2,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+216,P11,30/08/2026,integral,30,24,24,17,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+217,P11,30/08/2026,integral,30,25,25,28,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+218,P11,30/08/2026,integral,30,26,26,27,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+219,P11,30/08/2026,integral,30,27,27,11,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+220,P11,30/08/2026,integral,30,28,28,24,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+221,P11,30/08/2026,integral,30,29,29,20,Helena,Helena,True,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+222,P11,30/08/2026,integral,30,30,30,25,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=11,VERIFIED_NUMBER,VERIFIED_FULL
+223,P12,26/08/2026,desconhecido,20,1,1,7,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+224,P12,26/08/2026,desconhecido,20,2,2,11,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+225,P12,26/08/2026,desconhecido,20,3,3,18,Telma,Telma,False,low,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+226,P12,26/08/2026,desconhecido,20,4,4,17,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+227,P12,26/08/2026,desconhecido,20,5,5,6,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+228,P12,26/08/2026,desconhecido,20,6,6,4,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+229,P12,26/08/2026,desconhecido,20,7,7,2,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+230,P12,26/08/2026,desconhecido,20,8,8,10,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+231,P12,26/08/2026,desconhecido,20,9,9,1,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+232,P12,26/08/2026,desconhecido,20,10,10,3,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+233,P12,26/08/2026,desconhecido,20,11,11,14,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+234,P12,26/08/2026,desconhecido,20,12,12,15,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+235,P12,26/08/2026,desconhecido,20,13,13,8,Gloz,Gloz,False,low,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+236,P12,26/08/2026,desconhecido,20,14,14,16,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+237,P12,26/08/2026,desconhecido,20,15,15,12,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+238,P12,26/08/2026,desconhecido,20,16,16,20,Furlan,Furlan,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+239,P12,26/08/2026,desconhecido,20,17,17,19,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+240,P12,26/08/2026,desconhecido,20,18,18,13,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+241,P12,26/08/2026,desconhecido,20,19,19,5,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+242,P12,26/08/2026,desconhecido,20,20,20,9,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=12,VERIFIED_NUMBER,VERIFIED_FULL
+243,P13,não preenchida,tarde,28,1,1,23,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+244,P13,não preenchida,tarde,28,2,2,15,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+245,P13,não preenchida,tarde,28,3,3,10,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+246,P13,não preenchida,tarde,28,4,4,16,Jorge,Jorge,False,medium,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+247,P13,não preenchida,tarde,28,5,5,2,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+248,P13,não preenchida,tarde,28,7,6,3,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+249,P13,não preenchida,tarde,28,8,7,4,Barba,Barba,False,medium,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+250,P13,não preenchida,tarde,28,9,8,9,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+251,P13,não preenchida,tarde,28,10,9,18,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+252,P13,não preenchida,tarde,28,11,10,26,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+253,P13,não preenchida,tarde,28,12,11,13,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+254,P13,não preenchida,tarde,28,13,12,12,Furlan,Furlan,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+255,P13,não preenchida,tarde,28,14,13,24,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+256,P13,não preenchida,tarde,28,15,14,11,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+257,P13,não preenchida,tarde,28,16,15,22,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+258,P13,não preenchida,tarde,28,17,16,17,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+259,P13,não preenchida,tarde,28,18,17,27,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+260,P13,não preenchida,tarde,28,19,18,1,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+261,P13,não preenchida,tarde,28,20,19,6,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+262,P13,não preenchida,tarde,28,21,20,14,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+263,P13,não preenchida,tarde,28,22,21,28,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+264,P13,não preenchida,tarde,28,23,22,7,Suzete,Suzete,False,medium,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+265,P13,não preenchida,tarde,28,24,23,20,Nain,Nain,False,low,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+266,P13,não preenchida,tarde,28,25,24,8,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+267,P13,não preenchida,tarde,28,26,25,25,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+268,P13,não preenchida,tarde,28,27,26,21,Helena,Helena,True,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+269,P13,não preenchida,tarde,28,28,27,19,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+270,P13,não preenchida,tarde,28,29,28,5,Giao,Giao,False,low,Roleta Agosto Setembro.pdf#page=13,VERIFIED_NUMBER,VERIFIED_FULL
+271,P14,29/08/2026,integral,35,1,1,25,Monarca,Monarca,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+272,P14,29/08/2026,integral,35,2,2,30,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+273,P14,29/08/2026,integral,35,3,3,32,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+274,P14,29/08/2026,integral,35,4,4,23,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+275,P14,29/08/2026,integral,35,5,5,33,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+276,P14,29/08/2026,integral,35,6,6,16,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+277,P14,29/08/2026,integral,35,7,7,18,Jorge,Jorge,False,medium,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+278,P14,29/08/2026,integral,35,8,8,29,Barba,Barba,False,medium,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+279,P14,29/08/2026,integral,35,10,9,6,Prina,Prina,False,medium,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+280,P14,29/08/2026,integral,35,11,10,12,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+281,P14,29/08/2026,integral,35,12,11,9,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+282,P14,29/08/2026,integral,35,13,12,8,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+283,P14,29/08/2026,integral,35,14,13,27,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+284,P14,29/08/2026,integral,35,15,14,17,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+285,P14,29/08/2026,integral,35,16,15,20,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+286,P14,29/08/2026,integral,35,17,16,1,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+287,P14,29/08/2026,integral,35,18,17,31,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+288,P14,29/08/2026,integral,35,19,18,5,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+289,P14,29/08/2026,integral,35,20,19,13,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+290,P14,29/08/2026,integral,35,21,20,22,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+291,P14,29/08/2026,integral,35,22,21,3,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+292,P14,29/08/2026,integral,35,23,22,14,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+293,P14,29/08/2026,integral,35,24,23,11,Nain,Nain,False,low,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+294,P14,29/08/2026,integral,35,25,24,10,Furlan,Furlan,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+295,P14,29/08/2026,integral,35,26,25,24,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+296,P14,29/08/2026,integral,35,27,26,35,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+297,P14,29/08/2026,integral,35,28,27,7,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+298,P14,29/08/2026,integral,35,29,28,15,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+299,P14,29/08/2026,integral,35,30,29,26,Giao,Giao,False,low,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+300,P14,29/08/2026,integral,35,31,30,19,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+301,P14,29/08/2026,integral,35,32,31,34,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+302,P14,29/08/2026,integral,35,33,32,2,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+303,P14,29/08/2026,integral,35,34,33,28,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+304,P14,29/08/2026,integral,35,35,34,21,Helena,Helena,True,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+305,P14,29/08/2026,integral,35,36,35,4,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=14,VERIFIED_NUMBER,VERIFIED_FULL
+306,P15,25/08/2026,tarde,26,1,1,7,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+307,P15,25/08/2026,tarde,26,2,2,22,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+308,P15,25/08/2026,tarde,26,3,3,11,Nain,Nain,False,low,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+309,P15,25/08/2026,tarde,26,4,4,4,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+310,P15,25/08/2026,tarde,26,5,5,21,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+311,P15,25/08/2026,tarde,26,6,6,17,Furlan,Furlan,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+312,P15,25/08/2026,tarde,26,7,7,18,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+313,P15,25/08/2026,tarde,26,8,8,16,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+314,P15,25/08/2026,tarde,26,9,9,20,Prina,Prina,False,medium,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+315,P15,25/08/2026,tarde,26,10,10,14,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+316,P15,25/08/2026,tarde,26,11,11,5,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+317,P15,25/08/2026,tarde,26,12,12,1,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+318,P15,25/08/2026,tarde,26,13,13,23,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+319,P15,25/08/2026,tarde,26,14,14,2,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+320,P15,25/08/2026,tarde,26,15,15,10,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+321,P15,25/08/2026,tarde,26,16,16,24,Nain,Nain,False,low,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+322,P15,25/08/2026,tarde,26,17,17,19,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+323,P15,25/08/2026,tarde,26,18,18,6,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+324,P15,25/08/2026,tarde,26,19,19,9,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+325,P15,25/08/2026,tarde,26,20,20,26,Telma,Telma,False,low,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+326,P15,25/08/2026,tarde,26,21,21,13,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+327,P15,25/08/2026,tarde,26,22,22,8,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+328,P15,25/08/2026,tarde,26,23,23,3,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+329,P15,25/08/2026,tarde,26,24,24,15,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+330,P15,25/08/2026,tarde,26,25,25,25,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+331,P15,25/08/2026,tarde,26,26,26,12,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=15,VERIFIED_NUMBER,VERIFIED_FULL
+332,P16,25/08/2026,manha,22,1,1,21,Telma,Telma,False,low,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+333,P16,25/08/2026,manha,22,2,2,5,Biel,Biel,False,medium,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+334,P16,25/08/2026,manha,22,3,3,11,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+335,P16,25/08/2026,manha,22,4,4,1,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+336,P16,25/08/2026,manha,22,5,5,19,Prina,Prina,False,medium,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+337,P16,25/08/2026,manha,22,6,6,15,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+338,P16,25/08/2026,manha,22,7,7,22,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+339,P16,25/08/2026,manha,22,8,8,14,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+340,P16,25/08/2026,manha,22,9,9,20,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+341,P16,25/08/2026,manha,22,10,10,13,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+342,P16,25/08/2026,manha,22,11,11,10,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+343,P16,25/08/2026,manha,22,12,12,8,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+344,P16,25/08/2026,manha,22,13,13,2,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+345,P16,25/08/2026,manha,22,14,14,3,Furlan,Furlan,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+346,P16,25/08/2026,manha,22,15,15,6,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+347,P16,25/08/2026,manha,22,16,16,4,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+348,P16,25/08/2026,manha,22,17,17,16,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+349,P16,25/08/2026,manha,22,18,18,17,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+350,P16,25/08/2026,manha,22,19,19,9,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+351,P16,25/08/2026,manha,22,20,20,12,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+352,P16,25/08/2026,manha,22,21,21,7,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+353,P16,25/08/2026,manha,22,22,22,18,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=16,VERIFIED_NUMBER,VERIFIED_FULL
+354,P17,01/09/2026,desconhecido,21,1,1,2,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+355,P17,01/09/2026,desconhecido,21,2,2,20,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+356,P17,01/09/2026,desconhecido,21,3,3,6,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+357,P17,01/09/2026,desconhecido,21,4,4,17,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+358,P17,01/09/2026,desconhecido,21,5,5,7,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+359,P17,01/09/2026,desconhecido,21,6,6,21,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+360,P17,01/09/2026,desconhecido,21,7,7,14,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+361,P17,01/09/2026,desconhecido,21,8,8,18,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+362,P17,01/09/2026,desconhecido,21,9,9,19,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+363,P17,01/09/2026,desconhecido,21,10,10,16,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+364,P17,01/09/2026,desconhecido,21,11,11,11,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+365,P17,01/09/2026,desconhecido,21,12,12,1,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+366,P17,01/09/2026,desconhecido,21,13,13,13,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+367,P17,01/09/2026,desconhecido,21,14,14,9,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+368,P17,01/09/2026,desconhecido,21,15,15,5,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+369,P17,01/09/2026,desconhecido,21,16,16,10,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+370,P17,01/09/2026,desconhecido,21,17,17,12,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+371,P17,01/09/2026,desconhecido,21,18,18,4,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+372,P17,01/09/2026,desconhecido,21,19,19,8,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+373,P17,01/09/2026,desconhecido,21,20,20,3,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+374,P17,01/09/2026,desconhecido,21,21,21,15,Aline,Aline,False,high,Roleta Agosto Setembro.pdf#page=17,VERIFIED_NUMBER,VERIFIED_FULL
+375,P18,24/08/2026,manha,17,1,1,12,Telma,Telma,False,low,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+376,P18,24/08/2026,manha,17,2,2,9,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+377,P18,24/08/2026,manha,17,3,3,5,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+378,P18,24/08/2026,manha,17,4,4,13,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+379,P18,24/08/2026,manha,17,5,5,16,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+380,P18,24/08/2026,manha,17,6,6,4,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+381,P18,24/08/2026,manha,17,7,7,17,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+382,P18,24/08/2026,manha,17,8,8,7,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+383,P18,24/08/2026,manha,17,9,9,14,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+384,P18,24/08/2026,manha,17,10,10,10,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+385,P18,24/08/2026,manha,17,11,11,2,Giao,Giao,False,low,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+386,P18,24/08/2026,manha,17,12,12,3,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+387,P18,24/08/2026,manha,17,13,13,6,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+388,P18,24/08/2026,manha,17,14,14,1,Madri,Madri,False,medium,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+389,P18,24/08/2026,manha,17,15,15,8,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+390,P18,24/08/2026,manha,17,16,16,15,Nida,Nida,False,low,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+391,P18,24/08/2026,manha,17,17,17,11,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=18,VERIFIED_NUMBER,VERIFIED_FULL
+392,P19,27/08/2026,tarde,22,1,1,17,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+393,P19,27/08/2026,tarde,22,2,2,14,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+394,P19,27/08/2026,tarde,22,3,3,7,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+395,P19,27/08/2026,tarde,22,4,4,6,Suzete,Suzete,False,medium,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+396,P19,27/08/2026,tarde,22,5,5,9,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+397,P19,27/08/2026,tarde,22,6,6,3,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+398,P19,27/08/2026,tarde,22,7,7,19,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+399,P19,27/08/2026,tarde,22,8,8,20,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+400,P19,27/08/2026,tarde,22,9,9,18,Barba,Barba,False,medium,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+401,P19,27/08/2026,tarde,22,10,10,12,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+402,P19,27/08/2026,tarde,22,11,11,13,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+403,P19,27/08/2026,tarde,22,12,12,5,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+404,P19,27/08/2026,tarde,22,13,13,15,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+405,P19,27/08/2026,tarde,22,14,14,8,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+406,P19,27/08/2026,tarde,22,15,15,4,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+407,P19,27/08/2026,tarde,22,16,16,2,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+408,P19,27/08/2026,tarde,22,17,17,11,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+409,P19,27/08/2026,tarde,22,18,18,16,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+410,P19,27/08/2026,tarde,22,19,19,10,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+411,P19,27/08/2026,tarde,22,20,20,21,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+412,P19,27/08/2026,tarde,22,21,21,1,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+413,P19,27/08/2026,tarde,22,22,22,22,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=19,VERIFIED_NUMBER,VERIFIED_FULL
+414,P20,02/09/2026,manha,27,1,1,15,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+415,P20,02/09/2026,manha,27,2,2,16,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+416,P20,02/09/2026,manha,27,3,3,8,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+417,P20,02/09/2026,manha,27,4,4,3,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+418,P20,02/09/2026,manha,27,5,5,10,Guilherme,Guilherme,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+419,P20,02/09/2026,manha,27,6,6,25,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+420,P20,02/09/2026,manha,27,7,7,24,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+421,P20,02/09/2026,manha,27,8,8,9,Barba,Barba,False,medium,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+422,P20,02/09/2026,manha,27,9,9,13,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+423,P20,02/09/2026,manha,27,10,10,2,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+424,P20,02/09/2026,manha,27,11,11,18,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+425,P20,02/09/2026,manha,27,12,12,20,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+426,P20,02/09/2026,manha,27,13,13,14,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+427,P20,02/09/2026,manha,27,14,14,11,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+428,P20,02/09/2026,manha,27,15,15,5,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+429,P20,02/09/2026,manha,27,16,16,22,Mate,Mate,False,medium,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+430,P20,02/09/2026,manha,27,17,17,27,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+431,P20,02/09/2026,manha,27,18,18,23,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+432,P20,02/09/2026,manha,27,19,19,17,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+433,P20,02/09/2026,manha,27,20,20,26,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+434,P20,02/09/2026,manha,27,21,21,7,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+435,P20,02/09/2026,manha,27,22,22,21,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+436,P20,02/09/2026,manha,27,23,23,19,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+437,P20,02/09/2026,manha,27,24,24,12,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+438,P20,02/09/2026,manha,27,25,25,1,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+439,P20,02/09/2026,manha,27,26,26,6,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+440,P20,02/09/2026,manha,27,27,27,4,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=20,VERIFIED_NUMBER,VERIFIED_FULL
+441,P21,08/09/2026,tarde,32,1,1,4,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+442,P21,08/09/2026,tarde,32,2,2,16,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+443,P21,08/09/2026,tarde,32,3,3,13,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+444,P21,08/09/2026,tarde,32,4,4,25,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+445,P21,08/09/2026,tarde,32,5,5,2,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+446,P21,08/09/2026,tarde,32,6,6,23,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+447,P21,08/09/2026,tarde,32,7,7,14,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+448,P21,08/09/2026,tarde,32,8,8,9,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+449,P21,08/09/2026,tarde,32,9,9,21,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+450,P21,08/09/2026,tarde,32,10,10,15,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+451,P21,08/09/2026,tarde,32,11,11,8,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+452,P21,08/09/2026,tarde,32,12,12,11,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+453,P21,08/09/2026,tarde,32,13,13,20,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+454,P21,08/09/2026,tarde,32,14,14,18,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+455,P21,08/09/2026,tarde,32,15,15,5,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+456,P21,08/09/2026,tarde,32,16,16,26,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+457,P21,08/09/2026,tarde,32,17,17,31,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+458,P21,08/09/2026,tarde,32,18,18,1,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+459,P21,08/09/2026,tarde,32,19,19,3,Telma,Telma,False,low,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+460,P21,08/09/2026,tarde,32,20,20,28,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+461,P21,08/09/2026,tarde,32,21,21,27,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+462,P21,08/09/2026,tarde,32,22,22,32,Jorge,Jorge,False,medium,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+463,P21,08/09/2026,tarde,32,23,23,10,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+464,P21,08/09/2026,tarde,32,24,24,17,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+465,P21,08/09/2026,tarde,32,25,25,30,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+466,P21,08/09/2026,tarde,32,26,26,29,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+467,P21,08/09/2026,tarde,32,27,27,22,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+468,P21,08/09/2026,tarde,32,28,28,7,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+469,P21,08/09/2026,tarde,32,29,29,6,Aline,Aline,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+470,P21,08/09/2026,tarde,32,30,30,12,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+471,P21,08/09/2026,tarde,32,31,31,24,Mate,Mate,False,medium,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+472,P21,08/09/2026,tarde,32,32,32,19,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=21,VERIFIED_NUMBER,VERIFIED_FULL
+473,P22,08/09/2026,manha,24,1,1,13,Telma,Telma,False,low,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+474,P22,08/09/2026,manha,24,2,2,21,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+475,P22,08/09/2026,manha,24,3,3,3,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+476,P22,08/09/2026,manha,24,4,4,6,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+477,P22,08/09/2026,manha,24,5,5,23,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+478,P22,08/09/2026,manha,24,6,6,11,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+479,P22,08/09/2026,manha,24,7,7,22,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+480,P22,08/09/2026,manha,24,8,8,7,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+481,P22,08/09/2026,manha,24,9,9,19,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+482,P22,08/09/2026,manha,24,10,10,12,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+483,P22,08/09/2026,manha,24,11,11,18,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+484,P22,08/09/2026,manha,24,12,12,8,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+485,P22,08/09/2026,manha,24,13,13,5,Denise,Denise,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+486,P22,08/09/2026,manha,24,14,14,10,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+487,P22,08/09/2026,manha,24,15,15,9,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+488,P22,08/09/2026,manha,24,16,16,14,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+489,P22,08/09/2026,manha,24,17,17,16,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+490,P22,08/09/2026,manha,24,18,18,4,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+491,P22,08/09/2026,manha,24,19,19,24,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+492,P22,08/09/2026,manha,24,20,20,20,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+493,P22,08/09/2026,manha,24,21,21,2,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+494,P22,08/09/2026,manha,24,22,22,17,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+495,P22,08/09/2026,manha,24,23,23,15,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+496,P22,08/09/2026,manha,24,24,24,1,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=22,VERIFIED_NUMBER,VERIFIED_FULL
+497,P23,06/09/2026,manha,19,1,1,12,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+498,P23,06/09/2026,manha,19,2,2,2,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+499,P23,06/09/2026,manha,19,3,3,11,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+500,P23,06/09/2026,manha,19,4,4,19,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+501,P23,06/09/2026,manha,19,5,5,1,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+502,P23,06/09/2026,manha,19,6,6,10,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+503,P23,06/09/2026,manha,19,7,7,17,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+504,P23,06/09/2026,manha,19,8,8,3,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+505,P23,06/09/2026,manha,19,9,9,8,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+506,P23,06/09/2026,manha,19,10,10,7,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+507,P23,06/09/2026,manha,19,11,11,9,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+508,P23,06/09/2026,manha,19,12,12,6,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+509,P23,06/09/2026,manha,19,13,13,13,Barba,Barba,False,medium,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+510,P23,06/09/2026,manha,19,14,14,14,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+511,P23,06/09/2026,manha,19,15,15,4,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+512,P23,06/09/2026,manha,19,16,16,5,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+513,P23,06/09/2026,manha,19,17,17,15,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+514,P23,06/09/2026,manha,19,18,18,16,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+515,P23,06/09/2026,manha,19,19,19,18,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=23,VERIFIED_NUMBER,VERIFIED_FULL
+516,P24,04/09/2026,desconhecido,12,1,1,1,Nain,Nain,False,low,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+517,P24,04/09/2026,desconhecido,12,2,2,3,Ortega,Ortega,False,medium,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+518,P24,04/09/2026,desconhecido,12,3,3,7,Gelasio,Gelasio,False,low,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+519,P24,04/09/2026,desconhecido,12,4,4,2,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+520,P24,04/09/2026,desconhecido,12,5,5,8,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+521,P24,04/09/2026,desconhecido,12,6,6,9,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+522,P24,04/09/2026,desconhecido,12,7,7,12,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+523,P24,04/09/2026,desconhecido,12,8,8,10,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+524,P24,04/09/2026,desconhecido,12,9,9,11,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+525,P24,04/09/2026,desconhecido,12,10,10,6,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+526,P24,04/09/2026,desconhecido,12,11,11,5,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+527,P24,04/09/2026,desconhecido,12,12,12,4,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=24,VERIFIED_NUMBER,VERIFIED_FULL
+528,P25,16/09/2026,tarde,26,1,1,13,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+529,P25,16/09/2026,tarde,26,2,2,17,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+530,P25,16/09/2026,tarde,26,3,3,18,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+531,P25,16/09/2026,tarde,26,4,4,10,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+532,P25,16/09/2026,tarde,26,5,5,6,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+533,P25,16/09/2026,tarde,26,6,6,25,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+534,P25,16/09/2026,tarde,26,7,7,14,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+535,P25,16/09/2026,tarde,26,8,8,7,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+536,P25,16/09/2026,tarde,26,9,9,4,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+537,P25,16/09/2026,tarde,26,10,10,19,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+538,P25,16/09/2026,tarde,26,11,11,15,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+539,P25,16/09/2026,tarde,26,12,12,1,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+540,P25,16/09/2026,tarde,26,13,13,21,Arnon,Arnon,False,medium,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+541,P25,16/09/2026,tarde,26,14,14,5,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+542,P25,16/09/2026,tarde,26,15,15,24,Jorge,Jorge,False,medium,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+543,P25,16/09/2026,tarde,26,16,16,8,Ashley,Ashley,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+544,P25,16/09/2026,tarde,26,17,17,22,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+545,P25,16/09/2026,tarde,26,18,18,26,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+546,P25,16/09/2026,tarde,26,19,19,11,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+547,P25,16/09/2026,tarde,26,20,20,9,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+548,P25,16/09/2026,tarde,26,21,21,20,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+549,P25,16/09/2026,tarde,26,22,22,23,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+550,P25,16/09/2026,tarde,26,23,23,3,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+551,P25,16/09/2026,tarde,26,24,24,16,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+552,P25,16/09/2026,tarde,26,25,25,2,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+553,P25,16/09/2026,tarde,26,26,26,12,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=25,VERIFIED_NUMBER,VERIFIED_FULL
+554,P26,14/09/2026,tarde,18,1,1,4,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+555,P26,14/09/2026,tarde,18,2,2,15,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+556,P26,14/09/2026,tarde,18,3,3,12,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+557,P26,14/09/2026,tarde,18,4,4,17,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+558,P26,14/09/2026,tarde,18,5,5,10,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+559,P26,14/09/2026,tarde,18,6,6,14,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+560,P26,14/09/2026,tarde,18,7,7,13,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+561,P26,14/09/2026,tarde,18,8,8,5,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+562,P26,14/09/2026,tarde,18,9,9,1,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+563,P26,14/09/2026,tarde,18,10,10,8,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+564,P26,14/09/2026,tarde,18,11,11,7,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+565,P26,14/09/2026,tarde,18,12,12,2,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+566,P26,14/09/2026,tarde,18,13,13,3,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+567,P26,14/09/2026,tarde,18,14,14,9,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+568,P26,14/09/2026,tarde,18,15,15,11,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+569,P26,14/09/2026,tarde,18,16,16,18,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+570,P26,14/09/2026,tarde,18,17,17,16,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+571,P26,14/09/2026,tarde,18,18,18,6,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=26,VERIFIED_NUMBER,VERIFIED_FULL
+572,P27,14/09/2026,manha,9,1,1,9,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=27,VERIFIED_NUMBER,VERIFIED_FULL
+573,P27,14/09/2026,manha,9,2,2,2,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=27,VERIFIED_NUMBER,VERIFIED_FULL
+574,P27,14/09/2026,manha,9,3,3,8,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=27,VERIFIED_NUMBER,VERIFIED_FULL
+575,P27,14/09/2026,manha,9,4,4,6,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=27,VERIFIED_NUMBER,VERIFIED_FULL
+576,P27,14/09/2026,manha,9,5,5,1,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=27,VERIFIED_NUMBER,VERIFIED_FULL
+577,P27,14/09/2026,manha,9,6,6,3,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=27,VERIFIED_NUMBER,VERIFIED_FULL
+578,P27,14/09/2026,manha,9,7,7,5,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=27,VERIFIED_NUMBER,VERIFIED_FULL
+579,P27,14/09/2026,manha,9,8,8,7,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=27,VERIFIED_NUMBER,VERIFIED_FULL
+580,P27,14/09/2026,manha,9,9,9,4,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=27,VERIFIED_NUMBER,VERIFIED_FULL
+581,P28,10/09/2026,tarde,29,1,1,3,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+582,P28,10/09/2026,tarde,29,2,2,9,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+583,P28,10/09/2026,tarde,29,3,3,6,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+584,P28,10/09/2026,tarde,29,4,4,20,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+585,P28,10/09/2026,tarde,29,5,5,2,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+586,P28,10/09/2026,tarde,29,6,6,27,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+587,P28,10/09/2026,tarde,29,7,7,16,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+588,P28,10/09/2026,tarde,29,8,8,26,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+589,P28,10/09/2026,tarde,29,9,9,7,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+590,P28,10/09/2026,tarde,29,10,10,21,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+591,P28,10/09/2026,tarde,29,11,11,11,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+592,P28,10/09/2026,tarde,29,12,12,19,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+593,P28,10/09/2026,tarde,29,13,13,24,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+594,P28,10/09/2026,tarde,29,14,14,12,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+595,P28,10/09/2026,tarde,29,15,15,28,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+596,P28,10/09/2026,tarde,29,16,16,18,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+597,P28,10/09/2026,tarde,29,17,17,8,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+598,P28,10/09/2026,tarde,29,18,18,22,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+599,P28,10/09/2026,tarde,29,19,19,15,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+600,P28,10/09/2026,tarde,29,20,20,13,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+601,P28,10/09/2026,tarde,29,21,21,5,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+602,P28,10/09/2026,tarde,29,22,22,23,Aline,Aline,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+603,P28,10/09/2026,tarde,29,23,23,10,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+604,P28,10/09/2026,tarde,29,24,24,25,Mate,Mate,False,medium,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+605,P28,10/09/2026,tarde,29,25,25,29,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+606,P28,10/09/2026,tarde,29,26,26,4,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+607,P28,10/09/2026,tarde,29,27,27,17,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+608,P28,10/09/2026,tarde,29,28,28,1,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+609,P28,10/09/2026,tarde,29,29,29,14,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=28,VERIFIED_NUMBER,VERIFIED_FULL
+610,P29,09/09/2026,tarde,32,1,1,26,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+611,P29,09/09/2026,tarde,32,2,2,17,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+612,P29,09/09/2026,tarde,32,3,3,29,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+613,P29,09/09/2026,tarde,32,4,4,20,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+614,P29,09/09/2026,tarde,32,5,5,31,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+615,P29,09/09/2026,tarde,32,6,6,7,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+616,P29,09/09/2026,tarde,32,7,7,9,Mate,Mate,False,medium,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+617,P29,09/09/2026,tarde,32,8,8,23,Arnon,Arnon,False,medium,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+618,P29,09/09/2026,tarde,32,9,9,1,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+619,P29,09/09/2026,tarde,32,10,10,13,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+620,P29,09/09/2026,tarde,32,11,11,15,Arabella,Arabella,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+621,P29,09/09/2026,tarde,32,12,12,18,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+622,P29,09/09/2026,tarde,32,13,13,6,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+623,P29,09/09/2026,tarde,32,14,14,27,Telma,Telma,False,low,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+624,P29,09/09/2026,tarde,32,15,15,25,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+625,P29,09/09/2026,tarde,32,16,16,4,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+626,P29,09/09/2026,tarde,32,17,17,11,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+627,P29,09/09/2026,tarde,32,18,18,16,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+628,P29,09/09/2026,tarde,32,19,19,14,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+629,P29,09/09/2026,tarde,32,20,20,22,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+630,P29,09/09/2026,tarde,32,21,21,5,Jorge,Jorge,False,medium,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+631,P29,09/09/2026,tarde,32,22,22,32,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+632,P29,09/09/2026,tarde,32,23,23,30,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+633,P29,09/09/2026,tarde,32,24,24,8,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+634,P29,09/09/2026,tarde,32,25,25,19,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+635,P29,09/09/2026,tarde,32,26,26,24,Giao,Giao,False,low,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+636,P29,09/09/2026,tarde,32,27,27,3,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+637,P29,09/09/2026,tarde,32,28,28,2,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+638,P29,09/09/2026,tarde,32,29,29,28,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+639,P29,09/09/2026,tarde,32,30,30,10,Aline,Aline,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+640,P29,09/09/2026,tarde,32,31,31,21,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+641,P29,09/09/2026,tarde,32,32,32,12,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=29,VERIFIED_NUMBER,VERIFIED_FULL
+642,P30,não preenchida,desconhecido,22,1,1,5,Telma,Telma,False,low,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+643,P30,não preenchida,desconhecido,22,2,2,13,Arnon,Arnon,False,medium,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+644,P30,não preenchida,desconhecido,22,3,3,21,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+645,P30,não preenchida,desconhecido,22,4,4,20,Neuma,Neuma,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+646,P30,não preenchida,desconhecido,22,5,5,12,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+647,P30,não preenchida,desconhecido,22,6,6,18,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+648,P30,não preenchida,desconhecido,22,7,7,11,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+649,P30,não preenchida,desconhecido,22,8,8,3,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+650,P30,não preenchida,desconhecido,22,9,9,19,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+651,P30,não preenchida,desconhecido,22,10,10,10,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+652,P30,não preenchida,desconhecido,22,11,11,8,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+653,P30,não preenchida,desconhecido,22,12,12,4,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+654,P30,não preenchida,desconhecido,22,13,13,7,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+655,P30,não preenchida,desconhecido,22,14,14,16,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+656,P30,não preenchida,desconhecido,22,15,15,22,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+657,P30,não preenchida,desconhecido,22,16,16,14,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+658,P30,não preenchida,desconhecido,22,17,17,6,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+659,P30,não preenchida,desconhecido,22,18,18,1,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+660,P30,não preenchida,desconhecido,22,19,19,9,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+661,P30,não preenchida,desconhecido,22,20,20,17,Giao,Giao,False,low,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+662,P30,não preenchida,desconhecido,22,21,21,15,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+663,P30,não preenchida,desconhecido,22,22,22,2,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=30,VERIFIED_NUMBER,VERIFIED_FULL
+664,P31,13/09/2026,manha,25,1,1,23,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+665,P31,13/09/2026,manha,25,2,2,25,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+666,P31,13/09/2026,manha,25,3,3,16,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+667,P31,13/09/2026,manha,25,4,4,12,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+668,P31,13/09/2026,manha,25,5,5,19,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+669,P31,13/09/2026,manha,25,6,6,9,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+670,P31,13/09/2026,manha,25,7,7,17,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+671,P31,13/09/2026,manha,25,8,8,18,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+672,P31,13/09/2026,manha,25,9,9,4,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+673,P31,13/09/2026,manha,25,10,10,7,Enzo,Enzo,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+674,P31,13/09/2026,manha,25,11,11,21,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+675,P31,13/09/2026,manha,25,12,12,11,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+676,P31,13/09/2026,manha,25,13,13,6,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+677,P31,13/09/2026,manha,25,14,14,1,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+678,P31,13/09/2026,manha,25,15,15,2,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+679,P31,13/09/2026,manha,25,16,16,3,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+680,P31,13/09/2026,manha,25,17,17,8,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+681,P31,13/09/2026,manha,25,18,18,20,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+682,P31,13/09/2026,manha,25,19,19,15,Aline,Aline,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+683,P31,13/09/2026,manha,25,20,20,24,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+684,P31,13/09/2026,manha,25,21,21,10,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+685,P31,13/09/2026,manha,25,22,22,22,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+686,P31,13/09/2026,manha,25,23,23,5,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+687,P31,13/09/2026,manha,25,24,24,13,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+688,P31,13/09/2026,manha,25,25,25,14,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=31,VERIFIED_NUMBER,VERIFIED_FULL
+689,P32,15/09/2026,manha,17,1,1,13,Arnon,Arnon,False,medium,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+690,P32,15/09/2026,manha,17,2,2,15,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+691,P32,15/09/2026,manha,17,3,3,1,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+692,P32,15/09/2026,manha,17,4,4,14,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+693,P32,15/09/2026,manha,17,5,5,9,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+694,P32,15/09/2026,manha,17,6,6,8,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+695,P32,15/09/2026,manha,17,7,7,11,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+696,P32,15/09/2026,manha,17,8,8,12,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+697,P32,15/09/2026,manha,17,9,9,4,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+698,P32,15/09/2026,manha,17,10,10,2,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+699,P32,15/09/2026,manha,17,11,11,10,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+700,P32,15/09/2026,manha,17,12,12,7,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+701,P32,15/09/2026,manha,17,13,13,17,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+702,P32,15/09/2026,manha,17,15,14,16,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+703,P32,15/09/2026,manha,17,17,15,3,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+704,P32,15/09/2026,manha,17,18,16,5,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+705,P32,15/09/2026,manha,17,19,17,6,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=32,VERIFIED_NUMBER,VERIFIED_FULL
+706,P33,15/09/2026,tarde,20,1,1,6,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+707,P33,15/09/2026,tarde,20,2,2,15,Arnon,Arnon,False,medium,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+708,P33,15/09/2026,tarde,20,3,3,20,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+709,P33,15/09/2026,tarde,20,4,4,1,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+710,P33,15/09/2026,tarde,20,5,5,10,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+711,P33,15/09/2026,tarde,20,6,6,13,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+712,P33,15/09/2026,tarde,20,7,7,4,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+713,P33,15/09/2026,tarde,20,8,8,12,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+714,P33,15/09/2026,tarde,20,9,9,5,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+715,P33,15/09/2026,tarde,20,10,10,16,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+716,P33,15/09/2026,tarde,20,11,11,11,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+717,P33,15/09/2026,tarde,20,12,12,14,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+718,P33,15/09/2026,tarde,20,13,13,18,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+719,P33,15/09/2026,tarde,20,14,14,3,Jorge,Jorge,False,medium,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+720,P33,15/09/2026,tarde,20,15,15,2,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+721,P33,15/09/2026,tarde,20,16,16,7,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+722,P33,15/09/2026,tarde,20,17,17,19,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+723,P33,15/09/2026,tarde,20,18,18,9,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+724,P33,15/09/2026,tarde,20,19,19,17,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+725,P33,15/09/2026,tarde,20,20,20,8,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=33,VERIFIED_NUMBER,VERIFIED_FULL
+726,P34,16/09/2026,manha,22,1,1,19,Arnon,Arnon,False,medium,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+727,P34,16/09/2026,manha,22,2,2,17,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+728,P34,16/09/2026,manha,22,3,3,22,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+729,P34,16/09/2026,manha,22,4,4,5,Laura,Laura,True,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+730,P34,16/09/2026,manha,22,5,5,8,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+731,P34,16/09/2026,manha,22,6,6,6,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+732,P34,16/09/2026,manha,22,7,7,12,Belisario,Belisario,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+733,P34,16/09/2026,manha,22,8,8,7,Paola,Paola,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+734,P34,16/09/2026,manha,22,9,9,16,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+735,P34,16/09/2026,manha,22,10,10,14,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+736,P34,16/09/2026,manha,22,11,11,20,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+737,P34,16/09/2026,manha,22,12,12,13,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+738,P34,16/09/2026,manha,22,13,13,11,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+739,P34,16/09/2026,manha,22,14,14,1,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+740,P34,16/09/2026,manha,22,15,15,9,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+741,P34,16/09/2026,manha,22,16,16,4,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+742,P34,16/09/2026,manha,22,17,17,18,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+743,P34,16/09/2026,manha,22,18,18,15,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+744,P34,16/09/2026,manha,22,19,19,3,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+745,P34,16/09/2026,manha,22,20,20,2,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+746,P34,16/09/2026,manha,22,21,21,21,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+747,P34,16/09/2026,manha,22,22,22,10,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=34,VERIFIED_NUMBER,VERIFIED_FULL
+748,P35,14/09/2026,manha,11,1,1,8,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+749,P35,14/09/2026,manha,11,2,2,5,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+750,P35,14/09/2026,manha,11,3,3,3,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+751,P35,14/09/2026,manha,11,4,4,1,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+752,P35,14/09/2026,manha,11,5,5,10,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+753,P35,14/09/2026,manha,11,6,6,6,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+754,P35,14/09/2026,manha,11,7,7,9,Lotus,Lotus,False,high,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+755,P35,14/09/2026,manha,11,8,8,4,Lobo,Lobo,False,high,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+756,P35,14/09/2026,manha,11,9,9,11,Madri,Madri,False,medium,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+757,P35,14/09/2026,manha,11,10,10,7,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+758,P35,14/09/2026,manha,11,11,11,2,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=35,VERIFIED_NUMBER,VERIFIED_FULL
+759,P36,12/09/2026,integral,27,1,1,17,Monara,Monara,False,low,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+760,P36,12/09/2026,integral,27,2,2,6,Gelasio,Gelasio,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+761,P36,12/09/2026,integral,27,3,3,1,Amora,Amora,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+762,P36,12/09/2026,integral,27,4,4,20,Prina,Prina,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+763,P36,12/09/2026,integral,27,5,5,25,Benedito,Benedito,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+764,P36,12/09/2026,integral,27,6,6,22,Caetano,Caetano,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+765,P36,12/09/2026,integral,27,7,7,14,Ponce,Ponce,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+766,P36,12/09/2026,integral,27,8,8,4,Aline,Aline,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+767,P36,12/09/2026,integral,27,9,9,27,Wagner,Wagner,True,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+768,P36,12/09/2026,integral,27,10,10,3,Luma,Luma,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+769,P36,12/09/2026,integral,27,11,11,15,Magalhaes,Magalhaes,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+770,P36,12/09/2026,integral,27,12,12,16,Gloz,Gloz,False,medium,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+771,P36,12/09/2026,integral,27,13,13,9,Vicente,Vicente,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+772,P36,12/09/2026,integral,27,14,14,2,Lutela,Lutela,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+773,P36,12/09/2026,integral,27,15,15,5,Daniel,Daniel,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+774,P36,12/09/2026,integral,27,16,16,21,Turmalina,Turmalina,False,medium,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+775,P36,12/09/2026,integral,27,17,17,11,Sabrina,Sabrina,True,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+776,P36,12/09/2026,integral,27,18,18,26,Valeria,Valeria,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+777,P36,12/09/2026,integral,27,19,19,23,Katio,Katio,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+778,P36,12/09/2026,integral,27,20,20,19,Antonio,Antonio,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+779,P36,12/09/2026,integral,27,21,21,10,Aurora,Aurora,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+780,P36,12/09/2026,integral,27,22,22,8,Sanches,Sanches,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+781,P36,12/09/2026,integral,27,23,23,12,Profeta,Profeta,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+782,P36,12/09/2026,integral,27,24,24,24,Nina,Nina,False,medium,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+783,P36,12/09/2026,integral,27,25,25,13,Vaz,Vaz,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+784,P36,12/09/2026,integral,27,26,26,18,Veri,Veri,False,high,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+785,P36,12/09/2026,integral,27,27,27,7,Maranata,Maranata,False,medium,Roleta Agosto Setembro.pdf#page=36,VERIFIED_NUMBER,VERIFIED_FULL
+786,01-10-M,01/10/2026,manha,20,1,1,2,Prina,Prina,False,low,IMG_1645.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+787,01-10-M,01/10/2026,manha,20,2,2,16,Helena,Helena,True,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+788,01-10-M,01/10/2026,manha,20,3,3,10,Gelasio,Gelasio,False,medium,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+789,01-10-M,01/10/2026,manha,20,4,4,13,Katio,Katio,False,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+790,01-10-M,01/10/2026,manha,20,5,5,15,Barbio,Barbio,False,low,IMG_1645.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+791,01-10-M,01/10/2026,manha,20,6,6,3,Vicente,Vicente,False,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+792,01-10-M,01/10/2026,manha,20,7,7,20,Leandro,Leandro,False,medium,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+793,01-10-M,01/10/2026,manha,20,8,8,17,Paola,Paola,False,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+794,01-10-M,01/10/2026,manha,20,9,9,19,Sanches,Sanches,False,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+795,01-10-M,01/10/2026,manha,20,10,10,18,Gloz,Gloz,False,medium,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+796,01-10-M,01/10/2026,manha,20,11,11,6,Lotus,Lotus,False,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+797,01-10-M,01/10/2026,manha,20,12,12,14,Caetano,Caetano,False,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+798,01-10-M,01/10/2026,manha,20,13,13,1,Monarca,Monarca,False,medium,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+799,01-10-M,01/10/2026,manha,20,14,14,7,Wagner,Wagner,True,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+800,01-10-M,01/10/2026,manha,20,15,15,5,Ponce,Ponce,False,medium,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+801,01-10-M,01/10/2026,manha,20,16,16,12,Daniel,Daniel,False,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+802,01-10-M,01/10/2026,manha,20,17,17,4,Magalhaes,Magalhaes,False,medium,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+803,01-10-M,01/10/2026,manha,20,18,18,11,Lutela,Lutela,False,medium,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+804,01-10-M,01/10/2026,manha,20,19,19,9,Laura,Laura,True,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+805,01-10-M,01/10/2026,manha,20,20,20,8,Lobo,Lobo,False,high,IMG_1645.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+806,29-09-M,29/09/2026,manha,22,1,1,20,Priscila,Priscila,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+807,29-09-M,29/09/2026,manha,22,2,2,13,Sabrina,Sabrina,True,high,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+808,29-09-M,29/09/2026,manha,22,3,3,6,Wagner,Wagner,True,high,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+809,29-09-M,29/09/2026,manha,22,4,4,1,Natalia,Natalia,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+810,29-09-M,29/09/2026,manha,22,5,5,12,Vicente,Vicente,False,high,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+811,29-09-M,29/09/2026,manha,22,6,6,22,Monarca,Monarca,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+812,29-09-M,29/09/2026,manha,22,7,7,18,Luciana,Luciana,False,high,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+813,29-09-M,29/09/2026,manha,22,8,8,16,,,False,low,IMG_1635.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+814,29-09-M,29/09/2026,manha,22,9,9,17,,,False,low,IMG_1635.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+815,29-09-M,29/09/2026,manha,22,10,10,21,Gloz,Gloz,False,low,IMG_1635.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+816,29-09-M,29/09/2026,manha,22,11,11,10,Ashley,Ashley,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+817,29-09-M,29/09/2026,manha,22,12,12,19,,,False,low,IMG_1635.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+818,29-09-M,29/09/2026,manha,22,13,13,15,Aline,Aline,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+819,29-09-M,29/09/2026,manha,22,14,14,8,Amanda,Amanda,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+820,29-09-M,29/09/2026,manha,22,15,15,4,,,False,low,IMG_1635.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+821,29-09-M,29/09/2026,manha,22,16,16,11,Daniel,Daniel,False,high,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+822,29-09-M,29/09/2026,manha,22,17,17,2,Antonio,Antonio,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+823,29-09-M,29/09/2026,manha,22,18,18,3,Katio,Katio,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+824,29-09-M,29/09/2026,manha,22,19,19,5,Turmalina,Turmalina,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+825,29-09-M,29/09/2026,manha,22,20,20,7,Priscila,Priscila,False,medium,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+826,29-09-M,29/09/2026,manha,22,21,21,9,,,False,low,IMG_1635.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+827,29-09-M,29/09/2026,manha,22,22,22,14,Belisario,Belisario,False,high,IMG_1635.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+828,29-09-T,29/09/2026,tarde,28,1,1,4,Priscila,Priscila,False,medium,IMG_1636.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+829,29-09-T,29/09/2026,tarde,28,2,2,12,Sabrina,Sabrina,True,high,IMG_1636.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+830,29-09-T,29/09/2026,tarde,28,3,3,26,Wagner,Wagner,True,high,IMG_1636.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+831,29-09-T,29/09/2026,tarde,28,4,4,25,Turmalina,Turmalina,False,medium,IMG_1636.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+832,29-09-T,29/09/2026,tarde,28,5,5,10,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+833,29-09-T,29/09/2026,tarde,28,6,6,20,Vicente,Vicente,False,high,IMG_1636.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+834,29-09-T,29/09/2026,tarde,28,7,7,15,Amanda,Amanda,False,medium,IMG_1636.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+835,29-09-T,29/09/2026,tarde,28,8,8,24,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+836,29-09-T,29/09/2026,tarde,28,9,9,27,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+837,29-09-T,29/09/2026,tarde,28,10,10,13,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+838,29-09-T,29/09/2026,tarde,28,11,11,22,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+839,29-09-T,29/09/2026,tarde,28,12,12,11,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+840,29-09-T,29/09/2026,tarde,28,13,13,23,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+841,29-09-T,29/09/2026,tarde,28,14,14,19,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+842,29-09-T,29/09/2026,tarde,28,15,15,3,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+843,29-09-T,29/09/2026,tarde,28,16,16,21,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+844,29-09-T,29/09/2026,tarde,28,17,17,8,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+845,29-09-T,29/09/2026,tarde,28,18,18,17,Daniel,Daniel,False,high,IMG_1636.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+846,29-09-T,29/09/2026,tarde,28,19,19,16,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+847,29-09-T,29/09/2026,tarde,28,20,20,1,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+848,29-09-T,29/09/2026,tarde,28,21,21,18,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+849,29-09-T,29/09/2026,tarde,28,22,22,7,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+850,29-09-T,29/09/2026,tarde,28,23,23,5,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+851,29-09-T,29/09/2026,tarde,28,24,24,9,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+852,29-09-T,29/09/2026,tarde,28,25,25,2,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+853,29-09-T,29/09/2026,tarde,28,26,26,28,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+854,29-09-T,29/09/2026,tarde,28,27,27,14,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+855,29-09-T,29/09/2026,tarde,28,28,28,6,,,False,low,IMG_1636.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+856,30-09-M,30/09/2026,manha,23,1,1,20,Juliano,Juliano,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+857,30-09-M,30/09/2026,manha,23,2,2,7,Lobo,Lobo,False,medium,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+858,30-09-M,30/09/2026,manha,23,3,3,19,Marconato,Marconato,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+859,30-09-M,30/09/2026,manha,23,4,4,17,Katio,Katio,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+860,30-09-M,30/09/2026,manha,23,5,5,6,Luciana,Luciana,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+861,30-09-M,30/09/2026,manha,23,6,6,16,Valeria,Valeria,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+862,30-09-M,30/09/2026,manha,23,7,7,2,Paola,Paola,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+863,30-09-M,30/09/2026,manha,23,8,8,12,Lotus,Lotus,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+864,30-09-M,30/09/2026,manha,23,9,9,18,Wagner,Wagner,True,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+865,30-09-M,30/09/2026,manha,23,10,10,15,Gloz,Gloz,False,medium,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+866,30-09-M,30/09/2026,manha,23,11,11,1,Belisario,Belisario,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+867,30-09-M,30/09/2026,manha,23,12,12,9,Antonia,Antonia,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+868,30-09-M,30/09/2026,manha,23,13,13,4,Aurora,Aurora,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+869,30-09-M,30/09/2026,manha,23,14,14,8,Lutela,Lutela,False,medium,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+870,30-09-M,30/09/2026,manha,23,15,15,5,Daniel,Daniel,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+871,30-09-M,30/09/2026,manha,23,16,16,22,Sanches,Sanches,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+872,30-09-M,30/09/2026,manha,23,17,17,11,Ashley,Ashley,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+873,30-09-M,30/09/2026,manha,23,18,18,3,Turmalina,Turmalina,False,medium,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+874,30-09-M,30/09/2026,manha,23,19,19,10,Ponce,Ponce,False,medium,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+875,30-09-M,30/09/2026,manha,23,20,20,13,Monarca,Monarca,False,medium,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+876,30-09-M,30/09/2026,manha,23,21,21,21,Belisario,Belisario,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+877,30-09-M,30/09/2026,manha,23,22,22,14,Aline,Aline,False,high,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+878,30-09-M,30/09/2026,manha,23,23,23,23,Veri,Veri,False,medium,IMG_1643.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+879,30-09-T,30/09/2026,tarde,24,1,1,17,Priscila,Priscila,False,medium,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+880,30-09-T,30/09/2026,tarde,24,2,2,3,Laura,Laura,True,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+881,30-09-T,30/09/2026,tarde,24,3,3,22,Turmalina,Turmalina,False,medium,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+882,30-09-T,30/09/2026,tarde,24,4,4,20,Benedito,Benedito,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+883,30-09-T,30/09/2026,tarde,24,5,5,15,Sabrina,Sabrina,True,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+884,30-09-T,30/09/2026,tarde,24,6,6,16,Paola,Paola,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+885,30-09-T,30/09/2026,tarde,24,7,7,18,Luciana,Luciana,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+886,30-09-T,30/09/2026,tarde,24,8,8,23,Ponce,Ponce,False,medium,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+887,30-09-T,30/09/2026,tarde,24,9,9,5,Wagner,Wagner,True,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+888,30-09-T,30/09/2026,tarde,24,10,10,12,Vaz,Vaz,False,medium,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+889,30-09-T,30/09/2026,tarde,24,11,11,1,Aina,Aina,False,low,IMG_1644.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+890,30-09-T,30/09/2026,tarde,24,12,12,24,Daniel,Daniel,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+891,30-09-T,30/09/2026,tarde,24,13,13,19,Katio,Katio,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+892,30-09-T,30/09/2026,tarde,24,15,14,7,Ponce,Ponce,False,low,IMG_1644.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+893,30-09-T,30/09/2026,tarde,24,16,15,13,Monarca,Monarca,False,medium,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+894,30-09-T,30/09/2026,tarde,24,17,16,11,Gloz,Gloz,False,medium,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+895,30-09-T,30/09/2026,tarde,24,18,17,14,Belisario,Belisario,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+896,30-09-T,30/09/2026,tarde,24,19,18,21,Lutela,Lutela,False,medium,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+897,30-09-T,30/09/2026,tarde,24,20,19,9,Lobo,Lobo,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+898,30-09-T,30/09/2026,tarde,24,21,20,2,Lotus,Lotus,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+899,30-09-T,30/09/2026,tarde,24,22,21,6,Veri,Veri,False,medium,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+900,30-09-T,30/09/2026,tarde,24,23,22,4,Aline,Aline,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+901,30-09-T,30/09/2026,tarde,24,24,23,8,Ashley,Ashley,False,high,IMG_1644.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+902,30-09-T,30/09/2026,tarde,24,25,24,10,Gloz,Gloz,False,low,IMG_1644.jpeg,NUMBER_VERIFIED_NAME_REVIEW,VERIFIED_FULL
+903,17-09-M,17/09/2026,manha,18,1,1,16,Globz,Globz,False,medium,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+904,17-09-M,17/09/2026,manha,18,2,2,6,Monara,Monara,False,medium,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+905,17-09-M,17/09/2026,manha,18,3,3,8,Turmalina,Turmalina,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+906,17-09-M,17/09/2026,manha,18,4,4,12,Vicente,Vicente,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+907,17-09-M,17/09/2026,manha,18,5,5,4,Katia,Katia,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+908,17-09-M,17/09/2026,manha,18,6,6,7,Belisario,Belisario,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+909,17-09-M,17/09/2026,manha,18,7,7,2,Magalhaes,Magalhaes,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+910,17-09-M,17/09/2026,manha,18,8,8,11,Veri,Veri,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+911,17-09-M,17/09/2026,manha,18,9,9,1,Katio,Katio,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+912,17-09-M,17/09/2026,manha,18,10,10,10,Vaz,Vaz,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+913,17-09-M,17/09/2026,manha,18,11,11,17,Maranata,Maranata,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+914,17-09-M,17/09/2026,manha,18,12,12,9,Wagner,Wagner,True,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+915,17-09-M,17/09/2026,manha,18,13,13,3,Paola,Paola,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+916,17-09-M,17/09/2026,manha,18,14,14,18,Lutela,Lutela,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+917,17-09-M,17/09/2026,manha,18,15,15,13,Daniel,Daniel,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+918,17-09-M,17/09/2026,manha,18,16,16,14,Sabrina,Sabrina,True,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+919,17-09-M,17/09/2026,manha,18,17,17,15,Nina,Nina,False,medium,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+920,17-09-M,17/09/2026,manha,18,18,18,5,Lotus,Lotus,False,high,Roleta 17-09 a 20-09-26.pdf#page=1,VERIFIED_NUMBER,VERIFIED_FULL
+921,17-09-T,17/09/2026,tarde,20,1,1,20,Prima,Prima,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+922,17-09-T,17/09/2026,tarde,20,3,2,15,Maranata,Maranata,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+923,17-09-T,17/09/2026,tarde,20,4,3,18,Sabrina,Sabrina,True,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+924,17-09-T,17/09/2026,tarde,20,5,4,17,Turmalina,Turmalina,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+925,17-09-T,17/09/2026,tarde,20,6,5,8,Benedito,Benedito,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+926,17-09-T,17/09/2026,tarde,20,7,6,7,Vicente,Vicente,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+927,17-09-T,17/09/2026,tarde,20,8,7,9,Katio,Katio,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+928,17-09-T,17/09/2026,tarde,20,9,8,13,Antonio,Antonio,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+929,17-09-T,17/09/2026,tarde,20,10,9,2,Vaz,Vaz,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+930,17-09-T,17/09/2026,tarde,20,11,10,12,Jarde,Jarde,False,medium,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+931,17-09-T,17/09/2026,tarde,20,12,11,19,Wagner,Wagner,True,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+932,17-09-T,17/09/2026,tarde,20,13,12,1,Ashley,Ashley,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+933,17-09-T,17/09/2026,tarde,20,14,13,4,Lotus,Lotus,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+934,17-09-T,17/09/2026,tarde,20,15,14,11,Sanches,Sanches,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+935,17-09-T,17/09/2026,tarde,20,16,15,10,Paola,Paola,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+936,17-09-T,17/09/2026,tarde,20,17,16,6,Magalhaes,Magalhaes,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+937,17-09-T,17/09/2026,tarde,20,18,17,5,Joao,Joao,False,medium,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+938,17-09-T,17/09/2026,tarde,20,19,18,3,Daniel,Daniel,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+939,17-09-T,17/09/2026,tarde,20,20,19,14,Veri,Veri,False,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+940,17-09-T,17/09/2026,tarde,20,21,20,16,Laura,Laura,True,high,Roleta 17-09 a 20-09-26.pdf#page=2,VERIFIED_NUMBER,VERIFIED_FULL
+941,18-09-M,18/09/2026,manha,12,3,1,12,Benedito,Benedito,False,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+942,18-09-M,18/09/2026,manha,12,4,2,3,Nina,Nina,False,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+943,18-09-M,18/09/2026,manha,12,5,3,1,Magalhaes,Magalhaes,False,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+944,18-09-M,18/09/2026,manha,12,6,4,10,Joele,Joele,False,medium,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+945,18-09-M,18/09/2026,manha,12,7,5,9,Antonio,Antonio,False,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+946,18-09-M,18/09/2026,manha,12,8,6,8,Lobo,Lobo,False,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+947,18-09-M,18/09/2026,manha,12,9,7,7,Lotus,Lotus,False,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+948,18-09-M,18/09/2026,manha,12,10,8,5,Ashley,Ashley,False,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+949,18-09-M,18/09/2026,manha,12,11,9,11,Sanches,Sanches,False,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+950,18-09-M,18/09/2026,manha,12,12,10,4,Wagner,Wagner,True,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+951,18-09-M,18/09/2026,manha,12,13,11,6,Veri,Veri,False,high,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+952,18-09-M,18/09/2026,manha,12,14,12,2,Joao,Joao,False,medium,Roleta 17-09 a 20-09-26.pdf#page=3,VERIFIED_NUMBER,VERIFIED_FULL
+953,18-09-T,18/09/2026,tarde,10,2,1,4,Antonio,Antonio,False,high,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+954,18-09-T,18/09/2026,tarde,10,4,2,6,Lotus,Lotus,False,high,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+955,18-09-T,18/09/2026,tarde,10,5,3,5,Laura,Laura,True,high,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+956,18-09-T,18/09/2026,tarde,10,6,4,8,Magalhaes,Magalhaes,False,high,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+957,18-09-T,18/09/2026,tarde,10,7,5,1,Daniel,Daniel,False,high,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+958,18-09-T,18/09/2026,tarde,10,8,6,7,Ashley,Ashley,False,high,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+959,18-09-T,18/09/2026,tarde,10,9,7,10,Sabrina,Sabrina,True,high,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+960,18-09-T,18/09/2026,tarde,10,10,8,3,Wagner,Wagner,True,high,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+961,18-09-T,18/09/2026,tarde,10,11,9,2,Joao,Joao,False,medium,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+962,18-09-T,18/09/2026,tarde,10,12,10,9,Veri,Veri,False,high,Roleta 17-09 a 20-09-26.pdf#page=4,VERIFIED_NUMBER,VERIFIED_FULL
+963,19-09-I,19/09/2026,integral,23,1,1,4,Monara,Monara,False,medium,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+964,19-09-I,19/09/2026,integral,23,2,2,19,Veri,Veri,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+965,19-09-I,19/09/2026,integral,23,3,3,21,Valeria,Valeria,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+966,19-09-I,19/09/2026,integral,23,4,4,6,Antonio,Antonio,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+967,19-09-I,19/09/2026,integral,23,5,5,8,Caetano,Caetano,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+968,19-09-I,19/09/2026,integral,23,6,6,20,Aurora,Aurora,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+969,19-09-I,19/09/2026,integral,23,7,7,2,Lutela,Lutela,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+970,19-09-I,19/09/2026,integral,23,8,8,5,Belisario,Belisario,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+971,19-09-I,19/09/2026,integral,23,9,9,12,Turmalina,Turmalina,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+972,19-09-I,19/09/2026,integral,23,10,10,17,Jarde,Jarde,False,medium,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+973,19-09-I,19/09/2026,integral,23,11,11,9,Vicente,Vicente,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+974,19-09-I,19/09/2026,integral,23,12,12,10,Wagner,Wagner,True,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+975,19-09-I,19/09/2026,integral,23,13,13,1,Maranata,Maranata,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+976,19-09-I,19/09/2026,integral,23,14,14,15,Ashley,Ashley,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+977,19-09-I,19/09/2026,integral,23,15,15,7,Profeta,Profeta,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+978,19-09-I,19/09/2026,integral,23,16,16,11,Katio,Katio,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+979,19-09-I,19/09/2026,integral,23,17,17,16,Lotus,Lotus,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+980,19-09-I,19/09/2026,integral,23,18,18,14,Daniel,Daniel,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+981,19-09-I,19/09/2026,integral,23,19,19,3,Globz,Globz,False,medium,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+982,19-09-I,19/09/2026,integral,23,20,20,18,Zuma,Zuma,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+983,19-09-I,19/09/2026,integral,23,21,21,23,Sanches,Sanches,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+984,19-09-I,19/09/2026,integral,23,22,22,13,Vaz,Vaz,False,high,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+985,19-09-I,19/09/2026,integral,23,23,23,22,Nina,Nina,False,medium,Roleta 17-09 a 20-09-26.pdf#page=5,VERIFIED_NUMBER,VERIFIED_FULL
+986,20-09-I,20/09/2026,integral,21,1,1,8,Aurora,Aurora,False,high,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+987,20-09-I,20/09/2026,integral,21,2,2,14,Katio,Katio,False,high,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+988,20-09-I,20/09/2026,integral,21,3,3,12,Belisario,Belisario,False,high,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+989,20-09-I,20/09/2026,integral,21,4,4,1,Paola,Paola,False,high,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+990,20-09-I,20/09/2026,integral,21,5,5,15,Vicente,Vicente,False,high,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+991,20-09-I,20/09/2026,integral,21,6,6,6,Ashley,Ashley,False,high,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+992,20-09-I,20/09/2026,integral,21,7,7,3,Valeria,Valeria,False,high,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+993,20-09-I,20/09/2026,integral,21,8,8,21,Magalhaes,Magalhaes,False,high,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+994,20-09-I,20/09/2026,integral,21,9,9,10,Lotus,Lotus,False,high,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+995,20-09-I,20/09/2026,integral,21,10,10,11,Globz,Globz,False,medium,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+996,20-09-I,20/09/2026,integral,21,11,11,4,Zuma,Zuma,False,medium,Roleta 17-09 a 20-09-26.pdf#page=6,VERIFIED_NUMBER,VERIFIED_FULL
+997,04-10-M,04/10/2026,manha,13,2,1,5,Fuzmalina,Fuzmalina,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+998,04-10-M,04/10/2026,manha,13,3,2,1,Anthony,Anthony,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+999,04-10-M,04/10/2026,manha,13,4,3,12,Valeria,Valeria,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1000,04-10-M,04/10/2026,manha,13,5,4,9,Lotus,Lotus,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1001,04-10-M,04/10/2026,manha,13,6,5,7,Veri,Veri,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1002,04-10-M,04/10/2026,manha,13,7,6,13,Vicente,Vicente,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1003,04-10-M,04/10/2026,manha,13,8,7,4,Sanches,Sanches,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1004,04-10-M,04/10/2026,manha,13,9,8,8,Aline,Aline,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1005,04-10-M,04/10/2026,manha,13,10,9,6,Luna,Luna,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1006,04-10-M,04/10/2026,manha,13,11,10,10,Wagner,Wagner,True,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1007,04-10-M,04/10/2026,manha,13,12,11,2,Katto,Katto,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1008,04-10-M,04/10/2026,manha,13,13,12,11,Nina,Nina,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1009,04-10-M,04/10/2026,manha,13,14,13,3,Souza,Souza,False,medium,IMG_1670.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1010,04-10-T,04/10/2026,tarde,12,1,1,10,Nina,Nina,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1011,04-10-T,04/10/2026,tarde,12,2,2,2,Gloz,Gloz,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1012,04-10-T,04/10/2026,tarde,12,3,3,5,Valeria,Valeria,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1013,04-10-T,04/10/2026,tarde,12,4,4,6,Katto,Katto,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1014,04-10-T,04/10/2026,tarde,12,5,5,1,Fuzmalina,Fuzmalina,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1015,04-10-T,04/10/2026,tarde,12,6,6,7,Lotus,Lotus,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1016,04-10-T,04/10/2026,tarde,12,7,7,11,Sanches,Sanches,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1017,04-10-T,04/10/2026,tarde,12,8,8,3,Paola,Paola,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1018,04-10-T,04/10/2026,tarde,12,9,9,4,Veri,Veri,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1019,04-10-T,04/10/2026,tarde,12,10,10,8,Aline,Aline,False,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1020,04-10-T,04/10/2026,tarde,12,11,11,12,Sabrina,Sabrina,True,high,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
+1021,04-10-T,04/10/2026,tarde,12,14,12,9,Wagner,Wagner,True,medium,IMG_1671.jpeg,VERIFIED_NUMBER,VERIFIED_FULL
