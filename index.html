@@ -29,17 +29,17 @@
 
     <section class="hero-grid hero-grid-3">
       <article class="hero-card primary">
-        <span class="kicker">Hoje · manhã</span>
+        <span class="kicker">Histórico · manhã</span>
         <div id="morningPick" class="big-number">—</div>
         <p id="morningPickMeta">—</p>
       </article>
       <article class="hero-card">
-        <span class="kicker">Tarde · duas escolhas</span>
+        <span class="kicker">Histórico · tarde</span>
         <div class="afternoon-picks">
-          <div><span class="pick-label">principal</span><strong id="afternoonPick1">—</strong></div>
-          <div><span class="pick-label">reserva</span><strong id="afternoonPick2">—</strong></div>
+          <div><span class="pick-label">líder histórico</span><strong id="afternoonPick1">—</strong></div>
+          <div><span class="pick-label">2º histórico</span><strong id="afternoonPick2">—</strong></div>
         </div>
-        <p id="afternoonPickMeta">duas posições independentes para o objetivo Nº1 ou Último</p>
+        <p id="afternoonPickMeta">ranking descritivo do histórico; não é recomendação prospectiva</p>
       </article>
       <article class="hero-card accent">
         <span class="kicker">Fim de semana · sábado</span>
@@ -151,5 +151,12 @@
     <footer><span>Roleta V3 · workspace operacional</span><span>SFJM · estado versionado no GitHub</span></footer>
   </div>
   <script src="/app.js" defer></script>
+  <script src="/simulation/engine.js" defer></script>
+  <script src="/simulation/ui.js" defer></script>
+  <script src="/simulation/weekly-duel.js" defer></script>
+  <script src="/simulation/weekly-duel-ui.js" defer></script>
+  <script src="/prospective/ledger.js" defer></script>
+  <script src="/prospective/generator.js" defer></script>
+  <script src="/prospective/ui.js" defer></script>
 </body>
 </html>

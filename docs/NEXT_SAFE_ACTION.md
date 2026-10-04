@@ -1,33 +1,83 @@
 # Roleta — Next Safe Action
 
-## RLT-M3-05
+## RLT-M5-01 — Week 05–11/10 Frozen
 
-1. Resolver `main` ao vivo e confirmar `.sfjm/project.json`.
-2. Receber as duas folhas/resultados de 04/10/2026 separadamente:
-   - manhã;
-   - tarde.
-3. Registrar cada roleta de 04/10 como evento próprio; não criar evento `integral` para esta data.
-4. Adjudicar HIT/MISS apenas contra escolhas congeladas prospectivamente, sem hindsight.
-5. Não recalcular retroativamente escolhas depois de conhecer o resultado.
-6. Reconciliar presença de Sabrina/Brenda e Laura de 28/09 a 02/10 pelas fontes originais.
-7. Não usar overrides antigos como fonte primária.
-8. Continuar validação prospectiva Champion vs Challengers.
-9. Para 25/10/2026, aplicar a mesma exceção manhã+tarde somente se houver 2º turno.
+### Canonical state
+- 83 logical canonical events;
+- 82 validated complete permutations;
+- 79 quality A / 4 quality B;
+- 04/10/2026 incorporated as two distinct events: morning + afternoon;
+- policy locked before cutoff: `PROSPECTIVE-V1.0.0`;
+- model: `period_raw_global_fallback`;
+- model version: `RLT-M5-WEEKLY-V1`;
+- primary endpoint: 2X = Nº1 OR Último.
 
-### Regra de calendário
-- segunda a sexta: manhã + tarde;
-- sábado e domingo: uma roleta integral por dia;
-- exceções eleitorais:
-  - 04/10/2026: manhã + tarde;
-  - 25/10/2026: manhã + tarde, se houver 2º turno.
+### Frozen at 2026-10-04T20:04:19-03:00
+Generated from the 83-event canonical result ledger with `data_cutoff=04-10-T`:
+- 48 `WEEKLY_FROZEN` recommendations — immutable;
+- 48 initial `CURRENT` recommendations — DRAFT/revisable until each target event freeze;
+- 48 `RANDOM_SHADOW` deterministic chains — frozen.
 
-### Delivery
-- branch dedicada para mudanças;
-- validação local via LVR;
-- mesma branch para correções;
-- merge e produção somente após autorização explícita;
-- não usar patch manual como mecanismo padrão;
-- NO PREVIEW / NO REMOTE ITERATION.
+Initial period allocations, in family order Wagner / Laura / Brenda / Helena:
+- morning: `14 / 3 / 5 / 4`;
+- afternoon: `22 / 18 / 16 / 20`;
+- integral: `21 / 4 / 8 / 12`.
 
-### Bloqueios
-NO NAME INFERENCE; NO COMPLEMENT INFERENCE; NO POSITION COLLAPSE; NO PREDICTIVE CLAIM; NO HINDSIGHT CREDIT; NO PREVIEW; NO REMOTE ITERATION; NO IMPLICIT PUSH/DEPLOY; NO TRUST IN DISPUTED PRESENCE OVERRIDES.
+### Current invariants
+- WEEKLY_FROZEN never changes;
+- CURRENT recalculates after every newly incorporated real roulette for all unresolved future events;
+- CURRENT is frozen only before the operational choice for its target event;
+- RANDOM_SHADOW chain is frozen before outcomes;
+- recommendation != execution != outcome;
+- no hindsight credit;
+- no model shopping after cutoff;
+- 3X/4X remain exploratory;
+- the system may conclude COMPATÍVEL COM ACASO.
+
+### Next safe action
+1. Validate the RLT-M5-01 Overview locally via SFJM/LVR.
+2. Confirm the weekly panel renders the frozen numbers from `data/prospective/recommendations.jsonl`.
+3. Confirm CURRENT displays the same initial values now but remains revisable in data state.
+4. Confirm no historical-descriptive card appears as an operational recommendation.
+5. Confirm scorecard remains `AMOSTRA_INICIAL` with zero adjudicated events.
+6. On the next real roulette:
+   - transcribe/ingest using the established canonical workflow;
+   - adjudicate WEEKLY_FROZEN and the target event's frozen CURRENT;
+   - append CURRENT revisions for all later unresolved events;
+   - never rewrite prior recommendations.
+7. Backfill missing nominal full-sheet coverage for 02/10 and 03/10 as a data-quality follow-up; this does not alter the already frozen V1 week.
+
+### SFJM
+- branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`;
+- PR #3 remains Draft;
+- LOCAL-FIRST / LVR;
+- preferred port 8082;
+- NO PREVIEW;
+- NO REMOTE ITERATION;
+- no merge without explicit approval;
+- no production without explicit approval.
+
+
+## RLT-M4-07 — Weekly Frozen vs Current
+
+Implemented on the active branch without changing the frozen real-week policy.
+
+### Next simulation gate
+Run the first paired control:
+- weeks: 10,000;
+- scenario: NULL;
+- signal strength: 0;
+- seed: `weekly-duel-2026`.
+
+Expected control behavior:
+- Weekly Frozen and Current both remain compatible with theoretical chance;
+- Current must not show persistent artificial advantage merely because it recalculates after each event;
+- Random remains compatible with chance;
+- churn may be non-zero, but helpful and harmful revisions should balance under NULL.
+
+If NULL passes, run in order:
+1. Stable period signal · 3%;
+2. Regime shift · 3%;
+3. Weak signal + noise · 1%.
+
+Do not change `PROSPECTIVE-V1.0.0` or the already frozen real week based on these simulations. RLT-M4-07 evaluates the update mechanism only.

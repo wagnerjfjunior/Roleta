@@ -1,0 +1,66 @@
+{
+  "version": "PROSPECTIVE-V1.0.0",
+  "status": "LOCKED_BEFORE_2026-10-04_RESULTS_CUTOFF",
+  "primary_endpoint": "2X_N1_OR_LAST",
+  "model_family": "period_raw_global_fallback",
+  "model_version": "RLT-M5-WEEKLY-V1",
+  "source_models": {
+    "period_raw": "RLT-M4-05/RLT-M4-06 validated simulation specialist",
+    "global_fallback": "RLT-M4-05/RLT-M4-06 validated simulation baseline",
+    "adaptive_meta": "LAB_ONLY_NOT_ELIGIBLE_FOR_REAL_V1",
+    "context_raw": "NOT_USED_FOR_WEEKLY_FREEZE_REQUIRES_TARGET_N"
+  },
+  "score": {
+    "expected_per_exposure": "2/N",
+    "raw_score": "hits_minus_expected",
+    "minimum_exposure": 3,
+    "tie_break": [
+      "hits_desc",
+      "oe_desc",
+      "exposure_desc",
+      "position_asc"
+    ]
+  },
+  "context": {
+    "weekdays": "target_period",
+    "weekend": "integral_if_available_else_global",
+    "n": "not_used_for_weekly_freeze_because_future_N_unknown"
+  },
+  "family_allocation": {
+    "person_order": [
+      "Wagner",
+      "Laura",
+      "Brenda",
+      "Helena"
+    ],
+    "rule": "allocate distinct primary physical positions in ranking order; do not duplicate a primary within the same target event",
+    "fallback_count": 2,
+    "fallback_rule": "next distinct ranked physical positions, frozen with the primary before outcome"
+  },
+  "current_recalculation": {
+    "rule": "after every newly incorporated real roulette, recompute all unresolved future events using the same model policy and the new canonical cutoff",
+    "weekly_frozen_immutable": true
+  },
+  "freeze": {
+    "weekly": "after both 04/10/2026 election-Sunday real roulettes are incorporated and validated, after 20:00 America/Sao_Paulo",
+    "current": "before operational position selection for each target event",
+    "no_hindsight": true
+  },
+  "random_shadow": {
+    "protocol_version": "RANDOM-SHADOW-V1",
+    "deterministic_seed_prefix": "roleta-prospective-v1",
+    "rule": "generate a deterministic ranked candidate chain before outcome; resolve to first eligible position once occupied positions are known"
+  },
+  "change_control": {
+    "material_changes_start_new_epoch": true,
+    "material_fields": [
+      "model_family",
+      "score",
+      "minimum_exposure",
+      "context",
+      "family_allocation",
+      "fallback_rule",
+      "random_shadow"
+    ]
+  }
+}

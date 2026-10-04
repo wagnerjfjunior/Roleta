@@ -1,0 +1,304 @@
+(function(){
+  'use strict';
+
+  const STORAGE_KEY='roleta.simulation.runs.v1';
+  const labels={
+    adaptive_meta:'Adaptive Meta · Walk-forward',
+    context_raw:'Contextual Raw · Period+N',
+    period_raw:'Period Raw · Manhã/Tarde',
+    n_raw:'N Raw · Faixa de N',
+    global_raw:'Global Raw · Lab V1',
+    random_baseline:'Random Baseline',
+    fixed_baseline:'Fixed Baseline'
+  };
+  let worker=null;
+  let lastResult=null;
+  let lastTest=null;
+
+  function fmtPct(x){return Number.isFinite(x)?(x*100).toFixed(2).replace('.',',')+'%':'—'}
+  function fmt(x,d=3){return Number.isFinite(x)?x.toFixed(d).replace('.',','):'—'}
+  function compact(n){
+    if(n>=1e6)return (n/1e6).toFixed(2).replace('.',',')+' mi';
+    if(n>=1e3)return (n/1e3).toFixed(1).replace('.',',')+' mil';
+    return String(n);
+  }
+  function readRuns(){
+    try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(_){return[]}
+  }
+  function updateSavedCount(){
+    const el=document.querySelector('#simSavedRuns');
+    if(el)el.textContent=readRuns().length+' runs auditáveis salvos localmente';
+  }
+  function buildTestDefinition(config){
+    const scenarioNames={
+      null:'NULL · acaso puro',
+      fixed_2x:'Bias 2X · posição fixa',
+      morning_2x:'Bias 2X · somente manhã',
+      high_n_2x:'Bias 2X · N alto'
+    };
+    const expectations={
+      null:'Modelos devem convergir para O/E próximo de 1 e permanecer compatíveis com o Random Baseline.',
+      fixed_2x:'Modelos adaptativos devem aprender o sinal global; Global Raw tende a capturar melhor um efeito não contextual.',
+      morning_2x:'Contextual Raw deve explorar melhor um sinal restrito ao período da manhã do que Global Raw e Random Baseline.',
+      high_n_2x:'N Raw deve explorar melhor um sinal restrito a N alto do que Global Raw, Period Raw, Contextual Period+N e baselines.'
+    };
+    return {
+      id:'RLT-M4-06',
+      name:scenarioNames[config.signal.type]||config.signal.type,
+      objective:'Validar um meta-modelo adaptativo que escolhe entre Global, Period, N e Period+N usando somente evidência anterior ao sorteio.',
+      hypothesis:expectations[config.signal.type]||'Avaliar comportamento do modelo no cenário configurado.',
+      scenario:{
+        type:config.signal.type,
+        target:'2X = Nº1 ou Último',
+        position:config.signal.position,
+        strength:config.signal.strength,
+        minN:config.signal.minN
+      },
+      workload:{
+        universes:config.universes,
+        years_per_universe:config.years,
+        events_per_year:config.eventsPerYear,
+        planned_synthetic_events:config.universes*config.years*config.eventsPerYear
+      },
+      reproducibility:{
+        seed:config.seed,
+        structural_source:'81 eventos canônicos; somente permutações completas são elegíveis como moldes/estado inicial',
+        engine_protocol:'posição física -> gaps preservados -> ordem efetiva -> permutação 1..N sem reposição -> resultado final'
+      },
+      evaluation:{
+        primary_metric:'O/E 2X',
+        secondary_metrics:['hit_rate_2x','O/E 3X','O/E 4X','P05-P95 O/E 2X','max_losing_p95','O/E 2X morning','O/E 2X afternoon','O/E 2X signal_eligible'],
+        controls:['Random Baseline','Fixed Baseline'],
+        challengers:['Adaptive Meta · Walk-forward','Global Raw','Period Raw','N Raw','Contextual Raw · Period+N'],
+        rule:'Escolhas são congeladas antes de cada sorteio sintético; resultado só entra no histórico após adjudicação.'
+      }
+    };
+  }
+
+  function saveRun(test,result){
+    const runs=readRuns();
+    runs.unshift({
+      saved_at:new Date().toISOString(),
+      source:'Roleta Intelligence Simulation Lab',
+      test,
+      result
+    });
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(runs.slice(0,25)));
+    updateSavedCount();
+  }
+  function exportRun(){
+    if(!lastResult)return;
+    const payload={
+      exported_at:new Date().toISOString(),
+      source:'Roleta Intelligence Simulation Lab',
+      test:lastTest,
+      result:lastResult
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='roleta-simulation-'+Date.now()+'.json';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+
+  function renderSummary(result){
+    lastResult=result;
+    document.querySelector('#simUniverses').textContent=result.universes;
+    document.querySelector('#simYears').textContent=result.years+' anos';
+    document.querySelector('#simEvents').textContent=compact(result.total_synthetic_events);
+    document.querySelector('#simTemplates').textContent=result.structural_templates;
+    document.querySelector('#simMode').textContent=result.mode;
+    document.querySelector('#simSeedUsed').textContent=result.seed;
+
+    const rows=Object.values(result.models).sort((a,b)=>b.oe_2x-a.oe_2x);
+    document.querySelector('#simModelTable').innerHTML=rows.map((m,i)=>
+      '<div class="sim-model-row">'+
+        '<span class="model-place">'+(i+1)+'</span>'+
+        '<strong>'+labels[m.id]+'</strong>'+
+        '<span><b>2X</b> '+fmtPct(m.hit_rate_2x)+'</span>'+
+        '<span><b>Esp. 2X</b> '+fmtPct(m.expected_rate_2x)+'</span>'+
+        '<span><b>O/E 2X</b> '+fmt(m.oe_2x,3)+'</span>'+
+        '<span><b>3X</b> '+fmtPct(m.hit_rate_3x)+' · O/E '+fmt(m.oe_3x,3)+'</span>'+
+        '<span><b>4X</b> '+fmtPct(m.hit_rate_4x)+' · O/E '+fmt(m.oe_4x,3)+'</span>'+
+        '<span><b>Lose p95</b> '+m.max_losing_p95+'</span>'+
+      '</div>'
+    ).join('');
+
+    const contextHost=document.querySelector('#simContextTable');
+    if(contextHost){
+      contextHost.innerHTML=
+        '<div class="sim-context-row sim-context-header">'+
+          '<strong>Modelo</strong><span>GERAL</span><span>MANHÃ</span><span>TARDE</span><span>SIGNAL-ELIGIBLE</span>'+
+        '</div>'+
+        rows.map(m=>{
+          const s=m.slices||{};
+          return '<div class="sim-context-row">'+
+            '<strong>'+labels[m.id]+'</strong>'+
+            '<span>'+fmt(s.all?.oe_2x,3)+'</span>'+
+            '<span>'+fmt(s.morning?.oe_2x,3)+'</span>'+
+            '<span>'+fmt(s.afternoon?.oe_2x,3)+'</span>'+
+            '<span>'+fmt(s.signal_eligible?.oe_2x,3)+'</span>'+
+          '</div>';
+        }).join('');
+    }
+
+    const metaHost=document.querySelector('#simMetaPolicy');
+    if(metaHost&&result.adaptive_meta_policy){
+      const p=result.adaptive_meta_policy;
+      const shares=p.selection_share||{};
+      metaHost.innerHTML=
+        '<div class="sim-context-head"><span class="eyebrow">ADAPTIVE META</span><h3>Seleção de arquitetura em walk-forward</h3></div>'+
+        '<div class="sim-pair-grid">'+
+          Object.keys(shares).map(id=>
+            '<div class="sim-pair-card"><strong>'+labels[id]+'</strong>'+
+            '<span>Selecionado em <b>'+fmtPct(shares[id])+'</b> dos eventos</span>'+
+            '<small>'+Number(p.selection_counts?.[id]||0).toLocaleString('pt-BR')+' escolhas</small></div>'
+          ).join('')+
+        '</div>'+
+        '<p class="small muted">Fallback: '+labels[p.fallback]+' · mínimo '+p.min_prior_events+' eventos anteriores · limiar z &gt; '+fmt(p.z_threshold,1)+'.</p>';
+    }
+
+    const pairHost=document.querySelector('#simPairwise');
+    if(pairHost&&result.paired_comparisons){
+      const pairs=Object.values(result.paired_comparisons);
+      pairHost.innerHTML=
+        '<div class="sim-context-head"><span class="eyebrow">PAREADO POR UNIVERSO</span><h3>Quem vence dentro do mesmo universo?</h3></div>'+
+        '<div class="sim-pair-grid">'+
+        pairs.map(p=>
+          '<div class="sim-pair-card">'+
+            '<strong>'+labels[p.model_a]+' vs '+labels[p.model_b]+'</strong>'+
+            '<span>'+labels[p.model_a]+' venceu <b>'+p.a_wins+'/'+p.universes+'</b> ('+fmtPct(p.a_win_rate)+')</span>'+
+            '<span>'+labels[p.model_b]+' venceu <b>'+p.b_wins+'/'+p.universes+'</b></span>'+
+            '<span>Empates <b>'+p.ties+'</b></span>'+
+            '<span>Δ O/E médio <b>'+fmt(p.mean_delta,4)+'</b></span>'+
+            '<small>P05 '+fmt(p.delta_p05,4)+' · P50 '+fmt(p.delta_p50,4)+' · P95 '+fmt(p.delta_p95,4)+'</small>'+
+          '</div>'
+        ).join('')+
+        '</div>';
+    }
+
+    const title=document.querySelector('#simNullBands')?.previousElementSibling?.querySelector('h2');
+    if(title)title.textContent=result.mode.includes('SIGNAL')?'Faixa no cenário com sinal':'Faixa esperada sob acaso';
+
+    document.querySelector('#simNullBands').innerHTML=rows.map(m=>
+      '<div class="sim-band-card">'+
+        '<span>'+labels[m.id]+'</span>'+
+        '<strong>'+fmt(m.oe_2x,3)+'</strong>'+
+        '<small>O/E 2X agregado</small>'+
+        '<div class="sim-band"><i style="left:'+Math.max(0,Math.min(100,(m.oe_2x_p05-.5)*100))+'%"></i>'+
+        '<i class="mid" style="left:'+Math.max(0,Math.min(100,(m.oe_2x-.5)*100))+'%"></i>'+
+        '<i style="left:'+Math.max(0,Math.min(100,(m.oe_2x_p95-.5)*100))+'%"></i></div>'+
+        '<small>P05 '+fmt(m.oe_2x_p05,3)+' · P95 '+fmt(m.oe_2x_p95,3)+'</small>'+
+      '</div>'
+    ).join('');
+
+    const exp=document.querySelector('#exportSimulation');
+    if(exp)exp.disabled=false;
+  }
+
+  function wire(events){
+    const runButton=document.querySelector('#runSimulation');
+    const cancelButton=document.querySelector('#cancelSimulation');
+    const exportButton=document.querySelector('#exportSimulation');
+    const status=document.querySelector('#simStatus');
+    const bar=document.querySelector('#simProgressBar');
+    const progressText=document.querySelector('#simProgressText');
+    const scenarioInput=document.querySelector('#simScenarioInput');
+    const minNWrap=document.querySelector('#simMinNWrap');
+    const minNInput=document.querySelector('#simMinNInput');
+    if(!runButton||!cancelButton||!status||!bar||!progressText||!scenarioInput)return;
+
+    function syncScenarioFields(){
+      const showN=scenarioInput.value==='high_n_2x';
+      if(minNWrap)minNWrap.hidden=!showN;
+    }
+    scenarioInput.addEventListener('change',syncScenarioFields);
+    syncScenarioFields();
+
+    const integrity=window.RoletaSimulationEngine.selfTest(events);
+    status.textContent=integrity.pass
+      ? 'Motor íntegro · '+integrity.checks+' verificações mecânicas PASS.'
+      : 'Motor bloqueado · '+integrity.error;
+    runButton.disabled=!integrity.pass;
+    updateSavedCount();
+
+    function finishUi(){
+      runButton.disabled=!integrity.pass;
+      cancelButton.disabled=true;
+      runButton.textContent='Rodar simulação';
+    }
+
+    runButton.addEventListener('click',()=>{
+      if(worker)worker.terminate();
+      worker=new Worker('/simulation/worker.js');
+      runButton.disabled=true;
+      cancelButton.disabled=false;
+      runButton.textContent='Simulando…';
+      bar.style.width='0%';
+      progressText.textContent='0,0%';
+
+      const scenario=scenarioInput.value;
+      const signal={
+        type:scenario,
+        position:Number(document.querySelector('#simPositionInput').value)||14,
+        strength:scenario==='null'?0:Number(document.querySelector('#simStrengthInput').value)||0,
+        minN:scenario==='high_n_2x'?Math.max(4,Number(minNInput?.value)||25):25
+      };
+      const config={
+        realEvents:events,
+        universes:Number(document.querySelector('#simUniversesInput').value),
+        years:Number(document.querySelector('#simYearsInput').value),
+        seed:document.querySelector('#simSeedInput').value,
+        eventsPerYear:624,
+        signal
+      };
+      const total=config.universes*config.years*624;
+      const testDefinition=buildTestDefinition(config);
+      lastTest=testDefinition;
+      status.textContent='Executando '+compact(total)+' roletas sintéticas em worker…';
+
+      worker.onmessage=e=>{
+        const msg=e.data||{};
+        if(msg.type==='progress'){
+          const pct=(msg.pct*100);
+          bar.style.width=pct.toFixed(2)+'%';
+          progressText.textContent=pct.toFixed(1).replace('.',',')+'%';
+          status.textContent='Processando: '+compact(msg.processed_events)+' / '+compact(msg.total_events)+' roletas · universo '+Math.min(msg.completed_universes+1,msg.total_universes)+' / '+msg.total_universes;
+          return;
+        }
+        if(msg.type==='complete'){
+          renderSummary(msg.result);
+          saveRun(testDefinition,msg.result);
+          bar.style.width='100%';
+          progressText.textContent='100,0%';
+          status.textContent='Concluído · run salvo localmente · dados sintéticos não alteraram a base real.';
+          worker.terminate();worker=null;finishUi();
+          return;
+        }
+        if(msg.type==='error'){
+          status.textContent='Erro: '+msg.message;
+          worker.terminate();worker=null;finishUi();
+        }
+      };
+      worker.onerror=e=>{
+        status.textContent='Erro no worker: '+(e.message||'falha desconhecida');
+        worker.terminate();worker=null;finishUi();
+      };
+      worker.postMessage({type:'run',config});
+    });
+
+    cancelButton.addEventListener('click',()=>{
+      if(worker){worker.terminate();worker=null}
+      status.textContent='Simulação cancelada pelo usuário.';
+      bar.style.width='0%';
+      progressText.textContent='0,0%';
+      finishUi();
+    });
+
+    if(exportButton)exportButton.addEventListener('click',exportRun);
+  }
+
+  document.addEventListener('roleta:workspace-ready',e=>wire(e.detail.events));
+})();

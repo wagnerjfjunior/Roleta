@@ -1,0 +1,131 @@
+{
+  "version": "RLT-M5-01-prototype-v1",
+  "mode": "ACTIVE_PROSPECTIVE_V1",
+  "week": {
+    "start": "2026-10-05",
+    "end": "2026-10-11",
+    "label": "05–11 OUT 2026"
+  },
+  "people": [
+    "Wagner",
+    "Laura",
+    "Brenda",
+    "Helena"
+  ],
+  "events": [
+    {
+      "id": "2026-10-05-manha",
+      "date": "05/10",
+      "weekday": "SEG",
+      "period": "manha"
+    },
+    {
+      "id": "2026-10-05-tarde",
+      "date": "05/10",
+      "weekday": "SEG",
+      "period": "tarde"
+    },
+    {
+      "id": "2026-10-06-manha",
+      "date": "06/10",
+      "weekday": "TER",
+      "period": "manha"
+    },
+    {
+      "id": "2026-10-06-tarde",
+      "date": "06/10",
+      "weekday": "TER",
+      "period": "tarde"
+    },
+    {
+      "id": "2026-10-07-manha",
+      "date": "07/10",
+      "weekday": "QUA",
+      "period": "manha"
+    },
+    {
+      "id": "2026-10-07-tarde",
+      "date": "07/10",
+      "weekday": "QUA",
+      "period": "tarde"
+    },
+    {
+      "id": "2026-10-08-manha",
+      "date": "08/10",
+      "weekday": "QUI",
+      "period": "manha"
+    },
+    {
+      "id": "2026-10-08-tarde",
+      "date": "08/10",
+      "weekday": "QUI",
+      "period": "tarde"
+    },
+    {
+      "id": "2026-10-09-manha",
+      "date": "09/10",
+      "weekday": "SEX",
+      "period": "manha"
+    },
+    {
+      "id": "2026-10-09-tarde",
+      "date": "09/10",
+      "weekday": "SEX",
+      "period": "tarde"
+    },
+    {
+      "id": "2026-10-10-integral",
+      "date": "10/10",
+      "weekday": "SÁB",
+      "period": "integral"
+    },
+    {
+      "id": "2026-10-11-integral",
+      "date": "11/10",
+      "weekday": "DOM",
+      "period": "integral"
+    }
+  ],
+  "recommendations": [],
+  "executions": [],
+  "adjudications": [],
+  "scorecard": [
+    {
+      "strategy": "WEEKLY_FROZEN",
+      "label": "Pré-cravado",
+      "hits": 0,
+      "events": 0,
+      "expected": 0,
+      "oe": null,
+      "state": "AMOSTRA_INICIAL"
+    },
+    {
+      "strategy": "CURRENT",
+      "label": "Sugestão atual",
+      "hits": 0,
+      "events": 0,
+      "expected": 0,
+      "oe": null,
+      "state": "AMOSTRA_INICIAL"
+    },
+    {
+      "strategy": "EXECUTED_CHOICE",
+      "label": "Utilizado",
+      "hits": 0,
+      "events": 0,
+      "expected": 0,
+      "oe": null,
+      "state": "OBSERVACIONAL"
+    },
+    {
+      "strategy": "RANDOM_SHADOW",
+      "label": "Acaso sombra",
+      "hits": 0,
+      "events": 0,
+      "expected": 0,
+      "oe": null,
+      "state": "CONTROLE"
+    }
+  ],
+  "note": "Semana prospectiva V1 congelada em 04/10/2026 20:04:19 -03:00 com cutoff 04-10-T. Valores exibidos vêm do ledger canônico data/prospective/recommendations.jsonl."
+}

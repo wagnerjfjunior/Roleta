@@ -360,3 +360,346 @@ body{overflow-x:hidden}
   .family-number{font-size:40px}
   .assignment-card strong{font-size:31px}
 }
+
+
+/* RLT-M4-01 Simulation Lab */
+.simulation-separation,
+.simulation-real{
+  display:inline-flex;
+  align-items:center;
+  border:1px solid rgba(255,207,92,.32);
+  background:rgba(255,207,92,.06);
+  color:var(--amber);
+  border-radius:999px;
+  padding:7px 10px;
+  font-size:10px;
+  font-weight:850;
+  letter-spacing:.07em;
+}
+.simulation-real{
+  border-color:rgba(78,230,166,.30);
+  background:rgba(78,230,166,.06);
+  color:var(--green);
+}
+.simulation-control-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1.2fr auto;
+  gap:12px;
+  align-items:end;
+}
+.simulation-control-grid label{
+  display:grid;
+  gap:7px;
+}
+.simulation-control-grid label>span{
+  color:var(--muted);
+  font-size:10px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+.simulation-run{
+  appearance:none;
+  border:1px solid rgba(66,215,255,.38);
+  background:rgba(66,215,255,.08);
+  color:var(--cyan);
+  border-radius:12px;
+  padding:12px 16px;
+  font:inherit;
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+  min-height:45px;
+}
+.simulation-run:hover{background:rgba(66,215,255,.13)}
+.simulation-run:disabled{opacity:.55;cursor:wait}
+.simulation-kpis{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:12px;
+}
+.simulation-kpis>div{
+  background:#091523;
+  border:1px solid #20344b;
+  border-radius:14px;
+  padding:14px;
+}
+.simulation-kpis span{
+  display:block;
+  font-size:9px;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+.simulation-kpis strong{
+  display:block;
+  font-size:28px;
+  margin-top:5px;
+}
+.sim-model-table{display:grid;gap:8px}
+.sim-model-row{
+  display:grid;
+  grid-template-columns:32px minmax(170px,1.3fr) repeat(6,minmax(74px,1fr));
+  gap:10px;
+  align-items:center;
+  background:#091523;
+  border:1px solid #20344b;
+  border-radius:13px;
+  padding:11px 12px;
+}
+.sim-model-row>span{
+  font-size:11px;
+  color:var(--muted);
+}
+.sim-model-row>span b{
+  display:block;
+  color:var(--text);
+  font-size:9px;
+  margin-bottom:3px;
+  text-transform:uppercase;
+}
+.sim-band-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.sim-band-card{
+  background:#091523;
+  border:1px solid #20344b;
+  border-radius:14px;
+  padding:14px;
+}
+.sim-band-card>span{
+  display:block;
+  font-size:11px;
+  color:var(--muted);
+}
+.sim-band-card>strong{
+  display:block;
+  font-size:30px;
+  margin:5px 0 2px;
+}
+.sim-band-card small{color:var(--muted);font-size:10px}
+.sim-band{
+  height:8px;
+  background:#13243a;
+  border-radius:999px;
+  position:relative;
+  margin:12px 0 8px;
+}
+.sim-band i{
+  position:absolute;
+  top:-4px;
+  width:2px;
+  height:16px;
+  background:var(--amber);
+}
+.sim-band i.mid{
+  width:3px;
+  background:var(--cyan);
+}
+@media(max-width:1100px){
+  .simulation-control-grid{grid-template-columns:1fr 1fr}
+  .sim-model-row{grid-template-columns:32px 1.4fr repeat(3,1fr)}
+  .sim-model-row>span:nth-last-child(-n+3){display:none}
+}
+@media(max-width:680px){
+  .simulation-control-grid,
+  .simulation-kpis,
+  .sim-band-grid{grid-template-columns:1fr}
+  .sim-model-row{
+    grid-template-columns:28px minmax(0,1fr) 70px;
+  }
+  .sim-model-row>span{display:none}
+  .sim-model-row>span:nth-of-type(1){display:block}
+  .simulation-separation,.simulation-real{white-space:normal}
+}
+
+
+/* RLT-M4-02 worker, progress and audit */
+.simulation-cancel{
+  border-color:rgba(255,123,135,.35);
+  background:rgba(255,123,135,.06);
+  color:var(--danger);
+}
+.simulation-progress{
+  height:8px;
+  border:1px solid #20344b;
+  background:#091523;
+  border-radius:999px;
+  overflow:hidden;
+  margin:14px 0 10px;
+}
+.simulation-progress i{
+  display:block;
+  width:0;
+  height:100%;
+  background:linear-gradient(90deg,rgba(66,215,255,.8),rgba(78,230,166,.8));
+  transition:width .15s linear;
+}
+.simulation-audit-actions{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:10px;
+}
+@media(max-width:680px){
+  .simulation-audit-actions{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+
+
+/* RLT-M4-03 context-aware evaluation */
+.sim-context-head{
+  margin-top:22px;
+  padding-top:18px;
+  border-top:1px solid var(--line);
+}
+.sim-context-head h3{margin:5px 0 0}
+.sim-context-table{display:grid;gap:7px;margin-top:12px}
+.sim-context-row{
+  display:grid;
+  grid-template-columns:minmax(180px,1.4fr) repeat(4,minmax(92px,1fr));
+  gap:10px;
+  align-items:center;
+  background:#091523;
+  border:1px solid #20344b;
+  border-radius:12px;
+  padding:10px 12px;
+}
+.sim-context-row span{
+  font-size:12px;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.sim-context-header{
+  background:#0f1d30;
+  color:var(--muted);
+}
+.sim-context-header span{
+  font-size:9px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+@media(max-width:680px){
+  .sim-context-table{overflow-x:auto}
+  .sim-context-row{min-width:620px}
+}
+
+
+/* RLT-M4-04 paired universe comparison */
+.sim-pairwise{margin-top:18px}
+.sim-pair-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+.sim-pair-card{
+  display:grid;
+  gap:6px;
+  background:#091523;
+  border:1px solid #20344b;
+  border-radius:14px;
+  padding:14px;
+}
+.sim-pair-card strong{font-size:12px}
+.sim-pair-card span{font-size:11px;color:var(--muted)}
+.sim-pair-card span b{color:var(--text)}
+.sim-pair-card small{color:var(--muted)}
+@media(max-width:980px){.sim-pair-grid{grid-template-columns:1fr}}
+
+.simulation-progress-wrap{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 64px;
+  gap:10px;
+  align-items:center;
+  margin:14px 0 10px;
+}
+.simulation-progress-wrap .simulation-progress{margin:0}
+#simProgressText{
+  font-size:12px;
+  font-weight:850;
+  color:var(--cyan);
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+
+
+/* RLT-M5-01 Prospective Recommendation Ledger prototype */
+.workspace-prospective{margin-bottom:14px}
+.prospective-week{
+  display:inline-flex;align-items:center;border:1px solid rgba(66,215,255,.34);
+  background:rgba(66,215,255,.07);color:var(--cyan);border-radius:999px;
+  padding:7px 10px;font-size:10px;font-weight:850;letter-spacing:.06em;white-space:nowrap
+}
+.prospective-warning{
+  border:1px solid rgba(255,207,92,.28);background:rgba(255,207,92,.055);
+  color:#e8dcae;border-radius:13px;padding:11px 13px;font-size:12px;margin-bottom:14px
+}
+.prospective-events{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px
+}
+.prospective-event-card{
+  background:#091523;border:1px solid #20344b;border-radius:16px;padding:13px;min-width:0
+}
+.prospective-event-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding-bottom:10px;margin-bottom:8px;border-bottom:1px solid rgba(36,54,77,.7)
+}
+.prospective-event-head>div{display:grid;gap:2px}
+.prospective-event-head span{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.06em}
+.prospective-event-head strong{text-transform:uppercase;font-size:13px}
+.prospective-event-state{
+  border:1px solid #2b4058;border-radius:999px;padding:5px 7px;color:var(--muted)!important;font-size:9px!important
+}
+.prospective-person-list{display:grid;gap:6px}
+.prospective-person-row{
+  display:grid;grid-template-columns:minmax(70px,.9fr) 54px 54px minmax(92px,1fr) 54px 28px;
+  align-items:center;gap:7px;background:#0f1d30;border:1px solid rgba(36,54,77,.75);border-radius:11px;padding:8px 9px
+}
+.prospective-person-row>strong{font-size:12px;min-width:0;overflow-wrap:anywhere}
+.prospective-person-row>span:not(.prospective-status){display:grid;gap:2px}
+.prospective-person-row small{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.prospective-person-row b{font-size:15px;font-variant-numeric:tabular-nums}
+.prospective-trajectory b{font-size:11px;color:var(--cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prospective-status{
+  width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:900
+}
+.prospective-status.pending{border:1px solid #2b4058;color:var(--muted);font-size:11px}
+.prospective-status.hit{border:1px solid rgba(78,230,166,.4);background:rgba(78,230,166,.09);color:var(--green)}
+.prospective-status.miss{border:1px solid rgba(255,123,135,.4);background:rgba(255,123,135,.08);color:var(--danger)}
+.prospective-scorecard{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}
+.prospective-scorecard>div{background:#091523;border:1px solid #20344b;border-radius:13px;padding:12px}
+.prospective-scorecard span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em}
+.prospective-scorecard strong{display:block;font-size:25px;margin:4px 0}
+.prospective-scorecard small{display:block;color:var(--muted);font-size:9px;line-height:1.35}
+.prospective-note{margin:11px 0 0}
+@media(max-width:980px){
+  .prospective-events{grid-template-columns:1fr}
+  .prospective-scorecard{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .prospective-event-card{overflow-x:auto}
+  .prospective-person-list{min-width:560px}
+  .prospective-scorecard{grid-template-columns:1fr}
+  .prospective-week{white-space:normal}
+}
+
+
+/* RLT-M5-01 historical signal relocation */
+.workspace-historical-intro{margin-bottom:10px}
+.workspace-historical-signal{margin-bottom:14px}
+.historical-only-badge{
+  display:inline-flex;align-items:center;border:1px solid rgba(255,207,92,.34);
+  background:rgba(255,207,92,.06);color:var(--amber);border-radius:999px;
+  padding:7px 10px;font-size:10px;font-weight:850;letter-spacing:.06em;white-space:nowrap
+}
+@media(max-width:680px){
+  .historical-only-badge{white-space:normal}
+}
