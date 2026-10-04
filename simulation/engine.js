@@ -262,7 +262,7 @@
     return a[idx];
   }
 
-  function runUniverse(realEvents,templates,eventsCount,seed,fixed,signal){
+  function runUniverse(realEvents,templates,eventsCount,seed,fixed,signal,onProgress){
     const rng=mulberry32(seed);
     const stats=seedStats(realEvents);
     const metrics={
@@ -286,6 +286,7 @@
       const e=simulateEvent(template,rng,i+1,signal);
       for(const id of Object.keys(metrics))observeSlices(metrics[id],picks[id],e,template,signal);
       updateStats(stats,e);
+      if(typeof onProgress==='function'&&(i===eventsCount-1||i%250===0))onProgress(i+1,eventsCount);
     }
     return metrics;
   }
@@ -379,15 +380,24 @@
     const fixed=fixedLeaders(realEvents);
     const signal=config.signal||{type:'null',strength:0,position:null};
     const results=[];
+    const totalEvents=universes*eventsPerUniverse;
     for(let u=0;u<universes;u++){
       results.push(runUniverse(
         realEvents,templates,eventsPerUniverse,
         (baseSeed+Math.imul(u+1,2654435761))>>>0,
-        fixed,signal
+        fixed,signal,
+        (within,totalWithin)=>{
+          if(typeof config.onProgress!=='function')return;
+          const processed=u*eventsPerUniverse+within;
+          config.onProgress({
+            processed_events:processed,
+            total_events:totalEvents,
+            completed_universes:u+(within===totalWithin?1:0),
+            total_universes:universes,
+            pct:totalEvents?processed/totalEvents:0
+          });
+        }
       ));
-      if(typeof config.onProgress==='function'&&(u===universes-1||u%Math.max(1,Math.floor(universes/100))===0)){
-        config.onProgress(u+1,universes);
-      }
     }
     return aggregate(results,eventsPerUniverse,years,seedText,templates.length,signal);
   }
