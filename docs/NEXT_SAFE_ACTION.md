@@ -56,3 +56,28 @@ Initial period allocations, in family order Wagner / Laura / Brenda / Helena:
 - NO REMOTE ITERATION;
 - no merge without explicit approval;
 - no production without explicit approval.
+
+
+## RLT-M4-07 — Weekly Frozen vs Current
+
+Implemented on the active branch without changing the frozen real-week policy.
+
+### Next simulation gate
+Run the first paired control:
+- weeks: 10,000;
+- scenario: NULL;
+- signal strength: 0;
+- seed: `weekly-duel-2026`.
+
+Expected control behavior:
+- Weekly Frozen and Current both remain compatible with theoretical chance;
+- Current must not show persistent artificial advantage merely because it recalculates after each event;
+- Random remains compatible with chance;
+- churn may be non-zero, but helpful and harmful revisions should balance under NULL.
+
+If NULL passes, run in order:
+1. Stable period signal · 3%;
+2. Regime shift · 3%;
+3. Weak signal + noise · 1%.
+
+Do not change `PROSPECTIVE-V1.0.0` or the already frozen real week based on these simulations. RLT-M4-07 evaluates the update mechanism only.
