@@ -186,7 +186,8 @@
     const exportButton=document.querySelector('#exportSimulation');
     const status=document.querySelector('#simStatus');
     const bar=document.querySelector('#simProgressBar');
-    if(!runButton||!cancelButton||!status||!bar)return;
+    const progressText=document.querySelector('#simProgressText');
+    if(!runButton||!cancelButton||!status||!bar||!progressText)return;
 
     const integrity=window.RoletaSimulationEngine.selfTest(events);
     status.textContent=integrity.pass
@@ -208,6 +209,7 @@
       cancelButton.disabled=false;
       runButton.textContent='Simulando…';
       bar.style.width='0%';
+      progressText.textContent='0,0%';
 
       const scenario=document.querySelector('#simScenarioInput').value;
       const signal={
@@ -232,14 +234,17 @@
       worker.onmessage=e=>{
         const msg=e.data||{};
         if(msg.type==='progress'){
-          bar.style.width=(msg.pct*100).toFixed(1)+'%';
-          status.textContent='Processando universos: '+msg.done+' / '+msg.total+' · '+(msg.pct*100).toFixed(1)+'%';
+          const pct=(msg.pct*100);
+          bar.style.width=pct.toFixed(2)+'%';
+          progressText.textContent=pct.toFixed(1).replace('.',',')+'%';
+          status.textContent='Processando: '+compact(msg.processed_events)+' / '+compact(msg.total_events)+' roletas · universo '+Math.min(msg.completed_universes+1,msg.total_universes)+' / '+msg.total_universes;
           return;
         }
         if(msg.type==='complete'){
           renderSummary(msg.result);
           saveRun(testDefinition,msg.result);
           bar.style.width='100%';
+          progressText.textContent='100,0%';
           status.textContent='Concluído · run salvo localmente · dados sintéticos não alteraram a base real.';
           worker.terminate();worker=null;finishUi();
           return;
@@ -260,6 +265,7 @@
       if(worker){worker.terminate();worker=null}
       status.textContent='Simulação cancelada pelo usuário.';
       bar.style.width='0%';
+      progressText.textContent='0,0%';
       finishUi();
     });
 
