@@ -392,7 +392,7 @@ async function upgradeWorkspace(){
   const simControls=document.createElement('article');
   simControls.className='card simulation-controls';
   simControls.innerHTML=
-    '<div class="section-head"><div><span class="eyebrow">RLT-M4-05</span><h2>Configuração da simulação</h2></div><span class="simulation-separation">SIMULATION DATA</span></div>'+
+    '<div class="section-head"><div><span class="eyebrow">RLT-M4-06</span><h2>Configuração da simulação</h2></div><span class="simulation-separation">SIMULATION DATA</span></div>'+
     '<div class="simulation-control-grid">'+
       '<label><span>Universos</span><select id="simUniversesInput"><option>50</option><option selected>100</option><option>250</option><option>500</option><option>1000</option></select></label>'+
       '<label><span>Anos por universo</span><select id="simYearsInput"><option>1</option><option>5</option><option selected>10</option><option>20</option></select></label>'+
@@ -427,8 +427,9 @@ async function upgradeWorkspace(){
   simModels.innerHTML=
     '<div class="section-head"><div><span class="eyebrow">CHAMPION vs BASELINES</span><h2>Placar Monte Carlo</h2></div><span class="muted">Top-2 congelado antes de cada sorteio</span></div>'+
     '<div id="simModelTable" class="sim-model-table"><div class="muted small">Rode a simulação para gerar o placar.</div></div>'+
-    '<div class="sim-context-head"><span class="eyebrow">RLT-M4-05</span><h3>Decomposição N · O/E 2X</h3></div>'+
+    '<div class="sim-context-head"><span class="eyebrow">RLT-M4-06</span><h3>Adaptive Meta · O/E 2X</h3></div>'+
     '<div id="simContextTable" class="sim-context-table"><div class="muted small">Geral, manhã, tarde e signal-eligible serão comparados após a execução.</div></div>'+
+    '<div id="simMetaPolicy" class="sim-pairwise"><div class="muted small">Aguardando diagnóstico do meta-modelo.</div></div>'+
     '<div id="simPairwise" class="sim-pairwise"><div class="muted small">Aguardando comparação pareada entre universos.</div></div>';
   simulation.appendChild(simModels);
 
