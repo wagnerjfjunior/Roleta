@@ -61,7 +61,8 @@ Prototype behavior:
 - Wagner, Laura, Brenda and Helena appear in every event;
 - displays Pré / Atual / Histórico / Usado / result status;
 - no predictive number is invented: placeholders remain `—` until real generation/freeze exists;
-- prospective scorecard starts at zero and is explicitly non-conclusive.
+- prospective scorecard starts at zero and is explicitly non-conclusive;
+- historical morning/afternoon ranking cards were removed from Overview and moved to Modelos & estatística with explicit NÃO PROSPECTIVO labeling.
 
 ## Election exception
 04/10/2026 remains two separate events: morning and afternoon.
