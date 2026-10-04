@@ -45,7 +45,7 @@
     return {
       id:'RLT-M4-06',
       name:scenarioNames[config.signal.type]||config.signal.type,
-      objective:'Validar um meta-modelo adaptativo que escolhe entre Global, Period, N e Period+N usando somente evidência anterior ao sorteio.'
+      objective:'Validar um meta-modelo adaptativo que escolhe entre Global, Period, N e Period+N usando somente evidência anterior ao sorteio.',
       hypothesis:expectations[config.signal.type]||'Avaliar comportamento do modelo no cenário configurado.',
       scenario:{
         type:config.signal.type,
