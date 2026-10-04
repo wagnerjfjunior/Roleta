@@ -264,3 +264,49 @@ Hipótese do cenário `high_n_2x`:
 - N Raw deve explorar melhor um sinal definido apenas por N do que modelos que ignoram N ou fragmentam o histórico também por período.
 
 A versão do motor e o ID do teste passam a ser `RLT-M4-05`.
+
+
+## RLT-M4-06 — Adaptive Meta-Model
+
+Objetivo: testar se um seletor adaptativo consegue escolher entre as arquiteturas Raw já validadas sem usar hindsight.
+
+### Candidatos
+
+- Global Raw;
+- Period Raw;
+- N Raw;
+- Contextual Raw · Period+N.
+
+Random e Fixed permanecem controles, não candidatos do meta-modelo.
+
+### Regra walk-forward
+
+Antes de cada sorteio sintético:
+1. os quatro candidatos geram seus Top-2 usando somente o histórico disponível;
+2. o meta-modelo consulta apenas o desempenho 2X acumulado dos candidatos em eventos anteriores;
+3. calcula para cada candidato o excesso padronizado `z = (hits - esperado) / sqrt(variância)`;
+4. exige no mínimo 100 eventos anteriores;
+5. somente troca o fallback Global Raw quando o melhor candidato tem `z > 1,5`;
+6. congela as posições do candidato escolhido;
+7. o sorteio é gerado;
+8. somente depois da adjudicação são atualizadas as evidências de todos os candidatos.
+
+O limiar é um mecanismo operacional conservador, não um teste formal de significância.
+
+### Auditoria
+
+O resultado registra:
+- política do meta-modelo;
+- candidatos;
+- mínimo de eventos;
+- limiar z;
+- fallback;
+- quantidade e proporção de eventos em que cada arquitetura foi selecionada;
+- comparações pareadas Adaptive Meta vs Global, Period, N e Period+N.
+
+### Critério
+
+No NULL, Adaptive Meta deve permanecer próximo de O/E 1 e não apresentar vantagem artificial persistente.
+Nos cenários com sinal, deve aproximar-se do melhor especialista sem conhecer previamente qual arquitetura contém a estrutura correta.
+
+A versão do motor e o ID do teste passam a ser `RLT-M4-06`.
