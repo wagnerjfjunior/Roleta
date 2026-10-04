@@ -629,3 +629,64 @@ body{overflow-x:hidden}
   text-align:right;
   font-variant-numeric:tabular-nums;
 }
+
+
+/* RLT-M5-01 Prospective Recommendation Ledger prototype */
+.workspace-prospective{margin-bottom:14px}
+.prospective-week{
+  display:inline-flex;align-items:center;border:1px solid rgba(66,215,255,.34);
+  background:rgba(66,215,255,.07);color:var(--cyan);border-radius:999px;
+  padding:7px 10px;font-size:10px;font-weight:850;letter-spacing:.06em;white-space:nowrap
+}
+.prospective-warning{
+  border:1px solid rgba(255,207,92,.28);background:rgba(255,207,92,.055);
+  color:#e8dcae;border-radius:13px;padding:11px 13px;font-size:12px;margin-bottom:14px
+}
+.prospective-events{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px
+}
+.prospective-event-card{
+  background:#091523;border:1px solid #20344b;border-radius:16px;padding:13px;min-width:0
+}
+.prospective-event-head{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding-bottom:10px;margin-bottom:8px;border-bottom:1px solid rgba(36,54,77,.7)
+}
+.prospective-event-head>div{display:grid;gap:2px}
+.prospective-event-head span{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.06em}
+.prospective-event-head strong{text-transform:uppercase;font-size:13px}
+.prospective-event-state{
+  border:1px solid #2b4058;border-radius:999px;padding:5px 7px;color:var(--muted)!important;font-size:9px!important
+}
+.prospective-person-list{display:grid;gap:6px}
+.prospective-person-row{
+  display:grid;grid-template-columns:minmax(70px,.9fr) 54px 54px minmax(92px,1fr) 54px 28px;
+  align-items:center;gap:7px;background:#0f1d30;border:1px solid rgba(36,54,77,.75);border-radius:11px;padding:8px 9px
+}
+.prospective-person-row>strong{font-size:12px;min-width:0;overflow-wrap:anywhere}
+.prospective-person-row>span:not(.prospective-status){display:grid;gap:2px}
+.prospective-person-row small{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.prospective-person-row b{font-size:15px;font-variant-numeric:tabular-nums}
+.prospective-trajectory b{font-size:11px;color:var(--cyan);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prospective-status{
+  width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:16px;font-weight:900
+}
+.prospective-status.pending{border:1px solid #2b4058;color:var(--muted);font-size:11px}
+.prospective-status.hit{border:1px solid rgba(78,230,166,.4);background:rgba(78,230,166,.09);color:var(--green)}
+.prospective-status.miss{border:1px solid rgba(255,123,135,.4);background:rgba(255,123,135,.08);color:var(--danger)}
+.prospective-scorecard{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:12px}
+.prospective-scorecard>div{background:#091523;border:1px solid #20344b;border-radius:13px;padding:12px}
+.prospective-scorecard span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em}
+.prospective-scorecard strong{display:block;font-size:25px;margin:4px 0}
+.prospective-scorecard small{display:block;color:var(--muted);font-size:9px;line-height:1.35}
+.prospective-note{margin:11px 0 0}
+@media(max-width:980px){
+  .prospective-events{grid-template-columns:1fr}
+  .prospective-scorecard{grid-template-columns:1fr 1fr}
+}
+@media(max-width:680px){
+  .prospective-event-card{overflow-x:auto}
+  .prospective-person-list{min-width:560px}
+  .prospective-scorecard{grid-template-columns:1fr}
+  .prospective-week{white-space:normal}
+}
