@@ -85,7 +85,7 @@ function renderHero(){
   document.querySelector('#afternoonPick1').textContent=afternoon[0]?.pos??'—';
   document.querySelector('#afternoonPick2').textContent=afternoon[1]?.pos??'—';
   document.querySelector('#afternoonPickMeta').textContent=afternoon.length
-    ? 'principal #'+afternoon[0].pos+(afternoon[1]?' · reserva #'+afternoon[1].pos:'')
+    ? 'ranking histórico: #'+afternoon[0].pos+(afternoon[1]?' · #'+afternoon[1].pos:'')+' · não prospectivo'
     : 'amostra insuficiente';
   const p=state.weekendPolicy?.saturday?.assignments||state.weekendPolicy?.family_assignments||[];
   document.querySelector('#weekendSummary').innerHTML=p.map(x=>'<span><b>'+x.broker.split(' ')[0]+'</b> '+x.physical_position+'</span>').join('');
@@ -361,8 +361,15 @@ async function upgradeWorkspace(){
   if(hero){
     const duplicateSaturday=hero.querySelector('.hero-card.accent');
     if(duplicateSaturday)duplicateSaturday.remove();
-    hero.classList.add('workspace-hero');
-    move(hero,overview);
+    hero.classList.add('workspace-hero','workspace-historical-signal');
+    const historicalIntro=document.createElement('article');
+    historicalIntro.className='card workspace-historical-intro';
+    historicalIntro.innerHTML=
+      '<div class="section-head"><div><span class="eyebrow">SINAL HISTÓRICO · DESCRITIVO</span><h2>Leitura por período</h2></div>'+
+      '<span class="historical-only-badge">NÃO PROSPECTIVO</span></div>'+
+      '<p class="small muted">Estes números vêm do ranking histórico da base e servem apenas para análise em Modelos & estatística. Não são pré-cravados, não entram como sugestão operacional e não recebem crédito prospectivo.</p>';
+    models.appendChild(historicalIntro);
+    move(hero,models);
   }
 
   const weekendModule=shell.querySelector('.weekend-module');
