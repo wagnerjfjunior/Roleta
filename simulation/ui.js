@@ -3,7 +3,8 @@
 
   const STORAGE_KEY='roleta.simulation.runs.v1';
   const labels={
-    context_raw:'Contextual Raw · Lab V1',
+    context_raw:'Contextual Raw · Period+N',
+    period_raw:'Period Raw · Manhã/Tarde',
     global_raw:'Global Raw · Lab V1',
     random_baseline:'Random Baseline',
     fixed_baseline:'Fixed Baseline'
@@ -40,7 +41,7 @@
       high_n_2x:'Modelos sensíveis ao contexto de N devem capturar melhor um sinal restrito a N alto do que baselines não contextuais.'
     };
     return {
-      id:'RLT-M4-03',
+      id:'RLT-M4-04',
       name:scenarioNames[config.signal.type]||config.signal.type,
       objective:'Validar capacidade de distinguir sinal real de acaso em regime walk-forward sem hindsight.',
       hypothesis:expectations[config.signal.type]||'Avaliar comportamento do modelo no cenário configurado.',
@@ -66,6 +67,7 @@
         primary_metric:'O/E 2X',
         secondary_metrics:['hit_rate_2x','O/E 3X','O/E 4X','P05-P95 O/E 2X','max_losing_p95','O/E 2X morning','O/E 2X afternoon','O/E 2X signal_eligible'],
         controls:['Random Baseline','Fixed Baseline'],
+        challengers:['Global Raw','Period Raw','Contextual Raw · Period+N'],
         rule:'Escolhas são congeladas antes de cada sorteio sintético; resultado só entra no histórico após adjudicação.'
       }
     };
@@ -138,6 +140,25 @@
             '<span>'+fmt(s.signal_eligible?.oe_2x,3)+'</span>'+
           '</div>';
         }).join('');
+    }
+
+    const pairHost=document.querySelector('#simPairwise');
+    if(pairHost&&result.paired_comparisons){
+      const pairs=Object.values(result.paired_comparisons);
+      pairHost.innerHTML=
+        '<div class="sim-context-head"><span class="eyebrow">PAREADO POR UNIVERSO</span><h3>Quem vence dentro do mesmo universo?</h3></div>'+
+        '<div class="sim-pair-grid">'+
+        pairs.map(p=>
+          '<div class="sim-pair-card">'+
+            '<strong>'+labels[p.model_a]+' vs '+labels[p.model_b]+'</strong>'+
+            '<span>'+labels[p.model_a]+' venceu <b>'+p.a_wins+'/'+p.universes+'</b> ('+fmtPct(p.a_win_rate)+')</span>'+
+            '<span>'+labels[p.model_b]+' venceu <b>'+p.b_wins+'/'+p.universes+'</b></span>'+
+            '<span>Empates <b>'+p.ties+'</b></span>'+
+            '<span>Δ O/E médio <b>'+fmt(p.mean_delta,4)+'</b></span>'+
+            '<small>P05 '+fmt(p.delta_p05,4)+' · P50 '+fmt(p.delta_p50,4)+' · P95 '+fmt(p.delta_p95,4)+'</small>'+
+          '</div>'
+        ).join('')+
+        '</div>';
     }
 
     const title=document.querySelector('#simNullBands')?.previousElementSibling?.querySelector('h2');
