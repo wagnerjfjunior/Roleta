@@ -138,11 +138,14 @@ function renderPreviousDay(){
     '</div></div>';
 
   const integral=es.find(e=>e.period==='integral');
+  const modeTitle=document.querySelector('#previousDayModeTitle');
   if(integral){
+    if(modeTitle)modeTitle.textContent='Roleta integral';
     document.querySelector('#previousDayEvents').innerHTML=renderEvent(integral);
     return;
   }
 
+  if(modeTitle)modeTitle.textContent='Manhã e tarde lado a lado';
   const by={manha:es.find(e=>e.period==='manha'),tarde:es.find(e=>e.period==='tarde')};
   document.querySelector('#previousDayEvents').innerHTML=['manha','tarde'].map(period=>{
     const e=by[period];
