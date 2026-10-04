@@ -82,8 +82,34 @@ Sabrina/Brenda and Laura 28/09–02/10 remain contested. Reconcile from original
 - merge only after explicit approval;
 - production only after explicit approval.
 
+## 20:00 READINESS
+The prospective pipeline is READY before the 04/10 results cutoff.
+
+Locked policy:
+- PROSPECTIVE-V1.0.0;
+- period_raw_global_fallback;
+- RLT-M5-WEEKLY-V1;
+- 2X primary endpoint;
+- policy blob 965a06b358d504325e87076e09fb9dff12862ca3;
+- Adaptive Meta remains lab-only;
+- no post-result model switching.
+
+Infrastructure active on branch:
+- recommendations.jsonl;
+- executions.jsonl;
+- adjudications.jsonl;
+- scorecard.json;
+- prospective/ledger.js;
+- prospective/generator.js;
+- Overview connected to canonical prospective ledgers.
+
+Dry-run anti-hindsight: PASS.
+
+After 20:00 the only required sequence is:
+04/10 morning + afternoon ingestion -> validation -> final cutoff -> batch generation -> freeze -> scorecard/UI validation.
+
 ## NEXT SAFE ACTION
-Validate RLT-M5-01 prototype locally via LVR. If visually/structurally approved, implement the canonical append-only recommendation/execution/adjudication ledgers and anti-hindsight tests before generating real weekly recommendations.
+Receive and incorporate the two 04/10 real roulettes after 20:00, then execute the already-locked weekly batch. No methodology/model decision remains pending.
 
 ## Bootstrap
 `Ative o SFJM do projeto Roleta, resolva main ao vivo em wagnerjfjunior/Roleta, leia .sfjm/project.json, handoffs/CURRENT.md, docs/NEXT_SAFE_ACTION.md e docs/PROSPECTIVE_LEDGER.md, recupere a branch ativa e continue somente pela próxima ação segura canônica.`
