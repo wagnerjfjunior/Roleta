@@ -61,3 +61,17 @@ Sabrina/Brenda and Laura counts for 28/09–02/10 remain contested. Original she
 - 02/10 and 03/10 do not yet have full nominal transcription in the imported legacy source; their canonical event results remain valid in the 83-event ledger.
 - no global model/statistical aggregate may be recomputed from the 48-event nominal subset as though it were complete.
 - 04/10 afternoon correction: positions 12 and 13 excluded; Sabrina p11 → nº12 → Último; Wagner p14 → nº9.
+
+
+## Prospective week 05–11/10 frozen
+- freeze timestamp: `2026-10-04T20:04:19-03:00`;
+- data cutoff: `04-10-T`;
+- canonical source universe: 83 events;
+- 48 WEEKLY_FROZEN recommendations written;
+- 48 initial CURRENT recommendations written as DRAFT/revisable;
+- 48 deterministic RANDOM_SHADOW chains written and frozen;
+- period allocations, family order Wagner / Laura / Brenda / Helena:
+  - morning: 14 / 3 / 5 / 4;
+  - afternoon: 22 / 18 / 16 / 20;
+  - integral: 21 / 4 / 8 / 12;
+- scorecard remains AMOSTRA_INICIAL until real target events are adjudicated.
