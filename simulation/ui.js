@@ -5,6 +5,7 @@
   const labels={
     context_raw:'Contextual Raw · Period+N',
     period_raw:'Period Raw · Manhã/Tarde',
+    n_raw:'N Raw · Faixa de N',
     global_raw:'Global Raw · Lab V1',
     random_baseline:'Random Baseline',
     fixed_baseline:'Fixed Baseline'
@@ -38,10 +39,10 @@
       null:'Modelos devem convergir para O/E próximo de 1 e permanecer compatíveis com o Random Baseline.',
       fixed_2x:'Modelos adaptativos devem aprender o sinal global; Global Raw tende a capturar melhor um efeito não contextual.',
       morning_2x:'Contextual Raw deve explorar melhor um sinal restrito ao período da manhã do que Global Raw e Random Baseline.',
-      high_n_2x:'Modelos sensíveis ao contexto de N devem capturar melhor um sinal restrito a N alto do que baselines não contextuais.'
+      high_n_2x:'N Raw deve explorar melhor um sinal restrito a N alto do que Global Raw, Period Raw, Contextual Period+N e baselines.'
     };
     return {
-      id:'RLT-M4-04',
+      id:'RLT-M4-05',
       name:scenarioNames[config.signal.type]||config.signal.type,
       objective:'Validar capacidade de distinguir sinal real de acaso em regime walk-forward sem hindsight.',
       hypothesis:expectations[config.signal.type]||'Avaliar comportamento do modelo no cenário configurado.',
@@ -67,7 +68,7 @@
         primary_metric:'O/E 2X',
         secondary_metrics:['hit_rate_2x','O/E 3X','O/E 4X','P05-P95 O/E 2X','max_losing_p95','O/E 2X morning','O/E 2X afternoon','O/E 2X signal_eligible'],
         controls:['Random Baseline','Fixed Baseline'],
-        challengers:['Global Raw','Period Raw','Contextual Raw · Period+N'],
+        challengers:['Global Raw','Period Raw','N Raw','Contextual Raw · Period+N'],
         rule:'Escolhas são congeladas antes de cada sorteio sintético; resultado só entra no histórico após adjudicação.'
       }
     };
@@ -187,7 +188,17 @@
     const status=document.querySelector('#simStatus');
     const bar=document.querySelector('#simProgressBar');
     const progressText=document.querySelector('#simProgressText');
-    if(!runButton||!cancelButton||!status||!bar||!progressText)return;
+    const scenarioInput=document.querySelector('#simScenarioInput');
+    const minNWrap=document.querySelector('#simMinNWrap');
+    const minNInput=document.querySelector('#simMinNInput');
+    if(!runButton||!cancelButton||!status||!bar||!progressText||!scenarioInput)return;
+
+    function syncScenarioFields(){
+      const showN=scenarioInput.value==='high_n_2x';
+      if(minNWrap)minNWrap.hidden=!showN;
+    }
+    scenarioInput.addEventListener('change',syncScenarioFields);
+    syncScenarioFields();
 
     const integrity=window.RoletaSimulationEngine.selfTest(events);
     status.textContent=integrity.pass
@@ -211,12 +222,12 @@
       bar.style.width='0%';
       progressText.textContent='0,0%';
 
-      const scenario=document.querySelector('#simScenarioInput').value;
+      const scenario=scenarioInput.value;
       const signal={
         type:scenario,
         position:Number(document.querySelector('#simPositionInput').value)||14,
         strength:scenario==='null'?0:Number(document.querySelector('#simStrengthInput').value)||0,
-        minN:25
+        minN:scenario==='high_n_2x'?Math.max(4,Number(minNInput?.value)||25):25
       };
       const config={
         realEvents:events,
