@@ -403,7 +403,7 @@ async function upgradeWorkspace(){
       '<button id="runSimulation" class="simulation-run">Rodar simulação</button>'+
       '<button id="cancelSimulation" class="simulation-run simulation-cancel" disabled>Cancelar</button>'+
     '</div>'+
-    '<div class="simulation-progress"><i id="simProgressBar"></i></div>'+
+    '<div class="simulation-progress-wrap"><div class="simulation-progress"><i id="simProgressBar"></i></div><span id="simProgressText">0,0%</span></div>'+
     '<p id="simStatus" class="small muted">Pronto. A base real é usada somente como estrutura e estado inicial.</p>'+
     '<div class="simulation-audit-actions"><button id="exportSimulation" class="workspace-link-button" disabled>Exportar JSON</button><span id="simSavedRuns" class="small muted">0 runs auditáveis salvos localmente</span></div>';
   simulation.appendChild(simControls);
