@@ -111,3 +111,16 @@ Validate the frozen RLT-M5-01 weekly panel locally via SFJM/LVR. Then continue e
 
 ## Bootstrap
 `Ative o SFJM do projeto Roleta, resolva main ao vivo em wagnerjfjunior/Roleta, leia .sfjm/project.json, handoffs/CURRENT.md, docs/NEXT_SAFE_ACTION.md e docs/PROSPECTIVE_LEDGER.md, recupere a branch ativa e continue somente pela próxima ação segura canônica.`
+
+
+## RLT-M4-07 Weekly Frozen vs Current
+Implemented on the active branch:
+- `simulation/weekly-duel.js`;
+- `simulation/weekly-duel-worker.js`;
+- `simulation/weekly-duel-ui.js`.
+
+Purpose:
+test whether intra-week Current recalculation adds value over Weekly Frozen using paired complete synthetic weeks while keeping the real V1 policy fixed.
+
+First required control: 10,000 weeks / NULL / seed `weekly-duel-2026`.
+No simulation result may rewrite the live frozen week 05–11/10.
