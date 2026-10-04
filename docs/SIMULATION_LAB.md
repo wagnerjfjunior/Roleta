@@ -310,3 +310,79 @@ No NULL, Adaptive Meta deve permanecer próximo de O/E 1 e não apresentar vanta
 Nos cenários com sinal, deve aproximar-se do melhor especialista sem conhecer previamente qual arquitetura contém a estrutura correta.
 
 A versão do motor e o ID do teste passam a ser `RLT-M4-06`.
+
+
+## RLT-M4-07 — Weekly Frozen vs Current
+
+Purpose: evaluate the operational value of intra-week recalculation after the real V1 policy has been locked.
+
+This phase does **not** select a new model. It holds `PROSPECTIVE-V1.0.0 / RLT-M5-WEEKLY-V1` fixed and compares three strategies on exactly the same synthetic weeks:
+
+1. `WEEKLY_FROZEN` — positions are calculated at the start of the week and remain unchanged;
+2. `CURRENT` — starts from the same policy but recalculates future recommendations after every revealed roulette;
+3. `RANDOM` — paired random control.
+
+Each synthetic week contains:
+- Monday–Friday: morning + afternoon;
+- Saturday: integral;
+- Sunday: integral;
+- 12 roulettes/week;
+- 4 family opportunities per roulette.
+
+### Paired chronology
+
+For every synthetic week:
+
+1. seed model state only with canonical real events available before the synthetic week;
+2. calculate the complete Weekly Frozen plan;
+3. calculate the initial Current plan;
+4. draw the next structural template for the required period;
+5. freeze the Weekly/Current choices for that event;
+6. reveal the new permutation;
+7. adjudicate both strategies and random on the same outcome;
+8. append the revealed event to model state;
+9. recalculate Current only;
+10. continue through Sunday.
+
+Weekly Frozen is never revised.
+
+### Eligibility/fallback
+
+Each person has:
+- primary position;
+- fallback 1;
+- fallback 2.
+
+For each event the first physically eligible value in that frozen chain is used. If none is physically present, that person/event is counted as invalid rather than silently inventing another position.
+
+### Scenarios
+
+- `NULL`: pure chance. Current must not manufacture persistent gain from continual updating.
+- `stable_period`: a persistent period-specific signal favors the Weekly V1 leader for that period.
+- `regime_shift`: the favored period position switches halfway through the week, testing whether Current can adapt.
+- `weak_noise`: weak event-to-event moving signal, testing whether Current chases noise.
+
+### Primary diagnostics
+
+- 2X hits;
+- event-specific theoretical expected hits;
+- O/E;
+- Weekly vs Current paired win rate by week;
+- mean `hits(Current) - hits(Weekly)`;
+- P05/P50/P95 of weekly hit delta;
+- recommendation churn;
+- changes that helped;
+- changes that hurt;
+- neutral changes;
+- Random baseline.
+
+### Interpretation
+
+This laboratory can justify or reject the *updating mechanism*. It cannot prove that the real roulette contains predictive signal.
+
+The live week 05–11/10/2026 remains frozen and is not changed by RLT-M4-07 results.
+
+Engine: `simulation/weekly-duel.js`.
+Worker: `simulation/weekly-duel-worker.js`.
+UI: `simulation/weekly-duel-ui.js`.
+Protocol version: `RLT-M4-07-v1`.
