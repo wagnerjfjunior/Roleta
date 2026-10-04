@@ -124,6 +124,47 @@
     return topEligible(stats.global,template.occupied,2);
   }
 
+  const META_CANDIDATES=['global_raw','period_raw','n_raw','context_raw'];
+  const META_MIN_EVENTS=100;
+  const META_Z_THRESHOLD=1.5;
+
+  function createMetaEvidence(){
+    const out={};
+    for(const id of META_CANDIDATES)out[id]={events:0,hits:0,expected:0,variance:0};
+    return out;
+  }
+
+  function metaEvidenceScore(rec){
+    if(!rec||rec.events<META_MIN_EVENTS||rec.variance<=0)return -Infinity;
+    return (rec.hits-rec.expected)/Math.sqrt(rec.variance);
+  }
+
+  function chooseMetaModel(evidence){
+    let best='global_raw';
+    let bestScore=META_Z_THRESHOLD;
+    for(const id of META_CANDIDATES){
+      const z=metaEvidenceScore(evidence[id]);
+      if(z>bestScore+1e-12){
+        best=id;
+        bestScore=z;
+      }
+    }
+    return best;
+  }
+
+  function updateMetaEvidence(evidence,picksByModel,e){
+    const target=targetPositions(e,2);
+    for(const id of META_CANDIDATES){
+      const picks=picksByModel[id];
+      const p=expectedTop2(e.N,2,picks.length);
+      const rec=evidence[id];
+      rec.events++;
+      rec.hits+=hitAny(picks,target)?1:0;
+      rec.expected+=p;
+      rec.variance+=p*(1-p);
+    }
+  }
+
   function chooseRandom(template,rng){
     const a=[...template.occupied];
     for(let i=a.length-1;i>0;i--){
@@ -279,6 +320,7 @@
     const rng=mulberry32(seed);
     const stats=seedStats(realEvents);
     const metrics={
+      adaptive_meta:metricSlices(),
       context_raw:metricSlices(),
       period_raw:metricSlices(),
       n_raw:metricSlices(),
@@ -286,28 +328,38 @@
       random_baseline:metricSlices(),
       fixed_baseline:metricSlices()
     };
+    const metaEvidence=createMetaEvidence();
+    const metaSelection={global_raw:0,period_raw:0,n_raw:0,context_raw:0};
 
     for(let i=0;i<eventsCount;i++){
       const template=templates[Math.floor(rng()*templates.length)];
-      const picks={
+      const candidatePicks={
         context_raw:chooseContextual(stats,template),
         period_raw:choosePeriod(stats,template),
         n_raw:chooseN(stats,template),
-        global_raw:chooseGlobal(stats,template),
+        global_raw:chooseGlobal(stats,template)
+      };
+      const selectedMeta=chooseMetaModel(metaEvidence);
+      metaSelection[selectedMeta]++;
+      const picks={
+        adaptive_meta:candidatePicks[selectedMeta],
+        ...candidatePicks,
         random_baseline:chooseRandom(template,rng),
         fixed_baseline:chooseFixed(template,fixed)
       };
 
       const e=simulateEvent(template,rng,i+1,signal);
       for(const id of Object.keys(metrics))observeSlices(metrics[id],picks[id],e,template,signal);
+      updateMetaEvidence(metaEvidence,candidatePicks,e);
       updateStats(stats,e);
       if(typeof onProgress==='function'&&(i===eventsCount-1||i%250===0))onProgress(i+1,eventsCount);
     }
+    metrics.__meta_selection=metaSelection;
     return metrics;
   }
 
   function aggregate(universeResults,eventsPerUniverse,years,seed,templatesCount,signal){
-    const ids=Object.keys(universeResults[0]||{});
+    const ids=Object.keys(universeResults[0]||{}).filter(id=>!id.startsWith('__'));
     const models={};
     const universe_oe_2x={};
 
@@ -358,8 +410,19 @@
       };
     }
 
+    const metaSelectionTotals={global_raw:0,period_raw:0,n_raw:0,context_raw:0};
+    for(const u of universeResults){
+      const s=u.__meta_selection||{};
+      for(const id of Object.keys(metaSelectionTotals))metaSelectionTotals[id]+=Number(s[id]||0);
+    }
+    const metaSelectionTotal=Object.values(metaSelectionTotals).reduce((a,b)=>a+b,0);
+    const metaSelectionShare={};
+    for(const id of Object.keys(metaSelectionTotals)){
+      metaSelectionShare[id]=metaSelectionTotal?metaSelectionTotals[id]/metaSelectionTotal:0;
+    }
+
     return {
-      version:'RLT-M4-05-v1',
+      version:'RLT-M4-06-v1',
       mode:signal&&signal.type!=='null'?'HISTORICAL_SEEDED_SIGNAL_INJECTION':'HISTORICAL_SEEDED_NULL_STRUCTURAL_BOOTSTRAP',
       signal:signal||{type:'null',strength:0,position:null},
       evaluation_slices:['all','morning','afternoon','signal_eligible'],
@@ -370,7 +433,20 @@
       total_synthetic_events:eventsPerUniverse*universeResults.length,
       structural_templates:templatesCount,
       models,
+      adaptive_meta_policy:{
+        candidates:META_CANDIDATES,
+        min_prior_events:META_MIN_EVENTS,
+        z_threshold:META_Z_THRESHOLD,
+        fallback:'global_raw',
+        rule:'Antes do sorteio, seleciona o candidato com maior excesso 2X padronizado acumulado em eventos anteriores se z > threshold; caso contrário usa Global Raw. Evidência atualiza somente após adjudicação.',
+        selection_counts:metaSelectionTotals,
+        selection_share:metaSelectionShare
+      },
       paired_comparisons:{
+        meta_vs_global:paired('adaptive_meta','global_raw'),
+        meta_vs_period:paired('adaptive_meta','period_raw'),
+        meta_vs_n:paired('adaptive_meta','n_raw'),
+        meta_vs_context:paired('adaptive_meta','context_raw'),
         n_vs_global:paired('n_raw','global_raw'),
         n_vs_period:paired('n_raw','period_raw'),
         n_vs_context:paired('n_raw','context_raw'),
