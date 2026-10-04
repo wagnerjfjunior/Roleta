@@ -515,3 +515,39 @@ body{overflow-x:hidden}
   .sim-model-row>span:nth-of-type(1){display:block}
   .simulation-separation,.simulation-real{white-space:normal}
 }
+
+
+/* RLT-M4-02 worker, progress and audit */
+.simulation-cancel{
+  border-color:rgba(255,123,135,.35);
+  background:rgba(255,123,135,.06);
+  color:var(--danger);
+}
+.simulation-progress{
+  height:8px;
+  border:1px solid #20344b;
+  background:#091523;
+  border-radius:999px;
+  overflow:hidden;
+  margin:14px 0 10px;
+}
+.simulation-progress i{
+  display:block;
+  width:0;
+  height:100%;
+  background:linear-gradient(90deg,rgba(66,215,255,.8),rgba(78,230,166,.8));
+  transition:width .15s linear;
+}
+.simulation-audit-actions{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:10px;
+}
+@media(max-width:680px){
+  .simulation-audit-actions{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
