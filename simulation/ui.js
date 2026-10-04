@@ -54,6 +54,11 @@
   function wire(events){
     const button=document.querySelector('#runSimulation');
     if(!button)return;
+    const integrity=window.RoletaSimulationEngine.selfTest(events);
+    document.querySelector('#simStatus').textContent=integrity.pass
+      ? 'Motor íntegro · '+integrity.checks+' verificações mecânicas PASS.'
+      : 'Motor bloqueado · '+integrity.error;
+    button.disabled=!integrity.pass;
     const run=()=>{
       button.disabled=true;
       button.textContent='Simulando…';
