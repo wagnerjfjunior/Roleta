@@ -1,64 +1,68 @@
 # Roleta — Next Safe Action
 
-## RLT-M5-01 — Prospective Recommendation Ledger
+## RLT-M5-01 — 20:00 Cutoff Readiness
 
-### Current gate
-- statistical review: PASS_WITH_RESIDUAL_RISK;
-- software systems architecture review: PASS_WITH_RESIDUAL_RISK;
-- canonical protocol: `docs/PROSPECTIVE_LEDGER.md`;
-- prototype branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`;
-- no merge / no production until explicit approval.
+### READY STATE
+The prospective system is prepared before the 04/10/2026 results cutoff.
 
-### Next safe action
-1. Validate the first RLT-M5-01 prototype locally via SFJM/LVR.
-2. Confirm that Overview replaces only the redundant "Minha família / Resumo histórico" card with "Pré-cravados da semana".
-3. Confirm historical morning/afternoon ranking cards are no longer shown in Overview and appear only under Modelos & estatística, explicitly marked NÃO PROSPECTIVO.
-4. Confirm Monday-Friday dates and both weekday periods are visible, plus Saturday/Sunday.
-5. Confirm all four people are visible: Wagner, Laura, Brenda, Helena.
-6. Confirm prototype placeholders remain `—` until a recommendation is genuinely generated and frozen; do not invent numbers.
-7. Confirm the visual states for:
-   - Pré-cravado / WEEKLY_FROZEN;
-   - Atual / CURRENT;
-   - Histórico de revisions;
-   - Usado / EXECUTED_CHOICE;
-   - pending / green HIT / red MISS.
-8. Confirm prospective scorecard remains explicitly non-conclusive with zero evidence in prototype mode.
-9. After visual approval, implement the append-only ledgers:
-   - recommendations.jsonl;
-   - executions.jsonl;
-   - adjudications.jsonl;
-   - derived scorecard.json.
-10. Only after ledgers and anti-hindsight tests pass, generate real weekly frozen/current recommendations.
-11. Continue to receive 04/10/2026 morning and afternoon as distinct canonical real events when supplied; do not create an integral event for the election Sunday.
+Locked before results:
+- policy: `PROSPECTIVE-V1.0.0`;
+- model: `period_raw_global_fallback`;
+- model version: `RLT-M5-WEEKLY-V1`;
+- primary endpoint: 2X = Nº1 OR Último;
+- WEEKLY_FROZEN and CURRENT use the same algorithm and differ only by data cutoff;
+- Adaptive Meta remains laboratory-only;
+- no model may be switched after seeing today's results.
 
-### Prospective invariants
-- recommendation != execution != outcome;
-- WEEKLY_FROZEN and CURRENT are separate prospective strategies;
-- each new real roulette may recalculate ALL future unresolved events, including weekend;
-- frozen/adjudicated recommendations are immutable;
-- no hindsight credit;
-- manual override is not random;
-- Random Shadow is a control, not the definition of theoretical chance;
-- primary endpoint = 2X (Nº1 OR Último);
-- 3X/4X remain exploratory in V1;
-- materially changed algorithm/policy starts a new version/epoch;
-- the system must be able to conclude COMPATÍVEL COM ACASO.
+Implemented:
+- canonical policy file;
+- append-only recommendation ledger;
+- append-only execution ledger;
+- append-only adjudication ledger;
+- derived scorecard;
+- weekly batch generator;
+- deterministic Random Shadow;
+- Overview reads the canonical ledgers;
+- anti-hindsight dry-run: PASS.
+
+### Next safe action after 20:00 America/Sao_Paulo
+1. Receive the two real 04/10/2026 roulettes separately:
+   - morning;
+   - afternoon.
+2. Validate each sheet and preserve physical positions/gaps.
+3. Incorporate both as distinct canonical real events.
+4. Confirm the final real-data cutoff after the afternoon event.
+5. Run the already-locked V1 batch generator against the canonical dataset.
+6. Generate for 05–11/10/2026:
+   - 48 WEEKLY_FROZEN recommendations;
+   - 48 initial CURRENT recommendations;
+   - 48 deterministic RANDOM_SHADOW chains.
+7. Freeze records with:
+   - data cutoff;
+   - policy/model version;
+   - policy blob SHA as config hash;
+   - generated/frozen timestamp;
+   - primary and two fallbacks.
+8. Rebuild the derived scorecard.
+9. Validate the Overview.
+10. Do not alter model policy based on the 04/10 outcomes.
 
 ### Calendar
 - Monday-Friday: morning + afternoon;
-- normal Saturday/Sunday: one integral roulette/day;
+- normal Saturday/Sunday: integral;
 - 04/10/2026: morning + afternoon;
-- 25/10/2026: morning + afternoon only if there is a second round.
+- 25/10/2026: morning + afternoon only if a second round occurs.
 
 ### SFJM delivery
+- branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`;
+- PR: #3 draft;
 - LOCAL-FIRST / LVR;
 - preferred port 8082;
 - route `/`;
-- same branch for corrections;
 - NO PREVIEW;
 - NO REMOTE ITERATION;
-- merge only after explicit authorization;
-- production only after explicit authorization.
+- no merge without explicit approval;
+- no production without explicit approval.
 
 ### Blocks
-NO NAME INFERENCE; NO COMPLEMENT INFERENCE; NO POSITION COLLAPSE; NO PREDICTIVE CLAIM; NO HINDSIGHT CREDIT; NO PREVIEW; NO REMOTE ITERATION; NO IMPLICIT MERGE; NO IMPLICIT DEPLOY; NO INVENTED PROSPECTIVE NUMBERS; NO TRUST IN DISPUTED PRESENCE OVERRIDES.
+NO MODEL SHOPPING AFTER CUTOFF; NO NAME INFERENCE; NO COMPLEMENT INFERENCE; NO POSITION COLLAPSE; NO PREDICTIVE CLAIM; NO HINDSIGHT CREDIT; NO INVENTED NUMBERS; NO IMPLICIT MERGE; NO IMPLICIT DEPLOY.
