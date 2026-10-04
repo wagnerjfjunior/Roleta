@@ -237,3 +237,126 @@ body{overflow-x:hidden}
   .workspace-hero.hero-grid-3,.workspace-family-grid,.workspace-top5-grid,.workspace-family-mini{grid-template-columns:1fr}
   .workspace-page-head h2{font-size:28px}
 }
+
+
+/* RLT-M3-04 mobile hardening */
+@media(max-width:680px){
+  .workspace-root,
+  .workspace-main,
+  .workspace-page,
+  .card,
+  .hero-card,
+  .weekend-day-block{
+    min-width:0;
+    width:100%;
+  }
+
+  .workspace-sidebar{
+    position:static;
+    height:auto;
+    padding:16px 14px;
+  }
+
+  .workspace-brand{text-align:center}
+
+  .workspace-nav{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:thin;
+  }
+
+  .workspace-nav button{
+    flex:0 0 auto;
+    white-space:nowrap;
+    text-align:center;
+    padding:9px 12px;
+  }
+
+  .workspace-page-head,
+  .section-head,
+  .family-head,
+  .eligibility{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .section-head,
+  .workspace-page-head{gap:10px}
+
+  .status-stack{width:100%}
+  .hero-card{min-height:auto}
+  .big-number{font-size:56px}
+  .dual-number{font-size:46px}
+
+  .afternoon-picks,
+  .assignment-grid,
+  .last-grid,
+  .mini-grid,
+  .mini-grid.five,
+  .day-stats,
+  .model-metrics,
+  .workspace-family-stats{
+    grid-template-columns:1fr;
+  }
+
+  .family-grid,
+  .family-grid.compact{
+    grid-template-columns:1fr;
+  }
+
+  .period-grid{
+    grid-template-columns:repeat(5,minmax(48px,1fr));
+    overflow-x:auto;
+  }
+
+  .rank-row{
+    grid-template-columns:30px minmax(0,1fr);
+  }
+
+  .rank-meta{
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+
+  .model-rank-row{
+    grid-template-columns:30px minmax(0,1fr) auto;
+  }
+
+  .model-rank-row strong,
+  .model-rank-row span{
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+
+  .portfolio-inline{align-items:stretch}
+
+  .portfolio-inline span{
+    max-width:100%;
+    overflow-wrap:anywhere;
+  }
+
+  .timeline{max-width:100%}
+  footer{overflow-wrap:anywhere}
+}
+
+@media(max-width:420px){
+  .workspace-main{
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .card,
+  .hero-card,
+  .weekend-day-block{
+    padding:14px;
+    border-radius:16px;
+  }
+
+  h1{font-size:34px}
+  .workspace-page-head h2{font-size:25px}
+  .afternoon-picks strong{font-size:38px}
+  .family-number{font-size:40px}
+  .assignment-card strong{font-size:31px}
+}
