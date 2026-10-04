@@ -49,3 +49,13 @@ The derived event row must never replace the full-sheet transcription. Full tran
 
 For 04/10/2026 the primary source is:
 `data/transcriptions/2026-10-04.csv`.
+
+
+## Consolidated nominal ledger
+
+`data/full_draws_reconstructed.csv` is the repository-local nominal history currently available for broker-level audit. It preserves the established schema:
+`event_id,date,period,N,physical_position,effective_order,drawn_number,broker_name_raw,broker_name_normalized,is_family,transcription_confidence,source,row_status,event_status`.
+
+Current imported coverage is 48 events / 1022 participant rows. It is auxiliary. The canonical event universe for model generation remains the de-duplicated 83-event result ledger defined by `data/manifest.json`.
+
+Do not derive global model conclusions from the nominal subset until nominal coverage reaches the canonical event set.
