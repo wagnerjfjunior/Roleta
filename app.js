@@ -1,6 +1,11 @@
 const state={events:[],weekendPolicy:null,presence:null,modelLab:null};
 const OBJ='n1last';
 
+const SCHEDULE_EXCEPTIONS={
+  '04/10/2026':{mode:'dual',periods:['manha','tarde'],reason:'Eleições Gerais 2026 · 1º turno'},
+  '25/10/2026':{mode:'dual',periods:['manha','tarde'],reason:'Eleições Gerais 2026 · eventual 2º turno'}
+};
+
 function parseCSV(text){
   const rows=[];let row=[],field='',quoted=false;
   for(let i=0;i<text.length;i++){
@@ -137,15 +142,17 @@ function renderPreviousDay(){
     '<span><b>Cortesia</b>'+e.courtesy+'</span><span><b>Último</b>'+e.last+'</span>'+
     '</div></div>';
 
+  const exception=SCHEDULE_EXCEPTIONS[date];
   const integral=es.find(e=>e.period==='integral');
   const modeTitle=document.querySelector('#previousDayModeTitle');
-  if(integral){
+
+  if(!exception&&integral){
     if(modeTitle)modeTitle.textContent='Roleta integral';
     document.querySelector('#previousDayEvents').innerHTML=renderEvent(integral);
     return;
   }
 
-  if(modeTitle)modeTitle.textContent='Manhã e tarde lado a lado';
+  if(modeTitle)modeTitle.textContent=exception?'Manhã e tarde · exceção eleitoral':'Manhã e tarde lado a lado';
   const by={manha:es.find(e=>e.period==='manha'),tarde:es.find(e=>e.period==='tarde')};
   document.querySelector('#previousDayEvents').innerHTML=['manha','tarde'].map(period=>{
     const e=by[period];
