@@ -275,5 +275,23 @@
     return aggregate(results,eventsPerUniverse,years,config.seed||'roleta-2026',templates.length);
   }
 
-  global.RoletaSimulationEngine={run,simulateEvent,completeTemplates,hashSeed};
+  function selfTest(realEvents){
+    const templates=completeTemplates(realEvents||[]);
+    if(!templates.length)return {pass:false,checks:0,error:'Nenhum molde completo.'};
+    const rng=mulberry32(hashSeed('self-test'));
+    let checks=0;
+    for(let i=0;i<Math.min(50,templates.length*2);i++){
+      const t=templates[i%templates.length];
+      const e=simulateEvent(t,rng,i+1);
+      const sorted=[...e.permutation].sort((a,b)=>a-b);
+      if(sorted.length!==t.N||sorted.some((v,idx)=>v!==idx+1))return {pass:false,checks,error:'Permutação inválida.'};
+      if(e.occupied.length!==t.N||e.occupied.some((p,idx)=>p!==t.occupied[idx]))return {pass:false,checks,error:'Estrutura/gaps alterados.'};
+      const eligible=new Set(e.occupied);
+      if(![e.first,e.second,e.courtesy,e.last].every(p=>eligible.has(p)))return {pass:false,checks,error:'Resultado aponta para posição não elegível.'};
+      checks++;
+    }
+    return {pass:true,checks,error:null};
+  }
+
+  global.RoletaSimulationEngine={run,simulateEvent,completeTemplates,hashSeed,selfTest};
 })(window);
