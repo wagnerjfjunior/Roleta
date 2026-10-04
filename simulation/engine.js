@@ -192,6 +192,15 @@
     };
   }
 
+  function metricSlices(){
+    return {
+      all:metricBox(),
+      morning:metricBox(),
+      afternoon:metricBox(),
+      signal_eligible:metricBox()
+    };
+  }
+
   function observeMetric(m,picks,e){
     m.events++;
     const h2=hitAny(picks,targetPositions(e,2));
@@ -205,6 +214,37 @@
     m.exp4+=expectedTop2(e.N,4,picks.length);
   }
 
+  function observeSlices(slices,picks,e,template,signal){
+    observeMetric(slices.all,picks,e);
+    if(template.period==='manha')observeMetric(slices.morning,picks,e);
+    if(template.period==='tarde')observeMetric(slices.afternoon,picks,e);
+    const eligible=(!signal||signal.type==='null')?true:signalApplies(template,signal);
+    if(eligible)observeMetric(slices.signal_eligible,picks,e);
+  }
+
+  function summarizeRows(rows){
+    const sum=k=>rows.reduce((s,r)=>s+r[k],0);
+    const totalEvents=sum('events');
+    const hit2=sum('hit2'),hit3=sum('hit3'),hit4=sum('hit4');
+    const exp2=sum('exp2'),exp3=sum('exp3'),exp4=sum('exp4');
+    const lifts2=rows.filter(r=>r.exp2>0).map(r=>r.hit2/r.exp2);
+    return {
+      events:totalEvents,
+      hit_rate_2x:totalEvents?hit2/totalEvents:0,
+      hit_rate_3x:totalEvents?hit3/totalEvents:0,
+      hit_rate_4x:totalEvents?hit4/totalEvents:0,
+      expected_rate_2x:totalEvents?exp2/totalEvents:0,
+      expected_rate_3x:totalEvents?exp3/totalEvents:0,
+      expected_rate_4x:totalEvents?exp4/totalEvents:0,
+      oe_2x:exp2?hit2/exp2:0,
+      oe_3x:exp3?hit3/exp3:0,
+      oe_4x:exp4?hit4/exp4:0,
+      max_losing_p95:pct(rows.map(r=>r.maxLosing),.95),
+      oe_2x_p05:pct(lifts2,.05),
+      oe_2x_p95:pct(lifts2,.95)
+    };
+  }
+
   function pct(values,p){
     if(!values.length)return 0;
     const a=[...values].sort((x,y)=>x-y);
@@ -216,10 +256,10 @@
     const rng=mulberry32(seed);
     const stats=seedStats(realEvents);
     const metrics={
-      context_raw:metricBox(),
-      global_raw:metricBox(),
-      random_baseline:metricBox(),
-      fixed_baseline:metricBox()
+      context_raw:metricSlices(),
+      global_raw:metricSlices(),
+      random_baseline:metricSlices(),
+      fixed_baseline:metricSlices()
     };
 
     for(let i=0;i<eventsCount;i++){
@@ -232,7 +272,7 @@
       };
 
       const e=simulateEvent(template,rng,i+1,signal);
-      for(const id of Object.keys(metrics))observeMetric(metrics[id],picks[id],e);
+      for(const id of Object.keys(metrics))observeSlices(metrics[id],picks[id],e,template,signal);
       updateStats(stats,e);
     }
     return metrics;
@@ -242,34 +282,22 @@
     const ids=Object.keys(universeResults[0]||{});
     const models={};
     for(const id of ids){
-      const rows=universeResults.map(u=>u[id]);
-      const sum=k=>rows.reduce((s,r)=>s+r[k],0);
-      const totalEvents=sum('events');
-      const hit2=sum('hit2'),hit3=sum('hit3'),hit4=sum('hit4');
-      const exp2=sum('exp2'),exp3=sum('exp3'),exp4=sum('exp4');
-      const lifts2=rows.map(r=>r.exp2?r.hit2/r.exp2:0);
+      const slices={};
+      for(const key of ['all','morning','afternoon','signal_eligible']){
+        slices[key]=summarizeRows(universeResults.map(u=>u[id][key]));
+      }
       models[id]={
         id,
-        universes:rows.length,
-        events:totalEvents,
-        hit_rate_2x:totalEvents?hit2/totalEvents:0,
-        hit_rate_3x:totalEvents?hit3/totalEvents:0,
-        hit_rate_4x:totalEvents?hit4/totalEvents:0,
-        expected_rate_2x:totalEvents?exp2/totalEvents:0,
-        expected_rate_3x:totalEvents?exp3/totalEvents:0,
-        expected_rate_4x:totalEvents?exp4/totalEvents:0,
-        oe_2x:exp2?hit2/exp2:0,
-        oe_3x:exp3?hit3/exp3:0,
-        oe_4x:exp4?hit4/exp4:0,
-        max_losing_p95:pct(rows.map(r=>r.maxLosing),.95),
-        oe_2x_p05:pct(lifts2,.05),
-        oe_2x_p95:pct(lifts2,.95)
+        universes:universeResults.length,
+        ...slices.all,
+        slices
       };
     }
     return {
-      version:'RLT-M4-02-v1',
+      version:'RLT-M4-03-v1',
       mode:signal&&signal.type!=='null'?'HISTORICAL_SEEDED_SIGNAL_INJECTION':'HISTORICAL_SEEDED_NULL_STRUCTURAL_BOOTSTRAP',
       signal:signal||{type:'null',strength:0,position:null},
+      evaluation_slices:['all','morning','afternoon','signal_eligible'],
       seed:String(seed),
       universes:universeResults.length,
       years,
