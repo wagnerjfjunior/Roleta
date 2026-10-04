@@ -34,5 +34,15 @@
       "oe": null,
       "interpretation": "CONTROL"
     }
+  },
+  "generated_at": "2026-10-04T20:04:19-03:00",
+  "data_cutoff": "04-10-T",
+  "policy_version": "PROSPECTIVE-V1.0.0",
+  "model_version": "RLT-M5-WEEKLY-V1",
+  "frozen_week": "2026-10-05/2026-10-11",
+  "frozen_recommendations": {
+    "WEEKLY_FROZEN": 48,
+    "CURRENT": 48,
+    "RANDOM_SHADOW": 48
   }
 }
