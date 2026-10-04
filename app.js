@@ -300,6 +300,7 @@ async function init(){
     state.events=[...byId.values()];
     render();
     await upgradeWorkspace();
+    document.dispatchEvent(new CustomEvent('roleta:workspace-ready',{detail:{events:state.events}}));
   }catch(err){
     document.querySelector('#datasetStamp').textContent='erro de dados';
     document.body.insertAdjacentHTML('beforeend','<div class="error">'+err.message+'</div>');
@@ -331,6 +332,7 @@ async function upgradeWorkspace(){
       '<button data-workspace-page="ranking">Ranking</button>'+
       '<button data-workspace-page="weekend">Fim de semana</button>'+
       '<button data-workspace-page="models">Modelos & estatística</button>'+
+      '<button data-workspace-page="simulation">Simulação</button>'+
     '</nav>';
 
   root.appendChild(sidebar);
@@ -342,12 +344,13 @@ async function upgradeWorkspace(){
   const ranking=document.createElement('section');
   const weekend=document.createElement('section');
   const models=document.createElement('section');
+  const simulation=document.createElement('section');
   overview.id='workspace-overview'; family.id='workspace-family'; ranking.id='workspace-ranking';
-  weekend.id='workspace-weekend'; models.id='workspace-models';
-  [overview,family,ranking,weekend,models].forEach((p,idx)=>{p.className='workspace-page'+(idx===0?' active':'')});
+  weekend.id='workspace-weekend'; models.id='workspace-models'; simulation.id='workspace-simulation';
+  [overview,family,ranking,weekend,models,simulation].forEach((p,idx)=>{p.className='workspace-page'+(idx===0?' active':'')});
 
   const first=shell.firstChild;
-  shell.insertBefore(models,first); shell.insertBefore(weekend,models); shell.insertBefore(ranking,weekend);
+  shell.insertBefore(simulation,first); shell.insertBefore(models,simulation); shell.insertBefore(weekend,models); shell.insertBefore(ranking,weekend);
   shell.insertBefore(family,ranking); shell.insertBefore(overview,family);
 
   const move=(el,to)=>{if(el)to.appendChild(el)};
@@ -384,6 +387,55 @@ async function upgradeWorkspace(){
   ranking.prepend(pageHead('RANKING','Estatística de corretores','Top 5 por resultado especial e ranking histórico de posições.'));
   weekend.prepend(pageHead('FIM DE SEMANA','Sábado e domingo','Elegibilidade 5/10, prévia de sábado e fechamento de domingo após o resultado de sábado.'));
   models.prepend(pageHead('MODEL LAB','Modelos & estatística','Champion, challengers, backtest, viabilidade e auditoria estatística.'));
+  simulation.prepend(pageHead('SIMULATION LAB','Validação por Monte Carlo','Universos sintéticos estruturados pelas roletas reais. Nenhum evento simulado entra na base canônica.'));
+
+  const simControls=document.createElement('article');
+  simControls.className='card simulation-controls';
+  simControls.innerHTML=
+    '<div class="section-head"><div><span class="eyebrow">RLT-M4-01</span><h2>Configuração da simulação</h2></div><span class="simulation-separation">SIMULATION DATA</span></div>'+
+    '<div class="simulation-control-grid">'+
+      '<label><span>Universos</span><select id="simUniversesInput"><option>50</option><option selected>100</option><option>250</option><option>500</option></select></label>'+
+      '<label><span>Anos por universo</span><select id="simYearsInput"><option>1</option><option>5</option><option selected>10</option><option>20</option></select></label>'+
+      '<label><span>Seed</span><input id="simSeedInput" value="roleta-2026"></label>'+
+      '<button id="runSimulation" class="simulation-run">Rodar simulação</button>'+
+    '</div>'+
+    '<p id="simStatus" class="small muted">Pronto. A base real é usada somente como estrutura e estado inicial.</p>';
+  simulation.appendChild(simControls);
+
+  const simSummary=document.createElement('article');
+  simSummary.className='card';
+  simSummary.innerHTML=
+    '<div class="section-head"><div><span class="eyebrow">ESCALA</span><h2>Universos processados</h2></div><span class="simulation-real">REAL DATA: '+state.events.length+' roletas</span></div>'+
+    '<div class="simulation-kpis">'+
+      '<div><span>Universos</span><strong id="simUniverses">—</strong></div>'+
+      '<div><span>Horizonte</span><strong id="simYears">—</strong></div>'+
+      '<div><span>Roletas sintéticas</span><strong id="simEvents">—</strong></div>'+
+      '<div><span>Moldes estruturais</span><strong id="simTemplates">—</strong></div>'+
+    '</div>'+
+    '<p class="small muted">Modo: <b id="simMode">—</b> · seed: <b id="simSeedUsed">—</b></p>';
+  simulation.appendChild(simSummary);
+
+  const simModels=document.createElement('article');
+  simModels.className='card';
+  simModels.innerHTML=
+    '<div class="section-head"><div><span class="eyebrow">CHAMPION vs BASELINES</span><h2>Placar Monte Carlo</h2></div><span class="muted">Top-2 congelado antes de cada sorteio</span></div>'+
+    '<div id="simModelTable" class="sim-model-table"><div class="muted small">Rode a simulação para gerar o placar.</div></div>';
+  simulation.appendChild(simModels);
+
+  const simBands=document.createElement('article');
+  simBands.className='card';
+  simBands.innerHTML=
+    '<div class="section-head"><div><span class="eyebrow">NULL LAB</span><h2>Faixa esperada sob acaso</h2></div><span class="muted">O/E 2X · P05–P95 entre universos</span></div>'+
+    '<div id="simNullBands" class="sim-band-grid"><div class="muted small">Aguardando simulação.</div></div>';
+  simulation.appendChild(simBands);
+
+  const simMethod=document.createElement('article');
+  simMethod.className='card methodology';
+  simMethod.innerHTML=
+    '<div class="section-head"><div><span class="eyebrow">MECÂNICA</span><h2>Como cada roleta é simulada</h2></div></div>'+
+    '<p>O laboratório sorteia um molde real completo, preserva N, período, posições físicas e gaps, recalcula a ordem efetiva e gera uma nova permutação uniforme 1..N. Cada modelo escolhe antes do sorteio; somente depois o evento sintético é revelado e incorporado ao histórico daquele universo.</p>'+
+    '<p class="small muted"><strong>Isolamento:</strong> resultados sintéticos existem apenas no laboratório e nunca entram em data/manifest.json.</p>';
+  simulation.appendChild(simMethod);
 
   if(brokerStats){
     const familyCard=document.createElement('article');
