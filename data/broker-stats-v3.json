@@ -1,20 +1,20 @@
 {
-  "version": "2026-10-02-v8",
-  "source": "full_draws_reconstructed_v8.csv",
-  "reconstructed_events": 80,
-  "validated_events": 79,
-  "validated_rows": 1663,
-  "note": "Rankings usam apenas as 79 roletas com permutação completa validada. Brenda é exibida no painel; no ledger histórico correspondente, o nome registrado é Sabrina.",
+  "version": "2026-10-04-v9",
+  "source": "full_draws_reconstructed_v9.csv",
+  "reconstructed_events": 81,
+  "validated_events": 80,
+  "validated_rows": 1692,
+  "note": "Rankings usam apenas as 80 roletas com permutação completa validada. Sabrina/Brenda teve participação no sábado confirmada pelo usuário, porém sua linha nominal na foto de 03/10 não foi resolvida com segurança e não é usada para atribuir Nº1/Nº2/Cortesia/Último.",
   "family": [
     {
       "display_name": "Wagner",
       "ledger_name": "Wagner",
-      "participations": 46,
+      "participations": 47,
       "number1": 4,
-      "number2": 1,
+      "number2": 2,
       "courtesy": 1,
       "last": 2,
-      "total_special": 8
+      "total_special": 9
     },
     {
       "display_name": "Brenda",
@@ -29,7 +29,7 @@
     {
       "display_name": "Laura",
       "ledger_name": "Laura",
-      "participations": 17,
+      "participations": 18,
       "number1": 1,
       "number2": 0,
       "courtesy": 0,

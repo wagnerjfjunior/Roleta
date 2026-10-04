@@ -1,0 +1,55 @@
+{
+  "version": "2026-10-04-saturday-incorporated",
+  "event": "03-10-I",
+  "date": "03/10/2026",
+  "N": 29,
+  "outcomes": {
+    "number1_physical": 23,
+    "number2_physical": 9,
+    "courtesy_physical": 16,
+    "last_physical": 4
+  },
+  "family": {
+    "Wagner": {
+      "physical_position": 9,
+      "drawn_number": 2,
+      "result_2x": "MISS",
+      "result_3x": "MISS",
+      "result_4x": "HIT_N2"
+    },
+    "Laura": {
+      "physical_position": 25,
+      "drawn_number": 20
+    },
+    "Sabrina_Brenda": {
+      "participation": "USER_CONFIRMED",
+      "physical_position": "UNRESOLVED"
+    },
+    "Helena": {
+      "participation": "NOT_CONFIRMED_FROM_IMAGE"
+    }
+  },
+  "sunday_freeze": {
+    "Wagner": {
+      "target": "2X",
+      "primary": 9,
+      "reserve": 22
+    },
+    "Brenda": {
+      "target": "3X",
+      "primary": 5,
+      "reserve": 4
+    },
+    "Laura": {
+      "target": "4X",
+      "primary": 25,
+      "reserve": 22
+    },
+    "Helena": {
+      "target": "4X_weekend_context",
+      "primary": 23,
+      "reserve": 14
+    }
+  },
+  "interpretation": "Historical descriptive support only; no future predictive edge established."
+}

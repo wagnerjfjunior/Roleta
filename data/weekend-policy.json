@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-02-week-close-v4-family",
+  "version": "2026-10-04-sunday-frozen-v5",
   "objective": "n1_or_last",
   "qualification": {
     "required_weekday_periods": 5,
@@ -18,8 +18,8 @@
     "rule": "Cada corretor precisa cumprir pelo menos 5 dos 10 períodos úteis da semana para participar das roletas do fim de semana."
   },
   "weekend_baseline": {
-    "logical_events_total": 80,
-    "full_permutation_events": 79,
+    "logical_events_total": 81,
+    "full_permutation_events": 80,
     "evidence_level": "exploratory_only"
   },
   "family_assignments": [
@@ -27,46 +27,42 @@
       "broker": "Wagner",
       "presence_key": "Wagner",
       "physical_position": 9,
-      "role": "principal",
-      "fallback_position": 22,
-      "eligibility_mode": "confirmed"
+      "role": "2X",
+      "fallback_position": 22
     },
     {
       "broker": "Brenda",
       "presence_key": "Sabrina",
-      "physical_position": 3,
-      "role": "condicional",
-      "fallback_position": 13,
-      "eligibility_mode": "requires_5_of_10"
+      "physical_position": 5,
+      "role": "3X",
+      "fallback_position": 4
     },
     {
       "broker": "Laura",
       "presence_key": "Laura",
-      "physical_position": 22,
-      "role": "condicional",
-      "fallback_position": 13,
-      "eligibility_mode": "requires_5_of_10"
+      "physical_position": 25,
+      "role": "4X",
+      "fallback_position": 22
     },
     {
       "broker": "Helena",
       "presence_key": "Helena",
-      "physical_position": 14,
-      "role": "condicional",
-      "fallback_position": 8,
-      "eligibility_mode": "requires_5_of_10"
+      "physical_position": 23,
+      "role": "4X_contexto_weekend",
+      "fallback_position": 14
     }
   ],
   "interpretation": "Carteira familiar completa. O painel deve sempre mostrar Wagner, Brenda, Laura e Helena com contagem de períodos e número de fim de semana. Aptidão exige 5/10 períodos confirmados; contagem insuficiente permanece pendente/não liberada, sem apagar a escolha estatística.",
-  "review_rule": "Sábado está congelado após o fechamento de sexta. Domingo permanece provisório até incorporar o resultado de sábado, quando será recalculado uma única vez e congelado.",
+  "review_rule": "Sábado foi incorporado. Domingo foi recalculado uma única vez e agora está congelado.",
   "methodology": {
-    "primary_sample": "all_80_canonical_events",
-    "full_permutation_sample": 79,
+    "primary_sample": "all_81_canonical_events",
+    "full_permutation_sample": 80,
     "weekend_context": "secondary_only",
     "rationale": "Toda a base alimenta o modelo; sábado/domingo são contexto secundário para evitar perda severa de amostra."
   },
   "saturday": {
-    "status": "FROZEN_AFTER_FRIDAY_CLOSE",
-    "note": "Fechado após incorporar as roletas de 02/10. Os quatro membros da família permanecem visíveis; a escolha só é operacional para quem atingir 5/10 períodos confirmados.",
+    "status": "OBSERVED_COMPLETE",
+    "note": "Resultado observado de 03/10 incorporado: N=29; Nº1 p23; Nº2 p9; Cortesia p16; Último p4. Wagner p9 tirou nº2.",
     "assignments": [
       {
         "broker": "Wagner",
@@ -101,37 +97,36 @@
     "close_trigger": "completed_2026-10-02"
   },
   "sunday": {
-    "status": "FORECAST_ONLY_UNTIL_SATURDAY_RESULT",
-    "note": "Prévia para toda a família. Domingo será recalculado e congelado após o resultado de sábado; cada número só é operacional se a pessoa estiver apta pelo 5/10.",
+    "status": "FROZEN_AFTER_SATURDAY_RESULT",
+    "note": "Domingo congelado após incorporar a roleta de sábado. Carteira diversificada por objetivo: Wagner 2X, Brenda 3X, Laura/Helena 4X.",
     "assignments": [
       {
         "broker": "Wagner",
         "presence_key": "Wagner",
         "physical_position": 9,
-        "role": "previsao",
-        "fallback_position": 22,
-        "context_position": 3
+        "role": "2X",
+        "fallback_position": 22
       },
       {
         "broker": "Brenda",
         "presence_key": "Sabrina",
-        "physical_position": 3,
-        "role": "previsao_condicional",
-        "fallback_position": 13
+        "physical_position": 5,
+        "role": "3X",
+        "fallback_position": 4
       },
       {
         "broker": "Laura",
         "presence_key": "Laura",
-        "physical_position": 22,
-        "role": "previsao_condicional",
-        "fallback_position": 13
+        "physical_position": 25,
+        "role": "4X",
+        "fallback_position": 22
       },
       {
         "broker": "Helena",
         "presence_key": "Helena",
-        "physical_position": 14,
-        "role": "previsao_condicional",
-        "fallback_position": 8
+        "physical_position": 23,
+        "role": "4X_contexto_weekend",
+        "fallback_position": 14
       }
     ],
     "close_trigger": "after_saturday_roulette_photo"

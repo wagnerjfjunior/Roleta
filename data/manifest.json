@@ -1,7 +1,7 @@
 {
-  "logical_dataset_version": "2026-10-02-80",
-  "canonical_event_count": 80,
-  "quality_A": 76,
+  "logical_dataset_version": "2026-10-03-81",
+  "canonical_event_count": 81,
+  "quality_A": 77,
   "quality_B": 4,
   "sources": [
     {
@@ -23,6 +23,11 @@
       "path": "/data/incoming/2026-10-02.csv",
       "role": "append_only_ledger",
       "events": 2
+    },
+    {
+      "path": "/data/incoming/2026-10-03.csv",
+      "role": "append_only_ledger",
+      "events": 1
     }
   ],
   "rule": "Logical canonical dataset is the de-duplicated union by Evento of all manifest sources."
