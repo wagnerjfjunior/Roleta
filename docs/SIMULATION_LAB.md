@@ -79,3 +79,43 @@ A expectativa aleatória de duas posições distintas em um evento com N e k res
 5. dados simulados não entram no dataset real;
 6. painel exibe claramente REAL DATA vs SIMULATION DATA;
 7. comparação inclui pelo menos Contextual, Global, Random e Fixed.
+
+
+## RLT-M4-02 — Worker, auditoria e Signal Injection
+
+### Execução pesada
+- o Monte Carlo passa a executar em `simulation/worker.js`;
+- a UI permanece responsiva;
+- o worker publica progresso por universo;
+- o usuário pode cancelar a execução;
+- cargas de milhões de roletas deixam de bloquear a thread principal.
+
+### Persistência auditável V1
+- ao concluir, o resumo do run é gravado em `localStorage`;
+- são preservados os 25 runs mais recentes;
+- cada run guarda timestamp, versão do motor, seed, cenário, escala e métricas agregadas;
+- o usuário pode exportar o run atual em JSON;
+- nenhum resultado sintético entra em `data/manifest.json`.
+
+Observação: o navegador não grava diretamente no GitHub. Persistência central exigirá backend autenticado separado.
+
+### Signal Injection V1
+
+Cenários suportados:
+- `null`: acaso puro;
+- `fixed_2x`: uma posição física elegível recebe oportunidade adicional controlada de ser Nº1/Último;
+- `morning_2x`: o mesmo sinal, porém somente em eventos de manhã;
+- `high_n_2x`: o mesmo sinal somente quando N >= 25.
+
+Parâmetros:
+- posição-alvo configurável;
+- intensidade configurável;
+- seed reproduzível.
+
+A injeção ocorre somente na geração do resultado, depois que os modelos congelam suas escolhas. Isso preserva a disciplina walk-forward.
+
+### Interpretação
+- NULL LAB: os modelos devem convergir para O/E próximo de 1;
+- SIGNAL LAB: modelos sensíveis ao contexto devem detectar sinais contextualizados melhor que baselines incompatíveis;
+- Random Baseline permanece como controle negativo;
+- um O/E alto isolado não promove um modelo; é necessário comparar distribuição entre universos e falso positivo no NULL.
