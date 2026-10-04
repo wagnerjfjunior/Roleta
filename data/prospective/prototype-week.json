@@ -1,6 +1,6 @@
 {
   "version": "RLT-M5-01-prototype-v1",
-  "mode": "PROTOTYPE_NO_PREDICTIVE_VALUES",
+  "mode": "ACTIVE_PROSPECTIVE_V1",
   "week": {
     "start": "2026-10-05",
     "end": "2026-10-11",
@@ -127,5 +127,5 @@
       "state": "CONTROLE"
     }
   ],
-  "note": "Protótipo estrutural. Nenhum número desta semana foi congelado; valores ausentes não são previsões nem evidência."
+  "note": "Semana prospectiva V1 congelada em 04/10/2026 20:04:19 -03:00 com cutoff 04-10-T. Valores exibidos vêm do ledger canônico data/prospective/recommendations.jsonl."
 }
