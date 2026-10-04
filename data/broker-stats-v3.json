@@ -1,15 +1,15 @@
 {
-  "version": "2026-10-04-v9",
+  "version": "2026-10-04-v10",
   "source": "full_draws_reconstructed_v9.csv",
-  "reconstructed_events": 81,
-  "validated_events": 80,
+  "reconstructed_events": 83,
+  "validated_events": 82,
   "validated_rows": 1692,
-  "note": "Rankings usam apenas as 80 roletas com permutação completa validada. Sabrina/Brenda teve participação no sábado confirmada pelo usuário, porém sua linha nominal na foto de 03/10 não foi resolvida com segurança e não é usada para atribuir Nº1/Nº2/Cortesia/Último.",
+  "note": "Rankings incorporam as roletas completas validadas disponíveis. Em 04/10/2026 tarde, Sabrina está na posição física 11, tirou nº12 e foi Último de vez; posições 12 e 13 estavam riscadas/vazias e p14 Wagner ficou na ordem efetiva 12.",
   "family": [
     {
       "display_name": "Wagner",
       "ledger_name": "Wagner",
-      "participations": 47,
+      "participations": 49,
       "number1": 4,
       "number2": 2,
       "courtesy": 1,
@@ -19,12 +19,12 @@
     {
       "display_name": "Brenda",
       "ledger_name": "Sabrina",
-      "participations": 27,
+      "participations": 28,
       "number1": 0,
       "number2": 2,
       "courtesy": 1,
-      "last": 1,
-      "total_special": 4
+      "last": 2,
+      "total_special": 5
     },
     {
       "display_name": "Laura",
