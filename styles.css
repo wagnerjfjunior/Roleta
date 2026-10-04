@@ -590,3 +590,26 @@ body{overflow-x:hidden}
   .sim-context-table{overflow-x:auto}
   .sim-context-row{min-width:620px}
 }
+
+
+/* RLT-M4-04 paired universe comparison */
+.sim-pairwise{margin-top:18px}
+.sim-pair-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:12px;
+}
+.sim-pair-card{
+  display:grid;
+  gap:6px;
+  background:#091523;
+  border:1px solid #20344b;
+  border-radius:14px;
+  padding:14px;
+}
+.sim-pair-card strong{font-size:12px}
+.sim-pair-card span{font-size:11px;color:var(--muted)}
+.sim-pair-card span b{color:var(--text)}
+.sim-pair-card small{color:var(--muted)}
+@media(max-width:980px){.sim-pair-grid{grid-template-columns:1fr}}
