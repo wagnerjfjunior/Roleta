@@ -130,15 +130,24 @@ function renderPreviousDay(){
   if(!date)return;
   const es=state.events.filter(e=>e.date===date);
   document.querySelector('#previousDayTitle').textContent=date;
+
+  const renderEvent=e=>'<div class="day-card"><div class="day-title">'+e.period+' · N='+e.N+'</div>'+
+    '<div class="day-stats">'+
+    '<span><b>Nº1</b>'+e.first+'</span><span><b>Nº2</b>'+e.second+'</span>'+
+    '<span><b>Cortesia</b>'+e.courtesy+'</span><span><b>Último</b>'+e.last+'</span>'+
+    '</div></div>';
+
+  const integral=es.find(e=>e.period==='integral');
+  if(integral){
+    document.querySelector('#previousDayEvents').innerHTML=renderEvent(integral);
+    return;
+  }
+
   const by={manha:es.find(e=>e.period==='manha'),tarde:es.find(e=>e.period==='tarde')};
   document.querySelector('#previousDayEvents').innerHTML=['manha','tarde'].map(period=>{
     const e=by[period];
     if(!e)return '<div class="day-card"><h3>'+period+'</h3><div class="muted small">sem folha canônica</div></div>';
-    return '<div class="day-card"><div class="day-title">'+period+' · N='+e.N+'</div>'+
-      '<div class="day-stats">'+
-      '<span><b>Nº1</b>'+e.first+'</span><span><b>Nº2</b>'+e.second+'</span>'+
-      '<span><b>Cortesia</b>'+e.courtesy+'</span><span><b>Último</b>'+e.last+'</span>'+
-      '</div></div>';
+    return renderEvent(e);
   }).join('');
 }
 function renderRecent(){
