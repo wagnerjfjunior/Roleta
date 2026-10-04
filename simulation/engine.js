@@ -259,7 +259,10 @@
   }
 
   function run(config){
-    const realEvents=(config.realEvents||[]).filter(e=>Number.isFinite(e.N)&&e.N>0&&Array.isArray(e.occupied));
+    const realEvents=(config.realEvents||[]).filter(e=>{
+      const occupied=[...new Set((e.occupied||[]).filter(Number.isFinite))];
+      return Number.isFinite(e.N)&&e.N>=4&&occupied.length===e.N;
+    });
     const templates=completeTemplates(realEvents);
     if(!templates.length)throw new Error('Nenhuma roleta completa disponível para bootstrap estrutural.');
     const universes=Math.max(1,Math.min(1000,Number(config.universes)||100));
