@@ -2,6 +2,15 @@
   'use strict';
 
   const DATA_URL='/data/prospective/prototype-week.json';
+  const RECOMMENDATIONS_URL='/data/prospective/recommendations.jsonl';
+  const EXECUTIONS_URL='/data/prospective/executions.jsonl';
+  const ADJUDICATIONS_URL='/data/prospective/adjudications.jsonl';
+  const SCORECARD_URL='/data/prospective/scorecard.json';
+
+  function parseJsonl(text){
+    return String(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean)
+      .map(line=>JSON.parse(line)).filter(x=>x.record_type!=='LEDGER_INIT');
+  }
 
   function byId(list,id){return (list||[]).filter(x=>x.target_event_id===id)}
   function recommendationFor(data,eventId,person,strategy){
@@ -69,9 +78,25 @@
 
     let data;
     try{
-      const r=await fetch(DATA_URL,{cache:'no-store'});
-      if(!r.ok)throw new Error('Falha ao carregar protótipo prospectivo');
-      data=await r.json();
+      const [sr,rr,er,ar,cr]=await Promise.all([
+        fetch(DATA_URL,{cache:'no-store'}),
+        fetch(RECOMMENDATIONS_URL,{cache:'no-store'}),
+        fetch(EXECUTIONS_URL,{cache:'no-store'}),
+        fetch(ADJUDICATIONS_URL,{cache:'no-store'}),
+        fetch(SCORECARD_URL,{cache:'no-store'})
+      ]);
+      if(!sr.ok||!rr.ok||!er.ok||!ar.ok||!cr.ok)throw new Error('Falha ao carregar ledger prospectivo');
+      data=await sr.json();
+      data.recommendations=parseJsonl(await rr.text());
+      data.executions=parseJsonl(await er.text());
+      data.adjudications=parseJsonl(await ar.text());
+      const score=await cr.json();
+      data.scorecard=Object.entries(score.strategies||{}).map(([strategy,s])=>({
+        strategy,
+        label:strategy==='WEEKLY_FROZEN'?'Pré-cravado':strategy==='CURRENT'?'Sugestão atual':strategy==='EXECUTED_CHOICE'?'Utilizado':'Acaso sombra',
+        hits:s.hits||0,events:s.events||0,expected:s.expected||0,oe:s.oe,
+        state:s.interpretation||score.evidence_state||'AMOSTRA_INICIAL'
+      }));
     }catch(err){
       existing.innerHTML='<div class="section-head"><div><span class="eyebrow">RLT-M5-01</span><h2>Pré-cravados da semana</h2></div></div>'+
         '<p class="small error">'+err.message+'</p>';
@@ -85,13 +110,26 @@
         '<p class="small muted">Pré = número congelado no início da semana · Atual = última recomendação antes do evento · Usado = posição realmente escolhida.</p></div>'+
         '<span class="prospective-week">'+data.week.label+'</span>'+
       '</div>'+
-      '<div class="prospective-warning"><strong>Protótipo auditável.</strong> Nenhum número ainda foi congelado para esta semana; “—” não é previsão.</div>'+
+      '<div class="prospective-warning">'+
+        (data.recommendations.length
+          ? '<strong>Ledger ativo.</strong> Os valores exibidos vêm de recomendações prospectivas versionadas e congeladas.'
+          : '<strong>Protótipo auditável.</strong> Nenhum número ainda foi congelado para esta semana; “—” não é previsão.')+
+      '</div>'+
       '<div class="prospective-events">'+data.events.map(e=>eventCard(data,e)).join('')+'</div>'+
       '<div class="sim-context-head"><span class="eyebrow">VALIDAÇÃO PROSPECTIVA</span><h3>Modelo × execução × acaso</h3></div>'+
       scorecard(data)+
       '<p class="small muted prospective-note">'+data.note+'</p>';
   }
 
-  document.addEventListener('roleta:workspace-ready',render,{once:true});
+  document.addEventListener('roleta:workspace-ready',()=>{
+    const core=window.RoletaProspectiveLedger;
+    const gen=window.RoletaProspectiveGenerator;
+    if(core&&gen){
+      const a=core.selfTest();
+      const b=gen.selfTest(core);
+      if(!a.pass||!b.pass)throw new Error('Prospective self-test failed.');
+    }
+    render();
+  },{once:true});
   if(document.querySelector('.workspace-overview-family'))render();
 })();
