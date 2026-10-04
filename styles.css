@@ -690,3 +690,16 @@ body{overflow-x:hidden}
   .prospective-scorecard{grid-template-columns:1fr}
   .prospective-week{white-space:normal}
 }
+
+
+/* RLT-M5-01 historical signal relocation */
+.workspace-historical-intro{margin-bottom:10px}
+.workspace-historical-signal{margin-bottom:14px}
+.historical-only-badge{
+  display:inline-flex;align-items:center;border:1px solid rgba(255,207,92,.34);
+  background:rgba(255,207,92,.06);color:var(--amber);border-radius:999px;
+  padding:7px 10px;font-size:10px;font-weight:850;letter-spacing:.06em;white-space:nowrap
+}
+@media(max-width:680px){
+  .historical-only-badge{white-space:normal}
+}
