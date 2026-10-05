@@ -32,6 +32,7 @@ function extractOutputText(payload){
 }
 
 module.exports=async function handler(req,res){
+  res.setHeader('Cache-Control','no-store');
   if(req.method!=='POST')return res.status(405).json({error:'METHOD_NOT_ALLOWED'});
   if(!process.env.OPENAI_API_KEY)return res.status(503).json({error:'OPENAI_API_KEY_NOT_CONFIGURED'});
 
@@ -124,7 +125,7 @@ Retorne exclusivamente o JSON estruturado.`;
         'Content-Type':'application/json'
       },
       body:JSON.stringify({
-        model:process.env.OPENAI_VISION_MODEL||'gpt-5.6',
+        model:process.env.OPENAI_VISION_MODEL||'gpt-6-luna',
         store:false,
         reasoning:{effort:'medium'},
         input:[
@@ -141,7 +142,8 @@ Retorne exclusivamente o JSON estruturado.`;
 
     const payload=await upstream.json();
     if(!upstream.ok){
-      return res.status(upstream.status).json({error:'OPENAI_REQUEST_FAILED',detail:payload?.error?.message||'Falha na análise.'});
+      const code=payload?.error?.code||payload?.error?.type||'upstream_error';
+      return res.status(upstream.status).json({error:'OPENAI_REQUEST_FAILED',code});
     }
 
     const output=extractOutputText(payload);
@@ -151,6 +153,6 @@ Retorne exclusivamente o JSON estruturado.`;
     catch(_){return res.status(502).json({error:'INVALID_MODEL_JSON'});}
     return res.status(200).json(parsed);
   }catch(err){
-    return res.status(500).json({error:'ANALYSIS_FAILED',detail:String(err&&err.message||err)});
+    return res.status(500).json({error:'ANALYSIS_FAILED'});
   }
 };
