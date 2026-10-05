@@ -217,6 +217,17 @@ body{overflow-x:hidden}
 .workspace-top5-row strong{font-size:13px}
 .workspace-top5-row em{font-style:normal;font-size:11px;color:var(--muted)}
 .workspace-top5-row em b{font-size:18px;color:var(--text);margin-right:3px}
+.workspace-recent-specials{margin-top:14px}
+.recent-special-events{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.recent-special-event{background:#091523;border:1px solid #20344b;border-radius:16px;padding:14px}
+.recent-special-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+.recent-special-head strong{display:block;font-size:16px}
+.recent-special-head span,.recent-special-head small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.recent-special-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.recent-special-item{background:#0f1d30;border:1px solid #20344b;border-radius:12px;padding:10px}
+.recent-special-item>span{display:block;color:var(--cyan);font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.recent-special-item>strong{display:block;font-size:15px;margin-top:5px;overflow-wrap:anywhere}
+.recent-special-item>small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
 .workspace-overview-family{margin-bottom:14px}
 .workspace-link-button{appearance:none;border:1px solid #2a405a;background:#091523;color:var(--cyan);border-radius:999px;padding:7px 10px;font-size:11px;cursor:pointer}
 .workspace-family-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
@@ -229,12 +240,12 @@ body{overflow-x:hidden}
   .workspace-sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
   .workspace-nav{grid-template-columns:repeat(5,1fr);margin-top:16px}
   .workspace-nav button{text-align:center;padding:9px 6px;font-size:11px}
-  .workspace-family-grid,.workspace-top5-grid{grid-template-columns:1fr 1fr}
+  .workspace-family-grid,.workspace-top5-grid,.recent-special-events{grid-template-columns:1fr 1fr}
 }
 @media(max-width:680px){
   .workspace-main{padding:24px 14px 44px}
   .workspace-nav{grid-template-columns:1fr 1fr}
-  .workspace-hero.hero-grid-3,.workspace-family-grid,.workspace-top5-grid,.workspace-family-mini{grid-template-columns:1fr}
+  .workspace-hero.hero-grid-3,.workspace-family-grid,.workspace-top5-grid,.workspace-family-mini,.recent-special-events,.recent-special-grid{grid-template-columns:1fr}
   .workspace-page-head h2{font-size:28px}
 }
 
