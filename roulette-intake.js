@@ -157,7 +157,18 @@
       try{
         const r=await fetch('/api/analyze-roulette',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageDataUrl})});
         const data=await r.json();
-        if(!r.ok)throw new Error(data.detail||data.error||'Falha na análise');
+        if(!r.ok){
+          const map={
+            OPENAI_API_KEY_NOT_CONFIGURED:'Serviço de análise não configurado.',
+            OPENAI_REQUEST_FAILED:'Falha na análise da imagem. Verifique a configuração do serviço e tente novamente.',
+            INVALID_IMAGE:'Imagem inválida.',
+            IMAGE_TOO_LARGE:'Imagem muito grande.',
+            EMPTY_MODEL_OUTPUT:'A análise não retornou dados suficientes.',
+            INVALID_MODEL_JSON:'A análise retornou formato inválido.',
+            ANALYSIS_FAILED:'Falha interna na análise.'
+          };
+          throw new Error(map[data.error]||'Falha na análise da imagem.');
+        }
         analysis={
           metadata:{...data.metadata,dia_semana:data.metadata.dia_semana||dayFromBR(data.metadata.data)},
           cutoff:data.cutoff,
