@@ -392,6 +392,7 @@ async function upgradeWorkspace(){
     '<div class="workspace-brand"><b>Roleta Intelligence</b><span>WORKSPACE V3</span></div>'+
     '<nav class="workspace-nav">'+
       '<button class="active" data-workspace-page="overview">Visão geral</button>'+
+      '<button data-workspace-page="intake">Nova Roleta</button>'+
       '<button data-workspace-page="family">Minha família</button>'+
       '<button data-workspace-page="ranking">Ranking</button>'+
       '<button data-workspace-page="weekend">Fim de semana</button>'+
@@ -404,18 +405,19 @@ async function upgradeWorkspace(){
   shell.classList.add('workspace-main');
 
   const overview=document.createElement('section');
+  const intake=document.createElement('section');
   const family=document.createElement('section');
   const ranking=document.createElement('section');
   const weekend=document.createElement('section');
   const models=document.createElement('section');
   const simulation=document.createElement('section');
-  overview.id='workspace-overview'; family.id='workspace-family'; ranking.id='workspace-ranking';
+  overview.id='workspace-overview'; intake.id='workspace-intake'; family.id='workspace-family'; ranking.id='workspace-ranking';
   weekend.id='workspace-weekend'; models.id='workspace-models'; simulation.id='workspace-simulation';
-  [overview,family,ranking,weekend,models,simulation].forEach((p,idx)=>{p.className='workspace-page'+(idx===0?' active':'')});
+  [overview,intake,family,ranking,weekend,models,simulation].forEach((p,idx)=>{p.className='workspace-page'+(idx===0?' active':'')});
 
   const first=shell.firstChild;
   shell.insertBefore(simulation,first); shell.insertBefore(models,simulation); shell.insertBefore(weekend,models); shell.insertBefore(ranking,weekend);
-  shell.insertBefore(family,ranking); shell.insertBefore(overview,family);
+  shell.insertBefore(family,ranking); shell.insertBefore(intake,family); shell.insertBefore(overview,intake);
 
   const move=(el,to)=>{if(el)to.appendChild(el)};
   move(shell.querySelector('.topbar'),overview);
@@ -462,6 +464,8 @@ async function upgradeWorkspace(){
     h.innerHTML='<div><span class="eyebrow">'+eyebrow+'</span><h2>'+title+'</h2><p>'+desc+'</p></div>';
     return h;
   };
+  if(window.RouletteIntake)window.RouletteIntake.mount(intake);
+  else intake.prepend(pageHead('NOVA ROLETA','Upload e validação','Módulo de entrada indisponível.'));
   family.prepend(pageHead('MINHA FAMÍLIA','Histórico individual','Nº1, Nº2, Cortesia e Último por pessoa nas roletas com permutação completa validada.'));
   ranking.prepend(pageHead('RANKING','Estatística de corretores','Top 5 por resultado especial e ranking histórico de posições.'));
   weekend.prepend(pageHead('FIM DE SEMANA','Sábado e domingo','Elegibilidade 5/10, prévia de sábado e fechamento de domingo após o resultado de sábado.'));
