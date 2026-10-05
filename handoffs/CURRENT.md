@@ -156,3 +156,23 @@ Operational decision:
 - row result marker now follows WEEKLY_FROZEN adjudication.
 - frozen real week 05–11/10 remains unchanged.
 - next evidence phase is prospective real-world performance vs theoretical chance.
+
+
+## DAILY ROULETTE PRINT WORKFLOW
+
+Canonical instructions are documented in `docs/PROJECT_STATUS.md` under **Daily operational roulette / print protocol**.
+
+Mandatory invariants:
+- G&G is the master broker registry for official name / CRECI / manager / director.
+- BASE DIA is the pre-draw position sheet.
+- final printed sheet is the highest-authority period record when supplied.
+- handwritten/OCR names must be validated against G&G; ambiguous names require user confirmation before PDF generation.
+- complete line-by-line transcription is required; never reduce an event to only special outcomes.
+- approved print columns: Nº / CORRETOR(A) / CRECI / GERENTE / DIRETOR / STATUS CRECI.
+- do not include VALIDADE CRECI.
+- alternating broker rows: white / light gray.
+- TOP 5 remains untouched; recent-specials card is independent.
+- reception queue is a separate operational layer from the Tegra roulette.
+- operational rule: validate first, transpose second, print third.
+
+Confirmed print-reference event: 04/10/2026 afternoon, Caminhos da Lapa, final order Turmalina / Globz / Paola / Veri / Valeria / Katio / Lotus / Aline / Wagner / Nina / Sanches / Sabrina.
