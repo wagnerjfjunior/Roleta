@@ -188,7 +188,9 @@
     }
 
     const testDefinition=buildTestDefinition({weeks,scenario,signalStrength,seed});
-    lastTest=testDefinition;
+    lastTest=null;
+    lastResult=null;
+    if(exportBtn)exportBtn.disabled=true;
     worker=new Worker('/simulation/weekly-duel-worker.js');
     runBtn.disabled=true;cancelBtn.disabled=false;setProgress(0);
     status.textContent='Executando '+weeks.toLocaleString('pt-BR')+' semanas pareadas…';
@@ -199,9 +201,20 @@
         setProgress(msg.pct);
         status.textContent='Processadas '+msg.completed_weeks.toLocaleString('pt-BR')+' / '+msg.total_weeks.toLocaleString('pt-BR')+' semanas.';
       }else if(msg.type==='complete'){
-        setProgress(1);render(msg.result);saveRun(testDefinition,msg.result);
+        const result=msg.result;
+        const sameScenario=result.scenario===testDefinition.scenario.type;
+        const sameStrength=Math.abs(Number(result.signal_strength)-Number(testDefinition.scenario.signal_strength))<1e-12;
+        if(!sameScenario||!sameStrength){
+          status.textContent='AUDITORIA BLOQUEADA · configuração e resultado não coincidem. Run não salvo.';
+          worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+          lastTest=null;lastResult=null;
+          if(exportBtn)exportBtn.disabled=true;
+          return;
+        }
+        lastTest=testDefinition;
+        setProgress(1);render(result);saveRun(testDefinition,result);
         if(exportBtn)exportBtn.disabled=false;
-        status.textContent='Concluído · '+msg.result.total_synthetic_events.toLocaleString('pt-BR')+' roletas sintéticas · run salvo localmente.';
+        status.textContent='Concluído · '+result.total_synthetic_events.toLocaleString('pt-BR')+' roletas sintéticas · run salvo localmente.';
         worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
       }else if(msg.type==='error'){
         status.textContent='Erro: '+msg.message;
@@ -217,8 +230,11 @@
 
   function cancel(){
     if(worker){worker.terminate();worker=null}
+    lastTest=null;lastResult=null;
     document.querySelector('#runWeeklyDuel').disabled=false;
     document.querySelector('#cancelWeeklyDuel').disabled=true;
+    const exportBtn=document.querySelector('#exportWeeklyDuel');
+    if(exportBtn)exportBtn.disabled=true;
     document.querySelector('#weeklyDuelStatus').textContent='Simulação cancelada.';
   }
 
