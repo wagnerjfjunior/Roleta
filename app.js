@@ -167,6 +167,62 @@ function renderRecent(){
     '</div><div class="period">'+e.period+' · N='+e.N+'</div></div>'
   ).join('');
 }
+function latestNominalEvents(nominalRows,limit=2){
+  const nominalIds=new Set((nominalRows||[]).map(r=>r.event_id).filter(Boolean));
+  const periodOrder={desconhecido:0,manha:1,tarde:2,integral:3};
+  return [...state.events]
+    .filter(e=>parseDateBR(e.date)&&nominalIds.has(e.id))
+    .sort((a,b)=>dateKey(b)-dateKey(a)||(periodOrder[b.period]??0)-(periodOrder[a.period]??0))
+    .slice(0,limit);
+}
+function normalizeLookupName(v){
+  return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+}
+function nominalBrokerForDraw(nominalRows,eventId,drawnNumber,officialBrokers,nameAliases){
+  const row=(nominalRows||[]).find(r=>r.event_id===eventId&&Number(r.drawn_number)===drawnNumber);
+  if(!row)return null;
+  const transcribed=row.broker_name_normalized||row.broker_name_raw||'';
+  const canonical=(nameAliases&&nameAliases[transcribed])||transcribed;
+  const official=(officialBrokers||[]).find(b=>normalizeLookupName(b['Nome Comercial'])===normalizeLookupName(canonical));
+  return {
+    name:official?.['Nome Comercial']||canonical||'—',
+    manager:official?.['Equipe']||null,
+    director:official?.['Diretor']||null,
+    position:Number(row.physical_position),
+    transcribed
+  };
+}
+function buildLastTwoSpecialCard(nominalRows,officialBrokers,nameAliases){
+  const card=document.createElement('article');
+  card.className='card workspace-recent-specials';
+  const events=latestNominalEvents(nominalRows,2);
+  card.innerHTML=
+    '<div class="section-head"><div><span class="eyebrow">ÚLTIMAS 2 ROLETAS</span><h2>Quem tirou os números especiais</h2></div>'+
+    '<span class="muted">Nº1 · Nº2 · Cortesia · Último de vez</span></div>'+
+    (events.length
+      ? '<div class="recent-special-events">'+events.map(e=>{
+          const specials=[
+            ['Nº1',1],
+            ['Nº2',2],
+            ['Cortesia',Math.max(1,e.N-1)],
+            ['Último de vez',e.N]
+          ];
+          return '<section class="recent-special-event">'+
+            '<div class="recent-special-head"><div><strong>'+e.date+'</strong><span>'+e.period+' · N='+e.N+'</span></div><small>'+e.id+'</small></div>'+
+            '<div class="recent-special-grid">'+specials.map(([label,drawn])=>{
+              const broker=nominalBrokerForDraw(nominalRows,e.id,drawn,officialBrokers,nameAliases);
+              return '<div class="recent-special-item">'+
+                '<span>'+label+'</span>'+
+                '<strong>'+(broker?.name||'—')+'</strong>'+
+                '<small>'+(broker?'posição física '+broker.position:'nome não disponível na transcrição nominal')+'</small>'+
+              '</div>';
+            }).join('')+'</div>'+
+          '</section>';
+        }).join('')+'</div>'
+      : '<div class="muted small">Sem transcrição nominal validada para as roletas mais recentes.</div>')+
+    '<p class="small muted workspace-data-note">Quadro de recência independente. Não altera o TOP 5 nem o ranking histórico.</p>';
+  return card;
+}
 function renderWeekendFamily(){
   const host=document.querySelector('#weekendFamily');
   const policy=state.weekendPolicy,pres=state.presence;
@@ -309,10 +365,18 @@ async function init(){
 
 async function upgradeWorkspace(){
   if(document.querySelector('.workspace-root'))return;
-  let brokerStats=null;
+  let brokerStats=null,nominalRows=[],officialBrokers=[],nameAliases={};
   try{
-    const r=await fetch('/data/broker-stats-v3.json',{cache:'no-store'});
-    if(r.ok)brokerStats=await r.json();
+    const [statsResponse,nominalResponse,officialResponse,aliasesResponse]=await Promise.all([
+      fetch('/data/broker-stats-v3.json',{cache:'no-store'}),
+      fetch('/data/full_draws_reconstructed.csv',{cache:'no-store'}),
+      fetch('/data/brokers-official.csv',{cache:'no-store'}),
+      fetch('/data/broker-name-aliases.json',{cache:'no-store'})
+    ]);
+    if(statsResponse.ok)brokerStats=await statsResponse.json();
+    if(nominalResponse.ok)nominalRows=parseCSV(await nominalResponse.text());
+    if(officialResponse.ok)officialBrokers=parseCSV(await officialResponse.text());
+    if(aliasesResponse.ok)nameAliases=(await aliasesResponse.json()).aliases||{};
   }catch(_){}
 
   const shell=document.querySelector('.shell');
@@ -328,6 +392,7 @@ async function upgradeWorkspace(){
     '<div class="workspace-brand"><b>Roleta Intelligence</b><span>WORKSPACE V3</span></div>'+
     '<nav class="workspace-nav">'+
       '<button class="active" data-workspace-page="overview">Visão geral</button>'+
+      '<button data-workspace-page="intake">Nova Roleta</button>'+
       '<button data-workspace-page="family">Minha família</button>'+
       '<button data-workspace-page="ranking">Ranking</button>'+
       '<button data-workspace-page="weekend">Fim de semana</button>'+
@@ -340,18 +405,19 @@ async function upgradeWorkspace(){
   shell.classList.add('workspace-main');
 
   const overview=document.createElement('section');
+  const intake=document.createElement('section');
   const family=document.createElement('section');
   const ranking=document.createElement('section');
   const weekend=document.createElement('section');
   const models=document.createElement('section');
   const simulation=document.createElement('section');
-  overview.id='workspace-overview'; family.id='workspace-family'; ranking.id='workspace-ranking';
+  overview.id='workspace-overview'; intake.id='workspace-intake'; family.id='workspace-family'; ranking.id='workspace-ranking';
   weekend.id='workspace-weekend'; models.id='workspace-models'; simulation.id='workspace-simulation';
-  [overview,family,ranking,weekend,models,simulation].forEach((p,idx)=>{p.className='workspace-page'+(idx===0?' active':'')});
+  [overview,intake,family,ranking,weekend,models,simulation].forEach((p,idx)=>{p.className='workspace-page'+(idx===0?' active':'')});
 
   const first=shell.firstChild;
   shell.insertBefore(simulation,first); shell.insertBefore(models,simulation); shell.insertBefore(weekend,models); shell.insertBefore(ranking,weekend);
-  shell.insertBefore(family,ranking); shell.insertBefore(overview,family);
+  shell.insertBefore(family,ranking); shell.insertBefore(intake,family); shell.insertBefore(overview,intake);
 
   const move=(el,to)=>{if(el)to.appendChild(el)};
   move(shell.querySelector('.topbar'),overview);
@@ -398,6 +464,8 @@ async function upgradeWorkspace(){
     h.innerHTML='<div><span class="eyebrow">'+eyebrow+'</span><h2>'+title+'</h2><p>'+desc+'</p></div>';
     return h;
   };
+  if(window.RouletteIntake)window.RouletteIntake.mount(intake);
+  else intake.prepend(pageHead('NOVA ROLETA','Upload e validação','Módulo de entrada indisponível.'));
   family.prepend(pageHead('MINHA FAMÍLIA','Histórico individual','Nº1, Nº2, Cortesia e Último por pessoa nas roletas com permutação completa validada.'));
   ranking.prepend(pageHead('RANKING','Estatística de corretores','Top 5 por resultado especial e ranking histórico de posições.'));
   weekend.prepend(pageHead('FIM DE SEMANA','Sábado e domingo','Elegibilidade 5/10, prévia de sábado e fechamento de domingo após o resultado de sábado.'));
@@ -495,6 +563,8 @@ async function upgradeWorkspace(){
     ranking.insertBefore(topCard,ranking.children[1]||null);
 
   }
+
+  ranking.appendChild(buildLastTwoSpecialCard(nominalRows,officialBrokers,nameAliases));
 
   const footer=shell.querySelector('footer');
   if(footer)shell.appendChild(footer);

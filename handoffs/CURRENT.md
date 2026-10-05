@@ -156,3 +156,90 @@ Operational decision:
 - row result marker now follows WEEKLY_FROZEN adjudication.
 - frozen real week 05–11/10 remains unchanged.
 - next evidence phase is prospective real-world performance vs theoretical chance.
+
+
+## DAILY ROULETTE PRINT WORKFLOW
+
+Canonical instructions are documented in `docs/PROJECT_STATUS.md` under **Daily operational roulette / print protocol**.
+
+Mandatory invariants:
+- G&G is the master broker registry for official name / CRECI / manager / director.
+- BASE DIA is the pre-draw position sheet.
+- final printed sheet is the highest-authority period record when supplied.
+- handwritten/OCR names must be validated against G&G; ambiguous names require user confirmation before PDF generation.
+- complete line-by-line transcription is required; never reduce an event to only special outcomes.
+- approved print columns: Nº / CORRETOR(A) / CRECI / GERENTE / DIRETOR / STATUS CRECI.
+- do not include VALIDADE CRECI.
+- alternating broker rows: white / light gray.
+- TOP 5 remains untouched; recent-specials card is independent.
+- reception queue is a separate operational layer from the Tegra roulette.
+- operational rule: validate first, transpose second, print third.
+
+Confirmed print-reference event: 04/10/2026 afternoon, Caminhos da Lapa, final order Turmalina / Globz / Paola / Veri / Valeria / Katio / Lotus / Aline / Wagner / Nina / Sanches / Sabrina.
+
+
+### Participation classes
+Final-sheet participants must be separated into three classes:
+
+- **SALÃO**: above cutoff bar, participates in draw, counts in event N, eligible for spontaneous walk-in rotation.
+- **STAND-BY**: below cutoff bar / late arrival; does not participate in draw, does not count in N, does not receive spontaneous walk-in rotation, but **presence counts for weekend qualification** and broker may serve indication/own-client arrivals.
+- **ON-LINE**: online broker physically present at plantão; listed so reception knows broker is onsite for appointments/own clients; does not count in salão N merely by appearing in ON-LINE block.
+
+Print layout must keep the main SALÃO table first, then independent full-width **STAND-BY** and **ON-LINE** sections when present. If both exist, keep them on the same page when space allows, visibly separated. Do not include VALIDADE CRECI in any block.
+
+The cutoff bar is a business boundary. Never ingest a below-bar STAND-BY broker into the salão permutation or N. Preserve the class separately because STAND-BY can be present for weekend qualification while ineligible for that period's draw.
+
+
+### Team fallback routing / último de equipe
+
+The **GERENTE** field is operational, not merely informational. It identifies the broker's team for reception fallback routing.
+
+When a client arrives asking for a specific broker:
+1. reception first attempts to locate the requested broker;
+2. if that broker is not available, the client must be routed to the **último de equipe**;
+3. `último de equipe` means the last currently eligible/available broker in the roulette order who belongs to the **same gerente/team** as the requested broker;
+4. if no broker from that same team is available, route the client to the **último de vez** according to the applicable reception/roulette flow.
+
+Therefore:
+- manager/team identity must be validated correctly before final print;
+- a wrong manager can cause an operational routing error even if broker name and CRECI are correct;
+- never invent or infer a manager when the master registry does not support it;
+- future reception tooling should be able to derive team fallback from the canonical manager field and current availability state.
+
+### Print-section conditionality
+The final print layout is conditional:
+- always render the main SALÃO table;
+- render **STAND-BY** only when at least one validated standby broker exists;
+- render **ON-LINE** only when at least one validated online broker exists;
+- if neither exists, render neither lower block;
+- if only one exists, render only that block;
+- if both exist, render both, clearly separated and preferably on the same page when space allows.
+
+The preview/validation step must explicitly show the detected counts before print, for example:
+`SALÃO 18 · STAND-BY 3 · ON-LINE 0`.
+
+Printing is forbidden while:
+- any name is unresolved;
+- a broker class is uncertain;
+- the cutoff bar is unclear and affects class assignment;
+- N is not reconciled;
+- metadata needed for the final sheet is unresolved.
+
+
+## RLT-PRINT-V1
+Canonical print layout is defined in `docs/PRINT_TEMPLATE_V1.md`.
+
+Do not reconstruct the PDF layout from memory. Read the canonical spec before changing print generation.
+
+Critical invariants:
+- A4 portrait;
+- one shared six-column coordinate grid across header and every table;
+- aligned vertical boundaries;
+- company draw at top-right, results underneath;
+- no Tegra-count cell in header;
+- conditional STAND-BY / ON-LINE blocks;
+- no VALIDADE CRECI;
+- zebra rows;
+- validation gate before print.
+
+Accepted visual reference: `roleta_teste_09-08-2025_manha_v3_alinhada.pdf`.
