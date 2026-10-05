@@ -97,3 +97,143 @@ Key paired-valid findings:
 - Stable period 3%: essentially neutral, slight Weekly advantage.
 - Regime shift 3%: Weekly remained ahead.
 - Weak signal + noise 1%: Weekly remained ahead.
+
+
+## Daily operational roulette / print protocol
+
+This section is canonical and anti-regression.
+
+### Authority hierarchy
+1. **G&G** = master broker registry for official broker name, CRECI, manager and director.
+2. **BASE DIA** = pre-draw sheet where brokers choose/write their physical positions.
+3. **Draw** = permutation 1..N that maps physical position to drawn number / final operational order.
+4. **Final printed sheet** = highest authority for that period when available; it is the version delivered to reception.
+
+Never use an uncertain handwritten/OCR spelling as the final broker identity when G&G can resolve it. Example already confirmed: `Fuzmalina` must resolve to **Turmalina**.
+
+### Daily workflow
+For every roulette:
+1. receive the manual sheet photo;
+2. transcribe every valid line, not only special outcomes;
+3. preserve blank, crossed-out and excluded positions;
+4. determine N from valid participants only;
+5. validate every broker name against G&G;
+6. if a name is ambiguous, stop and ask the user with a short list of likely G&G matches;
+7. if none matches, require the user to provide the correct name;
+8. only after all names are resolved, transpose by drawn number;
+9. validate Nº1, Nº2, Cortesia and Último;
+10. fill canonical name, CRECI, manager and director;
+11. generate the approved A4 print sheet;
+12. when the official final sheet photo is later supplied, compare line by line and canonize the event.
+
+No final PDF may be produced with unresolved broker-name ambiguity.
+
+### Approved print template
+Header must contain:
+- empreendimento;
+- data;
+- Tegra/day of week;
+- período;
+- Helbor broker quantity when supplied;
+- company draw, e.g. `TG 1-2 / HB 3`.
+
+Table columns:
+1. Nº
+2. CORRETOR (A)
+3. CRECI
+4. GERENTE
+5. DIRETOR
+6. STATUS CRECI
+
+**Do not include the column `VALIDADE CRECI`.**
+
+Visual:
+- A4;
+- zebra rows;
+- first broker row white;
+- next broker row light gray;
+- alternate white/light gray through the table;
+- light header background is acceptable;
+- must remain legible on ordinary printing.
+
+The first column is the **final post-draw order**, not the original physical position.
+
+### Confirmed example — 04/10/2026 afternoon
+Metadata:
+- Caminhos da Lapa;
+- 04/10/2026;
+- Domingo;
+- Tarde;
+- HB 10;
+- company draw TG 1-2 / HB 3.
+
+Final official order:
+1. Turmalina
+2. Globz
+3. Paola
+4. Veri
+5. Valeria
+6. Katio
+7. Lotus
+8. Aline
+9. Wagner
+10. Nina
+11. Sanches
+12. Sabrina
+
+### Special-result semantics
+For an event with N valid participants:
+- Nº1 = drawn number 1;
+- Nº2 = drawn number 2;
+- Cortesia = drawn number N-1;
+- Último = drawn number N.
+
+Special outcomes never replace the complete line-by-line event transcription.
+
+### Ranking recency card
+The existing TOP 5 must remain unchanged.
+The separate lower Ranking card shows the two latest nominal roulettes with:
+- Nº1;
+- Nº2;
+- Cortesia;
+- Último de vez;
+- canonical broker name;
+- physical position when available.
+
+This card is recency-only and must not change historical ranking or model scoring.
+
+### Reception is a separate operational layer
+The Tegra roulette final order is not the same object as the consolidated reception queue.
+Reception may interleave brokers from different companies/teams and cross out consumed attendances.
+Therefore `Último da roleta` is not equivalent to `próximo corretor a atender agora`.
+Do not mix reception-queue state into Ranking statistics.
+
+### Priority workflow when the responsible broker draws Nº1
+When the responsible broker must carry the printed roulette to reception:
+1. receive manual photo;
+2. full transcription;
+3. G&G validation;
+4. resolve every ambiguity;
+5. transpose;
+6. fill CRECI/manager/director;
+7. generate the approved A4 PDF immediately.
+
+Goal: avoid requiring the user to open the operational spreadsheet and repeat the transposition manually.
+
+### Anti-regression checklist
+Before delivering a print PDF confirm:
+- correct date, period and empreendimento;
+- correct company draw and HB quantity when provided;
+- correct N;
+- complete valid-line transcription;
+- every broker name validated;
+- no unresolved ambiguity;
+- final order matches the draw;
+- Nº1, Nº2, Cortesia and Último are correct;
+- CRECI, manager and director are not invented;
+- no Validade CRECI column;
+- white/light-gray zebra rows;
+- printable A4 legibility;
+- final official sheet, when available, supersedes preliminary transcription.
+
+**Operational principle:** validate first, transpose second, print third.
