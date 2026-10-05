@@ -4,8 +4,8 @@
 
 - canonical repository: `wagnerjfjunior/Roleta`.
 - canonical production branch: `main`.
-- resolved main HEAD for this work: `71f3b06425cb7cf8ccfbc82c779aefce8b389037`.
-- active development branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`.
+- resolved main HEAD for this work: `5dfd6fada53e6106be290419e19ded6ff1b621c9`.
+- active development branch: `feat/rlt-m4-07-paired-valid-metrics-20261004`.
 - branch was created from and remains based on current main; no remote preview is used.
 - 83 logical canonical events.
 - 82 validated complete permutations.
@@ -81,3 +81,19 @@ Sabrina/Brenda and Laura counts for 28/09–02/10 remain contested. Original she
 Weekly Frozen vs Current paired-week laboratory is implemented on the active branch.
 It compares fixed weekly predictions, continuously recalculated Current suggestions and a random control on the same synthetic weeks.
 This is simulation-only and cannot mutate the frozen real prospective week.
+
+
+## RLT-M4-07-v2 decision
+Monte Carlo paired-valid policy duel completed at 50,000 weeks per canonical scenario.
+
+Operational conclusion:
+- WEEKLY_FROZEN becomes the official V1 recommendation surface.
+- CURRENT remains a secondary diagnostic/experimental track.
+- no automatic operational replacement occurs when CURRENT diverges from WEEKLY_FROZEN.
+- this does not establish real predictive edge; the next evidence phase is prospective real-event validation against theoretical chance.
+
+Key paired-valid findings:
+- NULL: no artificial Current advantage.
+- Stable period 3%: essentially neutral, slight Weekly advantage.
+- Regime shift 3%: Weekly remained ahead.
+- Weak signal + noise 1%: Weekly remained ahead.
