@@ -36,16 +36,18 @@ Initial period allocations, in family order Wagner / Laura / Brenda / Helena:
 
 ### Next safe action
 1. Validate the RLT-M5-01 Overview locally via SFJM/LVR.
-2. Confirm the weekly panel renders the frozen numbers from `data/prospective/recommendations.jsonl`.
-3. Confirm CURRENT displays the same initial values now but remains revisable in data state.
-4. Confirm no historical-descriptive card appears as an operational recommendation.
-5. Confirm scorecard remains `AMOSTRA_INICIAL` with zero adjudicated events.
-6. On the next real roulette:
+2. Confirm the weekly panel labels WEEKLY_FROZEN as **Oficial**.
+3. Confirm CURRENT is shown only as **Diagnóstico** and never as an automatic replacement for the official number.
+4. Confirm the status mark on each row adjudicates the official WEEKLY_FROZEN recommendation.
+5. Confirm the weekly frozen numbers still come unchanged from `data/prospective/recommendations.jsonl`.
+6. Confirm scorecard remains `AMOSTRA_INICIAL` until real target events are adjudicated.
+7. On the next real roulette:
    - transcribe/ingest using the established canonical workflow;
-   - adjudicate WEEKLY_FROZEN and the target event's frozen CURRENT;
-   - append CURRENT revisions for all later unresolved events;
+   - adjudicate WEEKLY_FROZEN as the official recommendation;
+   - retain CURRENT as a separately scored diagnostic track;
+   - record EXECUTED_CHOICE independently;
    - never rewrite prior recommendations.
-7. Backfill missing nominal full-sheet coverage for 02/10 and 03/10 as a data-quality follow-up; this does not alter the already frozen V1 week.
+8. Backfill missing nominal full-sheet coverage for 02/10 and 03/10 as a data-quality follow-up; this does not alter the already frozen V1 week.
 
 ### SFJM
 - branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`;
@@ -116,6 +118,8 @@ Audit fixes added:
 - export disabled while a run is active;
 - result scenario/strength must match the initiating test definition before save/export.
 
-Next runs:
-1. regime_shift · 3% · 50,000 weeks · seed weekly-duel-2026;
-2. weak_noise · 1% · 50,000 weeks · seed weekly-duel-2026.
+Final RLT-M4-07-v2 gate:
+- regime_shift · 3% · 50,000 weeks: Weekly paired-valid O/E 1.061997 vs Current 1.057276; mean Δ O/E -0.004720.
+- weak_noise · 1% · 50,000 weeks: Weekly paired-valid O/E 1.017500 vs Current 1.013143; mean Δ O/E -0.004238.
+
+Decision: RLT-M4-07-v2 is CLOSED for the V1 operational question. WEEKLY_FROZEN is the official recommendation; CURRENT remains diagnostic only.
