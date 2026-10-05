@@ -188,3 +188,39 @@ Final-sheet participants must be separated into three classes:
 Print layout must keep the main SALÃO table first, then independent full-width **STAND-BY** and **ON-LINE** sections when present. If both exist, keep them on the same page when space allows, visibly separated. Do not include VALIDADE CRECI in any block.
 
 The cutoff bar is a business boundary. Never ingest a below-bar STAND-BY broker into the salão permutation or N. Preserve the class separately because STAND-BY can be present for weekend qualification while ineligible for that period's draw.
+
+
+### Team fallback routing / último de equipe
+
+The **GERENTE** field is operational, not merely informational. It identifies the broker's team for reception fallback routing.
+
+When a client arrives asking for a specific broker:
+1. reception first attempts to locate the requested broker;
+2. if that broker is not available, the client must be routed to the **último de equipe**;
+3. `último de equipe` means the last currently eligible/available broker in the roulette order who belongs to the **same gerente/team** as the requested broker;
+4. if no broker from that same team is available, route the client to the **último de vez** according to the applicable reception/roulette flow.
+
+Therefore:
+- manager/team identity must be validated correctly before final print;
+- a wrong manager can cause an operational routing error even if broker name and CRECI are correct;
+- never invent or infer a manager when the master registry does not support it;
+- future reception tooling should be able to derive team fallback from the canonical manager field and current availability state.
+
+### Print-section conditionality
+The final print layout is conditional:
+- always render the main SALÃO table;
+- render **STAND-BY** only when at least one validated standby broker exists;
+- render **ON-LINE** only when at least one validated online broker exists;
+- if neither exists, render neither lower block;
+- if only one exists, render only that block;
+- if both exist, render both, clearly separated and preferably on the same page when space allows.
+
+The preview/validation step must explicitly show the detected counts before print, for example:
+`SALÃO 18 · STAND-BY 3 · ON-LINE 0`.
+
+Printing is forbidden while:
+- any name is unresolved;
+- a broker class is uncertain;
+- the cutoff bar is unclear and affects class assignment;
+- N is not reconciled;
+- metadata needed for the final sheet is unresolved.
