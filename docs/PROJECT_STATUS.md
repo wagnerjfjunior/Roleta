@@ -339,3 +339,22 @@ Printing is forbidden while:
 - the cutoff bar is unclear and affects class assignment;
 - N is not reconciled;
 - metadata needed for the final sheet is unresolved.
+
+
+## Canonical print template — RLT-PRINT-V1
+Canonical specification: `docs/PRINT_TEMPLATE_V1.md`.
+
+Mandatory layout invariants:
+- A4 portrait;
+- one shared six-column grid for top company-draw header, metadata, SALÃO, STAND-BY and ON-LINE;
+- all vertical boundaries must align;
+- `SORTEIO EMPRESA` in the upper-right grid area with `TG X - X` and `HB X` directly underneath;
+- do not show Tegra broker quantity in the header; derive SALÃO count from the validated broker list;
+- empreendimento is event-specific and must be validated;
+- STAND-BY and ON-LINE render only when populated;
+- no `VALIDADE CRECI` column;
+- white/light-gray zebra rows;
+- printing remains gated by validation.
+
+Accepted visual reference: `roleta_teste_09-08-2025_manha_v3_alinhada.pdf`.
+Layout correctness is part of operational correctness; a misaligned PDF is rejected even if the data values are correct.
