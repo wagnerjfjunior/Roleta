@@ -266,7 +266,9 @@
     for(const p of ['manha','tarde','integral'])if(!templates.some(t=>t.period===p))throw new Error('Sem molde '+p);
     const weeks=Math.max(1,Math.min(100000,Number(config.weeks)||10000));
     const scenario=config.scenario||'null';
-    const strength=Math.max(0,Math.min(.25,Number(config.signalStrength) || (scenario==='weak_noise'?.01:.03)));
+    const requestedStrength=Number(config.signalStrength);
+    const defaultStrength=scenario==='null'?0:(scenario==='weak_noise'?.01:.03);
+    const strength=Math.max(0,Math.min(.25,Number.isFinite(requestedStrength)?requestedStrength:defaultStrength));
     const seed=config.seed||'weekly-duel-2026';
     const base=hashSeed(seed);
     const out=[];
