@@ -90,3 +90,32 @@ If NULL passes, run in order:
 3. Weak signal + noise · 1%.
 
 Do not change `PROSPECTIVE-V1.0.0` or the already frozen real week based on these simulations. RLT-M4-07 evaluates the update mechanism only.
+
+
+### 50,000-week paired-valid evidence
+
+Accepted:
+- NULL / 50,000 weeks / seed weekly-duel-2026:
+  - Weekly paired-valid O/E 0.99906;
+  - Current paired-valid O/E 0.99740;
+  - mean Δ O/E -0.00191;
+  - mean Δ hits/week -0.00746;
+  - verdict: NULL PASS; no artificial Current advantage.
+- Stable period / 3% / 50,000 weeks:
+  - Weekly paired-valid O/E 1.04710;
+  - Current paired-valid O/E 1.04653;
+  - mean Δ O/E -0.00054;
+  - verdict: both capture stable signal similarly; recalculation adds no material value in this scenario.
+
+Rejected / rerun required:
+- regime_shift export: test metadata says regime_shift but result payload says stable_period; invalid audit pair and must be rerun after export-binding fix.
+- weak_noise was run at 3%; canonical planned gate remains 1%.
+
+Audit fixes added:
+- explicit zero signal strength is preserved;
+- export disabled while a run is active;
+- result scenario/strength must match the initiating test definition before save/export.
+
+Next runs:
+1. regime_shift · 3% · 50,000 weeks · seed weekly-duel-2026;
+2. weak_noise · 1% · 50,000 weeks · seed weekly-duel-2026.
