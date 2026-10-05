@@ -39,8 +39,8 @@ Canonical protocol:
 `docs/PROSPECTIVE_LEDGER.md`
 
 Core contract:
-- WEEKLY_FROZEN = pre-cravado before the week;
-- CURRENT = recommendation revised after newly completed real roulettes;
+- WEEKLY_FROZEN = pre-cravado before the week and official V1 operational recommendation;
+- CURRENT = recommendation revised after newly completed real roulettes, retained as diagnostic/experimental only;
 - EXECUTED_CHOICE = position actually used;
 - RANDOM_SHADOW = frozen random operational control;
 - theoretical chance = primary null benchmark;
@@ -107,7 +107,7 @@ Important correction:
 CURRENT is not frozen for the entire week. It remains revisable and is frozen only before the operational choice for its own target event.
 
 ## NEXT SAFE ACTION
-Validate the frozen RLT-M5-01 weekly panel locally via SFJM/LVR. Then continue event-by-event adjudication/recalculation with no hindsight.
+Validate the RLT-M5-01 weekly panel locally via SFJM/LVR with WEEKLY_FROZEN labelled as Oficial and CURRENT labelled as Diagnóstico. Then begin real event-by-event adjudication with WEEKLY_FROZEN as the operational reference, CURRENT scored separately, and no hindsight.
 
 ## Bootstrap
 `Ative o SFJM do projeto Roleta, resolva main ao vivo em wagnerjfjunior/Roleta, leia .sfjm/project.json, handoffs/CURRENT.md, docs/NEXT_SAFE_ACTION.md e docs/PROSPECTIVE_LEDGER.md, recupere a branch ativa e continue somente pela próxima ação segura canônica.`
@@ -143,3 +143,16 @@ RLT-M4-07-v2 now reports:
 - paired-valid win rates and quantiles.
 
 Next gate: rerun 10,000-week NULL with seed `weekly-duel-2026`. Do not proceed to signal scenarios until paired-valid NULL passes.
+
+
+## RLT-M4-07-v2 final decision
+The 50,000-week paired-valid scenario battery is complete.
+
+Operational decision:
+- WEEKLY_FROZEN = official recommendation.
+- CURRENT = diagnostic/experimental track only.
+- no automatic switching from Weekly to Current.
+- UI updated to use "Oficial" and "Diagnóstico".
+- row result marker now follows WEEKLY_FROZEN adjudication.
+- frozen real week 05–11/10 remains unchanged.
+- next evidence phase is prospective real-world performance vs theoretical chance.
