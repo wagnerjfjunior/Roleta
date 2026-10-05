@@ -358,3 +358,24 @@ Mandatory layout invariants:
 
 Accepted visual reference: `roleta_teste_09-08-2025_manha_v3_alinhada.pdf`.
 Layout correctness is part of operational correctness; a misaligned PDF is rejected even if the data values are correct.
+
+
+## RLT-PRINT-V2 deterministic handoff
+Canonical spec: `docs/PRINT_TEMPLATE_V2.md`.
+
+The Notion Skill is now data-only. It must return validated structured JSON and must not generate or design the PDF.
+
+The app's Nova Roleta page now accepts the Skill JSON and applies a deterministic template with:
+- exactly 6 body columns: Nº / NOME / CRECI / GERENTE / DIRETOR / STATUS CRECI;
+- exactly 2 header rows;
+- EMPREENDIMENTO merged over Nº+NOME;
+- CAMINHOS DA LAPA as enterprise value;
+- DATA;
+- HELBOR quantity with weekday beneath;
+- PERÍODO;
+- SORTEIO DE EMPRESA with mandatory visual split TG X-Y | HB Z;
+- conditional STAND-BY and ON-LINE blocks;
+- no drawn-number column;
+- no editorial title, validation prose, hash, evidence page or technical footer.
+
+Printing is blocked unless payload.status=VALIDADO and the JSON passes all structural checks.
