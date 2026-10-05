@@ -12,8 +12,8 @@ This layer is independent from the canonical real-event ledger and from Simulati
 Do recommendations frozen before each real roulette produce persistent and reproducible performance above the event-specific chance baseline?
 
 ## Confirmatory strategies
-1. `WEEKLY_FROZEN` — recommendation produced before the operational week starts.
-2. `CURRENT` — latest recommendation after incorporating newly completed real roulettes, recalculated for all unresolved future events.
+1. `WEEKLY_FROZEN` — recommendation produced before the operational week starts. This is the **official operational recommendation** for V1.
+2. `CURRENT` — latest recommendation after incorporating newly completed real roulettes, recalculated for all unresolved future events. After RLT-M4-07-v2, this remains a **secondary diagnostic track** and does not automatically replace WEEKLY_FROZEN.
 
 ## Observational/control tracks
 - `EXECUTED_CHOICE` — physical position actually used.
@@ -198,11 +198,13 @@ UI-only changes do not start a new experimental epoch.
 Material changes to score, weights, thresholds, contexts, candidate models, fallback logic or eligibility rules require a new model/policy version. Evidence from materially different epochs must not be silently pooled.
 
 ## Statistical interpretation
-Primary comparison:
+Primary real-world comparison:
+`WEEKLY_FROZEN 2X vs event-specific theoretical chance`.
+
+Secondary diagnostic comparison:
 `CURRENT 2X vs event-specific theoretical chance`.
 
-Secondary pre-specified comparison:
-`WEEKLY_FROZEN 2X vs event-specific theoretical chance`.
+RLT-M4-07-v2 showed no consistent simulated advantage from intra-week CURRENT recalculation across NULL, stable-signal, regime-shift and weak-signal/noise scenarios. Therefore CURRENT remains measured for scientific comparison, but V1 operational execution should not auto-switch away from the frozen weekly recommendation solely because CURRENT changed.
 
 Random Shadow is an operational control, not the definition of chance.
 
@@ -226,8 +228,8 @@ The system must be allowed to conclude that there is no demonstrable advantage o
 The redundant Overview card "Minha família / Resumo histórico" is replaced by "Pré-cravados da semana".
 
 For each person and future event, show:
-- initial weekly recommendation;
-- current recommendation;
+- official WEEKLY_FROZEN recommendation;
+- CURRENT diagnostic recommendation;
 - compact trajectory, e.g. `14 → 22 → 9`;
 - executed position after choice;
 - outcome status after adjudication.
@@ -293,3 +295,21 @@ Core blob SHA: `6650d9bdc4b6cbf43890c94ff0b4c271ac8ca2b0`.
 Batch generator blob SHA: `3b7aac2b076e2e26c400f490a2ab3bfd819f5c93`.
 
 At the 20:00+ cutoff, no statistical or model-selection decision remains open. The remaining operation is data ingestion, validation, batch generation and freeze.
+
+
+## RLT-M4-07-v2 operational decision
+
+The paired-valid Monte Carlo policy duel is closed for the V1 operational decision.
+
+Observed behavior:
+- NULL: Weekly and Current remained compatible with chance; Current did not manufacture artificial edge.
+- stable signal: recalculation added no material advantage.
+- regime shift: Current still did not outperform Weekly.
+- weak signal + noise: Current was slightly worse than Weekly.
+
+Decision for V1:
+- `WEEKLY_FROZEN` is the official operational recommendation.
+- `CURRENT` remains visible and scored as a diagnostic/experimental track.
+- CURRENT does not automatically overwrite or supersede the weekly operational choice.
+- the frozen real week 05–11/10/2026 is unchanged.
+- this simulation decision does not establish real predictive edge; real-world validation against event-specific chance remains required.

@@ -385,4 +385,61 @@ The live week 05–11/10/2026 remains frozen and is not changed by RLT-M4-07 res
 Engine: `simulation/weekly-duel.js`.
 Worker: `simulation/weekly-duel-worker.js`.
 UI: `simulation/weekly-duel-ui.js`.
-Protocol version: `RLT-M4-07-v1`.
+Protocol version: `RLT-M4-07-v2`.
+
+### Paired-valid correction
+
+The first 10,000-week NULL run exposed an interpretation confound: Weekly Frozen and Current can have different counts of valid operational recommendations because each may resolve different primary/fallback chains against the same occupied-position set.
+
+Observed first NULL run (v1):
+- Weekly O/E: 0.993;
+- Current O/E: 0.996;
+- Random O/E: 1.004;
+- conclusion: NULL behavior passed, but raw hit delta was not a fair quality comparison because valid-opportunity counts differed.
+
+RLT-M4-07-v2 therefore separates:
+
+1. **Operational metrics**
+   - valid opportunities by strategy;
+   - invalid opportunities;
+   - delta valid opportunities;
+   - raw hit and O/E differences.
+
+2. **Paired-valid metrics**
+   - include only person/event opportunities where both Weekly and Current resolve to a valid physical position;
+   - theoretical expected probability is identical for both strategies on every paired opportunity;
+   - compare hits, O/E, excess over theoretical chance, weekly win rate, and P05/P50/P95 deltas.
+
+Primary mechanism verdicts must use paired-valid metrics. Operational metrics remain secondary and measure deployability/coverage.
+
+Required NULL re-run:
+- 10,000 weeks;
+- seed `weekly-duel-2026`;
+- signal strength 0;
+- paired-valid `Δ O/E ≈ 0`;
+- paired-valid `Δ excess ≈ 0`;
+- no persistent Current advantage.
+
+
+
+### Persistência auditável do Policy Duel
+
+RLT-M4-07-v2 passa a persistir automaticamente cada execução concluída no navegador em:
+`roleta.weekly-duel.runs.v2`.
+
+Cada registro salvo contém:
+- timestamp;
+- definição completa do teste;
+- cenário;
+- força do sinal;
+- semanas simuladas;
+- seed;
+- política/modelo fixos;
+- métricas operacionais;
+- métricas paired-valid;
+- churn e impacto das revisões;
+- resultado agregado completo.
+
+A UI exibe a quantidade de runs salvos e habilita `Exportar JSON` após uma execução concluída.
+
+São preservados os 50 runs mais recentes localmente. Essa persistência é separada da base canônica real e não altera `data/manifest.json`.

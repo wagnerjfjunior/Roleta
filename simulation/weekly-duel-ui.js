@@ -1,9 +1,82 @@
 (function(){
   'use strict';
 
+  const STORAGE_KEY='roleta.weekly-duel.runs.v2';
   let worker=null;
   let lastResult=null;
+  let lastTest=null;
   let realEvents=[];
+
+  function readRuns(){
+    try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(_){return[]}
+  }
+  function updateSavedCount(){
+    const el=document.querySelector('#weeklyDuelSavedRuns');
+    if(el)el.textContent=readRuns().length+' runs auditáveis salvos localmente';
+  }
+  function buildTestDefinition(config){
+    const names={
+      null:'NULL · acaso puro',
+      stable_period:'Sinal estável por período',
+      regime_shift:'Mudança de regime no meio da semana',
+      weak_noise:'Sinal fraco + ruído'
+    };
+    return {
+      id:'RLT-M4-07-v2',
+      name:names[config.scenario]||config.scenario,
+      objective:'Comparar WEEKLY_FROZEN e CURRENT sob a mesma sequência de semanas sintéticas, separando disponibilidade operacional de qualidade paired-valid.',
+      policy:'PROSPECTIVE-V1.0.0 / RLT-M5-WEEKLY-V1',
+      scenario:{
+        type:config.scenario,
+        signal_strength:config.signalStrength,
+        target:'2X = Nº1 ou Último'
+      },
+      workload:{
+        weeks:config.weeks,
+        events_per_week:12,
+        people_per_event:4,
+        planned_synthetic_events:config.weeks*12,
+        planned_person_opportunities:config.weeks*12*4
+      },
+      reproducibility:{
+        seed:config.seed,
+        structural_source:'83 eventos canônicos; somente permutações completas são elegíveis como moldes/estado inicial',
+        chronology:'Weekly congela no início; Current recalcula somente após revelar cada evento; ambos usam o mesmo resultado sintético.'
+      },
+      evaluation:{
+        primary:'paired-valid Δ O/E e Δ excesso',
+        secondary:['paired-valid Δ hits','weekly win rate','operational valid opportunities','churn','helped/hurt/neutral revisions'],
+        guard:'Resultados simulados não alteram a semana real congelada.'
+      }
+    };
+  }
+  function saveRun(test,result){
+    const runs=readRuns();
+    runs.unshift({
+      saved_at:new Date().toISOString(),
+      source:'Roleta Intelligence · Weekly Policy Duel',
+      test,
+      result
+    });
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(runs.slice(0,50)));
+    updateSavedCount();
+  }
+  function exportRun(){
+    if(!lastResult||!lastTest)return;
+    const payload={
+      exported_at:new Date().toISOString(),
+      source:'Roleta Intelligence · Weekly Policy Duel',
+      test:lastTest,
+      result:lastResult
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='roleta-weekly-duel-'+Date.now()+'.json';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
 
   function pct(x){return Number.isFinite(x)?(x*100).toFixed(2).replace('.',',')+'%':'—'}
   function num(x,d=3){return Number.isFinite(x)?x.toFixed(d).replace('.',','):'—'}
@@ -29,6 +102,7 @@
       '</div>'+
       '<div class="simulation-progress-wrap"><div class="simulation-progress"><i id="weeklyDuelProgressBar"></i></div><span id="weeklyDuelProgressText">0,0%</span></div>'+
       '<p id="weeklyDuelStatus" class="small muted">Pronto para simular semanas completas.</p>'+
+      '<div class="simulation-audit-actions"><button id="exportWeeklyDuel" class="workspace-link-button" disabled>Exportar JSON</button><span id="weeklyDuelSavedRuns" class="small muted">0 runs auditáveis salvos localmente</span></div>'+
       '<div id="weeklyDuelSummary" class="sim-context-table"><div class="muted small">Sem resultado ainda.</div></div>'+
       '<div id="weeklyDuelUpdates" class="sim-pairwise"><div class="muted small">Churn e valor das atualizações aparecerão aqui.</div></div>';
 
@@ -38,6 +112,8 @@
 
     document.querySelector('#runWeeklyDuel').addEventListener('click',run);
     document.querySelector('#cancelWeeklyDuel').addEventListener('click',cancel);
+    document.querySelector('#exportWeeklyDuel').addEventListener('click',exportRun);
+    updateSavedCount();
   }
 
   function setProgress(v){
@@ -68,19 +144,28 @@
         '</div>'
       ).join('')+'</div>';
 
-    const p=result.paired,u=result.updates;
-    const decided=p.current_wins+p.weekly_wins;
-    const helpedDen=u.helped+u.hurt+u.neutral;
+    const p=result.paired_valid,u=result.updates,o=result.operational;
     document.querySelector('#weeklyDuelUpdates').innerHTML=
-      '<div class="sim-context-head"><span class="eyebrow">VALOR DA ATUALIZAÇÃO</span><h3>CURRENT − WEEKLY</h3></div>'+
+      '<div class="sim-context-head"><span class="eyebrow">OPERACIONAL</span><h3>Elegibilidade / disponibilidade</h3></div>'+
+      '<div class="simulation-kpis">'+
+        '<div><span>Weekly válidas</span><strong>'+int(o.weekly_valid_opportunities)+'</strong></div>'+
+        '<div><span>Current válidas</span><strong>'+int(o.current_valid_opportunities)+'</strong></div>'+
+        '<div><span>Δ oportunidades</span><strong>'+int(o.delta_valid_opportunities)+'</strong></div>'+
+        '<div><span>Δ O/E bruto</span><strong>'+num(o.delta_oe,3)+'</strong></div>'+
+      '</div>'+
+      '<div class="sim-context-head"><span class="eyebrow">PAIRED-VALID</span><h3>CURRENT − WEEKLY · mesma pessoa/evento, ambos válidos</h3></div>'+
       '<div class="simulation-kpis">'+
         '<div><span>Current venceu</span><strong>'+pct(p.current_win_rate)+'</strong></div>'+
         '<div><span>Weekly venceu</span><strong>'+pct(p.weekly_win_rate)+'</strong></div>'+
         '<div><span>Δ hits/semana</span><strong>'+num(p.mean_delta_hits,3)+'</strong></div>'+
+        '<div><span>Δ O/E</span><strong>'+num(p.mean_delta_oe,3)+'</strong></div>'+
+        '<div><span>Δ excesso</span><strong>'+num(p.mean_delta_excess,3)+'</strong></div>'+
         '<div><span>Churn</span><strong>'+int(u.churn)+'</strong></div>'+
       '</div>'+
+      '<p class="small muted">Paired-valid: <b>'+int(p.weekly.opportunities)+'</b> oportunidades idênticas de comparação. Weekly O/E <b>'+num(p.weekly.oe,3)+'</b> · Current O/E <b>'+num(p.current.oe,3)+'</b>.</p>'+
       '<p class="small muted">Mudanças que ajudaram: <b>'+int(u.helped)+'</b> · prejudicaram: <b>'+int(u.hurt)+'</b> · neutras: <b>'+int(u.neutral)+'</b> · empates semanais: <b>'+int(p.ties)+'</b>.</p>'+
-      '<p class="small muted">Faixa Δ hits P05/P50/P95: <b>'+num(p.delta_hits_p05,0)+' / '+num(p.delta_hits_p50,0)+' / '+num(p.delta_hits_p95,0)+'</b>. O resultado é comportamento simulado da política, não evidência preditiva real.</p>';
+      '<p class="small muted">Faixa paired-valid Δ hits P05/P50/P95: <b>'+num(p.delta_hits_p05,0)+' / '+num(p.delta_hits_p50,0)+' / '+num(p.delta_hits_p95,0)+'</b> · Δ O/E: <b>'+num(p.delta_oe_p05,2)+' / '+num(p.delta_oe_p50,2)+' / '+num(p.delta_oe_p95,2)+'</b>.</p>'+
+      '<p class="small muted">O bloco operacional mede disponibilidade; o paired-valid mede qualidade da escolha. O resultado continua sendo comportamento simulado da política, não evidência preditiva real.</p>';
   }
 
   function run(){
@@ -92,6 +177,7 @@
     const status=document.querySelector('#weeklyDuelStatus');
     const runBtn=document.querySelector('#runWeeklyDuel');
     const cancelBtn=document.querySelector('#cancelWeeklyDuel');
+    const exportBtn=document.querySelector('#exportWeeklyDuel');
 
     try{
       const self=window.RoletaWeeklyDuel?.selfTest(realEvents);
@@ -101,6 +187,10 @@
       return;
     }
 
+    const testDefinition=buildTestDefinition({weeks,scenario,signalStrength,seed});
+    lastTest=null;
+    lastResult=null;
+    if(exportBtn)exportBtn.disabled=true;
     worker=new Worker('/simulation/weekly-duel-worker.js');
     runBtn.disabled=true;cancelBtn.disabled=false;setProgress(0);
     status.textContent='Executando '+weeks.toLocaleString('pt-BR')+' semanas pareadas…';
@@ -111,8 +201,20 @@
         setProgress(msg.pct);
         status.textContent='Processadas '+msg.completed_weeks.toLocaleString('pt-BR')+' / '+msg.total_weeks.toLocaleString('pt-BR')+' semanas.';
       }else if(msg.type==='complete'){
-        setProgress(1);render(msg.result);
-        status.textContent='Concluído · '+msg.result.total_synthetic_events.toLocaleString('pt-BR')+' roletas sintéticas.';
+        const result=msg.result;
+        const sameScenario=result.scenario===testDefinition.scenario.type;
+        const sameStrength=Math.abs(Number(result.signal_strength)-Number(testDefinition.scenario.signal_strength))<1e-12;
+        if(!sameScenario||!sameStrength){
+          status.textContent='AUDITORIA BLOQUEADA · configuração e resultado não coincidem. Run não salvo.';
+          worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+          lastTest=null;lastResult=null;
+          if(exportBtn)exportBtn.disabled=true;
+          return;
+        }
+        lastTest=testDefinition;
+        setProgress(1);render(result);saveRun(testDefinition,result);
+        if(exportBtn)exportBtn.disabled=false;
+        status.textContent='Concluído · '+result.total_synthetic_events.toLocaleString('pt-BR')+' roletas sintéticas · run salvo localmente.';
         worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
       }else if(msg.type==='error'){
         status.textContent='Erro: '+msg.message;
@@ -128,8 +230,11 @@
 
   function cancel(){
     if(worker){worker.terminate();worker=null}
+    lastTest=null;lastResult=null;
     document.querySelector('#runWeeklyDuel').disabled=false;
     document.querySelector('#cancelWeeklyDuel').disabled=true;
+    const exportBtn=document.querySelector('#exportWeeklyDuel');
+    if(exportBtn)exportBtn.disabled=true;
     document.querySelector('#weeklyDuelStatus').textContent='Simulação cancelada.';
   }
 

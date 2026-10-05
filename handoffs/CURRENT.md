@@ -4,8 +4,8 @@
 
 canonical repo: `wagnerjfjunior/Roleta`
 canonical production ref: `main`
-last resolved main HEAD: `71f3b06425cb7cf8ccfbc82c779aefce8b389037`
-active development branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`
+last resolved main HEAD: `5dfd6fada53e6106be290419e19ded6ff1b621c9`
+active development branch: `feat/rlt-m4-07-paired-valid-metrics-20261004`
 
 ## Canonical data
 - 83 logical events;
@@ -21,7 +21,7 @@ active development branch: `feat/rlt-m4-01-simulation-lab-v1-20261004`
 - 04/10-T corrected: p12/p13 crossed out; Sabrina p11 drew 12 = Último; Wagner p14 drew 9.
 
 ## Production
-Workspace V3 remains production-delivered from main. No RLT-M4/RLT-M5 work in this active branch is merged or deployed.
+PR #3 is merged into main. RLT-M4/RLT-M5 simulation/prospective work is now canonical in repository main. No production deploy was performed as part of the merge.
 
 ## Active branch
 The active branch contains:
@@ -39,8 +39,8 @@ Canonical protocol:
 `docs/PROSPECTIVE_LEDGER.md`
 
 Core contract:
-- WEEKLY_FROZEN = pre-cravado before the week;
-- CURRENT = recommendation revised after newly completed real roulettes;
+- WEEKLY_FROZEN = pre-cravado before the week and official V1 operational recommendation;
+- CURRENT = recommendation revised after newly completed real roulettes, retained as diagnostic/experimental only;
 - EXECUTED_CHOICE = position actually used;
 - RANDOM_SHADOW = frozen random operational control;
 - theoretical chance = primary null benchmark;
@@ -107,7 +107,7 @@ Important correction:
 CURRENT is not frozen for the entire week. It remains revisable and is frozen only before the operational choice for its own target event.
 
 ## NEXT SAFE ACTION
-Validate the frozen RLT-M5-01 weekly panel locally via SFJM/LVR. Then continue event-by-event adjudication/recalculation with no hindsight.
+Validate the RLT-M5-01 weekly panel locally via SFJM/LVR with WEEKLY_FROZEN labelled as Oficial and CURRENT labelled as Diagnóstico. Then begin real event-by-event adjudication with WEEKLY_FROZEN as the operational reference, CURRENT scored separately, and no hindsight.
 
 ## Bootstrap
 `Ative o SFJM do projeto Roleta, resolva main ao vivo em wagnerjfjunior/Roleta, leia .sfjm/project.json, handoffs/CURRENT.md, docs/NEXT_SAFE_ACTION.md e docs/PROSPECTIVE_LEDGER.md, recupere a branch ativa e continue somente pela próxima ação segura canônica.`
@@ -124,3 +124,35 @@ test whether intra-week Current recalculation adds value over Weekly Frozen usin
 
 First required control: 10,000 weeks / NULL / seed `weekly-duel-2026`.
 No simulation result may rewrite the live frozen week 05–11/10.
+
+
+## RLT-M4-07-v2 paired-valid correction
+The first 10,000-week NULL run returned Weekly O/E 0.993, Current O/E 0.996 and Random O/E 1.004, which is compatible with chance.
+
+However, Weekly and Current had different valid-opportunity counts due to primary/fallback eligibility. Therefore raw hit delta is not a fair quality comparison.
+
+New branch:
+`feat/rlt-m4-07-paired-valid-metrics-20261004`
+
+RLT-M4-07-v2 now reports:
+- operational eligibility/coverage separately;
+- paired-valid quality only where both strategies have valid positions for the same person/event;
+- paired-valid Δ hits;
+- paired-valid Δ O/E;
+- paired-valid Δ excess over chance;
+- paired-valid win rates and quantiles.
+
+Next gate: rerun 10,000-week NULL with seed `weekly-duel-2026`. Do not proceed to signal scenarios until paired-valid NULL passes.
+
+
+## RLT-M4-07-v2 final decision
+The 50,000-week paired-valid scenario battery is complete.
+
+Operational decision:
+- WEEKLY_FROZEN = official recommendation.
+- CURRENT = diagnostic/experimental track only.
+- no automatic switching from Weekly to Current.
+- UI updated to use "Oficial" and "Diagnóstico".
+- row result marker now follows WEEKLY_FROZEN adjudication.
+- frozen real week 05–11/10 remains unchanged.
+- next evidence phase is prospective real-world performance vs theoretical chance.
