@@ -237,3 +237,69 @@ Before delivering a print PDF confirm:
 - final official sheet, when available, supersedes preliminary transcription.
 
 **Operational principle:** validate first, transpose second, print third.
+
+
+### Participation classes: SALÃO, STAND-BY and ON-LINE
+
+The final event sheet may contain up to three distinct participation blocks. They must never be merged for draw mechanics or statistical N.
+
+#### SALÃO
+- Brokers above the closing bar and admitted before the draw cutoff.
+- Participate in the roulette draw.
+- Count toward the event `N`.
+- Receive spontaneous walk-in clients according to the final roulette order.
+- Feed the canonical permutation and all Nº1/Nº2/Cortesia/Último statistics.
+
+#### STAND-BY
+- Brokers arriving after the cutoff bar, e.g. after 08:46 or 13:46.
+- Their names are written **below the bar**.
+- They do **not** participate in the roulette draw.
+- They do **not** count toward the event `N`.
+- They do **not** receive spontaneous walk-in clients through the salão rotation.
+- Their presence **does count for weekend qualification/presence rules**.
+- They may serve indication/own-client appointments: when the client arrives and names that broker, reception may call the broker because the broker is listed as present.
+- They must be stored as a distinct class, e.g. `participation_class=standby`, never as a normal draw participant.
+
+#### ON-LINE
+- Primarily online brokers who, especially on weekends, may be physically working at the plantão.
+- They do **not** enter the salão roulette unless explicitly admitted as a salão participant before cutoff.
+- Their presence on the final sheet informs reception that the broker is physically available, especially for scheduled/own clients.
+- They do **not** count toward the salão event `N` merely because they appear in the ON-LINE block.
+- They must be stored as a distinct class, e.g. `participation_class=online`.
+
+#### Printed layout for these classes
+The print/PDF model must preserve visual separation:
+1. main SALÃO table first;
+2. a full-width separator/header row **STAND-BY** if standby brokers exist;
+3. standby rows in their own block;
+4. a full-width separator/header row **ON-LINE** if online brokers exist;
+5. online rows in their own block.
+
+If both STAND-BY and ON-LINE exist on the same day, both blocks remain on the **same page when space allows**, each clearly separated like an independent subtable.
+
+The same approved columns may be reused in these lower blocks when data exist:
+- Nº within that block;
+- CORRETOR (A);
+- CRECI;
+- GERENTE;
+- DIRETOR;
+- STATUS CRECI.
+
+Do not include `VALIDADE CRECI` in these blocks either.
+
+The zebra-row rule applies inside each block and may restart at white after each section header.
+
+### Closing-bar semantics
+The physical line drawn on the manual sheet at the cutoff is a business-rule boundary:
+- above bar = eligible SALÃO candidates;
+- below bar = late arrival / STAND-BY unless explicitly identified otherwise;
+- entries below the bar must never be silently promoted into the roulette permutation;
+- the bar position must be captured during transcription when visible.
+
+This distinction is mandatory because a STAND-BY broker can count as **present** for weekend qualification while remaining **ineligible for the current roulette draw**.
+
+### Examples supplied as visual references
+- 17/09/2026 final sheet shows a distinct **STAND-BY** block below the salão table.
+- 26/09/2026 final sheet shows a distinct **ON-LINE** block below the salão table.
+
+These examples define the expected visual hierarchy but do not override the event-specific contents of future sheets.
