@@ -224,3 +224,22 @@ Printing is forbidden while:
 - the cutoff bar is unclear and affects class assignment;
 - N is not reconciled;
 - metadata needed for the final sheet is unresolved.
+
+
+## RLT-PRINT-V1
+Canonical print layout is defined in `docs/PRINT_TEMPLATE_V1.md`.
+
+Do not reconstruct the PDF layout from memory. Read the canonical spec before changing print generation.
+
+Critical invariants:
+- A4 portrait;
+- one shared six-column coordinate grid across header and every table;
+- aligned vertical boundaries;
+- company draw at top-right, results underneath;
+- no Tegra-count cell in header;
+- conditional STAND-BY / ON-LINE blocks;
+- no VALIDADE CRECI;
+- zebra rows;
+- validation gate before print.
+
+Accepted visual reference: `roleta_teste_09-08-2025_manha_v3_alinhada.pdf`.
