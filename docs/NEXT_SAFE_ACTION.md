@@ -69,10 +69,19 @@ Run the first paired control:
 - signal strength: 0;
 - seed: `weekly-duel-2026`.
 
-Expected control behavior:
-- Weekly Frozen and Current both remain compatible with theoretical chance;
+First NULL v1 observation:
+- Weekly O/E 0.993;
+- Current O/E 0.996;
+- Random O/E 1.004;
+- NULL behavior passed, but valid-opportunity counts differed, so raw hit delta was not a fair strategy-quality comparison.
+
+RLT-M4-07-v2 gate:
+- rerun 10,000 weeks / NULL / same seed after paired-valid correction;
+- operational block may show different valid-opportunity counts;
+- paired-valid Weekly and Current must have exactly the same opportunity count and theoretical expected total;
+- paired-valid Δ O/E must remain approximately 0;
+- paired-valid Δ excess must remain approximately 0;
 - Current must not show persistent artificial advantage merely because it recalculates after each event;
-- Random remains compatible with chance;
 - churn may be non-zero, but helpful and harmful revisions should balance under NULL.
 
 If NULL passes, run in order:
