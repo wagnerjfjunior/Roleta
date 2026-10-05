@@ -176,3 +176,15 @@ Mandatory invariants:
 - operational rule: validate first, transpose second, print third.
 
 Confirmed print-reference event: 04/10/2026 afternoon, Caminhos da Lapa, final order Turmalina / Globz / Paola / Veri / Valeria / Katio / Lotus / Aline / Wagner / Nina / Sanches / Sabrina.
+
+
+### Participation classes
+Final-sheet participants must be separated into three classes:
+
+- **SALÃO**: above cutoff bar, participates in draw, counts in event N, eligible for spontaneous walk-in rotation.
+- **STAND-BY**: below cutoff bar / late arrival; does not participate in draw, does not count in N, does not receive spontaneous walk-in rotation, but **presence counts for weekend qualification** and broker may serve indication/own-client arrivals.
+- **ON-LINE**: online broker physically present at plantão; listed so reception knows broker is onsite for appointments/own clients; does not count in salão N merely by appearing in ON-LINE block.
+
+Print layout must keep the main SALÃO table first, then independent full-width **STAND-BY** and **ON-LINE** sections when present. If both exist, keep them on the same page when space allows, visibly separated. Do not include VALIDADE CRECI in any block.
+
+The cutoff bar is a business boundary. Never ingest a below-bar STAND-BY broker into the salão permutation or N. Preserve the class separately because STAND-BY can be present for weekend qualification while ineligible for that period's draw.
