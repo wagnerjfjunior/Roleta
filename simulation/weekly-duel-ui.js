@@ -1,9 +1,82 @@
 (function(){
   'use strict';
 
+  const STORAGE_KEY='roleta.weekly-duel.runs.v2';
   let worker=null;
   let lastResult=null;
+  let lastTest=null;
   let realEvents=[];
+
+  function readRuns(){
+    try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(_){return[]}
+  }
+  function updateSavedCount(){
+    const el=document.querySelector('#weeklyDuelSavedRuns');
+    if(el)el.textContent=readRuns().length+' runs auditáveis salvos localmente';
+  }
+  function buildTestDefinition(config){
+    const names={
+      null:'NULL · acaso puro',
+      stable_period:'Sinal estável por período',
+      regime_shift:'Mudança de regime no meio da semana',
+      weak_noise:'Sinal fraco + ruído'
+    };
+    return {
+      id:'RLT-M4-07-v2',
+      name:names[config.scenario]||config.scenario,
+      objective:'Comparar WEEKLY_FROZEN e CURRENT sob a mesma sequência de semanas sintéticas, separando disponibilidade operacional de qualidade paired-valid.',
+      policy:'PROSPECTIVE-V1.0.0 / RLT-M5-WEEKLY-V1',
+      scenario:{
+        type:config.scenario,
+        signal_strength:config.signalStrength,
+        target:'2X = Nº1 ou Último'
+      },
+      workload:{
+        weeks:config.weeks,
+        events_per_week:12,
+        people_per_event:4,
+        planned_synthetic_events:config.weeks*12,
+        planned_person_opportunities:config.weeks*12*4
+      },
+      reproducibility:{
+        seed:config.seed,
+        structural_source:'83 eventos canônicos; somente permutações completas são elegíveis como moldes/estado inicial',
+        chronology:'Weekly congela no início; Current recalcula somente após revelar cada evento; ambos usam o mesmo resultado sintético.'
+      },
+      evaluation:{
+        primary:'paired-valid Δ O/E e Δ excesso',
+        secondary:['paired-valid Δ hits','weekly win rate','operational valid opportunities','churn','helped/hurt/neutral revisions'],
+        guard:'Resultados simulados não alteram a semana real congelada.'
+      }
+    };
+  }
+  function saveRun(test,result){
+    const runs=readRuns();
+    runs.unshift({
+      saved_at:new Date().toISOString(),
+      source:'Roleta Intelligence · Weekly Policy Duel',
+      test,
+      result
+    });
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(runs.slice(0,50)));
+    updateSavedCount();
+  }
+  function exportRun(){
+    if(!lastResult||!lastTest)return;
+    const payload={
+      exported_at:new Date().toISOString(),
+      source:'Roleta Intelligence · Weekly Policy Duel',
+      test:lastTest,
+      result:lastResult
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='roleta-weekly-duel-'+Date.now()+'.json';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
 
   function pct(x){return Number.isFinite(x)?(x*100).toFixed(2).replace('.',',')+'%':'—'}
   function num(x,d=3){return Number.isFinite(x)?x.toFixed(d).replace('.',','):'—'}
@@ -29,6 +102,7 @@
       '</div>'+
       '<div class="simulation-progress-wrap"><div class="simulation-progress"><i id="weeklyDuelProgressBar"></i></div><span id="weeklyDuelProgressText">0,0%</span></div>'+
       '<p id="weeklyDuelStatus" class="small muted">Pronto para simular semanas completas.</p>'+
+      '<div class="simulation-audit-actions"><button id="exportWeeklyDuel" class="workspace-link-button" disabled>Exportar JSON</button><span id="weeklyDuelSavedRuns" class="small muted">0 runs auditáveis salvos localmente</span></div>'+
       '<div id="weeklyDuelSummary" class="sim-context-table"><div class="muted small">Sem resultado ainda.</div></div>'+
       '<div id="weeklyDuelUpdates" class="sim-pairwise"><div class="muted small">Churn e valor das atualizações aparecerão aqui.</div></div>';
 
@@ -38,6 +112,8 @@
 
     document.querySelector('#runWeeklyDuel').addEventListener('click',run);
     document.querySelector('#cancelWeeklyDuel').addEventListener('click',cancel);
+    document.querySelector('#exportWeeklyDuel').addEventListener('click',exportRun);
+    updateSavedCount();
   }
 
   function setProgress(v){
@@ -101,6 +177,7 @@
     const status=document.querySelector('#weeklyDuelStatus');
     const runBtn=document.querySelector('#runWeeklyDuel');
     const cancelBtn=document.querySelector('#cancelWeeklyDuel');
+    const exportBtn=document.querySelector('#exportWeeklyDuel');
 
     try{
       const self=window.RoletaWeeklyDuel?.selfTest(realEvents);
@@ -110,6 +187,8 @@
       return;
     }
 
+    const testDefinition=buildTestDefinition({weeks,scenario,signalStrength,seed});
+    lastTest=testDefinition;
     worker=new Worker('/simulation/weekly-duel-worker.js');
     runBtn.disabled=true;cancelBtn.disabled=false;setProgress(0);
     status.textContent='Executando '+weeks.toLocaleString('pt-BR')+' semanas pareadas…';
@@ -120,8 +199,9 @@
         setProgress(msg.pct);
         status.textContent='Processadas '+msg.completed_weeks.toLocaleString('pt-BR')+' / '+msg.total_weeks.toLocaleString('pt-BR')+' semanas.';
       }else if(msg.type==='complete'){
-        setProgress(1);render(msg.result);
-        status.textContent='Concluído · '+msg.result.total_synthetic_events.toLocaleString('pt-BR')+' roletas sintéticas.';
+        setProgress(1);render(msg.result);saveRun(testDefinition,msg.result);
+        if(exportBtn)exportBtn.disabled=false;
+        status.textContent='Concluído · '+msg.result.total_synthetic_events.toLocaleString('pt-BR')+' roletas sintéticas · run salvo localmente.';
         worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
       }else if(msg.type==='error'){
         status.textContent='Erro: '+msg.message;
