@@ -175,15 +175,24 @@ function latestNominalEvents(nominalRows,limit=2){
     .sort((a,b)=>dateKey(b)-dateKey(a)||(periodOrder[b.period]??0)-(periodOrder[a.period]??0))
     .slice(0,limit);
 }
-function nominalBrokerForDraw(nominalRows,eventId,drawnNumber){
+function normalizeLookupName(v){
+  return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+}
+function nominalBrokerForDraw(nominalRows,eventId,drawnNumber,officialBrokers,nameAliases){
   const row=(nominalRows||[]).find(r=>r.event_id===eventId&&Number(r.drawn_number)===drawnNumber);
   if(!row)return null;
+  const transcribed=row.broker_name_normalized||row.broker_name_raw||'';
+  const canonical=(nameAliases&&nameAliases[transcribed])||transcribed;
+  const official=(officialBrokers||[]).find(b=>normalizeLookupName(b['Nome Comercial'])===normalizeLookupName(canonical));
   return {
-    name:row.broker_name_normalized||row.broker_name_raw||'—',
-    position:Number(row.physical_position)
+    name:official?.['Nome Comercial']||canonical||'—',
+    manager:official?.['Equipe']||null,
+    director:official?.['Diretor']||null,
+    position:Number(row.physical_position),
+    transcribed
   };
 }
-function buildLastTwoSpecialCard(nominalRows){
+function buildLastTwoSpecialCard(nominalRows,officialBrokers,nameAliases){
   const card=document.createElement('article');
   card.className='card workspace-recent-specials';
   const events=latestNominalEvents(nominalRows,2);
@@ -201,7 +210,7 @@ function buildLastTwoSpecialCard(nominalRows){
           return '<section class="recent-special-event">'+
             '<div class="recent-special-head"><div><strong>'+e.date+'</strong><span>'+e.period+' · N='+e.N+'</span></div><small>'+e.id+'</small></div>'+
             '<div class="recent-special-grid">'+specials.map(([label,drawn])=>{
-              const broker=nominalBrokerForDraw(nominalRows,e.id,drawn);
+              const broker=nominalBrokerForDraw(nominalRows,e.id,drawn,officialBrokers,nameAliases);
               return '<div class="recent-special-item">'+
                 '<span>'+label+'</span>'+
                 '<strong>'+(broker?.name||'—')+'</strong>'+
@@ -356,14 +365,18 @@ async function init(){
 
 async function upgradeWorkspace(){
   if(document.querySelector('.workspace-root'))return;
-  let brokerStats=null,nominalRows=[];
+  let brokerStats=null,nominalRows=[],officialBrokers=[],nameAliases={};
   try{
-    const [statsResponse,nominalResponse]=await Promise.all([
+    const [statsResponse,nominalResponse,officialResponse,aliasesResponse]=await Promise.all([
       fetch('/data/broker-stats-v3.json',{cache:'no-store'}),
-      fetch('/data/full_draws_reconstructed.csv',{cache:'no-store'})
+      fetch('/data/full_draws_reconstructed.csv',{cache:'no-store'}),
+      fetch('/data/brokers-official.csv',{cache:'no-store'}),
+      fetch('/data/broker-name-aliases.json',{cache:'no-store'})
     ]);
     if(statsResponse.ok)brokerStats=await statsResponse.json();
     if(nominalResponse.ok)nominalRows=parseCSV(await nominalResponse.text());
+    if(officialResponse.ok)officialBrokers=parseCSV(await officialResponse.text());
+    if(aliasesResponse.ok)nameAliases=(await aliasesResponse.json()).aliases||{};
   }catch(_){}
 
   const shell=document.querySelector('.shell');
@@ -547,7 +560,7 @@ async function upgradeWorkspace(){
 
   }
 
-  ranking.appendChild(buildLastTwoSpecialCard(nominalRows));
+  ranking.appendChild(buildLastTwoSpecialCard(nominalRows,officialBrokers,nameAliases));
 
   const footer=shell.querySelector('footer');
   if(footer)shell.appendChild(footer);
