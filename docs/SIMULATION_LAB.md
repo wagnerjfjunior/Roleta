@@ -420,3 +420,26 @@ Required NULL re-run:
 - paired-valid `Δ excess ≈ 0`;
 - no persistent Current advantage.
 
+
+
+### Persistência auditável do Policy Duel
+
+RLT-M4-07-v2 passa a persistir automaticamente cada execução concluída no navegador em:
+`roleta.weekly-duel.runs.v2`.
+
+Cada registro salvo contém:
+- timestamp;
+- definição completa do teste;
+- cenário;
+- força do sinal;
+- semanas simuladas;
+- seed;
+- política/modelo fixos;
+- métricas operacionais;
+- métricas paired-valid;
+- churn e impacto das revisões;
+- resultado agregado completo.
+
+A UI exibe a quantidade de runs salvos e habilita `Exportar JSON` após uma execução concluída.
+
+São preservados os 50 runs mais recentes localmente. Essa persistência é separada da base canônica real e não altera `data/manifest.json`.
