@@ -116,7 +116,7 @@
   function runWeek(seedEvents,templates,rng,scenario,strength){
     const stats=seedStats(seedEvents);
     const weeklyPlan=makePlan(stats);
-    const weekly=metric(),current=metric(),random=metric();
+    const weekly=metric(),current=metric(),random=metric(),pairedWeekly=metric(),pairedCurrent=metric();
     let churn=0,helped=0,hurt=0,neutral=0;
     let currentPlan=makePlan(stats);
     const previousCurrent={};
@@ -140,6 +140,10 @@
         const cp=resolvePick(currentRecs[pi],e.occupied);
         const rp=randomPositions[pi]??null;
         const wh=observe(weekly,wp,e), ch=observe(current,cp,e);observe(random,rp,e);
+        if(Number.isFinite(wp)&&Number.isFinite(cp)){
+          observe(pairedWeekly,wp,e);
+          observe(pairedCurrent,cp,e);
+        }
 
         const key=period+'|'+PEOPLE[pi];
         const prev=previousCurrent[key];
@@ -158,9 +162,13 @@
 
     return {
       weekly:summarize(weekly),current:summarize(current),random:summarize(random),
+      paired_weekly:summarize(pairedWeekly),paired_current:summarize(pairedCurrent),
       churn,helped,hurt,neutral,
-      delta_hits:current.hits-weekly.hits,
-      delta_oe:(current.expected?current.hits/current.expected:0)-(weekly.expected?weekly.hits/weekly.expected:0)
+      operational_delta_hits:current.hits-weekly.hits,
+      operational_delta_oe:(current.expected?current.hits/current.expected:0)-(weekly.expected?weekly.hits/weekly.expected:0),
+      paired_delta_hits:pairedCurrent.hits-pairedWeekly.hits,
+      paired_delta_oe:(pairedCurrent.expected?pairedCurrent.hits/pairedCurrent.expected:0)-(pairedWeekly.expected?pairedWeekly.hits/pairedWeekly.expected:0),
+      paired_delta_excess:(pairedCurrent.hits-pairedCurrent.expected)-(pairedWeekly.hits-pairedWeekly.expected)
     };
   }
 
@@ -180,15 +188,33 @@
         invalid:rows.reduce((s,r)=>s+r.invalid,0)
       };
     }
+    const pairedOut={};
+    for(const id of ['paired_weekly','paired_current']){
+      const rows=weeks.map(w=>w[id]);
+      const opportunities=rows.reduce((s,r)=>s+r.opportunities,0);
+      const hits=rows.reduce((s,r)=>s+r.hits,0);
+      const expected=rows.reduce((s,r)=>s+r.expected,0);
+      const oes=rows.filter(r=>r.expected>0).map(r=>r.hits/r.expected);
+      pairedOut[id]={
+        opportunities,hits,expected,
+        hit_rate:opportunities?hits/opportunities:0,
+        oe:expected?hits/expected:0,
+        excess:hits-expected,
+        oe_p05:pct(oes,.05),oe_p50:pct(oes,.5),oe_p95:pct(oes,.95)
+      };
+    }
+
     let currentWins=0,weeklyWins=0,ties=0;
     for(const w of weeks){
-      if(w.delta_hits>0)currentWins++;
-      else if(w.delta_hits<0)weeklyWins++;
+      if(w.paired_delta_hits>0)currentWins++;
+      else if(w.paired_delta_hits<0)weeklyWins++;
       else ties++;
     }
-    const deltas=weeks.map(w=>w.delta_hits);
+    const deltas=weeks.map(w=>w.paired_delta_hits);
+    const deltaOe=weeks.map(w=>w.paired_delta_oe);
+    const deltaExcess=weeks.map(w=>w.paired_delta_excess);
     return {
-      version:'RLT-M4-07-v1',
+      version:'RLT-M4-07-v2',
       experiment:'WEEKLY_FROZEN_VS_CURRENT',
       policy:'PROSPECTIVE-V1.0.0 / RLT-M5-WEEKLY-V1',
       scenario:config.scenario,
@@ -201,12 +227,27 @@
       total_person_opportunities_planned:weeks.length*12*4,
       structural_templates:templatesCount,
       strategies:out,
-      paired:{
+      operational:{
+        weekly_valid_opportunities:out.weekly.opportunities,
+        current_valid_opportunities:out.current.opportunities,
+        weekly_invalid:out.weekly.invalid,
+        current_invalid:out.current.invalid,
+        delta_valid_opportunities:out.current.opportunities-out.weekly.opportunities,
+        delta_hits:out.current.hits-out.weekly.hits,
+        delta_oe:out.current.oe-out.weekly.oe
+      },
+      paired_valid:{
+        weekly:pairedOut.paired_weekly,
+        current:pairedOut.paired_current,
         current_wins:currentWins,weekly_wins:weeklyWins,ties,
         current_win_rate:weeks.length?currentWins/weeks.length:0,
         weekly_win_rate:weeks.length?weeklyWins/weeks.length:0,
         mean_delta_hits:deltas.reduce((s,x)=>s+x,0)/Math.max(1,deltas.length),
-        delta_hits_p05:pct(deltas,.05),delta_hits_p50:pct(deltas,.5),delta_hits_p95:pct(deltas,.95)
+        mean_delta_oe:deltaOe.reduce((s,x)=>s+x,0)/Math.max(1,deltaOe.length),
+        mean_delta_excess:deltaExcess.reduce((s,x)=>s+x,0)/Math.max(1,deltaExcess.length),
+        delta_hits_p05:pct(deltas,.05),delta_hits_p50:pct(deltas,.5),delta_hits_p95:pct(deltas,.95),
+        delta_oe_p05:pct(deltaOe,.05),delta_oe_p50:pct(deltaOe,.5),delta_oe_p95:pct(deltaOe,.95),
+        delta_excess_p05:pct(deltaExcess,.05),delta_excess_p50:pct(deltaExcess,.5),delta_excess_p95:pct(deltaExcess,.95)
       },
       updates:{
         churn:weeks.reduce((s,w)=>s+w.churn,0),
@@ -214,7 +255,7 @@
         hurt:weeks.reduce((s,w)=>s+w.hurt,0),
         neutral:weeks.reduce((s,w)=>s+w.neutral,0)
       },
-      interpretation_guard:'Simulation validates policy behavior, not real predictive edge. The live week remains frozen and is not altered by this result.'
+      interpretation_guard:'Operational metrics measure deployability/eligibility. Paired-valid metrics compare Weekly and Current only when both had a valid recommendation for the same person/event. Simulation validates policy behavior, not real predictive edge. The live week remains frozen and is not altered by this result.'
     };
   }
 
@@ -241,8 +282,8 @@
     const r=run({realEvents,weeks:20,scenario:'null',seed:'weekly-duel-self-test',signalStrength:0});
     const planned=20*12*4;
     return {
-      pass:r.weeks===20&&r.total_person_opportunities_planned===planned&&r.strategies.weekly.expected>0&&r.strategies.current.expected>0,
-      checks:{weeks:r.weeks,planned,weekly_opportunities:r.strategies.weekly.opportunities,current_opportunities:r.strategies.current.opportunities}
+      pass:r.weeks===20&&r.total_person_opportunities_planned===planned&&r.strategies.weekly.expected>0&&r.strategies.current.expected>0&&r.paired_valid.weekly.opportunities===r.paired_valid.current.opportunities&&Math.abs(r.paired_valid.weekly.expected-r.paired_valid.current.expected)<1e-9,
+      checks:{weeks:r.weeks,planned,weekly_opportunities:r.strategies.weekly.opportunities,current_opportunities:r.strategies.current.opportunities,paired_opportunities:r.paired_valid.weekly.opportunities,paired_expected_equal:Math.abs(r.paired_valid.weekly.expected-r.paired_valid.current.expected)<1e-9}
     };
   }
 
