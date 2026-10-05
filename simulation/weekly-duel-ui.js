@@ -68,19 +68,28 @@
         '</div>'
       ).join('')+'</div>';
 
-    const p=result.paired,u=result.updates;
-    const decided=p.current_wins+p.weekly_wins;
-    const helpedDen=u.helped+u.hurt+u.neutral;
+    const p=result.paired_valid,u=result.updates,o=result.operational;
     document.querySelector('#weeklyDuelUpdates').innerHTML=
-      '<div class="sim-context-head"><span class="eyebrow">VALOR DA ATUALIZAÇÃO</span><h3>CURRENT − WEEKLY</h3></div>'+
+      '<div class="sim-context-head"><span class="eyebrow">OPERACIONAL</span><h3>Elegibilidade / disponibilidade</h3></div>'+
+      '<div class="simulation-kpis">'+
+        '<div><span>Weekly válidas</span><strong>'+int(o.weekly_valid_opportunities)+'</strong></div>'+
+        '<div><span>Current válidas</span><strong>'+int(o.current_valid_opportunities)+'</strong></div>'+
+        '<div><span>Δ oportunidades</span><strong>'+int(o.delta_valid_opportunities)+'</strong></div>'+
+        '<div><span>Δ O/E bruto</span><strong>'+num(o.delta_oe,3)+'</strong></div>'+
+      '</div>'+
+      '<div class="sim-context-head"><span class="eyebrow">PAIRED-VALID</span><h3>CURRENT − WEEKLY · mesma pessoa/evento, ambos válidos</h3></div>'+
       '<div class="simulation-kpis">'+
         '<div><span>Current venceu</span><strong>'+pct(p.current_win_rate)+'</strong></div>'+
         '<div><span>Weekly venceu</span><strong>'+pct(p.weekly_win_rate)+'</strong></div>'+
         '<div><span>Δ hits/semana</span><strong>'+num(p.mean_delta_hits,3)+'</strong></div>'+
+        '<div><span>Δ O/E</span><strong>'+num(p.mean_delta_oe,3)+'</strong></div>'+
+        '<div><span>Δ excesso</span><strong>'+num(p.mean_delta_excess,3)+'</strong></div>'+
         '<div><span>Churn</span><strong>'+int(u.churn)+'</strong></div>'+
       '</div>'+
+      '<p class="small muted">Paired-valid: <b>'+int(p.weekly.opportunities)+'</b> oportunidades idênticas de comparação. Weekly O/E <b>'+num(p.weekly.oe,3)+'</b> · Current O/E <b>'+num(p.current.oe,3)+'</b>.</p>'+
       '<p class="small muted">Mudanças que ajudaram: <b>'+int(u.helped)+'</b> · prejudicaram: <b>'+int(u.hurt)+'</b> · neutras: <b>'+int(u.neutral)+'</b> · empates semanais: <b>'+int(p.ties)+'</b>.</p>'+
-      '<p class="small muted">Faixa Δ hits P05/P50/P95: <b>'+num(p.delta_hits_p05,0)+' / '+num(p.delta_hits_p50,0)+' / '+num(p.delta_hits_p95,0)+'</b>. O resultado é comportamento simulado da política, não evidência preditiva real.</p>';
+      '<p class="small muted">Faixa paired-valid Δ hits P05/P50/P95: <b>'+num(p.delta_hits_p05,0)+' / '+num(p.delta_hits_p50,0)+' / '+num(p.delta_hits_p95,0)+'</b> · Δ O/E: <b>'+num(p.delta_oe_p05,2)+' / '+num(p.delta_oe_p50,2)+' / '+num(p.delta_oe_p95,2)+'</b>.</p>'+
+      '<p class="small muted">O bloco operacional mede disponibilidade; o paired-valid mede qualidade da escolha. O resultado continua sendo comportamento simulado da política, não evidência preditiva real.</p>';
   }
 
   function run(){
