@@ -167,6 +167,53 @@ function renderRecent(){
     '</div><div class="period">'+e.period+' · N='+e.N+'</div></div>'
   ).join('');
 }
+function latestNominalEvents(nominalRows,limit=2){
+  const nominalIds=new Set((nominalRows||[]).map(r=>r.event_id).filter(Boolean));
+  const periodOrder={desconhecido:0,manha:1,tarde:2,integral:3};
+  return [...state.events]
+    .filter(e=>parseDateBR(e.date)&&nominalIds.has(e.id))
+    .sort((a,b)=>dateKey(b)-dateKey(a)||(periodOrder[b.period]??0)-(periodOrder[a.period]??0))
+    .slice(0,limit);
+}
+function nominalBrokerForDraw(nominalRows,eventId,drawnNumber){
+  const row=(nominalRows||[]).find(r=>r.event_id===eventId&&Number(r.drawn_number)===drawnNumber);
+  if(!row)return null;
+  return {
+    name:row.broker_name_normalized||row.broker_name_raw||'—',
+    position:Number(row.physical_position)
+  };
+}
+function buildLastTwoSpecialCard(nominalRows){
+  const card=document.createElement('article');
+  card.className='card workspace-recent-specials';
+  const events=latestNominalEvents(nominalRows,2);
+  card.innerHTML=
+    '<div class="section-head"><div><span class="eyebrow">ÚLTIMAS 2 ROLETAS</span><h2>Quem tirou os números especiais</h2></div>'+
+    '<span class="muted">Nº1 · Nº2 · Cortesia · Último de vez</span></div>'+
+    (events.length
+      ? '<div class="recent-special-events">'+events.map(e=>{
+          const specials=[
+            ['Nº1',1],
+            ['Nº2',2],
+            ['Cortesia',Math.max(1,e.N-1)],
+            ['Último de vez',e.N]
+          ];
+          return '<section class="recent-special-event">'+
+            '<div class="recent-special-head"><div><strong>'+e.date+'</strong><span>'+e.period+' · N='+e.N+'</span></div><small>'+e.id+'</small></div>'+
+            '<div class="recent-special-grid">'+specials.map(([label,drawn])=>{
+              const broker=nominalBrokerForDraw(nominalRows,e.id,drawn);
+              return '<div class="recent-special-item">'+
+                '<span>'+label+'</span>'+
+                '<strong>'+(broker?.name||'—')+'</strong>'+
+                '<small>'+(broker?'posição física '+broker.position:'nome não disponível na transcrição nominal')+'</small>'+
+              '</div>';
+            }).join('')+'</div>'+
+          '</section>';
+        }).join('')+'</div>'
+      : '<div class="muted small">Sem transcrição nominal validada para as roletas mais recentes.</div>')+
+    '<p class="small muted workspace-data-note">Quadro de recência independente. Não altera o TOP 5 nem o ranking histórico.</p>';
+  return card;
+}
 function renderWeekendFamily(){
   const host=document.querySelector('#weekendFamily');
   const policy=state.weekendPolicy,pres=state.presence;
@@ -309,10 +356,14 @@ async function init(){
 
 async function upgradeWorkspace(){
   if(document.querySelector('.workspace-root'))return;
-  let brokerStats=null;
+  let brokerStats=null,nominalRows=[];
   try{
-    const r=await fetch('/data/broker-stats-v3.json',{cache:'no-store'});
-    if(r.ok)brokerStats=await r.json();
+    const [statsResponse,nominalResponse]=await Promise.all([
+      fetch('/data/broker-stats-v3.json',{cache:'no-store'}),
+      fetch('/data/full_draws_reconstructed.csv',{cache:'no-store'})
+    ]);
+    if(statsResponse.ok)brokerStats=await statsResponse.json();
+    if(nominalResponse.ok)nominalRows=parseCSV(await nominalResponse.text());
   }catch(_){}
 
   const shell=document.querySelector('.shell');
@@ -495,6 +546,8 @@ async function upgradeWorkspace(){
     ranking.insertBefore(topCard,ranking.children[1]||null);
 
   }
+
+  ranking.appendChild(buildLastTwoSpecialCard(nominalRows));
 
   const footer=shell.querySelector('footer');
   if(footer)shell.appendChild(footer);
