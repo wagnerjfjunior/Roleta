@@ -1,48 +1,20 @@
 {
   "version": "PROSPECTIVE-V1.0.0",
-  "derived_from": [
-    "recommendations.jsonl",
-    "executions.jsonl",
-    "adjudications.jsonl"
-  ],
+  "derived_from": ["recommendations.jsonl","executions.jsonl","adjudications.jsonl"],
   "primary_endpoint": "2X_N1_OR_LAST",
   "evidence_state": "AMOSTRA_INICIAL",
   "strategies": {
-    "WEEKLY_FROZEN": {
-      "events": 0,
-      "hits": 0,
-      "expected": 0,
-      "oe": null
-    },
-    "CURRENT": {
-      "events": 0,
-      "hits": 0,
-      "expected": 0,
-      "oe": null
-    },
-    "EXECUTED_CHOICE": {
-      "events": 0,
-      "hits": 0,
-      "expected": 0,
-      "oe": null,
-      "interpretation": "OBSERVATIONAL"
-    },
-    "RANDOM_SHADOW": {
-      "events": 0,
-      "hits": 0,
-      "expected": 0,
-      "oe": null,
-      "interpretation": "CONTROL"
-    }
+    "WEEKLY_FROZEN": {"events":12,"hits":2,"expected":1.1498310995,"oe":1.7393858984},
+    "CURRENT": {"events":0,"hits":0,"expected":0,"oe":null},
+    "EXECUTED_CHOICE": {"events":0,"hits":0,"expected":0,"oe":null,"interpretation":"OBSERVATIONAL"},
+    "RANDOM_SHADOW": {"events":0,"hits":0,"expected":0,"oe":null,"interpretation":"CONTROL"}
   },
-  "generated_at": "2026-10-04T20:04:19-03:00",
-  "data_cutoff": "04-10-T",
+  "generated_at": "2026-10-06T16:30:00-03:00",
+  "data_cutoff": "06-10-M",
   "policy_version": "PROSPECTIVE-V1.0.0",
   "model_version": "RLT-M5-WEEKLY-V1",
   "frozen_week": "2026-10-05/2026-10-11",
-  "frozen_recommendations": {
-    "WEEKLY_FROZEN": 48,
-    "RANDOM_SHADOW": 48
-  },
-  "open_current_recommendations": 48
+  "frozen_recommendations": {"WEEKLY_FROZEN":48,"RANDOM_SHADOW":48},
+  "open_current_recommendations":48,
+  "note":"WEEKLY_FROZEN adjudicado para 05/10 manhã, 05/10 tarde e 06/10 manhã. 06/10 tarde permanece pendente e fora do resultado até evidência manuscrita."
 }
