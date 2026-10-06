@@ -161,11 +161,13 @@
   "prospective_05_10": {
     "weekly_frozen": {
       "events": 8,
-      "hits": 1,
-      "expected": 0.7688787185354691,
-      "oe": 1.3005952380952381
+      "hits": null,
+      "expected": null,
+      "oe": null
     },
-    "note": "05/10-M: 0/4; 05/10-T: 1/4 (Laura posicao 18 = Ultimo)."
+    "operational_outcome": "05/10-T: posição física 18 = Wagner, número sorteado 23, portanto Wagner foi Último.",
+    "validation_status": "NOT_ADJUDICATED",
+    "note": "Não atribuir o resultado a Laura. A posição 18 era uma recomendação hipotética da família para Laura, mas a execução real da roleta teve Wagner nessa posição. Crédito prospectivo nominal exige execução/ocupação real compatível; o fechamento 05/10 não contabiliza esse caso como acerto de Laura."
   },
   "nominal_correction_05_10_tarde": {
     "physical_position_4": "Nair",
