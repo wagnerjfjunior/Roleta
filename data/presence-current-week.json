@@ -1,167 +1,32 @@
 {
-  "version": "2026-10-02T20:20-03:00-week-close",
-  "week_start": "2026-09-28",
-  "week_end": "2026-10-02",
+  "version": "2026-10-06T16:00-03:00-live-week",
+  "week_start": "2026-10-05",
+  "week_end": "2026-10-09",
   "required_periods": 5,
-  "brokers": [
-    "Wagner",
-    "Sabrina",
-    "Laura",
-    "Helena"
-  ],
+  "brokers": ["Wagner","Sabrina","Laura","Helena"],
   "aliases": {
-    "Wagner": [
-      "WAGNER",
-      "Wagner"
-    ],
-    "Sabrina": [
-      "SABRINA",
-      "Sabrina",
-      "Brenda"
-    ],
-    "Laura": [
-      "LAURA",
-      "Laura"
-    ],
-    "Helena": [
-      "HELENA",
-      "Helena",
-      "LIVIA",
-      "Lívia"
-    ]
+    "Wagner": ["WAGNER","Wagner"],
+    "Sabrina": ["SABRINA","Sabrina","Brenda"],
+    "Laura": ["LAURA","Laura"],
+    "Helena": ["HELENA","Helena","LIVIA","Lívia"]
   },
   "records": [
-    {
-      "date": "2026-09-30",
-      "period": "manha",
-      "broker": "Wagner",
-      "present": true,
-      "source": "IMG_1643.jpeg",
-      "confidence": "confirmed_visual"
-    },
-    {
-      "date": "2026-09-30",
-      "period": "tarde",
-      "broker": "Wagner",
-      "present": true,
-      "source": "IMG_1644.jpeg",
-      "confidence": "confirmed_visual"
-    },
-    {
-      "date": "2026-09-30",
-      "period": "tarde",
-      "broker": "Laura",
-      "present": true,
-      "source": "IMG_1644.jpeg",
-      "confidence": "confirmed_visual"
-    },
-    {
-      "date": "2026-10-01",
-      "period": "manha",
-      "broker": "Wagner",
-      "present": true,
-      "physical_position": 14,
-      "drawn_number": 7,
-      "source": "IMG_1645.jpeg",
-      "confidence": "confirmed_visual"
-    },
-    {
-      "date": "2026-10-02",
-      "period": "manha",
-      "broker": "Wagner",
-      "present": true,
-      "physical_position": 14,
-      "drawn_number": 8,
-      "source": "IMG_1664.jpeg",
-      "confidence": "confirmed_visual"
-    },
-    {
-      "date": "2026-10-02",
-      "period": "tarde",
-      "broker": "Wagner",
-      "present": true,
-      "physical_position": 14,
-      "drawn_number": 13,
-      "source": "IMG_1663.jpeg",
-      "confidence": "confirmed_visual"
-    },
-    {
-      "date": "2026-09-28",
-      "period": "tarde",
-      "broker": "Sabrina",
-      "present": true,
-      "physical_position": 14,
-      "drawn_number": 4,
-      "source": "user-confirmed 2026-10-01",
-      "confidence": "confirmed_user"
-    },
-    {
-      "date": "2026-09-29",
-      "period": "manha",
-      "broker": "Sabrina",
-      "present": true,
-      "physical_position": 9,
-      "drawn_number": 17,
-      "source": "user-confirmed 2026-10-01",
-      "confidence": "confirmed_user"
-    },
-    {
-      "date": "2026-09-29",
-      "period": "tarde",
-      "broker": "Sabrina",
-      "present": true,
-      "physical_position": 2,
-      "drawn_number": 12,
-      "source": "user-confirmed 2026-10-01",
-      "confidence": "confirmed_user"
-    },
-    {
-      "date": "2026-09-30",
-      "period": "tarde",
-      "broker": "Sabrina",
-      "present": true,
-      "physical_position": 5,
-      "drawn_number": 15,
-      "source": "user-confirmed 2026-10-01",
-      "confidence": "confirmed_user"
-    }
+    {"date":"2026-10-05","period":"manha","broker":"Wagner","present":true,"physical_position":14,"drawn_number":15,"source":"data/transcriptions/2026-10-05.csv","confidence":"canonical_transcription"},
+    {"date":"2026-10-05","period":"tarde","broker":"Wagner","present":true,"physical_position":18,"drawn_number":23,"source":"data/transcriptions/2026-10-05.csv","confidence":"canonical_transcription"},
+    {"date":"2026-10-06","period":"manha","broker":"Wagner","present":true,"physical_position":18,"drawn_number":21,"source":"data/transcriptions/2026-10-06.csv","confidence":"canonical_transcription"},
+    {"date":"2026-10-06","period":"manha","broker":"Sabrina","present":true,"physical_position":17,"drawn_number":17,"source":"data/transcriptions/2026-10-06.csv","confidence":"canonical_transcription"}
   ],
-  "note": "Count overrides are canonical when explicitly confirmed by the user. Missing exact counts are shown as under reconciliation, never as zero.",
+  "note": "Semana corrente reiniciada em 05/10. Somente presenças confirmadas pelas transcrições canônicas são contadas; 06/10 tarde permanece excluída até chegada da folha manuscrita.",
   "count_overrides": {
-    "Wagner": {
-      "count": 8,
-      "source": "user-confirmed week close + IMG_1664/IMG_1663",
-      "status": "confirmed"
-    },
-    "Sabrina": {
-      "count": 4,
-      "source": "user-confirmed-2026-10-01",
-      "status": "confirmed",
-      "note": "28/09 T, 29/09 M, 29/09 T, 30/09 T."
-    },
-    "Laura": {
-      "count": 1,
-      "source": "user-correction-2026-10-01",
-      "status": "confirmed_correct"
-    },
-    "Helena": {
-      "count": 0,
-      "source": "current-evidence",
-      "status": "no_confirmed_periods_in_ledger"
-    }
-  },
-  "confirmed_periods_override": {
-    "Wagner": {
-      "count": 8,
-      "source": "week-close-2026-10-02",
-      "note": "6 períodos já confirmados antes de 02/10 + manhã e tarde de 02/10."
-    }
+    "Wagner": {"count":3,"source":"canonical-transcriptions-through-06-10-M","status":"confirmed"},
+    "Sabrina": {"count":1,"source":"canonical-transcriptions-through-06-10-M","status":"confirmed"},
+    "Laura": {"count":0,"source":"current-week-evidence","status":"no_confirmed_periods_in_ledger"},
+    "Helena": {"count":0,"source":"current-week-evidence","status":"no_confirmed_periods_in_ledger"}
   },
   "notes": [
     "Only confirmed presences are counted.",
-    "Wagner week-close count is 8 and is APTO for the weekend.",
-    "Sabrina/Brenda has 4 confirmed periods and is not yet eligible under the 5/10 rule.",
-    "Laura has 1 confirmed period.",
-    "Helena has 0 confirmed periods in the current ledger; absence beyond available evidence is not inferred."
+    "Wagner: 3 períodos confirmados na semana corrente até 06/10 manhã.",
+    "Sabrina/Brenda: 1 período confirmado na semana corrente até 06/10 manhã.",
+    "06/10 tarde não é contabilizada enquanto a evidência manuscrita estiver pendente."
   ]
 }
