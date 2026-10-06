@@ -1,160 +1,44 @@
 {
-  "version": "2026-10-04-v9",
-  "source": "full_draws_reconstructed_v9.csv",
-  "reconstructed_events": 81,
-  "validated_events": 80,
-  "validated_rows": 1692,
-  "note": "Rankings usam apenas as 80 roletas com permutação completa validada. Sabrina/Brenda teve participação no sábado confirmada pelo usuário, porém sua linha nominal na foto de 03/10 não foi resolvida com segurança e não é usada para atribuir Nº1/Nº2/Cortesia/Último.",
+  "version": "2026-10-06-v10",
+  "source": "canonical transcriptions through 06/10/2026 morning",
+  "reconstructed_events": 84,
+  "validated_events": 83,
+  "validated_rows": 1755,
+  "note": "Rankings nominais incorporam 05/10 manhã, 05/10 tarde e 06/10 manhã. 06/10 tarde permanece explicitamente excluída até chegada da evidência manuscrita. O ranking histórico de posições do Dashboard é calculado dinamicamente a partir do manifest canônico.",
   "family": [
-    {
-      "display_name": "Wagner",
-      "ledger_name": "Wagner",
-      "participations": 47,
-      "number1": 4,
-      "number2": 2,
-      "courtesy": 1,
-      "last": 2,
-      "total_special": 9
-    },
-    {
-      "display_name": "Brenda",
-      "ledger_name": "Sabrina",
-      "participations": 27,
-      "number1": 0,
-      "number2": 2,
-      "courtesy": 1,
-      "last": 1,
-      "total_special": 4
-    },
-    {
-      "display_name": "Laura",
-      "ledger_name": "Laura",
-      "participations": 18,
-      "number1": 1,
-      "number2": 0,
-      "courtesy": 0,
-      "last": 0,
-      "total_special": 1
-    },
-    {
-      "display_name": "Helena",
-      "ledger_name": "Helena",
-      "participations": 7,
-      "number1": 0,
-      "number2": 0,
-      "courtesy": 0,
-      "last": 0,
-      "total_special": 0
-    }
+    {"display_name":"Wagner","ledger_name":"Wagner","participations":50,"number1":4,"number2":2,"courtesy":1,"last":4,"total_special":11},
+    {"display_name":"Brenda","ledger_name":"Sabrina","participations":28,"number1":0,"number2":2,"courtesy":1,"last":1,"total_special":4},
+    {"display_name":"Laura","ledger_name":"Laura","participations":18,"number1":1,"number2":0,"courtesy":0,"last":0,"total_special":1},
+    {"display_name":"Helena","ledger_name":"Helena","participations":7,"number1":0,"number2":0,"courtesy":0,"last":0,"total_special":0}
   ],
   "top5": {
     "number1": [
-      {
-        "broker": "Vicente",
-        "hits": 5,
-        "participations": 48
-      },
-      {
-        "broker": "Wagner",
-        "hits": 4,
-        "participations": 46
-      },
-      {
-        "broker": "Caetano",
-        "hits": 4,
-        "participations": 25
-      },
-      {
-        "broker": "Daniel",
-        "hits": 3,
-        "participations": 53
-      },
-      {
-        "broker": "Veri",
-        "hits": 3,
-        "participations": 49
-      }
+      {"broker":"Vicente","hits":5,"participations":48},
+      {"broker":"Wagner","hits":4,"participations":49},
+      {"broker":"Caetano","hits":4,"participations":27},
+      {"broker":"Daniel","hits":3,"participations":54},
+      {"broker":"Veri","hits":3,"participations":51}
     ],
     "number2": [
-      {
-        "broker": "Lutela",
-        "hits": 5,
-        "participations": 36
-      },
-      {
-        "broker": "Daniel",
-        "hits": 4,
-        "participations": 53
-      },
-      {
-        "broker": "Ashley",
-        "hits": 4,
-        "participations": 33
-      },
-      {
-        "broker": "Vaz",
-        "hits": 4,
-        "participations": 25
-      },
-      {
-        "broker": "Lotus",
-        "hits": 3,
-        "participations": 48
-      }
+      {"broker":"Lutela","hits":5,"participations":39},
+      {"broker":"Daniel","hits":4,"participations":54},
+      {"broker":"Ashley","hits":4,"participations":34},
+      {"broker":"Vaz","hits":4,"participations":27},
+      {"broker":"Lotus","hits":3,"participations":51}
     ],
     "courtesy": [
-      {
-        "broker": "Sanches",
-        "hits": 6,
-        "participations": 42
-      },
-      {
-        "broker": "Veri",
-        "hits": 4,
-        "participations": 49
-      },
-      {
-        "broker": "Lotus",
-        "hits": 4,
-        "participations": 48
-      },
-      {
-        "broker": "Nina",
-        "hits": 4,
-        "participations": 41
-      },
-      {
-        "broker": "Ponce",
-        "hits": 4,
-        "participations": 37
-      }
+      {"broker":"Sanches","hits":6,"participations":43},
+      {"broker":"Veri","hits":4,"participations":51},
+      {"broker":"Lotus","hits":4,"participations":51},
+      {"broker":"Nina","hits":4,"participations":41},
+      {"broker":"Ponce","hits":4,"participations":39}
     ],
     "last": [
-      {
-        "broker": "Daniel",
-        "hits": 6,
-        "participations": 53
-      },
-      {
-        "broker": "Valeria",
-        "hits": 6,
-        "participations": 47
-      },
-      {
-        "broker": "Lotus",
-        "hits": 5,
-        "participations": 48
-      },
-      {
-        "broker": "Vicente",
-        "hits": 3,
-        "participations": 48
-      },
-      {
-        "broker": "Aurora",
-        "hits": 3,
-        "participations": 39
-      }
+      {"broker":"Daniel","hits":6,"participations":54},
+      {"broker":"Valeria","hits":6,"participations":50},
+      {"broker":"Lotus","hits":5,"participations":51},
+      {"broker":"Wagner","hits":4,"participations":49},
+      {"broker":"Vicente","hits":3,"participations":49}
     ]
   }
 }
