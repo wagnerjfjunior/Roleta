@@ -400,7 +400,24 @@ async function upgradeWorkspace(){
       '<button data-workspace-page="simulation">Simulação</button>'+
     '</nav>';
 
+  const mobileHeader=document.createElement('div');
+  mobileHeader.className='workspace-mobile-header';
+  mobileHeader.innerHTML=
+    '<div class="workspace-mobile-brand"><b>Roleta Intelligence</b><span>WORKSPACE V3</span></div>'+
+    '<label class="workspace-mobile-nav-label"><span>Página</span>'+
+      '<select id="workspaceMobileNav" aria-label="Navegação do workspace">'+
+        '<option value="overview">Visão geral</option>'+
+        '<option value="intake">Nova Roleta</option>'+
+        '<option value="family">Minha família</option>'+
+        '<option value="ranking">Ranking</option>'+
+        '<option value="weekend">Fim de semana</option>'+
+        '<option value="models">Modelos & estatística</option>'+
+        '<option value="simulation">Simulação</option>'+
+      '</select>'+
+    '</label>';
+
   root.appendChild(sidebar);
+  root.appendChild(mobileHeader);
   root.appendChild(shell);
   shell.classList.add('workspace-main');
 
@@ -572,9 +589,13 @@ async function upgradeWorkspace(){
   function openPage(name){
     document.querySelectorAll('.workspace-page').forEach(p=>p.classList.toggle('active',p.id==='workspace-'+name));
     document.querySelectorAll('.workspace-nav button').forEach(b=>b.classList.toggle('active',b.dataset.workspacePage===name));
+    const mobileNav=document.querySelector('#workspaceMobileNav');
+    if(mobileNav&&mobileNav.value!==name)mobileNav.value=name;
     window.scrollTo({top:0,behavior:'smooth'});
   }
   document.querySelectorAll('.workspace-nav button').forEach(b=>b.addEventListener('click',()=>openPage(b.dataset.workspacePage)));
+  const mobileNav=document.querySelector('#workspaceMobileNav');
+  if(mobileNav)mobileNav.addEventListener('change',()=>openPage(mobileNav.value));
   document.querySelectorAll('[data-open-workspace]').forEach(b=>b.addEventListener('click',()=>openPage(b.dataset.openWorkspace)));
 }
 
