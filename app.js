@@ -134,7 +134,7 @@ function renderPreviousDay(){
   const date=latestCompletedDate();
   if(!date)return;
   const es=state.events.filter(e=>e.date===date);
-  document.querySelector('#previousDayTitle').textContent=date;
+  document.querySelector('#previousDayTitle').textContent='Data: '+date;
 
   const renderEvent=e=>'<div class="day-card"><div class="day-title">'+e.period+' · N='+e.N+'</div>'+
     '<div class="day-stats">'+
