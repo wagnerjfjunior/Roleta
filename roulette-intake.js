@@ -100,11 +100,11 @@
   function mount(host){
     let payload=null;
     host.innerHTML=
-      '<div class="workspace-page-head"><div><span class="eyebrow">RLT-PRINT-V2</span><h2>Gerador canônico</h2><p>A Skill valida os dados. Este módulo apenas valida o JSON e imprime o template fixo.</p></div></div>'+
+      '<div class="workspace-page-head"><div><span class="eyebrow">RLT-PRINT-V2</span><h2>Gerador canônico</h2><p>Copie o JSON da Skill e clique em <strong>Colar JSON</strong>. O APP cola, valida e monta a prévia automaticamente.</p></div></div>'+
       '<article class="card rltv2-import-card">'+
         '<div class="section-head"><div><span class="eyebrow">1 · DADOS VALIDADOS</span><h2>Importar JSON da Skill</h2></div><span class="intake-risk">LAYOUT DETERMINÍSTICO</span></div>'+
         '<textarea id="rltv2Json" class="rltv2-json" rows="16" spellcheck="false" placeholder="{ ... JSON VALIDADO da Skill ... }"></textarea>'+
-        '<div class="intake-actions"><label class="rltv2-file"><input id="rltv2File" type="file" accept="application/json,.json">Carregar .json</label><button id="rltv2Validate" class="simulation-run">Validar e montar prévia</button></div>'+
+        '<div class="intake-actions"><button id="rltv2Paste" class="simulation-run">Colar JSON</button><label class="rltv2-file"><input id="rltv2File" type="file" accept="application/json,.json">Carregar .json</label><button id="rltv2Validate" class="simulation-run">Validar e montar prévia</button></div>'+
         '<div id="rltv2Gate" class="intake-gate blocked"><strong>AGUARDANDO DADOS</strong></div>'+
       '</article>'+
       '<article id="rltv2PreviewCard" class="card rltv2-preview-card" hidden>'+
@@ -117,6 +117,7 @@
 
     const ta=host.querySelector('#rltv2Json');
     const file=host.querySelector('#rltv2File');
+    const paste=host.querySelector('#rltv2Paste');
     const btn=host.querySelector('#rltv2Validate');
     const gate=host.querySelector('#rltv2Gate');
     const card=host.querySelector('#rltv2PreviewCard');
@@ -131,7 +132,7 @@
       ta.value=await f.text();
     });
 
-    btn.addEventListener('click',()=>{
+    function validateAndRender(){
       card.hidden=true; confirm.checked=false; print.disabled=true; payload=null;
       try{
         const p=normalizePayload(ta.value);
@@ -151,7 +152,22 @@
         gate.className='intake-gate blocked';
         gate.innerHTML='<strong>JSON INVÁLIDO</strong><div>'+esc(err.message||err)+'</div>';
       }
+    }
+
+    paste.addEventListener('click',async()=>{
+      try{
+        if(!navigator.clipboard||!navigator.clipboard.readText)throw new Error('Leitura da área de transferência não está disponível neste navegador.');
+        const text=await navigator.clipboard.readText();
+        if(!text.trim())throw new Error('A área de transferência está vazia.');
+        ta.value=text.trim();
+        validateAndRender();
+      }catch(err){
+        gate.className='intake-gate blocked';
+        gate.innerHTML='<strong>NÃO FOI POSSÍVEL COLAR</strong><div>'+esc(err.message||err)+'</div><div>Use Ctrl+V no campo ou permita acesso à área de transferência e tente novamente.</div>';
+      }
     });
+
+    btn.addEventListener('click',validateAndRender);
 
     confirm.addEventListener('change',()=>{print.disabled=!confirm.checked||!payload});
     print.addEventListener('click',()=>{
