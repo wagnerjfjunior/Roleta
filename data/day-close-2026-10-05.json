@@ -159,40 +159,35 @@
     ]
   },
   "prospective_05_10": {
-    "methodology": "MODEL_POSITION_RESULT and PERSON_EXECUTION_RESULT are independent.",
-    "afternoon": {
-      "weekly_model": [
-        {
-          "person_id": "Wagner",
-          "recommended_position": 22,
-          "actual_occupant": "Lutela",
-          "drawn_number": 8,
-          "result_2x": "MISS"
-        },
-        {
-          "person_id": "Laura",
-          "recommended_position": 18,
-          "actual_occupant": "Wagner",
-          "drawn_number": 23,
-          "result_2x": "HIT",
-          "special": "ULTIMO"
-        }
-      ],
-      "execution": [
-        {
-          "person_id": "Wagner",
-          "executed_position": 18,
-          "origin": "BORROWED_FAMILY_PICK",
-          "source_person_id": "Laura",
-          "drawn_number": 23,
-          "result_2x": "HIT",
-          "special": "ULTIMO",
-          "matches_weekly": false
-        }
-      ],
-      "comparison_for_wagner": "MODEL_MISS/HUMAN_HIT"
+    "methodology": "MODEL_POSITION_RESULT and PERSON_EXECUTION_RESULT are independent",
+    "weekly_model_05_10_tarde": [
+      {
+        "person_id": "Wagner",
+        "recommended_position": 22,
+        "actual_occupant": "Lutela",
+        "drawn_number": 8,
+        "result_2x": "MISS"
+      },
+      {
+        "person_id": "Laura",
+        "recommended_position": 18,
+        "actual_occupant": "Wagner",
+        "drawn_number": 23,
+        "result_2x": "HIT",
+        "special": "ULTIMO"
+      }
+    ],
+    "confirmed_execution_05_10_tarde": {
+      "person_id": "Wagner",
+      "executed_position": 18,
+      "origin": "BORROWED_FAMILY_PICK",
+      "source_person_id": "Laura",
+      "drawn_number": 23,
+      "result_2x": "HIT",
+      "special": "ULTIMO"
     },
-    "note": "Model scoring follows the recommended physical position even when another broker occupies it. Person execution is scored separately."
+    "decision_comparison_wagner": "MODEL_MISS_HUMAN_HIT",
+    "rule": "Score every eligible model position as HIT or MISS regardless of occupant; score confirmed family execution separately."
   },
   "nominal_correction_05_10_tarde": {
     "physical_position_4": "Nair",
