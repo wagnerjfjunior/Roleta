@@ -1,7 +1,7 @@
 {
-  "logical_dataset_version": "2026-10-04-83",
-  "canonical_event_count": 83,
-  "quality_A": 79,
+  "logical_dataset_version": "2026-10-05-85",
+  "canonical_event_count": 85,
+  "quality_A": 81,
   "quality_B": 4,
   "sources": [
     {
@@ -31,6 +31,11 @@
     },
     {
       "path": "/data/incoming/2026-10-04.csv",
+      "role": "append_only_ledger",
+      "events": 2
+    },
+    {
+      "path": "/data/incoming/2026-10-05.csv",
       "role": "append_only_ledger",
       "events": 2
     }
