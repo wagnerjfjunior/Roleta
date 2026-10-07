@@ -13,9 +13,9 @@ Pure domain logic. No DOM, no UI selectors, no HTML generation.
 - `core/weekend.js`: presence/eligibility derivation.
 
 ### services/
-I/O and composition.
+Browser-facing I/O only.
 
-- `services/dashboard-service.js`: loads canonical sources and composes a dashboard model by calling `core/*`.
+- `services/dashboard-service.js`: loads only `data/dashboard-view.json`. It does not read canonical sources.
 
 ### ui/
 Presentation only.
@@ -23,7 +23,7 @@ Presentation only.
 - `ui/dashboard-renderers.js`: renders already-derived values.
 - `ui/workspace.js`: page composition/navigation and display-only components.
 
-UI files may not parse canonical CSV, calculate rankings, infer identities, resolve managers, count presence, decide eligibility, or read canonical source files directly.
+UI files may not parse canonical CSV, calculate rankings, infer identities, resolve managers, count presence, decide eligibility, or read canonical source files directly. `core/*` is build-time/domain code and is not loaded by `index.html`.
 
 ### app.js
 Bootstrap only. It may:
@@ -45,3 +45,11 @@ Broker-level statistics accept only rows whose identity is canonical under the i
 ## Anti-regression
 
 `scripts/architecture-guard.js` is executed by GitHub Actions. It fails when business/data-source logic returns to `app.js` or `ui/*`, or when `core/*` starts depending on the DOM.
+
+## Frontend data contract
+
+`scripts/build-dashboard-view.js` is the only dashboard derivation entry point. It reads canonical data, applies identity quarantine and domain rules, and materializes `data/dashboard-view.json`.
+
+The browser receives only this derived DTO. Canonical source files are not loaded by `app.js`, `ui/*`, or `services/dashboard-service.js`.
+
+Additional nominal transcriptions must be explicitly registered in `data/dashboard-transcription-sources.json`; directory scanning is forbidden.
