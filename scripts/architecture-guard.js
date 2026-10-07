@@ -5,7 +5,8 @@ const root=path.resolve(__dirname,'..');
 const rules=[
   {file:'app.js',maxLines:80,forbidden:['parseCSV','rank(','eligible(','chance(','brokers-official','full_draws_reconstructed','weekend-policy','presence-current-week','broker-stats-v3']},
   {file:'ui/dashboard-renderers.js',maxLines:180,forbidden:['parseCSV','brokers-official','full_draws_reconstructed','manifest.json','weekend-policy.json','presence-current-week.json']},
-  {file:'ui/workspace.js',maxLines:220,forbidden:['parseCSV','brokers-official','full_draws_reconstructed','manifest.json','weekend-policy.json','presence-current-week.json','broker-stats-v3']}
+  {file:'ui/workspace.js',maxLines:220,forbidden:['parseCSV','brokers-official','full_draws_reconstructed','manifest.json','weekend-policy.json','presence-current-week.json','broker-stats-v3']},
+  {file:'services/dashboard-service.js',maxLines:80,forbidden:['manifest.json','brokers-official','full_draws_reconstructed','weekend-policy.json','presence-current-week.json','broker-stats-v3','transcriptions/']}
 ];
 
 let failed=false;
@@ -24,3 +25,8 @@ for(const file of ['core/csv.js','core/events.js','core/brokers.js','core/weeken
 }
 if(failed)process.exit(1);
 console.log('Architecture guard PASS');
+
+const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
+if(/<script[^>]+src="\/core\//.test(index)){console.error('index.html: core domain modules must not execute in browser');failed=true}
+const service=fs.readFileSync(path.join(root,'services/dashboard-service.js'),'utf8');
+if(!service.includes('/data/dashboard-view.json')){console.error('dashboard service must consume dashboard-view DTO');failed=true}
