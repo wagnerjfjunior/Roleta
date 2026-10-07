@@ -872,6 +872,7 @@ body{overflow-x:hidden}
   margin:14px 0 18px;padding:12px;border:1px solid #20344b;border-radius:14px;background:#091523
 }
 .rltv2-company-review label{display:grid;gap:6px}
+.rltv2-company-review label[hidden]{display:none!important}
 .rltv2-company-review label>span,.rltv2-company-derived>span{
   font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:800
 }
