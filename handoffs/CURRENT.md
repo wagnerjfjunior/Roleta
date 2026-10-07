@@ -264,3 +264,21 @@ The app's Nova Roleta page now accepts the Skill JSON and applies a deterministi
 - no editorial title, validation prose, hash, evidence page or technical footer.
 
 Printing is blocked unless payload.status=VALIDADO and the JSON passes all structural checks.
+
+
+## RLT-RECONCILIATION-V2 — 06/10 morning gate
+
+State on branch `fix/05-10-canonical-recalc-20261006`:
+- 05/10 remains independently closed and statistically active;
+- source evidence `data/incoming/2026-10-06.csv` is preserved;
+- 06/10 morning is removed from `data/manifest.json` canonical sources while reconciliation is pending;
+- the four 06/10 morning WEEKLY_FROZEN adjudications are withdrawn from the active prospective ledger;
+- 06/10 morning must show PENDENTE in prospective UI until it passes RLT-RECONCILIATION-V2;
+- re-entry requires per-row identity resolution, physical mapping review and final human confirmation to `CANONICO_PARA_ESTATISTICA`;
+- 06/10 afternoon is still absent and must enter through the same flow when supplied.
+
+Regression checks:
+- `node tests/reconciliation-v2.test.js`
+- `node tests/06-10-reconciliation-gate.test.js`
+
+No merge, Preview or deploy is authorized.

@@ -1,0 +1,198 @@
+{
+  "version": "2026-10-05-close-v1",
+  "cutoff": "05-10-T",
+  "canonical_events_through_cutoff": 85,
+  "incorporated_events": [
+    "05-10-M",
+    "05-10-T"
+  ],
+  "excluded_future_events": [
+    "06-10-M",
+    "06-10-T"
+  ],
+  "objective": "N1_OR_LAST",
+  "weekly_frozen_immutable": true,
+  "weekly_frozen_allocations": {
+    "manha": {
+      "Wagner": 14,
+      "Laura": 3,
+      "Brenda": 5,
+      "Helena": 4
+    },
+    "tarde": {
+      "Wagner": 22,
+      "Laura": 18,
+      "Brenda": 16,
+      "Helena": 20
+    },
+    "integral": {
+      "Wagner": 21,
+      "Laura": 4,
+      "Brenda": 8,
+      "Helena": 12
+    }
+  },
+  "current_after_05_10": {
+    "manha": [
+      14,
+      3,
+      5,
+      4
+    ],
+    "tarde": [
+      22,
+      18,
+      16,
+      20
+    ],
+    "integral": [
+      21,
+      4,
+      8,
+      12
+    ],
+    "changed_vs_weekly_frozen": false,
+    "conclusion": "05/10 reafirma integralmente as alocacoes congeladas; nenhuma troca de numero e suportada pelo ranking vigente."
+  },
+  "rankings": {
+    "manha": [
+      {
+        "pos": 14,
+        "exposure": 27,
+        "hits": 6,
+        "expected": 2.8084765399619345,
+        "oe": 2.1363895744278936,
+        "excess": 3.1915234600380655
+      },
+      {
+        "pos": 3,
+        "exposure": 33,
+        "hits": 7,
+        "expected": 3.9340101566720223,
+        "oe": 1.779354836725092,
+        "excess": 3.0659898433279777
+      },
+      {
+        "pos": 5,
+        "exposure": 33,
+        "hits": 7,
+        "expected": 3.9340101566720223,
+        "oe": 1.779354836725092,
+        "excess": 3.0659898433279777
+      },
+      {
+        "pos": 4,
+        "exposure": 33,
+        "hits": 6,
+        "expected": 3.9340101566720223,
+        "oe": 1.5251612886215076,
+        "excess": 2.0659898433279777
+      }
+    ],
+    "tarde": [
+      {
+        "pos": 22,
+        "exposure": 19,
+        "hits": 5,
+        "expected": 1.4242345597930304,
+        "oe": 3.5106576831885046,
+        "excess": 3.5757654402069696
+      },
+      {
+        "pos": 18,
+        "exposure": 26,
+        "hits": 5,
+        "expected": 2.1411100819317106,
+        "oe": 2.335237240809682,
+        "excess": 2.8588899180682894
+      },
+      {
+        "pos": 16,
+        "exposure": 28,
+        "hits": 4,
+        "expected": 2.383757140755241,
+        "oe": 1.678023290045683,
+        "excess": 1.616242859244759
+      },
+      {
+        "pos": 20,
+        "exposure": 22,
+        "hits": 3,
+        "expected": 1.7285635641220347,
+        "oe": 1.7355450862599597,
+        "excess": 1.2714364358779653
+      }
+    ],
+    "integral": [
+      {
+        "pos": 21,
+        "exposure": 9,
+        "hits": 2,
+        "expected": 0.7002038663208079,
+        "oe": 2.8563109919814025,
+        "excess": 1.2997961336791921
+      },
+      {
+        "pos": 4,
+        "exposure": 11,
+        "hits": 2,
+        "expected": 0.9178509251443373,
+        "oe": 2.1790030877677533,
+        "excess": 1.0821490748556628
+      },
+      {
+        "pos": 8,
+        "exposure": 11,
+        "hits": 2,
+        "expected": 0.9178509251443373,
+        "oe": 2.1790030877677533,
+        "excess": 1.0821490748556628
+      },
+      {
+        "pos": 12,
+        "exposure": 11,
+        "hits": 2,
+        "expected": 0.9178509251443373,
+        "oe": 2.1790030877677533,
+        "excess": 1.0821490748556628
+      }
+    ]
+  },
+  "prospective_05_10": {
+    "methodology": "MODEL_POSITION_RESULT and PERSON_EXECUTION_RESULT are independent",
+    "weekly_model_05_10_tarde": [
+      {
+        "person_id": "Wagner",
+        "recommended_position": 22,
+        "actual_occupant": "Lutela",
+        "drawn_number": 8,
+        "result_2x": "MISS"
+      },
+      {
+        "person_id": "Laura",
+        "recommended_position": 18,
+        "actual_occupant": "Wagner",
+        "drawn_number": 23,
+        "result_2x": "HIT",
+        "special": "ULTIMO"
+      }
+    ],
+    "confirmed_execution_05_10_tarde": {
+      "person_id": "Wagner",
+      "executed_position": 18,
+      "origin": "BORROWED_FAMILY_PICK",
+      "source_person_id": "Laura",
+      "drawn_number": 23,
+      "result_2x": "HIT",
+      "special": "ULTIMO"
+    },
+    "decision_comparison_wagner": "MODEL_MISS_HUMAN_HIT",
+    "rule": "Score every eligible model position as HIT or MISS regardless of occupant; score confirmed family execution separately."
+  },
+  "nominal_correction_05_10_tarde": {
+    "physical_position_4": "Nair",
+    "physical_position_12": "Antonia",
+    "standby": "Amora"
+  },
+  "evidence_note": "Derived only from canonical event ledgers through 05/10/2026 and reconciled 05/10 full-sheet transcription."
+}

@@ -1,20 +1,87 @@
 {
-  "version": "PROSPECTIVE-V1.0.0",
-  "derived_from": ["recommendations.jsonl","executions.jsonl","adjudications.jsonl"],
+  "version": "PROSPECTIVE-V2.0.0-RC1",
+  "derived_from": [
+    "recommendations.jsonl",
+    "executions.jsonl",
+    "adjudications.jsonl"
+  ],
   "primary_endpoint": "2X_N1_OR_LAST",
   "evidence_state": "AMOSTRA_INICIAL",
   "strategies": {
-    "WEEKLY_FROZEN": {"events":12,"hits":2,"expected":1.1498310995,"oe":1.7393858984},
-    "CURRENT": {"events":0,"hits":0,"expected":0,"oe":null},
-    "EXECUTED_CHOICE": {"events":0,"hits":0,"expected":0,"oe":null,"interpretation":"OBSERVATIONAL"},
-    "RANDOM_SHADOW": {"events":0,"hits":0,"expected":0,"oe":null,"interpretation":"CONTROL"}
+    "WEEKLY_FROZEN": {
+      "attempts": 8,
+      "hits": 1,
+      "misses": 7,
+      "expected": 0.7688787185,
+      "oe": 1.3005952381,
+      "scope": "05/10 only"
+    },
+    "CURRENT": {
+      "attempts": 0,
+      "hits": 0,
+      "misses": 0,
+      "expected": 0,
+      "oe": null
+    },
+    "EXECUTED_CHOICE": {
+      "attempts": 1,
+      "hits": 1,
+      "misses": 0,
+      "expected": null,
+      "oe": null,
+      "interpretation": "OBSERVATIONAL",
+      "scope": "confirmed family executions only"
+    },
+    "RANDOM_SHADOW": {
+      "attempts": 0,
+      "hits": 0,
+      "misses": 0,
+      "expected": 0,
+      "oe": null,
+      "interpretation": "CONTROL"
+    }
   },
-  "generated_at": "2026-10-06T16:30:00-03:00",
-  "data_cutoff": "06-10-M",
+  "decision_comparisons": {
+    "MODEL_MISS_HUMAN_HIT": 1,
+    "MODEL_HIT_HUMAN_MISS": 0,
+    "MODEL_HIT_HUMAN_HIT": 0,
+    "MODEL_MISS_HUMAN_MISS": 0,
+    "confirmed_cases": 1
+  },
+  "per_person": {
+    "Wagner": {
+      "confirmed_executions": 1,
+      "hits": 1,
+      "misses": 0,
+      "followed_weekly": 0,
+      "manual_override": 0,
+      "borrowed_family_pick": 1
+    },
+    "Laura": {
+      "confirmed_executions": 0,
+      "hits": 0,
+      "misses": 0
+    },
+    "Brenda": {
+      "confirmed_executions": 0,
+      "hits": 0,
+      "misses": 0
+    },
+    "Helena": {
+      "confirmed_executions": 0,
+      "hits": 0,
+      "misses": 0
+    }
+  },
+  "regression_fixture_05_10_tarde": {
+    "wagner_weekly_position_22": "MISS",
+    "laura_weekly_position_18": "HIT",
+    "wagner_executed_position_18": "HIT",
+    "laura_execution_hit": false
+  },
+  "data_cutoff": "05-10-T",
   "policy_version": "PROSPECTIVE-V1.0.0",
   "model_version": "RLT-M5-WEEKLY-V1",
   "frozen_week": "2026-10-05/2026-10-11",
-  "frozen_recommendations": {"WEEKLY_FROZEN":48,"RANDOM_SHADOW":48},
-  "open_current_recommendations":48,
-  "note":"WEEKLY_FROZEN adjudicado para 05/10 manhã, 05/10 tarde e 06/10 manhã. 06/10 tarde permanece pendente e fora do resultado até evidência manuscrita."
+  "note": "RC1 V2 measurement view. Counts model-position hits and misses independently from confirmed family execution. 06/10 excluded from this cutoff."
 }
