@@ -196,7 +196,7 @@
   }
 
   function mount(host){
-    let payload=null,reviewedPayload=null,brokers=[];
+    let payload=null,reviewedPayload=null,brokers=[],reviewState=[];
     host.innerHTML=
       '<div class="workspace-page-head"><div><span class="eyebrow">RLT-PRINT-V2</span><h2>Gerador canônico</h2><p>JSON é transcrição inicial. A impressão só é liberada após <strong>conferência humana das posições e nomes</strong>.</p></div></div>'+
       '<article class="card rltv2-import-card">'+
@@ -253,6 +253,39 @@
       reviewGate.innerHTML='<strong>ALTERAÇÕES PENDENTES</strong><div>Clique em Aplicar correções e validar antes da impressão.</div>';
     }
 
+    function syncReviewState(){
+      if(!payload)return;
+      const rows=[...reviewHost.querySelectorAll('tbody tr')];
+      reviewState=rows.map((tr,index)=>({
+        index,
+        original_position:Number(tr.dataset.originalPosition),
+        original_name:tr.dataset.originalName||'',
+        ordem_final:Number(tr.querySelector('.rltv2-review-position').value),
+        nome:String(tr.querySelector('.rltv2-review-name').value||'').trim()
+      }));
+    }
+
+    function applyReviewState(){
+      const lookup=new Map(brokers.map(b=>[normalizeName(b.nome),b]));
+      const p=clonePayload(payload),errors=[],corrections=[];
+      const reviewed=reviewState.map((r,index)=>{
+        const broker=lookup.get(normalizeName(r.nome));
+        if(!Number.isInteger(r.ordem_final)||r.ordem_final<1||r.ordem_final>reviewState.length)errors.push('Linha '+(index+1)+': posição inválida.');
+        if(!broker)errors.push('Linha '+(index+1)+': corretor "'+r.nome+'" não consta no cadastro oficial.');
+        if(r.ordem_final!==r.original_position||normalizeName(r.nome)!==normalizeName(r.original_name)){
+          corrections.push('p'+r.original_position+' '+r.original_name+' → p'+r.ordem_final+' '+(broker?.nome||r.nome));
+        }
+        return broker?{ordem_final:r.ordem_final,nome:broker.nome,creci:broker.creci,status_creci:broker.status_creci,gerente:broker.gerente,diretor:broker.diretor}:null;
+      }).filter(Boolean);
+      const orders=reviewed.map(r=>r.ordem_final).sort((a,b)=>a-b);
+      for(let i=0;i<reviewState.length;i++)if(orders[i]!==i+1){errors.push('As posições corrigidas devem formar uma sequência única de 1 a '+reviewState.length+'.');break}
+      if(errors.length)return {errors:[...new Set(errors)],payload:null,corrections};
+      p.salao=reviewed.sort((a,b)=>a.ordem_final-b.ordem_final);
+      p.evento.tegra_qtd=p.salao.length;
+      const validationErrors=validatePayload(p);
+      return {errors:validationErrors,payload:validationErrors.length?null:p,corrections};
+    }
+
     async function validateAndPrepareReview(){
       reviewCard.hidden=true;card.hidden=true;confirm.checked=false;print.disabled=true;payload=null;reviewedPayload=null;
       try{
@@ -270,21 +303,28 @@
         reviewCount.textContent=p.salao.length+' linhas para conferir';
         reviewHost.innerHTML=reviewRowsHtml(p,brokers);
         reviewCard.hidden=false;
+        syncReviewState();
         reviewGate.className='intake-gate blocked';
         reviewGate.innerHTML='<strong>CONFERÊNCIA PENDENTE</strong><div>Compare posição e nome com a folha original.</div>';
-        reviewHost.querySelectorAll('input').forEach(input=>input.addEventListener('input',()=>{
-          const tr=input.closest('tr');
-          if(input.classList.contains('rltv2-review-name')){
-            const broker=brokers.find(b=>normalizeName(b.nome)===normalizeName(input.value));
-            if(broker){
-              tr.querySelector('.rltv2-review-creci').textContent=broker.creci;
-              tr.querySelector('.rltv2-review-manager').textContent=broker.gerente;
-              tr.querySelector('.rltv2-review-director').textContent=broker.diretor;
-              tr.querySelector('.rltv2-review-status').textContent=broker.status_creci;
+        reviewHost.querySelectorAll('input').forEach(input=>{
+          const onEdit=()=>{
+            const tr=input.closest('tr');
+            if(input.classList.contains('rltv2-review-name')){
+              const broker=brokers.find(b=>normalizeName(b.nome)===normalizeName(input.value));
+              if(broker){
+                input.value=broker.nome;
+                tr.querySelector('.rltv2-review-creci').textContent=broker.creci;
+                tr.querySelector('.rltv2-review-manager').textContent=broker.gerente;
+                tr.querySelector('.rltv2-review-director').textContent=broker.diretor;
+                tr.querySelector('.rltv2-review-status').textContent=broker.status_creci;
+              }
             }
-          }
-          invalidateFinal();
-        }));
+            syncReviewState();
+            invalidateFinal();
+          };
+          input.addEventListener('input',onEdit);
+          input.addEventListener('change',onEdit);
+        });
         reviewCard.scrollIntoView({behavior:'smooth',block:'start'});
       }catch(err){
         gate.className='intake-gate blocked';
@@ -309,7 +349,8 @@
 
     reviewBtn.addEventListener('click',()=>{
       if(!payload)return;
-      const result=applyHumanReview(payload,reviewHost,brokers);
+      syncReviewState();
+      const result=applyReviewState();
       if(result.errors.length){
         reviewGate.className='intake-gate blocked';
         reviewGate.innerHTML='<strong>CONFERÊNCIA BLOQUEADA</strong>'+result.errors.map(x=>'<div>• '+esc(x)+'</div>').join('');
@@ -318,7 +359,7 @@
       reviewedPayload=result.payload;
       reviewGate.className='intake-gate clear';
       reviewGate.innerHTML='<strong>CONFERÊNCIA HUMANA VALIDADA</strong>'+
-        (result.corrections.length?'<div>Correções aplicadas: '+esc(result.corrections.join(' · '))+'</div>':'<div>Nenhuma alteração necessária; transcrição confirmada.</div>');
+        (result.corrections.length?'<div>Correções aplicadas:</div>'+result.corrections.map(x=>'<div>• '+esc(x)+'</div>').join(''):'<div>Nenhuma alteração necessária; transcrição confirmada.</div>');
       counts.innerHTML=previewSummary(reviewedPayload);
       renderCanonical(preview,reviewedPayload);
       card.hidden=false;confirm.checked=false;print.disabled=true;
