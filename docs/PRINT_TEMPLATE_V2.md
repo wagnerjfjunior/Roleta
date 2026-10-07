@@ -123,3 +123,18 @@ Gate canônico:
 - o checkbox final confirma nomes, gerente/equipe e ordem final e autoriza aquela versão como fonte para estatística.
 
 A confirmação visual deve ocorrer antes de qualquer atualização de ranking, HIT/MISS, presença ou modelo.
+
+
+## Confirmação individual obrigatória
+
+A partir de RLT-RECONCILIATION-V2:
+- a aplicação recarrega `data/brokers-official.csv` e reconcilia cada linha novamente;
+- `EXACT_MATCH` só ocorre por igualdade normalizada inequívoca com o cadastro oficial;
+- similaridade reduz a lista para no máximo três candidatos;
+- GERENTE/EQUIPE pode desempatar, mas não cria identidade por si só;
+- `PROBABLE_MATCH` e `AMBIGUOUS` nunca são promovidos em lote;
+- cada linha pendente exige seleção explícita de um candidato oficial e passa a `USER_CONFIRMED`;
+- a escolha humana não pode alterar posição física, número sorteado ou ordem final;
+- antes do gate final a interface mostra posição física → nome reconciliado → gerente → número sorteado → ordem final;
+- `VALIDADO_PARA_IMPRESSAO` e `CANONICO_PARA_ESTATISTICA` são estados diferentes;
+- a ingestão estatística é bloqueada até `CANONICO_PARA_ESTATISTICA`.
