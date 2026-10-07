@@ -24,9 +24,9 @@
       "oe": null
     },
     "EXECUTED_CHOICE": {
-      "attempts": 1,
+      "attempts": 2,
       "hits": 1,
-      "misses": 0,
+      "misses": 1,
       "expected": null,
       "oe": null,
       "interpretation": "OBSERVATIONAL",
@@ -45,15 +45,15 @@
     "MODEL_MISS_HUMAN_HIT": 1,
     "MODEL_HIT_HUMAN_MISS": 0,
     "MODEL_HIT_HUMAN_HIT": 0,
-    "MODEL_MISS_HUMAN_MISS": 0,
-    "confirmed_cases": 1
+    "MODEL_MISS_HUMAN_MISS": 1,
+    "confirmed_cases": 2
   },
   "per_person": {
     "Wagner": {
-      "confirmed_executions": 1,
+      "confirmed_executions": 2,
       "hits": 1,
-      "misses": 0,
-      "followed_weekly": 0,
+      "misses": 1,
+      "followed_weekly": 1,
       "manual_override": 0,
       "borrowed_family_pick": 1
     },
@@ -83,5 +83,5 @@
   "policy_version": "PROSPECTIVE-V1.0.0",
   "model_version": "RLT-M5-WEEKLY-V1",
   "frozen_week": "2026-10-05/2026-10-11",
-  "note": "RC1 V2 measurement view. Counts model-position hits and misses independently from confirmed family execution. 06/10 excluded from this cutoff."
+  "note": "RC1 V2 measurement view. Counts model-position hits and misses independently from confirmed family execution. 05/10 morning Wagner execution p14 is recorded as MODEL MISS / EXECUTION MISS. 05/10 afternoon p18 is Laura model-position HIT but Wagner execution HIT. 06/10 excluded from this cutoff."
 }
