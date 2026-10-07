@@ -7,14 +7,12 @@ The canonical dataset is append-only and resolved through:
 `data/manifest.json`
 
 Current logical state:
-- 77 usable events;
-- 73 quality A;
+- 85 canonical events;
+- 81 quality A;
 - 4 quality B;
-- cut-off: 30/09/2026.
+- cut-off: 05/10/2026.
 
-Sources:
-- `data/events.csv` — immutable 75-event baseline;
-- `data/incoming/2026-09-30.csv` — 2-event append ledger.
+Sources are defined exclusively by `data/manifest.json`. The immutable 75-event baseline is extended by dated append-only ledgers through `data/incoming/2026-10-05.csv`.
 
 Consumers must deduplicate by `Evento` and must not silently rewrite historical rows.
 
@@ -56,6 +54,10 @@ For 04/10/2026 the primary source is:
 `data/full_draws_reconstructed.csv` is the repository-local nominal history currently available for broker-level audit. It preserves the established schema:
 `event_id,date,period,N,physical_position,effective_order,drawn_number,broker_name_raw,broker_name_normalized,is_family,transcription_confidence,source,row_status,event_status`.
 
-Current imported coverage is 48 events / 1022 participant rows. It is auxiliary. The canonical event universe for model generation remains the de-duplicated 83-event result ledger defined by `data/manifest.json`.
+Current imported coverage is 51 events / 1093 participant rows. It is auxiliary. The canonical event universe for model generation is the de-duplicated 85-event result ledger defined by `data/manifest.json`.
+
+03/10 is transcribed but its nominal identity mapping is quarantined as `PENDING_HUMAN_IDENTITY`: participation of Sabrina is confirmed while her physical row is unresolved. These rows must not feed broker-level statistics until the reconciliation case is human-confirmed.
+
+For all new nominal ingestion, apply `docs/IDENTITY_RECONCILIATION.md` and `reconciliation/identity.js`. Team/manager is a tie-break only; fuzzy/ambiguous identity never becomes statistical canon without human confirmation.
 
 Do not derive global model conclusions from the nominal subset until nominal coverage reaches the canonical event set.
