@@ -12,3 +12,5 @@ jobs:
         with:
           node-version: '20'
       - run: node scripts/architecture-guard.js
+      - run: node scripts/build-dashboard-view.js
+      - run: git diff --exit-code -- data/dashboard-view.json
