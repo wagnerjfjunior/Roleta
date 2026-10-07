@@ -280,7 +280,8 @@
         '<div class="section-head"><div><span class="eyebrow">3 · PRÉVIA FINAL</span><h2>RLT-PRINT-V2</h2></div><span id="rltv2Counts" class="intake-counts"></span></div>'+
         '<div id="rltv2Preview" class="rltv2-screen-preview"></div>'+
         '<label class="intake-confirm"><input id="rltv2Confirm" type="checkbox"> Conferi a folha final após as correções humanas.</label>'+
-        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Imprimir roleta final</button></div>'+
+        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Imprimir roleta</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar em PDF</button></div>'+
+        '<p class="small muted">Salvar em PDF abre o diálogo de impressão; selecione “Salvar como PDF” como destino.</p>'+
       '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
 
@@ -306,6 +307,7 @@
     const counts=host.querySelector('#rltv2Counts');
     const confirm=host.querySelector('#rltv2Confirm');
     const print=host.querySelector('#rltv2Print');
+    const savePdf=host.querySelector('#rltv2SavePdf');
     const printHost=host.querySelector('#rltv2PrintHost');
 
     loadBrokerDirectory().then(x=>{brokers=x}).catch(err=>{
@@ -319,7 +321,7 @@
     });
 
     function invalidateFinal(){
-      reviewedPayload=null;card.hidden=true;confirm.checked=false;print.disabled=true;
+      reviewedPayload=null;card.hidden=true;confirm.checked=false;print.disabled=true;savePdf.disabled=true;
       reviewGate.className='intake-gate blocked';
       reviewGate.innerHTML='<strong>ALTERAÇÕES PENDENTES</strong><div>Clique em Aplicar correções e validar antes da impressão.</div>';
     }
@@ -402,7 +404,7 @@
     }
 
     async function validateAndPrepareReview(){
-      reviewCard.hidden=true;card.hidden=true;confirm.checked=false;print.disabled=true;payload=null;reviewedPayload=null;
+      reviewCard.hidden=true;card.hidden=true;confirm.checked=false;print.disabled=true;savePdf.disabled=true;payload=null;reviewedPayload=null;
       try{
         if(!brokers.length)brokers=await loadBrokerDirectory();
         const p=normalizePayload(ta.value);
@@ -475,17 +477,23 @@
         (result.corrections.length?'<div>Correções aplicadas:</div>'+result.corrections.map(x=>'<div>• '+esc(x)+'</div>').join(''):'<div>Nenhuma alteração necessária; transcrição confirmada.</div>');
       counts.innerHTML=previewSummary(reviewedPayload);
       renderCanonical(preview,reviewedPayload);
-      card.hidden=false;confirm.checked=false;print.disabled=true;
+      card.hidden=false;confirm.checked=false;print.disabled=true;savePdf.disabled=true;
       card.scrollIntoView({behavior:'smooth',block:'start'});
     });
 
-    confirm.addEventListener('change',()=>{print.disabled=!confirm.checked||!reviewedPayload});
-    print.addEventListener('click',()=>{
+    confirm.addEventListener('change',()=>{
+      const disabled=!confirm.checked||!reviewedPayload;
+      print.disabled=disabled;
+      savePdf.disabled=disabled;
+    });
+    function openPrintDialog(){
       if(!reviewedPayload)return;
       renderCanonical(printHost,reviewedPayload);
       printHost.hidden=false;
       setTimeout(()=>window.print(),50);
-    });
+    }
+    print.addEventListener('click',openPrintDialog);
+    savePdf.addEventListener('click',openPrintDialog);
   }
 
   window.RouletteIntake={mount,normalizePayload,validatePayload,renderCanonical,applyHumanReview,deriveCompanyDraw};
