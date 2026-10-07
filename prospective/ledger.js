@@ -127,9 +127,19 @@
     });
   }
 
+  function canonicalTargetEventId(event,targetEventId){
+    if(!event)return null;
+    if(event.id===targetEventId||event.target_event_id===targetEventId)return targetEventId;
+    const m=String(targetEventId||'').match(/^(\\d{4})-(\\d{2})-(\\d{2})-(manha|tarde|integral)$/);
+    if(!m)return null;
+    const suffix={manha:'M',tarde:'T',integral:'I'}[m[4]];
+    const shortId=m[3]+'-'+m[2]+'-'+suffix;
+    return String(event.id||'')===shortId?targetEventId:null;
+  }
+
   function adjudicate(rec,event,at){
     if(!rec||rec.status!=='FROZEN'||!rec.is_frozen)throw new Error('Only frozen recommendations can be adjudicated.');
-    if(!event||event.id!==rec.target_event_id)throw new Error('Outcome event mismatch.');
+    if(!event||canonicalTargetEventId(event,rec.target_event_id)!==rec.target_event_id)throw new Error('Outcome event mismatch.');
     const hit2=event.first===rec.physical_position||event.last===rec.physical_position;
     const hit3=hit2||event.courtesy===rec.physical_position;
     const hit4=hit3||event.second===rec.physical_position;
@@ -178,6 +188,10 @@
     const adj=adjudicate(frozen,outcome,'2099-01-01T09:00:00-03:00');
     if(!adj.hit_2x)throw new Error('Adjudication failed.');
 
+    const canonicalShort={...outcome,id:'01-01-M'};
+    const adjShort=adjudicate(frozen,canonicalShort,'2099-01-01T09:00:00-03:00');
+    if(adjShort.target_event_id!==target.id)throw new Error('Canonical short event ID mapping failed.');
+
     let wrongOutcomeBlocked=false;
     try{adjudicate(frozen,{...outcome,id:'OTHER'},'2099-01-01T09:00:00-03:00')}catch(_){wrongOutcomeBlocked=true}
     if(!wrongOutcomeBlocked)throw new Error('Mismatched outcome was accepted.');
@@ -192,6 +206,7 @@
         distinct_family_allocation:true,
         frozen_immutable:true,
         event_identity_guard:true,
+        canonical_event_id_mapping:true,
         adjudication_after_freeze:true,
         deterministic_random_shadow:true
       }
@@ -200,7 +215,7 @@
 
   global.RoletaProspectiveLedger={
     POLICY_VERSION,MODEL_VERSION,PEOPLE,
-    rankingFor,allocateFamilies,deterministicChain,resolveFirstEligible,freezeRecord,adjudicate,selfTest
+    rankingFor,allocateFamilies,deterministicChain,resolveFirstEligible,freezeRecord,canonicalTargetEventId,adjudicate,selfTest
   };
 
   if(typeof module!=='undefined'&&module.exports)module.exports=global.RoletaProspectiveLedger;

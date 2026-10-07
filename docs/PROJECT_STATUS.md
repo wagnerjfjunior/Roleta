@@ -1,19 +1,32 @@
 # Roleta — Project Status
 
-## State — 2026-10-04
+## State — 2026-10-07
 
 - canonical repository: `wagnerjfjunior/Roleta`.
 - canonical production branch: `main`.
-- resolved main HEAD for this work: `5dfd6fada53e6106be290419e19ded6ff1b621c9`.
-- active development branch: `feat/rlt-m4-07-paired-valid-metrics-20261004`.
+- resolved main HEAD for this work: `bbc1be468e1f1a742a8bf81dd1b527af3d9a365e`.
+- active development branch: `data/prospective-adjudicate-2026-10-05`.
 - branch was created from and remains based on current main; no remote preview is used.
-- 83 logical canonical events.
-- 82 validated complete permutations.
-- 79 quality A / 4 quality B.
+- 85 logical canonical events.
+- 84 validated complete permutations.
+- 81 quality A / 4 quality B.
 - 1 partial event outside complete-permutation tests.
 - Workspace V3 is production-delivered on main.
 - current viability state: EVIDÊNCIA INSUFICIENTE.
 - no model has demonstrated robust real predictive edge.
+
+
+## Identity reconciliation gate — canonical before broker statistics
+- canonical registry: `data/brokers-official.csv`;
+- implementation: `reconciliation/identity.js`;
+- audit queue: `data/identity-reconciliation.jsonl`;
+- exact official-name matches may resolve directly; explicit aliases may resolve directly;
+- fuzzy matching only creates candidates;
+- manager/team may only break ties among already-plausible candidates and never creates an identity candidate;
+- fuzzy/ambiguous identities require explicit human confirmation before `CANONICAL_CONFIRMED`;
+- unresolved identities are excluded from broker-level statistics;
+- 03/10 remains `PENDING_HUMAN_IDENTITY` until Sabrina's physical row is human-confirmed;
+- nominal reprocessing of 06/10 is blocked until this gate is applied.
 
 ## RLT-M4 Simulation Lab
 - Monte Carlo laboratory remains isolated from canonical real data.
@@ -56,10 +69,10 @@ Sabrina/Brenda and Laura counts for 28/09–02/10 remain contested. Original she
 
 ## Nominal ledger consolidation
 - `data/full_draws_reconstructed.csv` is now the GitHub-hosted consolidated nominal ledger available to this project.
-- current imported nominal coverage: 48 events / 1022 participant rows, including 04/10 morning and afternoon.
-- this nominal ledger is auxiliary and does NOT replace the 83-event canonical result ledger in `data/manifest.json`.
-- 02/10 and 03/10 do not yet have full nominal transcription in the imported legacy source; their canonical event results remain valid in the 83-event ledger.
-- no global model/statistical aggregate may be recomputed from the 48-event nominal subset as though it were complete.
+- current imported nominal coverage: 51 events / 1093 participant rows, including 03/10, 04/10 morning+afternoon, and 05/10 morning+afternoon.
+- this nominal ledger is auxiliary and does NOT replace the 85-event canonical result ledger in `data/manifest.json`.
+- 02/10 still lacks full nominal transcription in the imported legacy source. 03/10 is fully transcribed positionally, but nominal identity remains quarantined because Sabrina's confirmed participation has no safely resolved physical row. Canonical event results remain authoritative.
+- no global model/statistical aggregate may be recomputed from the 51-event nominal subset as though it were complete; `PENDING_HUMAN_IDENTITY` rows are excluded from broker-level statistics.
 - 04/10 afternoon correction: positions 12 and 13 excluded; Sabrina p11 → nº12 → Último; Wagner p14 → nº9.
 
 

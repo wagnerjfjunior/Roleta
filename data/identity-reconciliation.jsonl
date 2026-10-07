@@ -1,0 +1,2 @@
+{"record_type":"IDENTITY_RECONCILIATION_INIT","policy_version":"IDENTITY-V1.0.0"}
+{"case_id":"IDR-2026-10-03-I-SABRINA","event_id":"03-10-I","observed_name":null,"expected_canonical_name":"Sabrina","expected_team":"Wislane","participation_confirmed":true,"physical_position":null,"status":"PENDING_HUMAN","canonical_for_statistics":false,"reason":"Participation confirmed, but the physical row cannot be safely identified from the available source. No candidate row may be reassigned by inference alone.","source":"IMG_1665.jpeg","created_at":"2026-10-07T10:40:00-03:00"}

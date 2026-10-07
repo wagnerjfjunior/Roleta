@@ -1,24 +1,34 @@
 # Roleta — Current Handoff
 
-## CURRENT STATE — 2026-10-04
+## CURRENT STATE — 2026-10-07
 
 canonical repo: `wagnerjfjunior/Roleta`
 canonical production ref: `main`
-last resolved main HEAD: `5dfd6fada53e6106be290419e19ded6ff1b621c9`
-active development branch: `feat/rlt-m4-07-paired-valid-metrics-20261004`
+last resolved main HEAD: `bbc1be468e1f1a742a8bf81dd1b527af3d9a365e`
+active development branch: `data/prospective-adjudicate-2026-10-05`
 
 ## Canonical data
-- 83 logical events;
-- 82 complete validated permutations;
-- 79 quality A / 4 quality B;
+- 85 logical events;
+- 84 complete validated permutations;
+- 81 quality A / 4 quality B;
 - one partial event excluded from complete-permutation tests.
 
 ## Nominal ledger
 - GitHub consolidated nominal file: `data/full_draws_reconstructed.csv`.
-- imported coverage: 48 events / 1022 participant rows.
-- canonical result ledger remains 83 events and is authoritative for model generation.
-- 02/10 and 03/10 nominal full-sheet backfill remains a data-quality follow-up, not a blocker for the prospective weekly freeze.
+- imported coverage: 51 events / 1093 participant rows.
+- canonical result ledger contains 85 events and is authoritative for model generation.
+- 02/10 nominal full-sheet backfill remains a data-quality follow-up. 03/10 is positionally transcribed, but nominal identity is quarantined pending human resolution of Sabrina's physical row.
 - 04/10-T corrected: p12/p13 crossed out; Sabrina p11 drew 12 = Último; Wagner p14 drew 9.
+
+## IDENTITY RECONCILIATION GATE
+- registry: `data/brokers-official.csv`;
+- code: `reconciliation/identity.js`;
+- audit queue: `data/identity-reconciliation.jsonl`;
+- team/manager is tie-break only, never primary identity evidence;
+- fuzzy/ambiguous candidates require human confirmation;
+- only exact/explicit-alias/human-confirmed identities can become canonical for broker statistics;
+- 03/10 is `PENDING_HUMAN_IDENTITY`;
+- nominal 06/10 reprocessing stays blocked until this gate is applied.
 
 ## Production
 PR #3 is merged into main. RLT-M4/RLT-M5 simulation/prospective work is now canonical in repository main. No production deploy was performed as part of the merge.
@@ -107,7 +117,7 @@ Important correction:
 CURRENT is not frozen for the entire week. It remains revisable and is frozen only before the operational choice for its own target event.
 
 ## NEXT SAFE ACTION
-Validate the RLT-M5-01 weekly panel locally via SFJM/LVR with WEEKLY_FROZEN labelled as Oficial and CURRENT labelled as Diagnóstico. Then begin real event-by-event adjudication with WEEKLY_FROZEN as the operational reference, CURRENT scored separately, and no hindsight.
+Complete review of PR #11 with the identity-reconciliation gate active. Keep 03/10 nominal identities quarantined until Sabrina's physical row is human-confirmed. Only after the PR is clean may nominal 06/10 be reprocessed; unresolved names must never enter broker-level statistics.
 
 ## Bootstrap
 `Ative o SFJM do projeto Roleta, resolva main ao vivo em wagnerjfjunior/Roleta, leia .sfjm/project.json, handoffs/CURRENT.md, docs/NEXT_SAFE_ACTION.md e docs/PROSPECTIVE_LEDGER.md, recupere a branch ativa e continue somente pela próxima ação segura canônica.`
