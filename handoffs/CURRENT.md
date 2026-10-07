@@ -274,3 +274,92 @@ The app's Nova Roleta page now accepts the Skill JSON and applies a deterministi
 - no editorial title, validation prose, hash, evidence page or technical footer.
 
 Printing is blocked unless payload.status=VALIDADO and the JSON passes all structural checks.
+
+
+---
+
+## RLT-PRINT-V2 — CURRENT OPERATIONAL STATE — 07/10/2026
+
+Canonical implementation work is on:
+`feature/rlt-print-company-draw-review-20261007`
+
+PR:
+`#19 feat: validar quantidade Helbor e sorteio de empresas`
+
+Base main at branch creation:
+`3336af73799140910eee2ed7bd86e3257020cfe9`
+
+Canonical specification:
+`docs/PRINT_TEMPLATE_V2.md`
+
+Implementation audit/changelog:
+`docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md`
+
+### Final workflow
+
+```
+Skill/photo transcription
+-> JSON import
+-> structural gate
+-> mandatory human review
+   -> HELBOR quantity
+   -> company share/mode/positions
+   -> SALÃO
+   -> STAND BY
+   -> ON-LINE
+-> reviewed payload
+-> final preview
+-> explicit human confirmation
+-> Print OR Save as PDF
+```
+
+### Mandatory invariants
+
+- imported JSON is transcription only, never direct print authority;
+- human review is mandatory before final preview;
+- broker changes resolve through the official registry DTO and replace CRECI/manager/director/status atomically;
+- SALÃO, STAND BY and ON-LINE remain distinct;
+- STAND BY/ON-LINE may be added or removed manually;
+- every edit invalidates prior approval and disables output until revalidation;
+- HELBOR participant quantity is independently editable;
+- company draw supports Share Tegra / No Share / Share Helbor;
+- Share Tegra complements the single Helbor position;
+- Share Helbor complements the single Tegra position;
+- no-share requires distinct single positions;
+- hidden fields must remain truly hidden;
+- numero_exposto=false must never leak the drawn number;
+- Print and Save as PDF use one renderer;
+- print target is A4 portrait, one page under normal event volume;
+- zebra white/light-gray is mandatory;
+- operational print typography target is ~13pt on broker rows;
+- current six-column proportions: 7 / 21 / 17 / 19 / 12 / 24 percent.
+
+### 07/10/2026 acceptance evidence
+
+Human review corrected the initial transcription to the official sheet, including:
+- p3 Nair;
+- p5 Nina;
+- p8 Turmalina.
+
+The flow also demonstrated manual recovery of omitted STAND BY entries.
+
+Company-draw rule tests passed:
+- Share Tegra HB1 -> TG2-3;
+- Share Tegra HB2 -> TG1-3;
+- Share Tegra HB3 -> TG1-2;
+- inverse Share Helbor mappings;
+- no-share distinct positions;
+- duplicate no-share position rejected.
+
+### Promotion gate
+
+Before merge of PR #19:
+1. locally validate final header controls;
+2. validate one-page print/PDF;
+3. validate zebra survives print/PDF;
+4. validate ~13pt readability;
+5. validate SORTEIO DE EMPRESA fits without clipping;
+6. validate Print and Save as PDF both derive from the same reviewed payload;
+7. merge only after explicit user approval.
+
+Do not reopen the old direct JSON -> print path.
