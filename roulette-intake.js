@@ -19,13 +19,17 @@
   function reconciliationGate(p){
     const rows=[...(p.salao||[]),...(p.standby||[]),...(p.online||[])];
     const hasV2=rows.some(r=>r.reconciliation||r.match_status);
-    if(!hasV2)return {mode:'LEGACY',errors:[]};
-    const errors=[];
+    if(!hasV2)return {mode:'LEGACY',errors:[],pending:[]};
+    const errors=[],pending=[];
     rows.forEach((r,i)=>{
       const s=reconciliationState(r);
-      if(!['EXACT_MATCH','USER_CONFIRMED'].includes(s))errors.push('Reconciliação pendente: '+(r.nome||('linha '+(i+1)))+' ['+s+'].');
+      if(!['EXACT_MATCH','USER_CONFIRMED'].includes(s)){
+        const item={row:r,index:i,status:s,label:(r.nome||('linha '+(i+1)))};
+        pending.push(item);
+        if(s==='AMBIGUOUS'&&!Array.isArray(r?.reconciliation?.candidates))errors.push('AMBIGUOUS sem candidatos: '+item.label+'.');
+      }
     });
-    return {mode:'V2',errors};
+    return {mode:'V2',errors,pending};
   }
 
   function validatePayload(p){
@@ -220,17 +224,17 @@
 
     confirm.addEventListener('change',()=>{
       const rg=payload?reconciliationGate(payload):{mode:'LEGACY',errors:['sem payload']};
-      if(confirm.checked&&payload&&rg.mode==='V2'&&rg.errors.length){
+      if(confirm.checked&&payload&&rg.mode==='V2'&&(rg.pending||[]).length){
         promoteHumanConfirmation(payload);
         reconciliation.innerHTML=reconciliationReview(payload);
         const after=reconciliationGate(payload);
-        print.disabled=after.errors.length>0;
+        print.disabled=after.errors.length>0||(after.pending||[]).length>0;
         gate.className='intake-gate clear';
         gate.innerHTML='<strong>USER_CONFIRMED</strong><div>Conferência humana registrada nesta versão. Nomes, gerente/equipe e ordem final estão liberados para impressão e ingestão estatística.</div>';
         return;
       }
-      print.disabled=!confirm.checked||!payload||rg.mode!=='V2'||rg.errors.length>0;
-      if(confirm.checked&&payload&&(rg.mode!=='V2'||rg.errors.length)){
+      print.disabled=!confirm.checked||!payload||rg.mode!=='V2'||rg.errors.length>0||(rg.pending||[]).length>0;
+      if(confirm.checked&&payload&&(rg.mode!=='V2'||rg.errors.length||(rg.pending||[]).length)){
         gate.className='intake-gate blocked';
         gate.innerHTML='<strong>CONFIRMAÇÃO CANÔNICA BLOQUEADA</strong><div>Resolva todas as reconciliações. Apenas EXACT_MATCH ou USER_CONFIRMED podem ser impressos e usados na estatística.</div>';
       }
