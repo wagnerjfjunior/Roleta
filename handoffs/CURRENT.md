@@ -4,8 +4,8 @@
 
 canonical repo: `wagnerjfjunior/Roleta`
 canonical production ref: `main`
-last resolved main HEAD: `3336af73799140910eee2ed7bd86e3257020cfe9`
-active development branch: `feature/rlt-print-company-draw-review-20261007`
+last resolved main HEAD: `83dd22f264bfbe45a2049d4f4f73dd74e9ca559e`
+active development branch: `none — RLT-PRINT-V2 gate closed on main`
 
 ## Canonical data
 - 85 logical events;
@@ -363,3 +363,24 @@ Before merge of PR #19:
 7. merge only after explicit user approval.
 
 Do not reopen the old direct JSON -> print path.
+
+
+---
+
+## RLT-PRINT-V2 — CLOSED ON MAIN
+
+PR #19 merged to main.
+
+Merge SHA:
+`83dd22f264bfbe45a2049d4f4f73dd74e9ca559e`
+
+Final state:
+- mandatory human review is canonical;
+- HELBOR quantity review is canonical;
+- Share Tegra / No Share / Share Helbor rules are canonical;
+- SALÃO / STAND BY / ON-LINE review is canonical;
+- Print and Save as PDF are canonical;
+- A4 legibility/zebra/layout refinements are canonical;
+- documentation is versioned and bootstrap-linked.
+
+This gate is CLOSED. Future changes must preserve `docs/PRINT_TEMPLATE_V2.md` anti-regression invariants.
