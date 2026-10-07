@@ -19,18 +19,25 @@
       });
 
       for(const base of allocations){
-        for(const strategy of ['WEEKLY_FROZEN','CURRENT']){
-          const revision=0;
-          recommendations.push(ledger.freezeRecord(base,{
-            recommendation_id:makeId('REC',target.id,base.person_id,strategy,revision),
-            strategy,
-            generated_at:meta.generated_at,
-            data_cutoff:meta.data_cutoff,
-            trigger_event_id:meta.trigger_event_id||null,
-            config_hash:meta.config_hash,
-            revision_number:revision
-          }));
-        }
+        const revision=0;
+        recommendations.push(ledger.freezeRecord(base,{
+          recommendation_id:makeId('REC',target.id,base.person_id,'WEEKLY_FROZEN',revision),
+          strategy:'WEEKLY_FROZEN',
+          generated_at:meta.generated_at,
+          data_cutoff:meta.data_cutoff,
+          trigger_event_id:meta.trigger_event_id||null,
+          config_hash:meta.config_hash,
+          revision_number:revision
+        }));
+        recommendations.push(ledger.createDraftRecord(base,{
+          recommendation_id:makeId('REC',target.id,base.person_id,'CURRENT',revision),
+          strategy:'CURRENT',
+          generated_at:meta.generated_at,
+          data_cutoff:meta.data_cutoff,
+          trigger_event_id:meta.trigger_event_id||null,
+          config_hash:meta.config_hash,
+          revision_number:revision
+        }));
 
         const candidateUniverse=ledger.rankingFor(events,target.period,3).rows.map(r=>r.pos);
         const seed=['roleta-prospective-v1',target.id,base.person_id].join('|');
@@ -93,6 +100,10 @@
     if(out.summary.weekly_frozen!==12)throw new Error('Weekly batch count failed.');
     if(out.summary.current!==12)throw new Error('Current batch count failed.');
     if(out.summary.random_shadow!==12)throw new Error('Random shadow count failed.');
+    const weekly=out.recommendations.find(x=>x.strategy==='WEEKLY_FROZEN');
+    const current=out.recommendations.find(x=>x.strategy==='CURRENT');
+    if(!weekly||weekly.status!=='FROZEN'||weekly.is_frozen!==true)throw new Error('Weekly frozen state failed.');
+    if(!current||current.status!=='DRAFT'||current.is_frozen!==false||current.frozen_at!==null)throw new Error('Current draft state failed.');
     return {pass:true,summary:out.summary};
   }
 
