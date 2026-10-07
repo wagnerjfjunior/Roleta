@@ -25,6 +25,8 @@ Este repositório aplica SFJM, mas não redefine o protocolo.
 8. ler `docs/METHODOLOGY.md` quando a tarefa envolver estatística/dados;
 9. ler `docs/OPERATING_RULES.md` quando a tarefa envolver regras de plantão;
 10. resolver evidência exata necessária antes de concluir ou mutar.
+11. ler `docs/PRINT_TEMPLATE_V2.md` sempre que a tarefa envolver Nova Roleta, validação, prévia, impressão ou PDF;
+12. ler `docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md` quando houver regressão ou dúvida sobre decisões de implementação do fluxo de impressão.
 
 ## 3. Regra de autoridade
 
