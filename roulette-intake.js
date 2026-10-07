@@ -147,21 +147,76 @@
     '</div>';
   }
 
+  let brokerDirectoryPromise=null;
+  function normalizeName(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase()}
+  function loadBrokerDirectory(){
+    if(!brokerDirectoryPromise)brokerDirectoryPromise=fetch('/data/print-brokers.json',{cache:'no-store'})
+      .then(r=>{if(!r.ok)throw new Error('Falha ao carregar cadastro oficial de corretores.');return r.json()})
+      .then(d=>Array.isArray(d.brokers)?d.brokers:[]);
+    return brokerDirectoryPromise;
+  }
+  function clonePayload(p){return JSON.parse(JSON.stringify(p))}
+  function reviewRowsHtml(p,brokers){
+    const options=brokers.map(b=>'<option value="'+esc(b.nome)+'"></option>').join('');
+    return '<datalist id="rltv2BrokerNames">'+options+'</datalist>'+
+      '<div class="rltv2-review-wrap"><table class="rltv2-review-table">'+
+      '<thead><tr><th>Posição</th><th>Nome transcrito</th><th>CRECI</th><th>Gerente</th><th>Diretor</th><th>Status</th></tr></thead>'+
+      '<tbody>'+[...p.salao].sort((a,b)=>Number(a.ordem_final)-Number(b.ordem_final)).map((r,i)=>
+        '<tr data-original-position="'+esc(r.ordem_final)+'" data-original-name="'+esc(r.nome)+'">'+
+          '<td><input class="rltv2-review-position" inputmode="numeric" type="number" min="1" max="'+p.salao.length+'" value="'+esc(r.ordem_final)+'"></td>'+
+          '<td><input class="rltv2-review-name" list="rltv2BrokerNames" value="'+esc(r.nome)+'" autocomplete="off"></td>'+
+          '<td class="rltv2-review-creci">'+esc(r.creci)+'</td>'+
+          '<td class="rltv2-review-manager">'+esc(r.gerente)+'</td>'+
+          '<td class="rltv2-review-director">'+esc(r.diretor)+'</td>'+
+          '<td class="rltv2-review-status">'+esc(r.status_creci)+'</td>'+
+        '</tr>').join('')+
+      '</tbody></table></div>';
+  }
+  function applyHumanReview(base,reviewHost,brokers){
+    const lookup=new Map(brokers.map(b=>[normalizeName(b.nome),b]));
+    const p=clonePayload(base),rows=[...reviewHost.querySelectorAll('tbody tr')],errors=[],corrections=[];
+    const reviewed=rows.map((tr,index)=>{
+      const pos=Number(tr.querySelector('.rltv2-review-position').value);
+      const typed=String(tr.querySelector('.rltv2-review-name').value||'').trim();
+      const broker=lookup.get(normalizeName(typed));
+      if(!Number.isInteger(pos)||pos<1||pos>rows.length)errors.push('Linha '+(index+1)+': posição inválida.');
+      if(!broker)errors.push('Linha '+(index+1)+': corretor "'+typed+'" não consta no cadastro oficial.');
+      const originalPos=Number(tr.dataset.originalPosition),originalName=tr.dataset.originalName||'';
+      if(pos!==originalPos||normalizeName(typed)!==normalizeName(originalName)){
+        corrections.push('p'+originalPos+' '+originalName+' → p'+pos+' '+(broker?.nome||typed));
+      }
+      return broker?{ordem_final:pos,nome:broker.nome,creci:broker.creci,status_creci:broker.status_creci,gerente:broker.gerente,diretor:broker.diretor}:null;
+    }).filter(Boolean);
+    const orders=reviewed.map(r=>r.ordem_final).sort((a,b)=>a-b);
+    for(let i=0;i<rows.length;i++)if(orders[i]!==i+1){errors.push('As posições corrigidas devem formar uma sequência única de 1 a '+rows.length+'.');break}
+    if(errors.length)return {errors:[...new Set(errors)],payload:null,corrections};
+    p.salao=reviewed.sort((a,b)=>a.ordem_final-b.ordem_final);
+    p.evento.tegra_qtd=p.salao.length;
+    return {errors:validatePayload(p),payload:p,corrections};
+  }
+
   function mount(host){
-    let payload=null;
+    let payload=null,reviewedPayload=null,brokers=[];
     host.innerHTML=
-      '<div class="workspace-page-head"><div><span class="eyebrow">RLT-PRINT-V2</span><h2>Gerador canônico</h2><p>Copie o JSON da Skill e clique em <strong>Colar JSON</strong>. O APP cola, valida e monta a prévia automaticamente.</p></div></div>'+
+      '<div class="workspace-page-head"><div><span class="eyebrow">RLT-PRINT-V2</span><h2>Gerador canônico</h2><p>JSON é transcrição inicial. A impressão só é liberada após <strong>conferência humana das posições e nomes</strong>.</p></div></div>'+
       '<article class="card rltv2-import-card">'+
-        '<div class="section-head"><div><span class="eyebrow">1 · DADOS VALIDADOS</span><h2>Importar JSON da Skill</h2></div><span class="intake-risk">LAYOUT DETERMINÍSTICO</span></div>'+
-        '<textarea id="rltv2Json" class="rltv2-json" rows="16" spellcheck="false" placeholder="{ ... JSON VALIDADO da Skill ... }"></textarea>'+
-        '<div class="intake-actions"><button id="rltv2Paste" class="simulation-run">Colar JSON</button><label class="rltv2-file"><input id="rltv2File" type="file" accept="application/json,.json">Carregar .json</label><button id="rltv2Validate" class="simulation-run">Validar e montar prévia</button></div>'+
+        '<div class="section-head"><div><span class="eyebrow">1 · IMPORTAÇÃO</span><h2>Importar JSON da Skill</h2></div><span class="intake-risk">TRANSCRIÇÃO INICIAL</span></div>'+
+        '<textarea id="rltv2Json" class="rltv2-json" rows="16" spellcheck="false" placeholder="{ ... JSON da Skill ... }"></textarea>'+
+        '<div class="intake-actions"><button id="rltv2Paste" class="simulation-run">Colar JSON</button><label class="rltv2-file"><input id="rltv2File" type="file" accept="application/json,.json">Carregar .json</label><button id="rltv2Validate" class="simulation-run">Carregar para conferência</button></div>'+
         '<div id="rltv2Gate" class="intake-gate blocked"><strong>AGUARDANDO DADOS</strong></div>'+
       '</article>'+
+      '<article id="rltv2ReviewCard" class="card rltv2-review-card" hidden>'+
+        '<div class="section-head"><div><span class="eyebrow">2 · CONFERÊNCIA HUMANA</span><h2>Validar posição e nome</h2></div><span id="rltv2ReviewCount" class="intake-counts"></span></div>'+
+        '<p class="small muted">Compare com a folha manuscrita. Corrija somente o que estiver errado. Ao trocar o nome, CRECI, gerente, diretor e status são atualizados pelo cadastro oficial.</p>'+
+        '<div id="rltv2Review"></div>'+
+        '<div class="intake-actions"><button id="rltv2ApplyReview" class="simulation-run">Aplicar correções e validar</button></div>'+
+        '<div id="rltv2ReviewGate" class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Revise as linhas antes de liberar a prévia final.</div></div>'+
+      '</article>'+
       '<article id="rltv2PreviewCard" class="card rltv2-preview-card" hidden>'+
-        '<div class="section-head"><div><span class="eyebrow">2 · PRÉVIA</span><h2>RLT-PRINT-V2</h2></div><span id="rltv2Counts" class="intake-counts"></span></div>'+
+        '<div class="section-head"><div><span class="eyebrow">3 · PRÉVIA FINAL</span><h2>RLT-PRINT-V2</h2></div><span id="rltv2Counts" class="intake-counts"></span></div>'+
         '<div id="rltv2Preview" class="rltv2-screen-preview"></div>'+
-        '<label class="intake-confirm"><input id="rltv2Confirm" type="checkbox"> Conferi o cabeçalho, os 6 campos da tabela e os blocos condicionais.</label>'+
-        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>Imprimir roleta final</button></div>'+
+        '<label class="intake-confirm"><input id="rltv2Confirm" type="checkbox"> Conferi a folha final após as correções humanas.</label>'+
+        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Imprimir roleta final</button></div>'+
       '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
 
@@ -170,6 +225,11 @@
     const paste=host.querySelector('#rltv2Paste');
     const btn=host.querySelector('#rltv2Validate');
     const gate=host.querySelector('#rltv2Gate');
+    const reviewCard=host.querySelector('#rltv2ReviewCard');
+    const reviewHost=host.querySelector('#rltv2Review');
+    const reviewCount=host.querySelector('#rltv2ReviewCount');
+    const reviewBtn=host.querySelector('#rltv2ApplyReview');
+    const reviewGate=host.querySelector('#rltv2ReviewGate');
     const card=host.querySelector('#rltv2PreviewCard');
     const preview=host.querySelector('#rltv2Preview');
     const counts=host.querySelector('#rltv2Counts');
@@ -177,27 +237,55 @@
     const print=host.querySelector('#rltv2Print');
     const printHost=host.querySelector('#rltv2PrintHost');
 
+    loadBrokerDirectory().then(x=>{brokers=x}).catch(err=>{
+      gate.className='intake-gate blocked';
+      gate.innerHTML='<strong>CADASTRO INDISPONÍVEL</strong><div>'+esc(err.message||err)+'</div>';
+    });
+
     file.addEventListener('change',async()=>{
       const f=file.files&&file.files[0]; if(!f)return;
       ta.value=await f.text();
     });
 
-    function validateAndRender(){
-      card.hidden=true; confirm.checked=false; print.disabled=true; payload=null;
+    function invalidateFinal(){
+      reviewedPayload=null;card.hidden=true;confirm.checked=false;print.disabled=true;
+      reviewGate.className='intake-gate blocked';
+      reviewGate.innerHTML='<strong>ALTERAÇÕES PENDENTES</strong><div>Clique em Aplicar correções e validar antes da impressão.</div>';
+    }
+
+    async function validateAndPrepareReview(){
+      reviewCard.hidden=true;card.hidden=true;confirm.checked=false;print.disabled=true;payload=null;reviewedPayload=null;
       try{
+        if(!brokers.length)brokers=await loadBrokerDirectory();
         const p=normalizePayload(ta.value);
         const errors=validatePayload(p);
         if(errors.length){
           gate.className='intake-gate blocked';
-          gate.innerHTML='<strong>IMPRESSÃO BLOQUEADA</strong>'+errors.map(x=>'<div>• '+esc(x)+'</div>').join('');
+          gate.innerHTML='<strong>IMPORTAÇÃO BLOQUEADA</strong>'+errors.map(x=>'<div>• '+esc(x)+'</div>').join('');
           return;
         }
         payload=p;
         gate.className='intake-gate clear';
-        gate.innerHTML='<strong>DADOS VÁLIDOS</strong><div>Contrato RLT-PRINT-V2 atendido. Faça a conferência visual final.</div>';
-        counts.innerHTML=previewSummary(p);
-        renderCanonical(preview,p);
-        card.hidden=false;
+        gate.innerHTML='<strong>JSON CARREGADO</strong><div>Agora faça a conferência humana de posição e nome. A impressão ainda está bloqueada.</div>';
+        reviewCount.textContent=p.salao.length+' linhas para conferir';
+        reviewHost.innerHTML=reviewRowsHtml(p,brokers);
+        reviewCard.hidden=false;
+        reviewGate.className='intake-gate blocked';
+        reviewGate.innerHTML='<strong>CONFERÊNCIA PENDENTE</strong><div>Compare posição e nome com a folha original.</div>';
+        reviewHost.querySelectorAll('input').forEach(input=>input.addEventListener('input',()=>{
+          const tr=input.closest('tr');
+          if(input.classList.contains('rltv2-review-name')){
+            const broker=brokers.find(b=>normalizeName(b.nome)===normalizeName(input.value));
+            if(broker){
+              tr.querySelector('.rltv2-review-creci').textContent=broker.creci;
+              tr.querySelector('.rltv2-review-manager').textContent=broker.gerente;
+              tr.querySelector('.rltv2-review-director').textContent=broker.diretor;
+              tr.querySelector('.rltv2-review-status').textContent=broker.status_creci;
+            }
+          }
+          invalidateFinal();
+        }));
+        reviewCard.scrollIntoView({behavior:'smooth',block:'start'});
       }catch(err){
         gate.className='intake-gate blocked';
         gate.innerHTML='<strong>JSON INVÁLIDO</strong><div>'+esc(err.message||err)+'</div>';
@@ -210,23 +298,41 @@
         const text=await navigator.clipboard.readText();
         if(!text.trim())throw new Error('A área de transferência está vazia.');
         ta.value=text.trim();
-        validateAndRender();
+        await validateAndPrepareReview();
       }catch(err){
         gate.className='intake-gate blocked';
         gate.innerHTML='<strong>NÃO FOI POSSÍVEL COLAR</strong><div>'+esc(err.message||err)+'</div><div>Use Ctrl+V no campo ou permita acesso à área de transferência e tente novamente.</div>';
       }
     });
 
-    btn.addEventListener('click',validateAndRender);
+    btn.addEventListener('click',validateAndPrepareReview);
 
-    confirm.addEventListener('change',()=>{print.disabled=!confirm.checked||!payload});
-    print.addEventListener('click',()=>{
+    reviewBtn.addEventListener('click',()=>{
       if(!payload)return;
-      renderCanonical(printHost,payload);
+      const result=applyHumanReview(payload,reviewHost,brokers);
+      if(result.errors.length){
+        reviewGate.className='intake-gate blocked';
+        reviewGate.innerHTML='<strong>CONFERÊNCIA BLOQUEADA</strong>'+result.errors.map(x=>'<div>• '+esc(x)+'</div>').join('');
+        reviewedPayload=null;card.hidden=true;return;
+      }
+      reviewedPayload=result.payload;
+      reviewGate.className='intake-gate clear';
+      reviewGate.innerHTML='<strong>CONFERÊNCIA HUMANA VALIDADA</strong>'+
+        (result.corrections.length?'<div>Correções aplicadas: '+esc(result.corrections.join(' · '))+'</div>':'<div>Nenhuma alteração necessária; transcrição confirmada.</div>');
+      counts.innerHTML=previewSummary(reviewedPayload);
+      renderCanonical(preview,reviewedPayload);
+      card.hidden=false;confirm.checked=false;print.disabled=true;
+      card.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+
+    confirm.addEventListener('change',()=>{print.disabled=!confirm.checked||!reviewedPayload});
+    print.addEventListener('click',()=>{
+      if(!reviewedPayload)return;
+      renderCanonical(printHost,reviewedPayload);
       printHost.hidden=false;
       setTimeout(()=>window.print(),50);
     });
   }
 
-  window.RouletteIntake={mount,normalizePayload,validatePayload,renderCanonical};
+  window.RouletteIntake={mount,normalizePayload,validatePayload,renderCanonical,applyHumanReview};
 })();
