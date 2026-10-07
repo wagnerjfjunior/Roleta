@@ -4,8 +4,8 @@
 
 canonical repo: `wagnerjfjunior/Roleta`
 canonical production ref: `main`
-last resolved main HEAD: `bbc1be468e1f1a742a8bf81dd1b527af3d9a365e`
-active development branch: `data/prospective-adjudicate-2026-10-05`
+last resolved main HEAD: `3336af73799140910eee2ed7bd86e3257020cfe9`
+active development branch: `feature/rlt-print-company-draw-review-20261007`
 
 ## Canonical data
 - 85 logical events;
