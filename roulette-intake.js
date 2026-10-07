@@ -156,47 +156,77 @@
     return brokerDirectoryPromise;
   }
   function clonePayload(p){return JSON.parse(JSON.stringify(p))}
+  function reviewRowHtml(r,group,index,total){
+    const pos=group==='salao'?Number(r.ordem_final||index+1):index+1;
+    return '<tr data-group="'+group+'" data-original-position="'+esc(pos)+'" data-original-name="'+esc(r.nome||'')+'">'+
+      '<td><input class="rltv2-review-position" inputmode="numeric" type="number" min="1" max="'+Math.max(total,1)+'" value="'+esc(pos)+'"></td>'+
+      '<td><input class="rltv2-review-name" list="rltv2BrokerNames" value="'+esc(r.nome||'')+'" autocomplete="off"></td>'+
+      '<td class="rltv2-review-creci">'+esc(r.creci||'')+'</td>'+
+      '<td class="rltv2-review-manager">'+esc(r.gerente||'')+'</td>'+
+      '<td class="rltv2-review-director">'+esc(r.diretor||'')+'</td>'+
+      '<td class="rltv2-review-status">'+esc(r.status_creci||'')+'</td>'+
+      (group==='salao'?'<td></td>':'<td><button type="button" class="rltv2-remove-row">Remover</button></td>')+
+    '</tr>';
+  }
+
+  function reviewGroupHtml(title,group,rows,allowAdd){
+    const ordered=group==='salao'?[...rows].sort((a,b)=>Number(a.ordem_final)-Number(b.ordem_final)):[...rows];
+    return '<section class="rltv2-review-group" data-review-group="'+group+'">'+
+      '<div class="rltv2-review-group-head"><strong>'+title+'</strong>'+
+      (allowAdd?'<button type="button" class="rltv2-add-row" data-add-group="'+group+'">Adicionar '+title+'</button>':'')+
+      '</div>'+
+      '<div class="rltv2-review-wrap"><table class="rltv2-review-table">'+
+      '<thead><tr><th>Posição</th><th>Nome</th><th>CRECI</th><th>Gerente</th><th>Diretor</th><th>Status</th><th></th></tr></thead>'+
+      '<tbody>'+ordered.map((r,i)=>reviewRowHtml(r,group,i,ordered.length)).join('')+'</tbody>'+
+      '</table></div></section>';
+  }
+
   function reviewRowsHtml(p,brokers){
     const options=brokers.map(b=>'<option value="'+esc(b.nome)+'"></option>').join('');
     return '<datalist id="rltv2BrokerNames">'+options+'</datalist>'+
-      '<div class="rltv2-review-wrap"><table class="rltv2-review-table">'+
-      '<thead><tr><th>Posição</th><th>Nome transcrito</th><th>CRECI</th><th>Gerente</th><th>Diretor</th><th>Status</th></tr></thead>'+
-      '<tbody>'+[...p.salao].sort((a,b)=>Number(a.ordem_final)-Number(b.ordem_final)).map((r,i)=>
-        '<tr data-original-position="'+esc(r.ordem_final)+'" data-original-name="'+esc(r.nome)+'">'+
-          '<td><input class="rltv2-review-position" inputmode="numeric" type="number" min="1" max="'+p.salao.length+'" value="'+esc(r.ordem_final)+'"></td>'+
-          '<td><input class="rltv2-review-name" list="rltv2BrokerNames" value="'+esc(r.nome)+'" autocomplete="off"></td>'+
-          '<td class="rltv2-review-creci">'+esc(r.creci)+'</td>'+
-          '<td class="rltv2-review-manager">'+esc(r.gerente)+'</td>'+
-          '<td class="rltv2-review-director">'+esc(r.diretor)+'</td>'+
-          '<td class="rltv2-review-status">'+esc(r.status_creci)+'</td>'+
-        '</tr>').join('')+
-      '</tbody></table></div>';
+      reviewGroupHtml('SALÃO','salao',p.salao,false)+
+      reviewGroupHtml('STAND BY','standby',p.standby,true)+
+      reviewGroupHtml('ON-LINE','online',p.online,true);
   }
+
   function applyHumanReview(base,reviewHost,brokers){
     const lookup=new Map(brokers.map(b=>[normalizeName(b.nome),b]));
-    const p=clonePayload(base),rows=[...reviewHost.querySelectorAll('tbody tr')],errors=[],corrections=[];
-    const reviewed=rows.map((tr,index)=>{
-      const pos=Number(tr.querySelector('.rltv2-review-position').value);
-      const typed=String(tr.querySelector('.rltv2-review-name').value||'').trim();
-      const broker=lookup.get(normalizeName(typed));
-      if(!Number.isInteger(pos)||pos<1||pos>rows.length)errors.push('Linha '+(index+1)+': posição inválida.');
-      if(!broker)errors.push('Linha '+(index+1)+': corretor "'+typed+'" não consta no cadastro oficial.');
-      const originalPos=Number(tr.dataset.originalPosition),originalName=tr.dataset.originalName||'';
-      if(pos!==originalPos||normalizeName(typed)!==normalizeName(originalName)){
-        corrections.push('p'+originalPos+' '+originalName+' → p'+pos+' '+(broker?.nome||typed));
-      }
-      return broker?{ordem_final:pos,nome:broker.nome,creci:broker.creci,status_creci:broker.status_creci,gerente:broker.gerente,diretor:broker.diretor}:null;
-    }).filter(Boolean);
-    const orders=reviewed.map(r=>r.ordem_final).sort((a,b)=>a-b);
-    for(let i=0;i<rows.length;i++)if(orders[i]!==i+1){errors.push('As posições corrigidas devem formar uma sequência única de 1 a '+rows.length+'.');break}
+    const p=clonePayload(base),errors=[],corrections=[];
+
+    function readGroup(group){
+      const rows=[...reviewHost.querySelectorAll('tr[data-group="'+group+'"]')];
+      const reviewed=rows.map((tr,index)=>{
+        const pos=Number(tr.querySelector('.rltv2-review-position').value);
+        const typed=String(tr.querySelector('.rltv2-review-name').value||'').trim();
+        const broker=lookup.get(normalizeName(typed));
+        if(!Number.isInteger(pos)||pos<1||pos>Math.max(rows.length,1))errors.push(group.toUpperCase()+' linha '+(index+1)+': posição inválida.');
+        if(!broker)errors.push(group.toUpperCase()+' linha '+(index+1)+': corretor "'+typed+'" não consta no cadastro oficial.');
+        const originalPos=Number(tr.dataset.originalPosition),originalName=tr.dataset.originalName||'';
+        if(pos!==originalPos||normalizeName(typed)!==normalizeName(originalName)){
+          corrections.push(group+' p'+originalPos+' '+originalName+' → p'+pos+' '+(broker?.nome||typed));
+        }
+        if(!broker)return null;
+        const out={nome:broker.nome,creci:broker.creci,status_creci:broker.status_creci,gerente:broker.gerente,diretor:broker.diretor};
+        if(group==='salao')out.ordem_final=pos;
+        else out.__review_position=pos;
+        return out;
+      }).filter(Boolean);
+      const orders=reviewed.map(r=>group==='salao'?r.ordem_final:r.__review_position).sort((a,b)=>a-b);
+      for(let i=0;i<orders.length;i++)if(orders[i]!==i+1){errors.push(group.toUpperCase()+' deve formar sequência única de 1 a '+orders.length+'.');break}
+      return reviewed.sort((a,b)=>(group==='salao'?a.ordem_final:a.__review_position)-(group==='salao'?b.ordem_final:b.__review_position)).map(r=>{if(group!=='salao')delete r.__review_position;return r});
+    }
+
+    p.salao=readGroup('salao');
+    p.standby=readGroup('standby');
+    p.online=readGroup('online');
     if(errors.length)return {errors:[...new Set(errors)],payload:null,corrections};
-    p.salao=reviewed.sort((a,b)=>a.ordem_final-b.ordem_final);
     p.evento.tegra_qtd=p.salao.length;
-    return {errors:validatePayload(p),payload:p,corrections};
+    const validationErrors=validatePayload(p);
+    return {errors:validationErrors,payload:validationErrors.length?null:p,corrections};
   }
 
   function mount(host){
-    let payload=null,reviewedPayload=null,brokers=[],reviewState=[];
+    let payload=null,reviewedPayload=null,brokers=[];
     host.innerHTML=
       '<div class="workspace-page-head"><div><span class="eyebrow">RLT-PRINT-V2</span><h2>Gerador canônico</h2><p>JSON é transcrição inicial. A impressão só é liberada após <strong>conferência humana das posições e nomes</strong>.</p></div></div>'+
       '<article class="card rltv2-import-card">'+
@@ -206,8 +236,8 @@
         '<div id="rltv2Gate" class="intake-gate blocked"><strong>AGUARDANDO DADOS</strong></div>'+
       '</article>'+
       '<article id="rltv2ReviewCard" class="card rltv2-review-card" hidden>'+
-        '<div class="section-head"><div><span class="eyebrow">2 · CONFERÊNCIA HUMANA</span><h2>Validar posição e nome</h2></div><span id="rltv2ReviewCount" class="intake-counts"></span></div>'+
-        '<p class="small muted">Compare com a folha manuscrita. Corrija somente o que estiver errado. Ao trocar o nome, CRECI, gerente, diretor e status são atualizados pelo cadastro oficial.</p>'+
+        '<div class="section-head"><div><span class="eyebrow">2 · CONFERÊNCIA HUMANA</span><h2>Validar SALÃO, STAND BY e ON-LINE</h2></div><span id="rltv2ReviewCount" class="intake-counts"></span></div>'+
+        '<p class="small muted">Compare todos os blocos com a folha manuscrita. Corrija posição/nome e adicione ou remova STAND BY e ON-LINE quando a transcrição tiver omitido alguém. Os dados cadastrais são atualizados pelo cadastro oficial.</p>'+
         '<div id="rltv2Review"></div>'+
         '<div class="intake-actions"><button id="rltv2ApplyReview" class="simulation-run">Aplicar correções e validar</button></div>'+
         '<div id="rltv2ReviewGate" class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Revise as linhas antes de liberar a prévia final.</div></div>'+
@@ -253,37 +283,38 @@
       reviewGate.innerHTML='<strong>ALTERAÇÕES PENDENTES</strong><div>Clique em Aplicar correções e validar antes da impressão.</div>';
     }
 
-    function syncReviewState(){
-      if(!payload)return;
-      const rows=[...reviewHost.querySelectorAll('tbody tr')];
-      reviewState=rows.map((tr,index)=>({
-        index,
-        original_position:Number(tr.dataset.originalPosition),
-        original_name:tr.dataset.originalName||'',
-        ordem_final:Number(tr.querySelector('.rltv2-review-position').value),
-        nome:String(tr.querySelector('.rltv2-review-name').value||'').trim()
-      }));
+    function applyReviewState(){
+      return applyHumanReview(payload,reviewHost,brokers);
     }
 
-    function applyReviewState(){
-      const lookup=new Map(brokers.map(b=>[normalizeName(b.nome),b]));
-      const p=clonePayload(payload),errors=[],corrections=[];
-      const reviewed=reviewState.map((r,index)=>{
-        const broker=lookup.get(normalizeName(r.nome));
-        if(!Number.isInteger(r.ordem_final)||r.ordem_final<1||r.ordem_final>reviewState.length)errors.push('Linha '+(index+1)+': posição inválida.');
-        if(!broker)errors.push('Linha '+(index+1)+': corretor "'+r.nome+'" não consta no cadastro oficial.');
-        if(r.ordem_final!==r.original_position||normalizeName(r.nome)!==normalizeName(r.original_name)){
-          corrections.push('p'+r.original_position+' '+r.original_name+' → p'+r.ordem_final+' '+(broker?.nome||r.nome));
-        }
-        return broker?{ordem_final:r.ordem_final,nome:broker.nome,creci:broker.creci,status_creci:broker.status_creci,gerente:broker.gerente,diretor:broker.diretor}:null;
-      }).filter(Boolean);
-      const orders=reviewed.map(r=>r.ordem_final).sort((a,b)=>a-b);
-      for(let i=0;i<reviewState.length;i++)if(orders[i]!==i+1){errors.push('As posições corrigidas devem formar uma sequência única de 1 a '+reviewState.length+'.');break}
-      if(errors.length)return {errors:[...new Set(errors)],payload:null,corrections};
-      p.salao=reviewed.sort((a,b)=>a.ordem_final-b.ordem_final);
-      p.evento.tegra_qtd=p.salao.length;
-      const validationErrors=validatePayload(p);
-      return {errors:validationErrors,payload:validationErrors.length?null:p,corrections};
+    function bindReviewControls(scope){
+      scope.querySelectorAll('input').forEach(input=>{
+        const onEdit=()=>{
+          const tr=input.closest('tr');
+          if(input.classList.contains('rltv2-review-name')){
+            const broker=brokers.find(b=>normalizeName(b.nome)===normalizeName(input.value));
+            if(broker){
+              input.value=broker.nome;
+              tr.querySelector('.rltv2-review-creci').textContent=broker.creci;
+              tr.querySelector('.rltv2-review-manager').textContent=broker.gerente;
+              tr.querySelector('.rltv2-review-director').textContent=broker.diretor;
+              tr.querySelector('.rltv2-review-status').textContent=broker.status_creci;
+            }
+          }
+          invalidateFinal();
+        };
+        input.addEventListener('input',onEdit);
+        input.addEventListener('change',onEdit);
+      });
+      scope.querySelectorAll('.rltv2-remove-row').forEach(button=>button.addEventListener('click',()=>{
+        const tbody=button.closest('tbody');
+        button.closest('tr').remove();
+        [...tbody.querySelectorAll('tr')].forEach((tr,i)=>{
+          const pos=tr.querySelector('.rltv2-review-position');
+          pos.value=String(i+1);pos.max=String(tbody.querySelectorAll('tr').length);
+        });
+        invalidateFinal();
+      }));
     }
 
     async function validateAndPrepareReview(){
@@ -300,31 +331,25 @@
         payload=p;
         gate.className='intake-gate clear';
         gate.innerHTML='<strong>JSON CARREGADO</strong><div>Agora faça a conferência humana de posição e nome. A impressão ainda está bloqueada.</div>';
-        reviewCount.textContent=p.salao.length+' linhas para conferir';
+        reviewCount.textContent=(p.salao.length+p.standby.length+p.online.length)+' linhas carregadas';
         reviewHost.innerHTML=reviewRowsHtml(p,brokers);
         reviewCard.hidden=false;
-        syncReviewState();
         reviewGate.className='intake-gate blocked';
-        reviewGate.innerHTML='<strong>CONFERÊNCIA PENDENTE</strong><div>Compare posição e nome com a folha original.</div>';
-        reviewHost.querySelectorAll('input').forEach(input=>{
-          const onEdit=()=>{
-            const tr=input.closest('tr');
-            if(input.classList.contains('rltv2-review-name')){
-              const broker=brokers.find(b=>normalizeName(b.nome)===normalizeName(input.value));
-              if(broker){
-                input.value=broker.nome;
-                tr.querySelector('.rltv2-review-creci').textContent=broker.creci;
-                tr.querySelector('.rltv2-review-manager').textContent=broker.gerente;
-                tr.querySelector('.rltv2-review-director').textContent=broker.diretor;
-                tr.querySelector('.rltv2-review-status').textContent=broker.status_creci;
-              }
-            }
-            syncReviewState();
-            invalidateFinal();
-          };
-          input.addEventListener('input',onEdit);
-          input.addEventListener('change',onEdit);
-        });
+        reviewGate.innerHTML='<strong>CONFERÊNCIA PENDENTE</strong><div>Compare SALÃO, STAND BY e ON-LINE com a folha original.</div>';
+        bindReviewControls(reviewHost);
+        reviewHost.querySelectorAll('.rltv2-add-row').forEach(button=>button.addEventListener('click',()=>{
+          const group=button.dataset.addGroup;
+          const section=reviewHost.querySelector('[data-review-group="'+group+'"]');
+          const tbody=section.querySelector('tbody');
+          const index=tbody.querySelectorAll('tr').length;
+          const temp={nome:'',creci:'',gerente:'',diretor:'',status_creci:''};
+          tbody.insertAdjacentHTML('beforeend',reviewRowHtml(temp,group,index,index+1));
+          const row=tbody.lastElementChild;
+          row.dataset.originalPosition=String(index+1);
+          row.dataset.originalName='';
+          bindReviewControls(row);
+          invalidateFinal();
+        }));
         reviewCard.scrollIntoView({behavior:'smooth',block:'start'});
       }catch(err){
         gate.className='intake-gate blocked';
@@ -349,7 +374,6 @@
 
     reviewBtn.addEventListener('click',()=>{
       if(!payload)return;
-      syncReviewState();
       const result=applyReviewState();
       if(result.errors.length){
         reviewGate.className='intake-gate blocked';
