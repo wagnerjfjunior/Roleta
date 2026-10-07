@@ -48,6 +48,7 @@ const brokers=Brokers.derive(
   {blockedEvents:[...blockedEvents]}
 );
 
+const legacyBrokerStats=json('data/legacy/broker-stats-v3-2026-10-06.json');
 const model={
   version:'DASHBOARD-MODEL-V1',
   source_version:manifest.logical_dataset_version,
@@ -55,6 +56,19 @@ const model={
   blocked_identity_events:[...blockedEvents].sort(),
   events,
   eventModel:Events.build(events,exceptions),
+  brokerCoverage:{
+    status:'PARTIAL_NOMINAL_AUDITABLE',
+    canonical_event_count:manifest.canonical_event_count,
+    auditable_nominal_events:brokers.validated_events,
+    auditable_nominal_rows:brokers.validated_rows,
+    blocked_identity_events:[...blockedEvents].sort(),
+    legacy_snapshot:{
+      validated_events:legacyBrokerStats.validated_events,
+      validated_rows:legacyBrokerStats.validated_rows,
+      audit_status:legacyBrokerStats.audit_status,
+      source:legacyBrokerStats.source
+    }
+  },
   brokers,
   weekend:Weekend.resolve(json('data/weekend-policy.json'),json('data/presence-current-week.json')),
   modelLab:json('data/model-lab.json')
