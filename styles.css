@@ -820,18 +820,32 @@ body{overflow-x:hidden}
   .rltv2-screen-preview{overflow-x:auto}
 }
 @media print{
-  @page{size:A4 portrait;margin:8mm}
-  body{background:#fff!important}
+  @page{size:A4 portrait;margin:4.5mm}
+  html,body{height:auto!important;margin:0!important;padding:0!important;background:#fff!important}
   body *{visibility:hidden!important}
   #rltv2PrintHost,#rltv2PrintHost *{visibility:visible!important}
-  #rltv2PrintHost{display:block!important;position:absolute;left:0;top:0;width:100%;margin:0!important;padding:0!important;background:#fff!important;color:#000!important}
+  #rltv2PrintHost{
+    display:block!important;position:absolute;left:0;top:0;width:100%;margin:0!important;padding:0!important;
+    background:#fff!important;color:#000!important;font-family:Arial,Helvetica,sans-serif!important;
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important
+  }
+  #rltv2PrintHost .rltv2-sheet{page-break-inside:avoid!important;break-inside:avoid-page!important}
   #rltv2PrintHost .rltv2-grid{grid-template-columns:8% 24% 17% 22% 13% 16%;width:100%}
-  #rltv2PrintHost .rltv2-grid>span{font-size:8.7pt;min-height:6.3mm;padding:1mm 1.1mm;border-color:#111}
-  #rltv2PrintHost .rltv2-header-labels>span{font-size:8.8pt}
-  #rltv2PrintHost .rltv2-header-values>span{font-size:8.8pt}
-  #rltv2PrintHost .rltv2-company-split b{font-size:8pt;padding:.8mm .5mm}
-  #rltv2PrintHost .rltv2-head>span{font-size:8pt}
-  #rltv2PrintHost .rltv2-section{font-size:8.5pt;padding:1.2mm;margin-top:1.5mm}
+  #rltv2PrintHost .rltv2-grid>span{
+    font-size:11.5pt;line-height:1.02;min-height:5.35mm;padding:.45mm .65mm;border-color:#111;
+    overflow:hidden;white-space:nowrap
+  }
+  #rltv2PrintHost .rltv2-header-labels>span,
+  #rltv2PrintHost .rltv2-header-values>span{font-size:11pt;min-height:5.6mm}
+  #rltv2PrintHost .rltv2-company-split b{font-size:10.5pt;padding:.35mm .25mm;line-height:1}
+  #rltv2PrintHost .rltv2-head>span{font-size:10.5pt;min-height:5.2mm}
+  #rltv2PrintHost .rltv2-row>span{font-size:11.5pt}
+  #rltv2PrintHost .rltv2-row.shade>span{background:#eeeeee!important}
+  #rltv2PrintHost .rltv2-row:not(.shade)>span{background:#ffffff!important}
+  #rltv2PrintHost .rltv2-section{
+    font-size:11pt;line-height:1;padding:.65mm;margin-top:.65mm;background:#d9d9d9!important;
+    page-break-after:avoid!important;break-after:avoid-page!important
+  }
 }
 
 
