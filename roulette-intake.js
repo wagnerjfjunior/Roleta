@@ -106,6 +106,24 @@
       '</div>';
   }
 
+  function promoteHumanConfirmation(p){
+    const groups=[p.salao||[],p.standby||[],p.online||[]];
+    groups.flat().forEach(r=>{
+      const s=reconciliationState(r);
+      if(s==='EXACT_MATCH'||s==='USER_CONFIRMED')return;
+      r.reconciliation=Object.assign({},r.reconciliation||{},{
+        status:'USER_CONFIRMED',
+        confirmed_name:r.nome,
+        confirmed_manager:r.gerente,
+        confirmed_at:new Date().toISOString(),
+        confirmation_source:'RLT_PRINT_V2_HUMAN_GATE'
+      });
+      r.match_status='USER_CONFIRMED';
+    });
+    p.canonical_confirmation={status:'USER_CONFIRMED',confirmed_at:new Date().toISOString(),scope:'names_managers_final_order'};
+    return p;
+  }
+
   function reconciliationReview(p){
     const groups=[['SALÃO',p.salao],['STAND-BY',p.standby],['ON-LINE',p.online]];
     const rows=groups.flatMap(([g,rs])=>(rs||[]).map((r,i)=>({g,r,i})));
@@ -202,6 +220,15 @@
 
     confirm.addEventListener('change',()=>{
       const rg=payload?reconciliationGate(payload):{mode:'LEGACY',errors:['sem payload']};
+      if(confirm.checked&&payload&&rg.mode==='V2'&&rg.errors.length){
+        promoteHumanConfirmation(payload);
+        reconciliation.innerHTML=reconciliationReview(payload);
+        const after=reconciliationGate(payload);
+        print.disabled=after.errors.length>0;
+        gate.className='intake-gate clear';
+        gate.innerHTML='<strong>USER_CONFIRMED</strong><div>Conferência humana registrada nesta versão. Nomes, gerente/equipe e ordem final estão liberados para impressão e ingestão estatística.</div>';
+        return;
+      }
       print.disabled=!confirm.checked||!payload||rg.mode!=='V2'||rg.errors.length>0;
       if(confirm.checked&&payload&&(rg.mode!=='V2'||rg.errors.length)){
         gate.className='intake-gate blocked';
@@ -216,5 +243,5 @@
     });
   }
 
-  window.RouletteIntake={mount,validatePayload,renderCanonical};
+  window.RouletteIntake={mount,validatePayload,renderCanonical,reconciliationGate,promoteHumanConfirmation};
 })();
