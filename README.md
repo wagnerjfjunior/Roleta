@@ -45,3 +45,14 @@ Comece sempre por:
 ## Regra estatística
 
 Padrões históricos podem ser acompanhados, mas não devem ser apresentados como aumento comprovado da probabilidade futura sem validação prospectiva adequada.
+
+
+## Fluxo canônico de Nova Roleta / impressão
+
+Para qualquer alteração no fluxo operacional de validação e impressão, ler obrigatoriamente:
+
+- `docs/PRINT_TEMPLATE_V2.md` — contrato e invariantes canônicos do RLT-PRINT-V2;
+- `docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md` — histórico de implementação, falhas reais, decisões e testes;
+- `handoffs/CURRENT.md` — estado corrente e gate de promoção.
+
+Regra central: **JSON importado é transcrição inicial; impressão/PDF exige conferência humana e payload revisado.**
