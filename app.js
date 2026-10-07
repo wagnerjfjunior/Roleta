@@ -1,5 +1,7 @@
 const state={events:[],weekendPolicy:null,presence:null,modelLab:null};
 const OBJ='n1last';
+const domain=window.RoletaDomainCore;
+if(!domain)throw new Error('RoletaDomainCore unavailable.');
 
 const SCHEDULE_EXCEPTIONS={
   '04/10/2026':{mode:'dual',periods:['manha','tarde'],reason:'Eleições Gerais 2026 · 1º turno'},
@@ -42,9 +44,9 @@ function eventFromRow(r){
     quality:r['Qualidade'],notes:r['Observação']||''
   };
 }
-function eligible(e,pos){return e.occupied.includes(pos)}
-function hit(e,pos){return e.first===pos||e.last===pos}
-function chance(e){return Math.min(1,2/e.N)}
+function eligible(e,pos){return domain.eligible(e,pos)}
+function hit(e,pos){return domain.hit2x(e,pos)}
+function chance(e){return domain.chance2x(e)}
 function format(x,d=2){return Number.isFinite(x)?x.toFixed(d).replace('.',','):'—'}
 
 function rank(events,minExposure=3){

@@ -1,0 +1,30 @@
+{
+  "generated_from": "canonical versioned data",
+  "schema": "rlt-current-data-state-v1",
+  "canonical_dataset": {
+    "version": "2026-10-06-86",
+    "logical_events": 86,
+    "quality_A": 82,
+    "quality_B": 4,
+    "sources": 8
+  },
+  "nominal_ledger": {
+    "events": 51,
+    "participant_rows": 1093
+  },
+  "prospective": {
+    "recommendations": 144,
+    "weekly_frozen": 48,
+    "current": 48,
+    "random_shadow": 48,
+    "executions": 0,
+    "adjudications": 12
+  },
+  "authority": {
+    "dataset": "data/manifest.json",
+    "nominal": "data/full_draws_reconstructed.csv",
+    "prospective_recommendations": "data/prospective/recommendations.jsonl",
+    "prospective_executions": "data/prospective/executions.jsonl",
+    "prospective_adjudications": "data/prospective/adjudications.jsonl"
+  }
+}

@@ -1,6 +1,9 @@
 (function(global){
   'use strict';
 
+  const domain=global.RoletaDomainCore||(typeof module!=='undefined'&&module.exports?require('../domain/core.js'):null);
+  if(!domain)throw new Error('RoletaDomainCore unavailable.');
+
   function hashSeed(input){
     let h=2166136261>>>0;
     const s=String(input??'roleta');
@@ -70,7 +73,7 @@
     const nm=stats.nBuckets.get(nk);
     for(const pos of e.occupied){
       const isHit=(e.first===pos||e.last===pos)?1:0;
-      const expected=Math.min(1,2/e.N);
+      const expected=domain.chance2x(e);
       const g=statFor(stats.global,pos);
       g.exp++;g.hits+=isHit;g.expected+=expected;
       const p=statFor(pm,pos);

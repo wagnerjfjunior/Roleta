@@ -1,6 +1,9 @@
 (function(global){
   'use strict';
 
+  const domain=global.RoletaDomainCore||(typeof module!=='undefined'&&module.exports?require('../domain/core.js'):null);
+  if(!domain)throw new Error('RoletaDomainCore unavailable.');
+
   function hashSeed(input){
     let h=2166136261>>>0;
     for(const ch of String(input??'roleta-weekly-duel')){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}
@@ -34,7 +37,7 @@
     const pm=stats.periods.get(period);
     for(const pos of e.occupied){
       const hit=(e.first===pos||e.last===pos)?1:0;
-      const expected=Math.min(1,2/e.N);
+      const expected=domain.chance2x(e);
       const g=statFor(stats.global,pos);g.exp++;g.hits+=hit;g.expected+=expected;
       const p=statFor(pm,pos);p.exp++;p.hits+=hit;p.expected+=expected;
     }

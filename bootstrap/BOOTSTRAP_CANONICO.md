@@ -20,17 +20,21 @@ Este repositório aplica SFJM, mas não redefine o protocolo.
 3. ler `docs/SFJM_BOUNDARY.md`;
 4. ler `handoffs/CURRENT.md`;
 5. ler `docs/PROJECT_STATUS.md`;
-6. ler `docs/NEXT_SAFE_ACTION.md`;
-7. ler `docs/BLOCKED_ACTIONS.md`;
-8. ler `docs/METHODOLOGY.md` quando a tarefa envolver estatística/dados;
-9. ler `docs/OPERATING_RULES.md` quando a tarefa envolver regras de plantão;
-10. resolver evidência exata necessária antes de concluir ou mutar.
-11. ler `docs/PRINT_TEMPLATE_V2.md` sempre que a tarefa envolver Nova Roleta, validação, prévia, impressão ou PDF;
-12. ler `docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md` quando houver regressão ou dúvida sobre decisões de implementação do fluxo de impressão.
+6. ler `docs/sfjm/CURRENT_DATA_STATE.json` para contagens voláteis derivadas;
+7. ler `docs/NEXT_SAFE_ACTION.md`;
+8. ler `docs/BLOCKED_ACTIONS.md`;
+9. ler `docs/METHODOLOGY.md` quando a tarefa envolver estatística/dados;
+10. ler `docs/OPERATING_RULES.md` quando a tarefa envolver regras de plantão;
+11. resolver evidência exata necessária antes de concluir ou mutar.
+12. ler `docs/PRINT_TEMPLATE_V2.md` sempre que a tarefa envolver Nova Roleta, validação, prévia, impressão ou PDF;
+13. ler `docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md` quando houver regressão ou dúvida sobre decisões de implementação do fluxo de impressão.
+14. ler `docs/ARCHITECTURE.md` quando a tarefa alterar fronteiras de domínio, dados, simulação, prospectivo ou infraestrutura.
 
 ## 3. Regra de autoridade
 
 GitHub/versionado controla o estado atual.
+
+Para contagens voláteis de dataset/ledgers, `data/manifest.json` e `docs/sfjm/CURRENT_DATA_STATE.json` prevalecem sobre números copiados em documentação narrativa.
 
 ```text
 CONVERSATION != CANONICAL_STATE
