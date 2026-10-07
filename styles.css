@@ -850,3 +850,17 @@ body{overflow-x:hidden}
   .rltv2-review-card{padding:14px}
   .rltv2-review-wrap{margin-left:-2px;margin-right:-2px}
 }
+
+
+.rltv2-review-group{margin-top:16px}
+.rltv2-review-group:first-of-type{margin-top:0}
+.rltv2-review-group-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.rltv2-review-group-head strong{font-size:12px;letter-spacing:.05em}
+.rltv2-add-row,.rltv2-remove-row{
+  border:1px solid #2a405a;background:#091523;color:var(--cyan);border-radius:9px;
+  padding:7px 10px;font-size:10px;font-weight:800;cursor:pointer
+}
+.rltv2-remove-row{color:var(--danger);border-color:rgba(255,123,135,.35)}
+@media(max-width:700px){
+  .rltv2-review-group-head{align-items:flex-start;flex-direction:column}
+}
