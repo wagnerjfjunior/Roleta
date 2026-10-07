@@ -40,3 +40,25 @@ assert.strictEqual(payload.canonical_confirmation.status,'CANONICO_PARA_ESTATIST
 assert.doesNotThrow(()=>r.canonicalStatisticalPayload(payload));
 
 console.log('PASS reconciliation-v2 regression: no bulk promotion, position/name/draw mapping preserved.');
+
+
+(function verifyProspectiveSemantics(){
+  const fs=require('fs');
+  const path=require('path');
+  const root=path.join(__dirname,'..');
+  const executions=fs.readFileSync(path.join(root,'data','prospective','executions.jsonl'),'utf8');
+  const ui=fs.readFileSync(path.join(root,'prospective','ui.js'),'utf8');
+
+  assert.ok(executions.includes('"execution_id":"EXEC-2026-10-05-manha-Wagner-14"'));
+  assert.ok(executions.includes('"physical_position":14'));
+  assert.ok(executions.includes('"result_2x":"MISS"'));
+
+  assert.ok(executions.includes('"execution_id":"EXEC-2026-10-05-tarde-Wagner-18"'));
+  assert.ok(executions.includes('"source_person_id":"Laura"'));
+  assert.ok(executions.includes('"result_2x":"HIT"'));
+
+  assert.ok(ui.includes('MODELO'));
+  assert.ok(ui.includes('EXECUÇÃO'));
+  assert.ok(ui.includes('executionMark(executed)'));
+  console.log('PASS 05-10 prospective display semantics: model result and person execution are distinct.');
+})();
