@@ -98,3 +98,28 @@ ON-LINE somente se online.length > 0.
 ## Regra antirregressão
 O renderer não pode interpretar ou redesenhar o layout.
 Ele apenas preenche este template com o JSON validado.
+
+
+## RLT-RECONCILIATION-V2
+A leitura manuscrita não é verdade canônica por si só. Antes da impressão e antes de alimentar estatística, cada corretor deve passar por reconciliação contra data/brokers-official.csv.
+
+Estados:
+- EXACT_MATCH: leitura e cadastro oficial convergem sem ambiguidade.
+- PROBABLE_MATCH: melhor candidato, ainda exige confirmação humana.
+- AMBIGUOUS: dois ou mais candidatos plausíveis.
+- USER_CONFIRMED: usuário resolveu explicitamente a identidade.
+
+Critérios de reconciliação, em ordem:
+1. similaridade do nome manuscrito com Nome Comercial;
+2. gerente/equipe como evidência de desempate quando disponível;
+3. confirmação humana quando a evidência não for suficiente.
+
+CRECI, diretor, equipe e status devem vir do cadastro oficial após a identidade ser resolvida; não devem ser inferidos da caligrafia.
+
+Gate canônico:
+- somente EXACT_MATCH e USER_CONFIRMED podem ser liberados para impressão e ingestão estatística;
+- PROBABLE_MATCH e AMBIGUOUS bloqueiam;
+- payload legado sem estado de reconciliação pode ser visualizado, mas não recebe confirmação canônica V2;
+- o checkbox final confirma nomes, gerente/equipe e ordem final e autoriza aquela versão como fonte para estatística.
+
+A confirmação visual deve ocorrer antes de qualquer atualização de ranking, HIT/MISS, presença ou modelo.
