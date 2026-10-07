@@ -4,39 +4,14 @@
   const POLICY_VERSION='PROSPECTIVE-V1.0.0';
   const MODEL_VERSION='RLT-M5-WEEKLY-V1';
   const PEOPLE=['Wagner','Laura','Brenda','Helena'];
-
-  function nChance(e){return Number.isFinite(e.N)&&e.N>0?Math.min(1,2/e.N):0}
-
-  function scoreRows(events){
-    const map=new Map();
-    for(const e of events||[]){
-      if(!Number.isFinite(e.N)||!Array.isArray(e.occupied))continue;
-      const expected=nChance(e);
-      for(const pos of e.occupied){
-        if(!Number.isFinite(pos))continue;
-        if(!map.has(pos))map.set(pos,{pos,exposure:0,hits:0,expected:0});
-        const r=map.get(pos);
-        r.exposure++;
-        r.expected+=expected;
-        if(e.first===pos||e.last===pos)r.hits++;
-      }
-    }
-    return [...map.values()].map(r=>({
-      ...r,
-      oe:r.expected?r.hits/r.expected:0,
-      excess:r.hits-r.expected
-    }));
-  }
-
-  function rankRows(rows,minExposure){
-    return rows.filter(r=>r.exposure>=minExposure)
-      .sort((a,b)=>b.excess-a.excess||b.hits-a.hits||b.oe-a.oe||b.exposure-a.exposure||a.pos-b.pos);
-  }
+  const core=global.RoletaDomainCore||(typeof module!=='undefined'&&module.exports?require('../domain/core.js'):null);
+  if(!core)throw new Error('RoletaDomainCore unavailable.');
 
   function rankingFor(events,period,minExposure=3){
-    const periodRows=rankRows(scoreRows((events||[]).filter(e=>e.period===period)),minExposure);
-    if(periodRows.length>=PEOPLE.length+2)return {source:'period_raw',rows:periodRows};
-    return {source:'global_fallback',rows:rankRows(scoreRows(events||[]),minExposure)};
+    return core.rankingForPeriod(events,period,{
+      minExposure,
+      minRowsForPeriod:PEOPLE.length+2
+    });
   }
 
   function allocateFamilies(events,targetEvent,options={}){
@@ -127,6 +102,36 @@
     });
   }
 
+  function createDraftRecord(base,meta){
+    if(!base||!Number.isFinite(base.physical_position))throw new Error('Recommendation requires physical_position.');
+    if(!meta||!meta.data_cutoff||!meta.generated_at)throw new Error('Draft requires data_cutoff and generated_at.');
+    if(meta.strategy!=='CURRENT')throw new Error('Only CURRENT may be created as a draft recommendation.');
+    return Object.freeze({
+      recommendation_id:meta.recommendation_id,
+      person_id:base.person_id,
+      target_event_id:base.target_event_id,
+      target_date:base.target_date,
+      target_period:base.target_period,
+      strategy:'CURRENT',
+      physical_position:base.physical_position,
+      fallback_positions:[...(base.fallback_positions||[])],
+      previous_position:meta.previous_position??null,
+      revision_number:meta.revision_number||0,
+      generated_at:meta.generated_at,
+      data_cutoff:meta.data_cutoff,
+      trigger_event_id:meta.trigger_event_id||null,
+      model_family:'period_raw_global_fallback',
+      model_version:MODEL_VERSION,
+      policy_version:POLICY_VERSION,
+      config_hash:meta.config_hash,
+      status:'DRAFT',
+      is_frozen:false,
+      frozen_at:null,
+      supersedes_recommendation_id:meta.supersedes_recommendation_id||null,
+      ranking_source:base.ranking_source
+    });
+  }
+
   function canonicalTargetEventId(event,targetEventId){
     if(!event)return null;
     if(event.id===targetEventId||event.target_event_id===targetEventId)return targetEventId;
@@ -157,7 +162,7 @@
       hit_2x:hit2,
       hit_3x:hit3,
       hit_4x:hit4,
-      expected_probability_2x:nChance(event),
+      expected_probability_2x:core.chance2x(event),
       adjudicated_at:at
     });
   }
@@ -175,11 +180,18 @@
     const alloc=allocateFamilies(history,target,{minExposure:1});
     if(alloc.length!==4||new Set(alloc.map(x=>x.physical_position)).size!==4)throw new Error('Distinct allocation failed.');
 
+    core.selfTest();
     const frozen=freezeRecord(alloc[0],{
       recommendation_id:'REC-TEST-1',strategy:'WEEKLY_FROZEN',
       generated_at:'2098-12-31T20:00:00-03:00',data_cutoff:'F',
       config_hash:'TEST'
     });
+    const draft=createDraftRecord(alloc[0],{
+      recommendation_id:'REC-TEST-CURRENT-1',strategy:'CURRENT',
+      generated_at:'2098-12-31T20:00:00-03:00',data_cutoff:'F',
+      config_hash:'TEST'
+    });
+    if(draft.status!=='DRAFT'||draft.is_frozen||draft.frozen_at!==null)throw new Error('CURRENT draft state failed.');
     let mutationBlocked=false;
     try{frozen.physical_position=99}catch(_){mutationBlocked=true}
     if(frozen.physical_position===99)throw new Error('Frozen recommendation mutated.');
@@ -215,7 +227,7 @@
 
   global.RoletaProspectiveLedger={
     POLICY_VERSION,MODEL_VERSION,PEOPLE,
-    rankingFor,allocateFamilies,deterministicChain,resolveFirstEligible,freezeRecord,canonicalTargetEventId,adjudicate,selfTest
+    rankingFor,allocateFamilies,deterministicChain,resolveFirstEligible,freezeRecord,createDraftRecord,canonicalTargetEventId,adjudicate,selfTest
   };
 
   if(typeof module!=='undefined'&&module.exports)module.exports=global.RoletaProspectiveLedger;
