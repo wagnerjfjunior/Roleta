@@ -130,7 +130,7 @@
   function canonicalTargetEventId(event,targetEventId){
     if(!event)return null;
     if(event.id===targetEventId||event.target_event_id===targetEventId)return targetEventId;
-    const m=String(targetEventId||'').match(/^(\\d{4})-(\\d{2})-(\\d{2})-(manha|tarde|integral)$/);
+    const m=String(targetEventId||'').match(/^(\d{4})-(\d{2})-(\d{2})-(manha|tarde|integral)$/);
     if(!m)return null;
     const suffix={manha:'M',tarde:'T',integral:'I'}[m[4]];
     const shortId=m[3]+'-'+m[2]+'-'+suffix;
