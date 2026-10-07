@@ -46,6 +46,15 @@
   }
 
   function companyResult(e){
+    if(e&&e.company_draw){
+      const d=e.company_draw;
+      const tg=Array.isArray(d.tegra_positions)?d.tegra_positions:[];
+      const hb=Array.isArray(d.helbor_positions)?d.helbor_positions:[];
+      const parts=[];
+      if(tg.length)parts.push('TG '+tg.join(' - '));
+      if(hb.length)parts.push('HB '+hb.join(' - '));
+      return {parts,summary:parts.join(' | ')};
+    }
     if(e&&e.resultado){
       const empresa=String(e.resultado.empresa||'TEGRA').trim()||'TEGRA';
       if(e.resultado.numero_exposto===true&&e.resultado.numero!==null&&e.resultado.numero!==undefined&&String(e.resultado.numero).trim()!==''){
@@ -58,6 +67,24 @@
     if(String(legacy.tg||'').trim())parts.push('TG '+String(legacy.tg).replace(/^TG\s*/i,'').trim());
     if(String(legacy.hb||'').trim())parts.push('HB '+String(legacy.hb).replace(/^HB\s*/i,'').trim());
     return {parts,summary:parts.join(' | ')};
+  }
+
+  function deriveCompanyDraw(mode,primary,secondary){
+    const all=[1,2,3];
+    const a=Number(primary),b=Number(secondary);
+    if(mode==='tegra_share'){
+      if(!all.includes(a))return null;
+      return {mode,tegra_positions:all.filter(x=>x!==a),helbor_positions:[a]};
+    }
+    if(mode==='helbor_share'){
+      if(!all.includes(a))return null;
+      return {mode,tegra_positions:[a],helbor_positions:all.filter(x=>x!==a)};
+    }
+    if(mode==='none'){
+      if(!all.includes(a)||!all.includes(b)||a===b)return null;
+      return {mode,tegra_positions:[a],helbor_positions:[b]};
+    }
+    return null;
   }
 
   function validatePayload(p){
@@ -238,6 +265,13 @@
       '<article id="rltv2ReviewCard" class="card rltv2-review-card" hidden>'+
         '<div class="section-head"><div><span class="eyebrow">2 · CONFERÊNCIA HUMANA</span><h2>Validar SALÃO, STAND BY e ON-LINE</h2></div><span id="rltv2ReviewCount" class="intake-counts"></span></div>'+
         '<p class="small muted">Compare todos os blocos com a folha manuscrita. Corrija posição/nome e adicione ou remova STAND BY e ON-LINE quando a transcrição tiver omitido alguém. Os dados cadastrais são atualizados pelo cadastro oficial.</p>'+
+        '<div class="rltv2-company-review">'+
+          '<label><span>Quantidade HELBOR</span><input id="rltv2HelborQtd" type="number" min="0" inputmode="numeric"></label>'+
+          '<label><span>Regra do sorteio</span><select id="rltv2ShareMode"><option value="tegra_share">Share Tegra</option><option value="none">Sem share</option><option value="helbor_share">Share Helbor</option></select></label>'+
+          '<label id="rltv2PrimaryWrap"><span id="rltv2PrimaryLabel">Posição HELBOR</span><select id="rltv2PrimaryPosition"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>'+
+          '<label id="rltv2SecondaryWrap" hidden><span>Posição HELBOR</span><select id="rltv2SecondaryPosition"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>'+
+          '<div class="rltv2-company-derived"><span>Resultado</span><strong id="rltv2CompanyDerived">—</strong></div>'+
+        '</div>'+
         '<div id="rltv2Review"></div>'+
         '<div class="intake-actions"><button id="rltv2ApplyReview" class="simulation-run">Aplicar correções e validar</button></div>'+
         '<div id="rltv2ReviewGate" class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Revise as linhas antes de liberar a prévia final.</div></div>'+
@@ -260,6 +294,13 @@
     const reviewCount=host.querySelector('#rltv2ReviewCount');
     const reviewBtn=host.querySelector('#rltv2ApplyReview');
     const reviewGate=host.querySelector('#rltv2ReviewGate');
+    const helborQtd=host.querySelector('#rltv2HelborQtd');
+    const shareMode=host.querySelector('#rltv2ShareMode');
+    const primaryPosition=host.querySelector('#rltv2PrimaryPosition');
+    const secondaryPosition=host.querySelector('#rltv2SecondaryPosition');
+    const primaryLabel=host.querySelector('#rltv2PrimaryLabel');
+    const secondaryWrap=host.querySelector('#rltv2SecondaryWrap');
+    const companyDerived=host.querySelector('#rltv2CompanyDerived');
     const card=host.querySelector('#rltv2PreviewCard');
     const preview=host.querySelector('#rltv2Preview');
     const counts=host.querySelector('#rltv2Counts');
@@ -283,8 +324,51 @@
       reviewGate.innerHTML='<strong>ALTERAÇÕES PENDENTES</strong><div>Clique em Aplicar correções e validar antes da impressão.</div>';
     }
 
+    function refreshCompanyDraw(){
+      const mode=shareMode.value;
+      secondaryWrap.hidden=mode!=='none';
+      primaryLabel.textContent=mode==='tegra_share'?'Posição HELBOR':(mode==='helbor_share'?'Posição TEGRA':'Posição TEGRA');
+      const draw=deriveCompanyDraw(mode,primaryPosition.value,secondaryPosition.value);
+      companyDerived.textContent=draw?('TG '+draw.tegra_positions.join(' - ')+' | HB '+draw.helbor_positions.join(' - ')):'Seleção inválida';
+      return draw;
+    }
+
+    function seedCompanyControls(p){
+      helborQtd.value=String(Number(p.evento?.helbor_qtd)||0);
+      const d=p.evento?.company_draw;
+      if(d&&['tegra_share','none','helbor_share'].includes(d.mode)){
+        shareMode.value=d.mode;
+        if(d.mode==='tegra_share')primaryPosition.value=String(d.helbor_positions?.[0]||1);
+        else if(d.mode==='helbor_share')primaryPosition.value=String(d.tegra_positions?.[0]||1);
+        else{
+          primaryPosition.value=String(d.tegra_positions?.[0]||1);
+          secondaryPosition.value=String(d.helbor_positions?.[0]||2);
+        }
+      }else{
+        // Safe default for the current operational pattern; human review remains mandatory.
+        shareMode.value='tegra_share';
+        primaryPosition.value='1';
+        secondaryPosition.value='2';
+      }
+      refreshCompanyDraw();
+    }
+
     function applyReviewState(){
-      return applyHumanReview(payload,reviewHost,brokers);
+      const result=applyHumanReview(payload,reviewHost,brokers);
+      if(result.errors.length||!result.payload)return result;
+      const qtd=Number(helborQtd.value);
+      const draw=refreshCompanyDraw();
+      const extra=[];
+      if(!Number.isInteger(qtd)||qtd<0)extra.push('Quantidade HELBOR inválida.');
+      if(!draw)extra.push('Sorteio de empresa inválido.');
+      if(extra.length)return {errors:extra,payload:null,corrections:result.corrections};
+      result.payload.evento.helbor_qtd=qtd;
+      result.payload.evento.company_draw=draw;
+      result.payload.evento.sorteio_empresa={
+        tg:draw.tegra_positions.join(' - '),
+        hb:draw.helbor_positions.join(' - ')
+      };
+      return result;
     }
 
     function bindReviewControls(scope){
@@ -333,10 +417,15 @@
         gate.innerHTML='<strong>JSON CARREGADO</strong><div>Agora faça a conferência humana de posição e nome. A impressão ainda está bloqueada.</div>';
         reviewCount.textContent=(p.salao.length+p.standby.length+p.online.length)+' linhas carregadas';
         reviewHost.innerHTML=reviewRowsHtml(p,brokers);
+        seedCompanyControls(p);
         reviewCard.hidden=false;
         reviewGate.className='intake-gate blocked';
         reviewGate.innerHTML='<strong>CONFERÊNCIA PENDENTE</strong><div>Compare SALÃO, STAND BY e ON-LINE com a folha original.</div>';
         bindReviewControls(reviewHost);
+        [helborQtd,shareMode,primaryPosition,secondaryPosition].forEach(control=>{
+          control.addEventListener('input',()=>{refreshCompanyDraw();invalidateFinal()});
+          control.addEventListener('change',()=>{refreshCompanyDraw();invalidateFinal()});
+        });
         reviewHost.querySelectorAll('.rltv2-add-row').forEach(button=>button.addEventListener('click',()=>{
           const group=button.dataset.addGroup;
           const section=reviewHost.querySelector('[data-review-group="'+group+'"]');
@@ -399,5 +488,5 @@
     });
   }
 
-  window.RouletteIntake={mount,normalizePayload,validatePayload,renderCanonical,applyHumanReview};
+  window.RouletteIntake={mount,normalizePayload,validatePayload,renderCanonical,applyHumanReview,deriveCompanyDraw};
 })();
