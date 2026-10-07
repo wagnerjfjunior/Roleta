@@ -23,10 +23,10 @@ for(const file of ['core/csv.js','core/events.js','core/brokers.js','core/weeken
   const text=fs.readFileSync(path.join(root,file),'utf8');
   if(/\bdocument\b|querySelector|innerHTML|createElement/.test(text)){console.error(file+': domain module references DOM');failed=true}
 }
-if(failed)process.exit(1);
-console.log('Architecture guard PASS');
-
 const index=fs.readFileSync(path.join(root,'index.html'),'utf8');
 if(/<script[^>]+src="\/core\//.test(index)){console.error('index.html: core domain modules must not execute in browser');failed=true}
 const service=fs.readFileSync(path.join(root,'services/dashboard-service.js'),'utf8');
 if(!service.includes('/data/dashboard-view.json')){console.error('dashboard service must consume dashboard-view DTO');failed=true}
+
+if(failed)process.exit(1);
+console.log('Architecture guard PASS');
