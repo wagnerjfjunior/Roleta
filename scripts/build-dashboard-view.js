@@ -19,10 +19,8 @@ const exceptions={
   '25/10/2026':{mode:'dual',periods:['manha','tarde'],reason:'Eleições Gerais 2026 · eventual 2º turno'}
 };
 
-const transDir=path.join(root,'data','transcriptions');
-const transRows=fs.existsSync(transDir)
-  ? fs.readdirSync(transDir).filter(x=>x.endsWith('.csv')).sort().flatMap(x=>CSV.parse(fs.readFileSync(path.join(transDir,x),'utf8')))
-  : [];
+const transcriptionRegistry=json('data/dashboard-transcription-sources.json');
+const transRows=(transcriptionRegistry.sources||[]).flatMap(p=>CSV.parse(read(p)));
 
 const blockedEvents=new Set();
 if(exists('data/identity-reconciliation.jsonl')){
