@@ -123,3 +123,34 @@ Final RLT-M4-07-v2 gate:
 - weak_noise · 1% · 50,000 weeks: Weekly paired-valid O/E 1.017500 vs Current 1.013143; mean Δ O/E -0.004238.
 
 Decision: RLT-M4-07-v2 is CLOSED for the V1 operational question. WEEKLY_FROZEN is the official recommendation; CURRENT remains diagnostic only.
+
+
+---
+
+## NEXT SAFE ACTION — RLT-PRINT-V2 / PR #19
+
+Active branch:
+`feature/rlt-print-company-draw-review-20261007`
+
+PR:
+`#19`
+
+Do not add new business behavior before closing this gate.
+
+Required final local acceptance:
+1. load the 07/10/2026 afternoon case;
+2. confirm HELBOR quantity can be corrected independently;
+3. confirm Share Tegra exposes only Posição HELBOR;
+4. confirm Share Helbor exposes only Posição TEGRA;
+5. confirm No Share exposes both positions;
+6. confirm derived TG/HB positions are correct;
+7. confirm SALÃO/STAND BY/ON-LINE human edits survive into final preview;
+8. confirm final print has zebra;
+9. confirm broker rows are legible at ~13pt;
+10. confirm SORTEIO DE EMPRESA is not clipped;
+11. confirm output remains one A4 page for the accepted test case;
+12. confirm both Imprimir and Salvar em PDF use the same reviewed payload.
+
+If all pass, request/receive explicit user approval and merge PR #19 to main.
+
+After merge, update `handoffs/CURRENT.md` with the merge SHA and mark this RLT-PRINT-V2 gate CLOSED.
