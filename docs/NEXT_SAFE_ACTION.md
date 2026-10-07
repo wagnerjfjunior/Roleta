@@ -127,30 +127,44 @@ Decision: RLT-M4-07-v2 is CLOSED for the V1 operational question. WEEKLY_FROZEN 
 
 ---
 
-## NEXT SAFE ACTION — RLT-PRINT-V2 / PR #19
+## RLT-PRINT-V2 — CLOSED
 
-Active branch:
-`feature/rlt-print-company-draw-review-20261007`
+PR #19 was approved and merged to `main`.
 
-PR:
-`#19`
+Functional merge SHA:
+`83dd22f264bfbe45a2049d4f4f73dd74e9ca559e`
 
-Do not add new business behavior before closing this gate.
+Post-merge handoff/documentation commit:
+`f526a86ef6a399b0991131ad6b355ef9e25e34d6`
 
-Required final local acceptance:
-1. load the 07/10/2026 afternoon case;
-2. confirm HELBOR quantity can be corrected independently;
-3. confirm Share Tegra exposes only Posição HELBOR;
-4. confirm Share Helbor exposes only Posição TEGRA;
-5. confirm No Share exposes both positions;
-6. confirm derived TG/HB positions are correct;
-7. confirm SALÃO/STAND BY/ON-LINE human edits survive into final preview;
-8. confirm final print has zebra;
-9. confirm broker rows are legible at ~13pt;
-10. confirm SORTEIO DE EMPRESA is not clipped;
-11. confirm output remains one A4 page for the accepted test case;
-12. confirm both Imprimir and Salvar em PDF use the same reviewed payload.
+Canonical specification:
+`docs/PRINT_TEMPLATE_V2.md`
 
-If all pass, request/receive explicit user approval and merge PR #19 to main.
+Implementation history:
+`docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md`
 
-After merge, update `handoffs/CURRENT.md` with the merge SHA and mark this RLT-PRINT-V2 gate CLOSED.
+Do not reopen the former direct JSON -> print workflow. Human review remains mandatory.
+
+## NEXT SAFE ACTION — nominal backfill
+
+Resume nominal-history reconstruction in strict chronological order, one roulette at a time.
+
+First target:
+- date: 21/07/2025;
+- period: morning;
+- event id: `21-07-M`;
+- source reference: `IMG_1630.jpeg`;
+- N=10.
+
+Operational procedure:
+1. use existing canonical/structural information first;
+2. inspect the original sheet/photo when available;
+3. ask the user only for unresolved names/numbers/positions, never for full re-entry when existing data are sufficient;
+4. never infer illegible identities;
+5. resolve identities against `data/brokers-official.csv`;
+6. write only human-confirmed/reproducible nominal rows into the auditable ledger;
+7. keep ambiguous identities quarantined;
+8. advance to the next missing event only after the current event is reconciled.
+
+Purpose:
+increase auditable nominal coverage and statistical sample size without contaminating broker-level statistics with inferred identities.
