@@ -6961,6 +6961,21 @@
       }
     ]
   },
+  "brokerCoverage": {
+    "status": "PARTIAL_NOMINAL_AUDITABLE",
+    "canonical_event_count": 86,
+    "auditable_nominal_events": 50,
+    "auditable_nominal_rows": 1023,
+    "blocked_identity_events": [
+      "03-10-I"
+    ],
+    "legacy_snapshot": {
+      "validated_events": 83,
+      "validated_rows": 1755,
+      "audit_status": "LEGACY_NON_REPRODUCIBLE",
+      "source": "canonical transcriptions through 06/10/2026 morning"
+    }
+  },
   "brokers": {
     "validated_events": 50,
     "validated_rows": 1023,
@@ -7459,20 +7474,5 @@
       "rule": "Continuar como experimento controlado; não declarar edge enquanto a vantagem não se sustentar prospectivamente."
     },
     "prospective_note": "A competição prospectiva entre todos os modelos começa na V2. Resultados anteriores não são atribuídos retrospectivamente a challengers."
-  },
-  "brokerCoverage": {
-    "status": "PARTIAL_NOMINAL_AUDITABLE",
-    "canonical_event_count": 86,
-    "auditable_nominal_events": 50,
-    "auditable_nominal_rows": 1023,
-    "blocked_identity_events": [
-      "03-10-I"
-    ],
-    "legacy_snapshot": {
-      "validated_events": 83,
-      "validated_rows": 1755,
-      "audit_status": "LEGACY_NON_REPRODUCIBLE",
-      "source": "canonical transcriptions through 06/10/2026 morning"
-    }
   }
 }
