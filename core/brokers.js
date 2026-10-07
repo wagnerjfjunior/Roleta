@@ -2,15 +2,17 @@
   'use strict';
   function norm(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase()}
   function canonicalName(name,aliases){return (aliases&&aliases[name])||name}
-  function buildRows(nominalRows,transcriptionRows,aliases){
-    const out=[],seen=new Set();
+  function buildRows(nominalRows,transcriptionRows,aliases,options={}){
+    const out=[],seen=new Set(),blocked=new Set(options.blockedEvents||[]);
     for(const r of nominalRows||[]){
+      if(blocked.has(r.event_id))continue;
       if(r.row_status!=='VERIFIED_NUMBER'||r.event_status!=='VERIFIED_FULL')continue;
       const name=canonicalName(r.broker_name_normalized||r.broker_name_raw||'',aliases); if(!name)continue;
       const key=r.event_id+'|'+r.physical_position;if(seen.has(key))continue;seen.add(key);
       out.push({event_id:r.event_id,name,position:Number(r.physical_position),drawn:Number(r.drawn_number),N:Number(r.N),source:r.source});
     }
     for(const r of transcriptionRows||[]){
+      if(blocked.has(r['Evento']))continue;
       if(r['Status da linha']!=='PARTICIPANTE')continue;
       const name=canonicalName(r['Corretor']||'',aliases);if(!name)continue;
       const key=r['Evento']+'|'+r['Posição física'];if(seen.has(key))continue;seen.add(key);
@@ -19,8 +21,8 @@
     }
     return out;
   }
-  function derive(nominalRows,transcriptionRows,officialRows,aliases,events,familyMap){
-    const rows=buildRows(nominalRows,transcriptionRows,aliases),official=new Map((officialRows||[]).map(r=>[norm(r['Nome Comercial']),r]));
+  function derive(nominalRows,transcriptionRows,officialRows,aliases,events,familyMap,options={}){
+    const rows=buildRows(nominalRows,transcriptionRows,aliases,options),official=new Map((officialRows||[]).map(r=>[norm(r['Nome Comercial']),r]));
     const names=new Map();
     for(const r of rows){
       const off=official.get(norm(r.name));const canonical=off?.['Nome Comercial']||r.name;
