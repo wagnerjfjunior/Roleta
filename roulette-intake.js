@@ -10,6 +10,24 @@
     return p;
   }
 
+  const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+  function reconciliationState(r){
+    const s=String(r?.reconciliation?.status||r?.match_status||'').toUpperCase();
+    if(['EXACT_MATCH','USER_CONFIRMED'].includes(s))return s;
+    return s||'LEGACY_UNVERIFIED';
+  }
+  function reconciliationGate(p){
+    const rows=[...(p.salao||[]),...(p.standby||[]),...(p.online||[])];
+    const hasV2=rows.some(r=>r.reconciliation||r.match_status);
+    if(!hasV2)return {mode:'LEGACY',errors:[]};
+    const errors=[];
+    rows.forEach((r,i)=>{
+      const s=reconciliationState(r);
+      if(!['EXACT_MATCH','USER_CONFIRMED'].includes(s))errors.push('Reconciliação pendente: '+(r.nome||('linha '+(i+1)))+' ['+s+'].');
+    });
+    return {mode:'V2',errors};
+  }
+
   function validatePayload(p){
     const errors=[];
     if(p.status!=='VALIDADO')errors.push('status precisa ser VALIDADO.');
@@ -35,6 +53,8 @@
       });
     }
     if(Array.isArray(p.pendencias)&&p.pendencias.length)errors.push('Existem pendências abertas no payload.');
+    const rg=reconciliationGate(p);
+    errors.push(...rg.errors);
     return [...new Set(errors)];
   }
 
@@ -86,6 +106,15 @@
       '</div>';
   }
 
+  function reconciliationReview(p){
+    const groups=[['SALÃO',p.salao],['STAND-BY',p.standby],['ON-LINE',p.online]];
+    const rows=groups.flatMap(([g,rs])=>(rs||[]).map((r,i)=>({g,r,i})));
+    const mode=reconciliationGate(p).mode;
+    if(mode==='LEGACY')return '<div class="intake-gate blocked"><strong>RECONCILIAÇÃO V2 AUSENTE</strong><div>Payload legado: pode ser visualizado, mas a confirmação canônica V2 exige match_status/reconciliation por corretor.</div></div>';
+    return '<div class="rltv2-reconciliation"><div class="section-head"><div><span class="eyebrow">GATE DE RECONCILIAÇÃO</span><h3>Conferência humana antes da impressão</h3></div></div>'+
+      rows.map(({g,r,i})=>{const rec=r.reconciliation||{};const s=reconciliationState(r);const ok=['EXACT_MATCH','USER_CONFIRMED'].includes(s);const candidates=Array.isArray(rec.candidates)?rec.candidates:[];return '<div class="list-item"><strong>'+esc(g)+' '+(i+1)+' · '+esc(r.nome)+'</strong><span class="'+(ok?'pill-up':'pill-cold')+'">'+esc(s)+'</span><small>Gerente: '+esc(r.gerente||'—')+(candidates.length?' · candidatos: '+esc(candidates.map(x=>typeof x==='string'?x:(x.nome||x.name||'')).filter(Boolean).join(' / ')):'')+'</small></div>'}).join('')+'</div>';
+  }
+
   function previewSummary(p){
     const e=p.evento;
     return '<div class="rltv2-summary">'+
@@ -109,8 +138,8 @@
       '</article>'+
       '<article id="rltv2PreviewCard" class="card rltv2-preview-card" hidden>'+
         '<div class="section-head"><div><span class="eyebrow">2 · PRÉVIA</span><h2>RLT-PRINT-V2</h2></div><span id="rltv2Counts" class="intake-counts"></span></div>'+
-        '<div id="rltv2Preview" class="rltv2-screen-preview"></div>'+
-        '<label class="intake-confirm"><input id="rltv2Confirm" type="checkbox"> Conferi o cabeçalho, os 6 campos da tabela e os blocos condicionais.</label>'+
+        '<div id="rltv2Reconciliation"></div><div id="rltv2Preview" class="rltv2-screen-preview"></div>'+
+        '<label class="intake-confirm"><input id="rltv2Confirm" type="checkbox"> Confirmo os nomes, gerente/equipe e a ordem final. Esta versão pode ser tratada como USER_CONFIRMED e usada na estatística.</label>'+
         '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>Imprimir roleta final</button></div>'+
       '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
@@ -122,6 +151,7 @@
     const gate=host.querySelector('#rltv2Gate');
     const card=host.querySelector('#rltv2PreviewCard');
     const preview=host.querySelector('#rltv2Preview');
+    const reconciliation=host.querySelector('#rltv2Reconciliation');
     const counts=host.querySelector('#rltv2Counts');
     const confirm=host.querySelector('#rltv2Confirm');
     const print=host.querySelector('#rltv2Print');
@@ -146,6 +176,7 @@
         gate.className='intake-gate clear';
         gate.innerHTML='<strong>DADOS VÁLIDOS</strong><div>Contrato RLT-PRINT-V2 atendido. Faça a conferência visual final.</div>';
         counts.innerHTML=previewSummary(p);
+        reconciliation.innerHTML=reconciliationReview(p);
         renderCanonical(preview,p);
         card.hidden=false;
       }catch(err){
@@ -169,7 +200,14 @@
 
     btn.addEventListener('click',validateAndRender);
 
-    confirm.addEventListener('change',()=>{print.disabled=!confirm.checked||!payload});
+    confirm.addEventListener('change',()=>{
+      const rg=payload?reconciliationGate(payload):{mode:'LEGACY',errors:['sem payload']};
+      print.disabled=!confirm.checked||!payload||rg.mode!=='V2'||rg.errors.length>0;
+      if(confirm.checked&&payload&&(rg.mode!=='V2'||rg.errors.length)){
+        gate.className='intake-gate blocked';
+        gate.innerHTML='<strong>CONFIRMAÇÃO CANÔNICA BLOQUEADA</strong><div>Resolva todas as reconciliações. Apenas EXACT_MATCH ou USER_CONFIRMED podem ser impressos e usados na estatística.</div>';
+      }
+    });
     print.addEventListener('click',()=>{
       if(!payload)return;
       renderCanonical(printHost,payload);
