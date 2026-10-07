@@ -1,0 +1,758 @@
+{
+  "version": "2026-10-07-v1",
+  "source": "data/brokers-official.csv",
+  "brokers": [
+    {
+      "nome": "Alberto",
+      "creci": "099.387-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Alexandre",
+      "creci": "161.865-F",
+      "status_creci": "Definitivo",
+      "gerente": "Danilo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Alexsandra",
+      "creci": "303.557-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Aline",
+      "creci": "295.643-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Alves",
+      "creci": "221.168-F",
+      "status_creci": "Definitivo",
+      "gerente": "Danilo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Amora",
+      "creci": "078.793-F",
+      "status_creci": "Definitivo",
+      "gerente": "Kim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Analu",
+      "creci": "190.909-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Antonia",
+      "creci": "174.741-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Arabela",
+      "creci": "264.977-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Arcade",
+      "creci": "158.755-F",
+      "status_creci": "Definitivo",
+      "gerente": "Danilo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Arnon",
+      "creci": "295.007-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Ashley",
+      "creci": "254.373-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Aurora",
+      "creci": "289.021-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Barba",
+      "creci": "233.200-F",
+      "status_creci": "Definitivo",
+      "gerente": "Kim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Bariloche",
+      "creci": "221.681-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Belisario",
+      "creci": "182.509-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Benedito",
+      "creci": "218.910-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gustavo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Bia",
+      "creci": "",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Biel",
+      "creci": "177.006-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Brunette",
+      "creci": "",
+      "status_creci": "Definitivo",
+      "gerente": "Kim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Caetano",
+      "creci": "144.824-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Cardim",
+      "creci": "145.02-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Cassidori",
+      "creci": "242.625 - F",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Chaya",
+      "creci": "227.779-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Cristal",
+      "creci": "164.747-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Damasco",
+      "creci": "260.840-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Daniel",
+      "creci": "210.445-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Denise",
+      "creci": "242.364-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Dias",
+      "creci": "074.381-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Drika",
+      "creci": "240.997-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Enzo",
+      "creci": "223.420-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Furlan",
+      "creci": "304.816-F",
+      "status_creci": "Definitivo",
+      "gerente": "Kim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Galdino",
+      "creci": "118.531-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Gelasio",
+      "creci": "232.492-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Globz",
+      "creci": "217.171-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Guilherme",
+      "creci": "123.456-E",
+      "status_creci": "Estagiário",
+      "gerente": "Danilo",
+      "diretor": "Renan",
+      "cargo": ""
+    },
+    {
+      "nome": "Helena",
+      "creci": "123.456-F",
+      "status_creci": "Estagiário",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Hilton",
+      "creci": "224.358-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Jeniffer",
+      "creci": "209.108-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Joelma",
+      "creci": "191.454-F",
+      "status_creci": "Definitivo",
+      "gerente": "Kim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Joice",
+      "creci": "200.297-F",
+      "status_creci": "Definitivo",
+      "gerente": "Demetrius",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Josue",
+      "creci": "192.006-F",
+      "status_creci": "Definitivo",
+      "gerente": "Danilo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Katio",
+      "creci": "169.506-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Lais",
+      "creci": "",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Laura",
+      "creci": "312.476-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Lazzati",
+      "creci": "319.110-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Leonora",
+      "creci": "121.681-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Lira",
+      "creci": "123.456 E",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Lobo",
+      "creci": "233.226-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Lotus",
+      "creci": "234.260-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Lucy",
+      "creci": "121.413-F",
+      "status_creci": "Definitivo",
+      "gerente": "Danilo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Luma",
+      "creci": "214.927-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Lurdes",
+      "creci": "150.626-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Lutela",
+      "creci": "149.726-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Madri",
+      "creci": "181.002-F",
+      "status_creci": "Definitivo",
+      "gerente": "Danilo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Magalhaes",
+      "creci": "174.762-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Maite",
+      "creci": "270.025-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Maranata",
+      "creci": "167.720-F",
+      "status_creci": "Definitivo",
+      "gerente": "Amaral",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Marcato",
+      "creci": "",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Marinela",
+      "creci": "127.605-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Midori",
+      "creci": "127.341-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Millian",
+      "creci": "215.783-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Monara",
+      "creci": "192.223-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Nair",
+      "creci": "186.958-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Nanda",
+      "creci": "",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Neuma",
+      "creci": "259.709-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Nina",
+      "creci": "285.417-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Ortega",
+      "creci": "095.901-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Paola",
+      "creci": "284.754-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Paz",
+      "creci": "123.456-F",
+      "status_creci": "Estagiário",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Penelope",
+      "creci": "135.564-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gurgel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Ponce",
+      "creci": "119.838-F",
+      "status_creci": "Definitivo",
+      "gerente": "Kim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Prado",
+      "creci": "231.975-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Prina",
+      "creci": "121.473-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Profeta",
+      "creci": "201.580-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Railton",
+      "creci": "251.031-F",
+      "status_creci": "Definitivo",
+      "gerente": "Danilo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Sabrina",
+      "creci": "209.905-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Sanches",
+      "creci": "130.717-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Santos",
+      "creci": "300.552-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Sheila",
+      "creci": "251.421-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gurgel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) Online"
+    },
+    {
+      "nome": "Suzete",
+      "creci": "114.585-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Telma",
+      "creci": "118.559-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Tessaro",
+      "creci": "260.322-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Tiao",
+      "creci": "184.911-F",
+      "status_creci": "Definitivo",
+      "gerente": "Kim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Tina",
+      "creci": "303.646-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Tulio",
+      "creci": "224.279-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Turmalina",
+      "creci": "224.279-F",
+      "status_creci": "Definitivo",
+      "gerente": "Danilo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Valeria",
+      "creci": "193.714-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Vaz",
+      "creci": "123.456-E",
+      "status_creci": "Estagiário",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Veri",
+      "creci": "132.226-F",
+      "status_creci": "Definitivo",
+      "gerente": "Gabriel",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Viana",
+      "creci": "118.354-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Vicente",
+      "creci": "118.354-F",
+      "status_creci": "Definitivo",
+      "gerente": "Anselmo",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Violeta",
+      "creci": "130.893-F",
+      "status_creci": "Definitivo",
+      "gerente": "Cazarim",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    },
+    {
+      "nome": "Wagner",
+      "creci": "297.586-F",
+      "status_creci": "Definitivo",
+      "gerente": "Wislane",
+      "diretor": "Renan",
+      "cargo": "Corretor(a) salão"
+    }
+  ]
+}
