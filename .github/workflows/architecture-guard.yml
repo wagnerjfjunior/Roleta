@@ -1,0 +1,16 @@
+name: Architecture Guard
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  architecture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node scripts/architecture-guard.js
+      - run: node scripts/build-dashboard-view.js
+      - run: git diff --exit-code -- data/dashboard-view.json

@@ -1,0 +1,162 @@
+{
+  "version": "2026-10-06-v10",
+  "source": "canonical transcriptions through 06/10/2026 morning",
+  "reconstructed_events": 84,
+  "validated_events": 83,
+  "validated_rows": 1755,
+  "note": "Rankings nominais incorporam 05/10 manhã, 05/10 tarde e 06/10 manhã. 06/10 tarde permanece explicitamente excluída até chegada da evidência manuscrita. O ranking histórico de posições do Dashboard é calculado dinamicamente a partir do manifest canônico.",
+  "family": [
+    {
+      "display_name": "Wagner",
+      "ledger_name": "Wagner",
+      "participations": 50,
+      "number1": 4,
+      "number2": 2,
+      "courtesy": 1,
+      "last": 4,
+      "total_special": 11
+    },
+    {
+      "display_name": "Brenda",
+      "ledger_name": "Sabrina",
+      "participations": 28,
+      "number1": 0,
+      "number2": 2,
+      "courtesy": 1,
+      "last": 1,
+      "total_special": 4
+    },
+    {
+      "display_name": "Laura",
+      "ledger_name": "Laura",
+      "participations": 18,
+      "number1": 1,
+      "number2": 0,
+      "courtesy": 0,
+      "last": 0,
+      "total_special": 1
+    },
+    {
+      "display_name": "Helena",
+      "ledger_name": "Helena",
+      "participations": 7,
+      "number1": 0,
+      "number2": 0,
+      "courtesy": 0,
+      "last": 0,
+      "total_special": 0
+    }
+  ],
+  "top5": {
+    "number1": [
+      {
+        "broker": "Vicente",
+        "hits": 5,
+        "participations": 48
+      },
+      {
+        "broker": "Wagner",
+        "hits": 4,
+        "participations": 49
+      },
+      {
+        "broker": "Caetano",
+        "hits": 4,
+        "participations": 27
+      },
+      {
+        "broker": "Daniel",
+        "hits": 3,
+        "participations": 54
+      },
+      {
+        "broker": "Veri",
+        "hits": 3,
+        "participations": 51
+      }
+    ],
+    "number2": [
+      {
+        "broker": "Lutela",
+        "hits": 5,
+        "participations": 39
+      },
+      {
+        "broker": "Daniel",
+        "hits": 4,
+        "participations": 54
+      },
+      {
+        "broker": "Ashley",
+        "hits": 4,
+        "participations": 34
+      },
+      {
+        "broker": "Vaz",
+        "hits": 4,
+        "participations": 27
+      },
+      {
+        "broker": "Lotus",
+        "hits": 3,
+        "participations": 51
+      }
+    ],
+    "courtesy": [
+      {
+        "broker": "Sanches",
+        "hits": 6,
+        "participations": 44
+      },
+      {
+        "broker": "Veri",
+        "hits": 4,
+        "participations": 51
+      },
+      {
+        "broker": "Lotus",
+        "hits": 4,
+        "participations": 51
+      },
+      {
+        "broker": "Nina",
+        "hits": 4,
+        "participations": 41
+      },
+      {
+        "broker": "Ponce",
+        "hits": 4,
+        "participations": 39
+      }
+    ],
+    "last": [
+      {
+        "broker": "Daniel",
+        "hits": 6,
+        "participations": 54
+      },
+      {
+        "broker": "Valeria",
+        "hits": 6,
+        "participations": 50
+      },
+      {
+        "broker": "Lotus",
+        "hits": 5,
+        "participations": 51
+      },
+      {
+        "broker": "Wagner",
+        "hits": 4,
+        "participations": 49
+      },
+      {
+        "broker": "Vicente",
+        "hits": 3,
+        "participations": 49
+      }
+    ]
+  },
+  "audit_status": "LEGACY_NON_REPRODUCIBLE",
+  "provenance_note": "Snapshot preserved for historical comparison only. Its declared validated_rows=1755 cannot be reproduced from the versioned nominal ledger present in the same repository history; do not use as active canonical input."
+}

@@ -1,0 +1,7 @@
+{
+  "version": "2026-10-07-v1",
+  "sources": [
+    "data/transcriptions/2026-10-06.csv"
+  ],
+  "rule": "Only canonical nominal transcriptions not already represented as VERIFIED_FULL in full_draws_reconstructed.csv belong here. Identity-blocked events remain excluded by data/identity-reconciliation.jsonl."
+}
