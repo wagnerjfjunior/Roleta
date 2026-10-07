@@ -75,3 +75,23 @@ Gate 6 rollout: SFJM/LVR validation, explicit merge authorization, explicit prod
 
 ## Scientific boundary
 Manual performance is observational because overrides are selected rather than randomized. Report it transparently without claiming causal superiority from raw hit rate alone. The operational comparison remains: when the family chose differently from the model, which observed choice did better?
+
+
+## Regression gate — assisted name reconciliation
+
+Antes de qualquer reprocessamento de 06/10:
+1. a leitura manuscrita é preservada em `reconciliation.raw_name`;
+2. a shortlist vem exclusivamente de `data/brokers-official.csv`;
+3. nenhum `PROBABLE_MATCH` ou `AMBIGUOUS` recebe identidade canônica sem ação humana por linha;
+4. a confirmação de identidade não move `physical_position`, `drawn_number` ou `ordem_final`;
+5. impressão e estatística usam gates separados;
+6. o payload estatístico só é exportável após confirmação humana final.
+
+Teste automatizado:
+`node tests/reconciliation-v2.test.js`
+
+O caso de regressão representa uma leitura aproximada que produz candidato provável e verifica que:
+- não há promoção automática;
+- a confirmação individual fixa a identidade oficial;
+- o vínculo posição/nome/número sorteado é preservado;
+- `VALIDADO_PARA_IMPRESSAO` ainda não equivale a `CANONICO_PARA_ESTATISTICA`.
