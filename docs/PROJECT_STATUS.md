@@ -392,3 +392,47 @@ The app's Nova Roleta page now accepts the Skill JSON and applies a deterministi
 - no editorial title, validation prose, hash, evidence page or technical footer.
 
 Printing is blocked unless payload.status=VALIDADO and the JSON passes all structural checks.
+
+
+---
+
+## RLT-PRINT-V2 — final operational workflow, 07/10/2026
+
+The Nova Roleta print flow was materially revised after a real 07/10/2026 operational test exposed that a structurally valid Skill JSON could still contain nominal or block omissions.
+
+Canonical rule is now:
+**transcription is not authorization**.
+
+Current architecture:
+- Skill supplies structured transcription;
+- app normalizes current flat schema and legacy schema;
+- structural gate runs first;
+- mandatory human-review layer runs second;
+- official broker metadata is refreshed from `data/print-brokers.json`, derived from `data/brokers-official.csv`;
+- human review covers HELBOR quantity, company draw/share, SALÃO, STAND BY and ON-LINE;
+- final preview is generated only from the reviewed payload;
+- Print and Save as PDF are locked until explicit final confirmation.
+
+Company-share semantics:
+- Share Tegra: Helbor gets one selected position, Tegra gets the other two;
+- Share Helbor: Tegra gets one selected position, Helbor gets the other two;
+- No share: each company gets one distinct position.
+
+Current print contract:
+- A4 portrait;
+- one page under normal period volume;
+- zebra white/light gray;
+- approximately 13pt broker-row typography;
+- grid proportions 7/21/17/19/12/24;
+- no drawn-number column;
+- no VALIDADE CRECI;
+- SORTEIO DE EMPRESA receives the wide final column;
+- PDF and print use the same browser-print renderer.
+
+Canonical detail:
+`docs/PRINT_TEMPLATE_V2.md`
+
+Implementation chronology:
+`docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md`
+
+PR #19 remains the promotion vehicle for the final header/share/print refinements until explicitly approved.
