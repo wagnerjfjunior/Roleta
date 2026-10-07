@@ -671,7 +671,7 @@ body{overflow-x:hidden}
 }
 .prospective-person-list{display:grid;gap:6px}
 .prospective-person-row{
-  display:grid;grid-template-columns:minmax(70px,.9fr) 54px 54px minmax(92px,1fr) 54px 28px;
+  display:grid;grid-template-columns:minmax(70px,.9fr) 54px 54px minmax(92px,1fr) 54px minmax(76px,.75fr) minmax(82px,.8fr);
   align-items:center;gap:7px;background:#0f1d30;border:1px solid rgba(36,54,77,.75);border-radius:11px;padding:8px 9px
 }
 .prospective-person-row>strong{font-size:12px;min-width:0;overflow-wrap:anywhere}
@@ -697,7 +697,7 @@ body{overflow-x:hidden}
 }
 @media(max-width:680px){
   .prospective-event-card{overflow-x:auto}
-  .prospective-person-list{min-width:560px}
+  .prospective-person-list{min-width:720px}
   .prospective-scorecard{grid-template-columns:1fr}
   .prospective-week{white-space:normal}
 }
@@ -854,3 +854,11 @@ body{overflow-x:hidden}
   .rltv2-candidate-control,.rltv2-state-grid{grid-template-columns:1fr}
   .rltv2-reconcile-item>div:first-child{flex-direction:column}
 }
+
+
+.prospective-result{display:grid;gap:2px;align-content:center;min-width:0}
+.prospective-result small{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.prospective-result b{font-size:11px;line-height:1.2;overflow-wrap:anywhere}
+.prospective-result.hit b{color:var(--green)}
+.prospective-result.miss b{color:var(--danger)}
+.prospective-result.pending b,.prospective-result.neutral b{color:var(--muted)}
