@@ -1,13 +1,63 @@
 (function(){
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+  function toBRDate(value){
+    const v=String(value||'').trim();
+    if(/^\d{2}\/\d{2}\/\d{4}$/.test(v))return v;
+    const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+    return m?m[3]+'/'+m[2]+'/'+m[1]:v;
+  }
+
+  function weekdayPT(value){
+    const br=toBRDate(value),m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(br);
+    if(!m)return '';
+    const d=new Date(Date.UTC(Number(m[3]),Number(m[2])-1,Number(m[1]),12));
+    return ['DOMINGO','SEGUNDA-FEIRA','TERÇA-FEIRA','QUARTA-FEIRA','QUINTA-FEIRA','SEXTA-FEIRA','SÁBADO'][d.getUTCDay()];
+  }
+
   function normalizePayload(input){
-    const p=typeof input==='string'?JSON.parse(input):input;
-    if(!p||typeof p!=='object')throw new Error('JSON inválido.');
-    p.standby=Array.isArray(p.standby)?p.standby:[];
-    p.online=Array.isArray(p.online)?p.online:[];
-    p.salao=Array.isArray(p.salao)?p.salao:[];
+    const raw=typeof input==='string'?JSON.parse(input):input;
+    if(!raw||typeof raw!=='object')throw new Error('JSON inválido.');
+
+    const currentSchema=raw.schema==='rlt-print-v2'&&!raw.evento;
+    const p={...raw};
+    p.standby=Array.isArray(raw.standby)?raw.standby:[];
+    p.online=Array.isArray(raw.online)?raw.online:[];
+    p.salao=Array.isArray(raw.salao)?raw.salao:[];
+
+    if(currentSchema){
+      const result=raw.resultado&&typeof raw.resultado==='object'?raw.resultado:{};
+      p.status='VALIDADO';
+      p.evento={
+        empreendimento:raw.empreendimento,
+        data:toBRDate(raw.data),
+        dia_semana:raw.dia_semana||weekdayPT(raw.data),
+        periodo:raw.periodo,
+        tegra_qtd:raw.tegra_qtd,
+        helbor_qtd:raw.helbor_qtd,
+        resultado:{
+          empresa:String(result.empresa||raw.empresa||'TEGRA').trim(),
+          numero:result.numero??null,
+          numero_exposto:result.numero_exposto===true
+        }
+      };
+    }
     return p;
+  }
+
+  function companyResult(e){
+    if(e&&e.resultado){
+      const empresa=String(e.resultado.empresa||'TEGRA').trim()||'TEGRA';
+      if(e.resultado.numero_exposto===true&&e.resultado.numero!==null&&e.resultado.numero!==undefined&&String(e.resultado.numero).trim()!==''){
+        return {parts:[empresa+' '+String(e.resultado.numero).trim()],summary:empresa+' '+String(e.resultado.numero).trim()};
+      }
+      return {parts:[empresa],summary:empresa+' · número não exposto'};
+    }
+    const legacy=e?.sorteio_empresa||{};
+    const parts=[];
+    if(String(legacy.tg||'').trim())parts.push('TG '+String(legacy.tg).replace(/^TG\s*/i,'').trim());
+    if(String(legacy.hb||'').trim())parts.push('HB '+String(legacy.hb).replace(/^HB\s*/i,'').trim());
+    return {parts,summary:parts.join(' | ')};
   }
 
   function validatePayload(p){
@@ -19,7 +69,8 @@
     if(!String(e.dia_semana||'').trim())errors.push('dia_semana ausente.');
     if(!['MANHA','MANHÃ','TARDE','INTEGRAL'].includes(String(e.periodo||'').trim().toUpperCase()))errors.push('periodo deve ser MANHÃ, TARDE ou INTEGRAL.');
     if(!Number.isInteger(Number(e.helbor_qtd))||Number(e.helbor_qtd)<0)errors.push('helbor_qtd deve ser informado.');
-    if(!e.sorteio_empresa||!String(e.sorteio_empresa.tg||'').trim()||!String(e.sorteio_empresa.hb||'').trim())errors.push('resultado TG/HB ausente.');
+    const result=companyResult(e);
+    if(!result.parts.length)errors.push('resultado de empresa ausente.');
 
     const N=p.salao.length;
     if(!N)errors.push('salao vazio.');
@@ -62,8 +113,7 @@
 
   function renderCanonical(host,p){
     const e=p.evento;
-    const tg='TG '+String(e.sorteio_empresa.tg).replace(/^TG\s*/i,'').trim();
-    const hb='HB '+String(e.sorteio_empresa.hb).replace(/^HB\s*/i,'').trim();
+    const company=companyResult(e);
     host.innerHTML=
       '<div class="rltv2-sheet">'+
         '<div class="rltv2-grid rltv2-header-line rltv2-header-labels">'+
@@ -78,7 +128,7 @@
           '<span class="c3">'+esc(e.data)+'</span>'+
           '<span class="c4">'+esc(e.dia_semana)+'</span>'+
           '<span class="c5">'+esc(String(e.periodo).replace('MANHA','MANHÃ'))+'</span>'+
-          '<span class="c6 rltv2-company-split"><b>'+esc(tg)+'</b><b>'+esc(hb)+'</b></span>'+
+          '<span class="c6 rltv2-company-split">'+company.parts.map(x=>'<b>'+esc(x)+'</b>').join('')+'</span>'+
         '</div>'+
         section(p.salao,'',true)+
         section(p.standby,'STAND-BY',false)+
@@ -87,13 +137,13 @@
   }
 
   function previewSummary(p){
-    const e=p.evento;
+    const e=p.evento,company=companyResult(e);
     return '<div class="rltv2-summary">'+
       '<span><b>SALÃO</b> '+p.salao.length+'</span>'+
       '<span><b>STAND-BY</b> '+p.standby.length+'</span>'+
       '<span><b>ON-LINE</b> '+p.online.length+'</span>'+
       '<span><b>HELBOR</b> '+esc(e.helbor_qtd)+'</span>'+
-      '<span><b>SORTEIO</b> TG '+esc(e.sorteio_empresa.tg)+' | HB '+esc(e.sorteio_empresa.hb)+'</span>'+
+      '<span><b>SORTEIO</b> '+esc(company.summary)+'</span>'+
     '</div>';
   }
 
@@ -178,5 +228,5 @@
     });
   }
 
-  window.RouletteIntake={mount,validatePayload,renderCanonical};
+  window.RouletteIntake={mount,normalizePayload,validatePayload,renderCanonical};
 })();
