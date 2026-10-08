@@ -145,10 +145,10 @@ async function mount(host){
        '<td><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
        '<option value="'+(l.numero_sorteado===null?'':'salao')+'">'+(l.numero_sorteado===null?'Confirmar classe':'SALÃO')+'</option>'+
        (l.numero_sorteado===null?'<option value="salao">SALÃO</option>':'')+
-       '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></td></tr>').join('');
+       '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></td><td><label class="rlt-line-check"><input data-correct-confirm type="checkbox"><span data-line-state>Revisar</span></label></td></tr>').join('');
      human.innerHTML='<h3>Correção humana assistida</h3><p class="small muted">Confira os números com a fotografia. Corrija 01/10 e qualquer duplicidade. Os números são usados apenas nesta etapa e não aparecem na impressão.</p>'+
        '<datalist id="geminiReviewBrokerNames">'+opts+'</datalist>'+
-       '<div class="rltv2-review-wrap"><table class="rltv2-review-table"><thead><tr><th>Posição física</th><th>Nº manuscrito</th><th>Corretor</th><th>Classe</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
+       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rltv2-review-wrap"><table class="rltv2-review-table"><thead><tr><th>Nº Escolhido</th><th>Nº Sorteado</th><th>Corretor</th><th>Classe</th><th>Conferido</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
        '<h3>Conferir cabeçalho operacional</h3>'+
        '<div class="rltv2-company-review">'+
        '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(value.data||'')+'"></label>'+
@@ -163,6 +163,39 @@ async function mount(host){
        '<div data-review-errors class="intake-gate blocked"><strong>TRANSFERÊNCIA NÃO AUTORIZADA</strong><div>Corrija as linhas, escolha as classes e confirme o cabeçalho antes de continuar.</div></div>';
      details.appendChild(human);
      human.querySelector('[data-review-period]').value=['MANHÃ','TARDE','INTEGRAL'].includes(String(value.periodo).toUpperCase())?String(value.periodo).toUpperCase():'TARDE';
+
+     const correctionRows=[...human.querySelectorAll('[data-correction-row]')];
+     const lineProgress=human.querySelector('[data-line-progress]');
+     const transferButton=human.querySelector('[data-review-transfer]');
+     function refreshChecks(){
+       const tallies=new Map();
+       correctionRows.forEach(tr=>{const n=tr.querySelector('[data-correct-number]').value;if(n)tallies.set(n,(tallies.get(n)||0)+1);});
+       let confirmed=0;
+       correctionRows.forEach(tr=>{
+         const check=tr.querySelector('[data-correct-confirm]');
+         const n=tr.querySelector('[data-correct-number]').value;
+         const name=tr.querySelector('[data-correct-name]').value.trim();
+         const category=tr.querySelector('[data-correct-class]').value;
+         const warning=!name||!category||(category==='salao'&&!n)||(n&&tallies.get(n)>1);
+         tr.classList.toggle('rlt-line-verified',check.checked);
+         tr.classList.toggle('rlt-line-attention',!check.checked&&!!warning);
+         tr.querySelector('[data-line-state]').textContent=check.checked?'Conferido':(warning?'Atenção':'Revisar');
+         if(check.checked)confirmed++;
+       });
+       lineProgress.textContent=confirmed+' de '+correctionRows.length+' linhas conferidas.';
+       lineProgress.className='intake-gate '+(confirmed===correctionRows.length?'clear':'blocked');
+       transferButton.disabled=confirmed!==correctionRows.length;
+     }
+     correctionRows.forEach(tr=>{
+       tr.querySelector('[data-correct-confirm]').addEventListener('change',refreshChecks);
+       ['[data-correct-number]','[data-correct-name]','[data-correct-class]'].forEach(sel=>{
+         const field=tr.querySelector(sel);
+         function invalidate(){tr.querySelector('[data-correct-confirm]').checked=false;refreshChecks();}
+         field.addEventListener('input',invalidate);
+         field.addEventListener('change',invalidate);
+       });
+     });
+     refreshChecks();
 
      const modeInput=human.querySelector('[data-review-share]');
      const firstInput=human.querySelector('[data-review-primary]');
@@ -192,6 +225,12 @@ async function mount(host){
      updateCompanyChoice();
 
      human.querySelector('[data-review-transfer]').addEventListener('click',()=>{
+       if(correctionRows.some(tr=>!tr.querySelector('[data-correct-confirm]').checked)){
+         const message=human.querySelector('[data-review-errors]');
+         message.className='intake-gate blocked';
+         message.textContent='Conferência incompleta: confirme cada linha antes de transferir.';
+         return;
+       }
        const rows=[...human.querySelectorAll('[data-correction-row]')].map(tr=>({
          posicao_impressa:tr.dataset.pos,
          numero_sorteado:tr.querySelector('[data-correct-number]').value,

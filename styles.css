@@ -951,3 +951,10 @@ body{overflow-x:hidden}
   .rltv2-add-row,.rltv2-remove-row{min-height:44px;font-size:13px}
   .rltv2-json{font-size:16px;min-height:180px}
 }
+
+.rltv2-review-table tr.rlt-line-verified td{background:#123b30!important;color:#d9fff0}
+.rltv2-review-table tr.rlt-line-attention td{background:#483516!important}
+.rlt-line-check{display:inline-flex;gap:8px;align-items:center}
+.rlt-line-check input{width:20px;height:20px;accent-color:#32c782;padding:0}
+.rlt-line-verified [data-line-state]{color:#4ae6a5}
+.rlt-line-attention [data-line-state]{color:#ffcf79}
