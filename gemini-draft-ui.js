@@ -192,11 +192,12 @@ async function mount(host){
      const transferButton=human.querySelector('[data-review-transfer]');
      function refreshChecks(){
        const tallies=new Map(),positions=new Map();
+       const numericPosition=value=>/^\d+$/.test(value)&&Number.isInteger(Number(value))&&Number(value)>=1&&Number(value)<=100?Number(value):null;
        correctionRows.forEach(tr=>{
          const n=tr.querySelector('[data-correct-number]').value;
-         const p=tr.querySelector('[data-correct-position]').value;
+         const p=numericPosition(tr.querySelector('[data-correct-position]').value);
          if(n)tallies.set(n,(tallies.get(n)||0)+1);
-         if(p)positions.set(p,(positions.get(p)||0)+1);
+         if(p!==null)positions.set(p,(positions.get(p)||0)+1);
        });
        let confirmed=0;
        correctionRows.forEach(tr=>{
@@ -205,7 +206,8 @@ async function mount(host){
          const physical=tr.querySelector('[data-correct-position]').value;
          const name=tr.querySelector('[data-correct-name]').value.trim();
          const category=tr.querySelector('[data-correct-class]').value;
-         const invalidPhysical=!/^[1-9]\d*$/.test(physical)||Number(physical)>100||(positions.get(physical)>1);
+         const parsedPhysical=numericPosition(physical);
+         const invalidPhysical=parsedPhysical===null||(positions.get(parsedPhysical)>1);
          const warning=invalidPhysical||!name||!category||(category==='salao'&&!n)||(n&&tallies.get(n)>1);
          if(warning&&check.checked)check.checked=false;
          tr.classList.toggle('rlt-line-verified',check.checked);
