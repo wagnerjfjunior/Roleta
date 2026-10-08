@@ -14,8 +14,7 @@ async function mount(host){
  '<div data-photo-review hidden><img data-photo-preview alt="Pré-visualização da roleta selecionada" style="width:100%;max-height:420px;object-fit:contain;border-radius:8px;margin-top:12px"><p class="small muted" data-photo-meta></p><label class="intake-confirm"><input data-photo-confirm type="checkbox"> Conferi orientação, legibilidade e enquadramento da fotografia.</label><div class="intake-actions"><button type="button" data-photo-send class="simulation-run" disabled>Enviar para leitura automática</button><button type="button" data-photo-remove class="simulation-run">Substituir fotografia</button></div></div>'+
  '<div data-google-auth class="intake-gate blocked"><strong>ACESSO À LEITURA AUTOMÁTICA</strong><div>Verificando login Google…</div></div>'+
  '<div class="intake-actions"><a data-google-login href="/api/auth/google/start" class="simulation-run" style="text-decoration:none">Entrar com Google</a><button data-google-logout type="button" class="simulation-run" hidden>Sair do Google</button></div>'+
- '<label data-legacy-access class="rltv2-file" style="display:block;margin-top:12px">Código de acesso (contingência) <input data-photo-access type="password" autocomplete="off" placeholder="Código de acesso configurado na Vercel"></label>'+
- '<div data-photo-status class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Selecione a fotografia, confira a prévia e informe o código de acesso. O envio será processado pela API protegida.</div></div>'+
+ '<div data-photo-status class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Faça login com Google, selecione uma foto e confirme o enquadramento.</div></div>'+
  '<label class="rltv2-file">Carregar resposta Gemini (.json)<input data-gemini-file type="file" accept=".json,application/json"></label>'+
  '<textarea data-gemini-json class="rltv2-json" rows="5" spellcheck="false" placeholder="Ou cole aqui o JSON preliminar do Gemini"></textarea>'+
  '<div class="intake-actions"><button type="button" data-gemini-check class="simulation-run">Analisar rascunho</button></div>'+
@@ -38,12 +37,10 @@ async function mount(host){
  const remove=article.querySelector('[data-photo-remove]');
  const photoStatus=article.querySelector('[data-photo-status]');
  let selected=null,objectURL=null;
- const access=article.querySelector('[data-photo-access]');
  const maxBytes=4*1024*1024;
  const authIndicator=article.querySelector('[data-google-auth]');
  const loginLink=article.querySelector('[data-google-login]');
  const logoutButton=article.querySelector('[data-google-logout]');
- const legacyLabel=article.querySelector('[data-legacy-access]');
  let googleSession=null;
  async function checkGoogleSession(){
    try{
@@ -53,10 +50,9 @@ async function mount(host){
      googleSession=data.authenticated&&data.csrfToken?data:null;
    }catch{googleSession=null;}
    authIndicator.className='intake-gate '+(googleSession?'clear':'blocked');
-   authIndicator.textContent=googleSession?'Conectado com Google: '+googleSession.email:'Login Google disponível após configuração das credenciais na Vercel. Até lá, utilize o código de contingência.';
+   authIndicator.textContent=googleSession?'Conectado com Google: '+googleSession.email:'Entre com Google para enviar fotografias.';
    loginLink.hidden=!!googleSession;
    logoutButton.hidden=!googleSession;
-   legacyLabel.hidden=!!googleSession;
    refreshSend();
  }
  logoutButton.addEventListener('click',async()=>{
@@ -66,7 +62,7 @@ async function mount(host){
  });
 
  let busy=false;
- function canSend(){return !!selected&&confirmation.checked&&(!!googleSession||access.value.trim().length>0)&&!busy;}
+ function canSend(){return !!selected&&confirmation.checked&&!!googleSession&&!busy;}
  function refreshSend(){send.disabled=!canSend();}
  function resetPhoto(){
    if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
@@ -86,7 +82,7 @@ async function mount(host){
    meta.textContent=file.name+' · '+(file.size/1024/1024).toFixed(2)+' MB';
    review.hidden=false;
    photoStatus.className='intake-gate blocked';
-   photoStatus.innerHTML='<strong>FOTOGRAFIA SELECIONADA</strong><div>Confira a imagem e informe o código de acesso.</div>';
+   photoStatus.innerHTML='<strong>FOTOGRAFIA SELECIONADA</strong><div>Confira a imagem e confirme o enquadramento.</div>';
    refreshSend();
  }
  article.querySelector('[data-photo-camera]').addEventListener('click',()=>camera.click());
@@ -94,7 +90,6 @@ async function mount(host){
  camera.addEventListener('change',()=>setPhoto(camera.files?.[0]));
  gallery.addEventListener('change',()=>setPhoto(gallery.files?.[0]));
  confirmation.addEventListener('change',refreshSend);
- access.addEventListener('input',refreshSend);
  checkGoogleSession();
  send.addEventListener('click',async()=>{
    if(!canSend())return;
@@ -106,7 +101,7 @@ async function mount(host){
        method:'POST',headers:{
          'Content-Type':selected.type,
          'X-Roleta-Filename':selected.name,
-         ...(googleSession?{'X-Roleta-CSRF':googleSession.csrfToken}:{'X-Roleta-Access-Token':access.value.trim()})
+         'X-Roleta-CSRF':googleSession.csrfToken
        },body:selected,cache:'no-store'
      });
      const json=await response.json();
@@ -120,7 +115,7 @@ async function mount(host){
    }catch(e){
      photoStatus.className='intake-gate blocked';
      photoStatus.innerHTML='<strong>ENVIO NÃO CONCLUÍDO</strong><div>'+escapeHtml(e.message||e)+'</div>';
-   }finally{busy=false;access.value='';refreshSend();}
+   }finally{busy=false;refreshSend();}
  });
  remove.addEventListener('click',()=>{
    resetPhoto();

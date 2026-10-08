@@ -1,13 +1,7 @@
 'use strict';
-const {timingSafeEqual}=require('node:crypto');
 const auth=require('../auth/google');
 const MAX_BYTES=4*1024*1024;
 const ALLOWED=new Set(['image/jpeg','image/png','image/webp']);
-function equalSecret(input,expected){
- if(typeof input!=='string'||typeof expected!=='string'||!expected)return false;
- const a=Buffer.from(input),b=Buffer.from(expected);
- return a.length===b.length&&timingSafeEqual(a,b);
-}
 async function readStream(req){
  if(Buffer.isBuffer(req.body)){if(req.body.length>MAX_BYTES){const e=new Error('Imagem excede 4 MB.');e.status=413;throw e;}return req.body;}
  const chunks=[];let total=0;
@@ -20,37 +14,33 @@ async function readStream(req){
  return Buffer.concat(chunks);
 }
 function validResponse(value){
- return value&&typeof value==='object'&&!Array.isArray(value)&&Array.isArray(value.linhas);
+ return !!(value&&typeof value==='object'&&!Array.isArray(value)&&Array.isArray(value.linhas)&&value.linhas.length>0&&value.linhas.length<=100&&value.linhas.every(l=>l&&typeof l==='object'&&!Array.isArray(l)&&Number.isInteger(Number(l.posicao_impressa))&&Number(l.posicao_impressa)>=1&&Number(l.posicao_impressa)<=100&&(l.nome_lido===null||typeof l.nome_lido==='string')&&(l.numero_sorteado===null||typeof l.numero_sorteado==='string'||typeof l.numero_sorteado==='number')));
 }
 module.exports=async function handler(req,res){
  res.setHeader('Cache-Control','no-store');
  res.setHeader('X-Content-Type-Options','nosniff');
  if(req.method!=='POST'){res.setHeader('Allow','POST');return res.status(405).json({error:'Método não permitido.'});}
- const origin=req.headers.origin||'';
- const host=req.headers['x-forwarded-host']||req.headers.host||'';
- if(!origin||!host){return res.status(403).json({error:'Origem não autorizada.'});}
- let parsedOrigin;
- try{parsedOrigin=new URL(origin);}catch{return res.status(403).json({error:'Origem inválida.'});}
- if(parsedOrigin.host!==host||parsedOrigin.protocol!=='https:'&&parsedOrigin.hostname!=='localhost'){
-   return res.status(403).json({error:'Origem não autorizada.'});
- }
- const expected=process.env.ROLETA_UPLOAD_ACCESS_TOKEN;
- const webhook=process.env.ROLETA_MAKE_WEBHOOK_URL;
- if(!webhook)return res.status(503).json({error:'Integração Make indisponível.'});
+ if(!auth.requireSameOrigin(req))return res.status(403).json({error:'Origem não autorizada.'});
  let currentSession=null;
  try{currentSession=auth.session(req);}catch{}
- const authorizedBySession=currentSession&&auth.requireSameOrigin(req)&&req.headers['x-roleta-csrf']===auth.csrfForSub(currentSession.sub);
- const supplied=req.headers['x-roleta-access-token'];
- const authorizedByLegacy=expected&&expected.length>=24&&equalSecret(supplied,expected);
- if(!authorizedBySession&&!authorizedByLegacy)return res.status(401).json({error:'Faça login com Google ou informe o código de acesso.'});
+ if(!currentSession)return res.status(401).json({error:'Entre com uma conta Google autorizada para enviar fotografias.'});
+ const csrf=req.headers['x-roleta-csrf'];
+ const expectedCsrf=auth.csrfForSub(currentSession.sub);
+ // Constant-time check without trusting request-provided token lengths.
+ const crypto=require('node:crypto');
+ const received=typeof csrf==='string'?Buffer.from(csrf):Buffer.alloc(0);
+ const expected=Buffer.from(expectedCsrf);
+ if(received.length!==expected.length||!crypto.timingSafeEqual(received,expected))return res.status(403).json({error:'Confirmação de segurança inválida. Recarregue a página.'});
+ const webhook=process.env.ROLETA_MAKE_WEBHOOK_URL;
+ if(!webhook)return res.status(503).json({error:'Integração Make indisponível.'});
  const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
  if(!ALLOWED.has(mime))return res.status(415).json({error:'Formato de imagem não permitido.'});
  const length=Number(req.headers['content-length']||0);
  if(length>MAX_BYTES)return res.status(413).json({error:'Imagem excede 4 MB.'});
  const originalName=String(req.headers['x-roleta-filename']||'captura').replace(/[^a-zA-Z0-9._-]/g,'_').slice(0,70)||'captura';
  const suffix=mime==='image/png'?'.png':mime==='image/webp'?'.webp':'.jpg';
- // Current Make Router selects Gemini only when the filename contains 'roleta'.
- const fileName='roleta_'+originalName.replace(/\.(jpe?g|png|webp)$/i,'')+suffix;
+ // Filename is not used as an authorization or routing mechanism.
+ const fileName=originalName.replace(/\.(jpe?g|png|webp)$/i,'')+suffix;
  let url;
  try{url=new URL(webhook);if(url.protocol!=='https:'||!url.hostname.endsWith('.make.com'))throw Error('host');}
  catch{return res.status(503).json({error:'Destino Make inválido.'});}
