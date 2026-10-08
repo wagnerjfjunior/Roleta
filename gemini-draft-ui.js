@@ -109,16 +109,23 @@ async function mount(host){
    const original=JSON.parse(textarea.value);
    const value=original?.result?.linhas?original.result:original?.body?.linhas?original.body:original;
    const draft=window.RoletaGeminiConverter.convertGeminiDraft(value,dto);
-   const lines=draft.leitura_original.linhas;
+   const lines=draft.sorteados;
+   const extras=draft.sem_sorteio;
    status.className='intake-gate blocked';
-   status.innerHTML='<strong>RASCUNHO NÃO APROVADO</strong><div>'+lines.length+' linhas lidas; '+draft.pendencias.length+' pendências. Compare cada registro com a fotografia antes de prosseguir.</div>';
+   status.innerHTML='<strong>RASCUNHO NÃO APROVADO</strong><div>SALÃO sorteado: '+lines.length+' · sem sorteio: '+extras.length+' · pendências: '+draft.pendencias.length+'. A ordem abaixo é a do sorteio; compare com a folha original.</div>';
    const problems=document.createElement('div');
    problems.innerHTML='<h3>Pendências</h3>'+draft.pendencias.map(p=>'<div>• '+escapeHtml(p.code)+': '+escapeHtml(p.message)+(p.posicao===undefined?'':' (linha '+escapeHtml(p.posicao)+')')+'</div>').join('');
    details.appendChild(problems);
    const wrap=document.createElement('div');wrap.className='rltv2-review-wrap';
-   wrap.innerHTML='<table class="rltv2-review-table"><thead><tr><th>Posição</th><th>Nome lido</th><th>Nome oficial</th><th>CRECI</th><th>Número lido</th><th>Cadastro</th></tr></thead><tbody>'+
-   lines.map(l=>'<tr><td>'+escapeHtml(l.posicao_impressa)+'</td><td>'+escapeHtml(l.nome_lido)+'</td><td>'+escapeHtml(l.nome||'PENDENTE')+'</td><td>'+escapeHtml(l.creci)+'</td><td>'+escapeHtml(l.numero_sorteado??'—')+'</td><td>'+ (l.cadastro_confirmado?'Correspondência única':'Verificar')+'</td></tr>').join('')+'</tbody></table>';
+   const tableHeader='<table class="rltv2-review-table"><thead><tr><th>Ordem sorteada</th><th>Posição impressa</th><th>Nome lido</th><th>Nome oficial</th><th>CRECI</th><th>Cadastro</th></tr></thead><tbody>';
+   const rowHtml=l=>'<tr><td>'+escapeHtml(l.numero_sorteado??'—')+'</td><td>'+escapeHtml(l.posicao_impressa)+'</td><td>'+escapeHtml(l.nome_lido)+'</td><td>'+escapeHtml(l.nome||'PENDENTE')+'</td><td>'+escapeHtml(l.creci)+'</td><td>'+(l.cadastro_confirmado?'Correspondência única':'Verificar')+'</td></tr>';
+   wrap.innerHTML='<h3>SALÃO — ordem do sorteio (conferência preliminar)</h3>'+tableHeader+lines.map(rowHtml).join('')+'</tbody></table>';
    details.appendChild(wrap);
+   if(extras.length){
+     const pending=document.createElement('div');pending.className='rltv2-review-wrap';
+     pending.innerHTML='<h3>Sem número sorteado — confirmar classe de participação</h3>'+tableHeader+extras.map(rowHtml).join('')+'</tbody></table>';
+     details.appendChild(pending);
+   }
   }catch(e){
    status.className='intake-gate blocked';
    status.innerHTML='<strong>LEITURA BLOQUEADA</strong><div>'+escapeHtml(e.message||e)+'</div>';
