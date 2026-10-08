@@ -8,6 +8,7 @@ function equalSecret(input,expected){
  return a.length===b.length&&timingSafeEqual(a,b);
 }
 async function readStream(req){
+ if(Buffer.isBuffer(req.body)){if(req.body.length>MAX_BYTES){const e=new Error('Imagem excede 4 MB.');e.status=413;throw e;}return req.body;}
  const chunks=[];let total=0;
  for await(const part of req){
    const chunk=Buffer.isBuffer(part)?part:Buffer.from(part);
@@ -34,7 +35,7 @@ module.exports=async function handler(req,res){
  }
  const expected=process.env.ROLETA_UPLOAD_ACCESS_TOKEN;
  const webhook=process.env.ROLETA_MAKE_WEBHOOK_URL;
- if(!expected||!webhook)return res.status(503).json({error:'Integração não configurada no servidor.'});
+ if(!expected||expected.length<24||!webhook)return res.status(503).json({error:'Integração não configurada no servidor.'});
  const supplied=req.headers['x-roleta-access-token'];
  if(!equalSecret(supplied,expected))return res.status(401).json({error:'Código de acesso inválido.'});
  const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
