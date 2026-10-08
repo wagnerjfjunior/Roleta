@@ -32,3 +32,6 @@ assert.equal(duplicate.payload.salao[0].ordem_final,null);
 assert.throws(()=>convertGeminiDraft({},dto));
 console.log('PASS: Gemini sorted SALÃO / undrawn participants / safe pending assertions');
 require('./gemini-review-bridge.test.cjs');
+
+// Cross-cutting print/PDF regression: the legacy GPT and Gemini paths share this layout.
+require('./print-layout-blank-pages.test.cjs');

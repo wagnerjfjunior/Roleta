@@ -488,11 +488,39 @@
       print.disabled=disabled;
       savePdf.disabled=disabled;
     });
+    let printInProgress=false;
     function openPrintDialog(){
-      if(!reviewedPayload)return;
+      if(!reviewedPayload||printInProgress)return;
+      printInProgress=true;
       renderCanonical(printHost,reviewedPayload);
+      const originalParent=printHost.parentNode;
+      const originalNextSibling=printHost.nextSibling;
+      // Print outside the SPA layout: hidden workspace sections otherwise
+      // keep their height and produce blank A4 pages after the roleta.
+      document.body.appendChild(printHost);
       printHost.hidden=false;
-      setTimeout(()=>window.print(),50);
+      let restored=false;
+      function restorePrintHost(){
+        if(restored)return;
+        restored=true;
+        window.removeEventListener('afterprint',restorePrintHost);
+        printHost.hidden=true;
+        if(originalParent&&originalParent.isConnected){
+          if(originalNextSibling&&originalNextSibling.parentNode===originalParent){
+            originalParent.insertBefore(printHost,originalNextSibling);
+          }else{
+            originalParent.appendChild(printHost);
+          }
+        }else{
+          printHost.remove();
+        }
+        printInProgress=false;
+      }
+      window.addEventListener('afterprint',restorePrintHost);
+      setTimeout(()=>{
+        try{window.print();}
+        catch(error){restorePrintHost();throw error;}
+      },50);
     }
     print.addEventListener('click',openPrintDialog);
     savePdf.addEventListener('click',openPrintDialog);
