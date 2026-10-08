@@ -145,10 +145,10 @@ async function mount(host){
        '<td><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
        '<option value="'+(l.numero_sorteado===null?'':'salao')+'">'+(l.numero_sorteado===null?'Confirmar classe':'SALÃO')+'</option>'+
        (l.numero_sorteado===null?'<option value="salao">SALÃO</option>':'')+
-       '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></td></tr>').join('');
+       '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></td><td><label class="rlt-line-check"><input data-correct-confirm type="checkbox"><span data-line-state>Revisar</span></label></td></tr>').join('');
      human.innerHTML='<h3>Correção humana assistida</h3><p class="small muted">Confira os números com a fotografia. Corrija 01/10 e qualquer duplicidade. Os números são usados apenas nesta etapa e não aparecem na impressão.</p>'+
        '<datalist id="geminiReviewBrokerNames">'+opts+'</datalist>'+
-       '<div class="rltv2-review-wrap"><table class="rltv2-review-table"><thead><tr><th>Posição física</th><th>Nº manuscrito</th><th>Corretor</th><th>Classe</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
+       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rltv2-review-wrap"><table class="rltv2-review-table"><thead><tr><th>Nº Escolhido</th><th>Nº Sorteado</th><th>Corretor</th><th>Classe</th><th>Conferido</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
        '<h3>Conferir cabeçalho operacional</h3>'+
        '<div class="rltv2-company-review">'+
        '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(value.data||'')+'"></label>'+
