@@ -225,6 +225,12 @@ async function mount(host){
      updateCompanyChoice();
 
      human.querySelector('[data-review-transfer]').addEventListener('click',()=>{
+       if(correctionRows.some(tr=>!tr.querySelector('[data-correct-confirm]').checked)){
+         const message=human.querySelector('[data-review-errors]');
+         message.className='intake-gate blocked';
+         message.textContent='Conferência incompleta: confirme cada linha antes de transferir.';
+         return;
+       }
        const rows=[...human.querySelectorAll('[data-correction-row]')].map(tr=>({
          posicao_impressa:tr.dataset.pos,
          numero_sorteado:tr.querySelector('[data-correct-number]').value,
