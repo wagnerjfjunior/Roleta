@@ -22,6 +22,17 @@ const img=Buffer.from([0xff,0xd8,0xff,0xe0,0,0]);
  const originalFetch=global.fetch;
  global.fetch=async(_url,options)=>{assert.equal(options.method,'POST');return {ok:true,text:async()=>JSON.stringify({linhas:[{posicao_impressa:16,nome_lido:'Paola',numero_sorteado:'01'}]})};};
  try{r=res();await handler(req(img),r);assert.equal(r.statusCode,200);assert.equal(r.body.status,'PENDENTE_REVISAO');assert.equal(r.body.result.linhas.length,1);}
+  finally{global.fetch=originalFetch;}
+ // An illegible printed position must remain a human-review pending item,
+ // not cause a gateway 502 discarding all otherwise legible records.
+ global.fetch=async()=>({ok:true,text:async()=>JSON.stringify({linhas:[
+   {posicao_impressa:1,nome_lido:'Arnon',numero_sorteado:'04'},
+   {posicao_impressa:null,nome_lido:null,numero_sorteado:null}
+ ]})});
+ try{r=res();await handler(req(img),r);assert.equal(r.statusCode,200);assert.equal(r.body.result.linhas[1].posicao_impressa,null);}
+ finally{global.fetch=originalFetch;}
+ global.fetch=async()=>({ok:true,text:async()=>JSON.stringify({linhas:[{posicao_impressa:0,nome_lido:'Arnon',numero_sorteado:'01'}]})});
+ try{r=res();await handler(req(img),r);assert.equal(r.statusCode,502);}
  finally{global.fetch=originalFetch;}
  console.log('PASS: Google-only relay auth, CSRF, origin, upload constraints and JSON response');
 })().catch(e=>{console.error(e);process.exitCode=1;});
