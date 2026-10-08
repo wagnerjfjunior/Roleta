@@ -164,6 +164,39 @@ async function mount(host){
      details.appendChild(human);
      human.querySelector('[data-review-period]').value=['MANHÃ','TARDE','INTEGRAL'].includes(String(value.periodo).toUpperCase())?String(value.periodo).toUpperCase():'TARDE';
 
+     const correctionRows=[...human.querySelectorAll('[data-correction-row]')];
+     const lineProgress=human.querySelector('[data-line-progress]');
+     const transferButton=human.querySelector('[data-review-transfer]');
+     function refreshChecks(){
+       const tallies=new Map();
+       correctionRows.forEach(tr=>{const n=tr.querySelector('[data-correct-number]').value;if(n)tallies.set(n,(tallies.get(n)||0)+1);});
+       let confirmed=0;
+       correctionRows.forEach(tr=>{
+         const check=tr.querySelector('[data-correct-confirm]');
+         const n=tr.querySelector('[data-correct-number]').value;
+         const name=tr.querySelector('[data-correct-name]').value.trim();
+         const category=tr.querySelector('[data-correct-class]').value;
+         const warning=!name||!category||(category==='salao'&&!n)||(n&&tallies.get(n)>1);
+         tr.classList.toggle('rlt-line-verified',check.checked);
+         tr.classList.toggle('rlt-line-attention',!check.checked&&!!warning);
+         tr.querySelector('[data-line-state]').textContent=check.checked?'Conferido':(warning?'Atenção':'Revisar');
+         if(check.checked)confirmed++;
+       });
+       lineProgress.textContent=confirmed+' de '+correctionRows.length+' linhas conferidas.';
+       lineProgress.className='intake-gate '+(confirmed===correctionRows.length?'clear':'blocked');
+       transferButton.disabled=confirmed!==correctionRows.length;
+     }
+     correctionRows.forEach(tr=>{
+       tr.querySelector('[data-correct-confirm]').addEventListener('change',refreshChecks);
+       ['[data-correct-number]','[data-correct-name]','[data-correct-class]'].forEach(sel=>{
+         const field=tr.querySelector(sel);
+         function invalidate(){tr.querySelector('[data-correct-confirm]').checked=false;refreshChecks();}
+         field.addEventListener('input',invalidate);
+         field.addEventListener('change',invalidate);
+       });
+     });
+     refreshChecks();
+
      const modeInput=human.querySelector('[data-review-share]');
      const firstInput=human.querySelector('[data-review-primary]');
      const secondInput=human.querySelector('[data-review-secondary]');
