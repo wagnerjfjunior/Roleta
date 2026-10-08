@@ -42,7 +42,10 @@ module.exports=async function handler(req,res){
  if(!ALLOWED.has(mime))return res.status(415).json({error:'Formato de imagem não permitido.'});
  const length=Number(req.headers['content-length']||0);
  if(length>MAX_BYTES)return res.status(413).json({error:'Imagem excede 4 MB.'});
- const fileName=String(req.headers['x-roleta-filename']||'roleta.jpeg').replace(/[^a-zA-Z0-9._-]/g,'_').slice(0,100)||'roleta.jpeg';
+ const originalName=String(req.headers['x-roleta-filename']||'captura').replace(/[^a-zA-Z0-9._-]/g,'_').slice(0,70)||'captura';
+ const suffix=mime==='image/png'?'.png':mime==='image/webp'?'.webp':'.jpg';
+ // Current Make Router selects Gemini only when the filename contains 'roleta'.
+ const fileName='roleta_'+originalName.replace(/\.(jpe?g|png|webp)$/i,'')+suffix;
  let url;
  try{url=new URL(webhook);if(url.protocol!=='https:'||!url.hostname.endsWith('.make.com'))throw Error('host');}
  catch{return res.status(503).json({error:'Destino Make inválido.'});}
