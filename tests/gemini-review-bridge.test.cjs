@@ -7,3 +7,11 @@ const bad=toCanonicalReview({rows:rows.map((r,i)=>i===0?{...r,numero_sorteado:'0
 const pending=toCanonicalReview({rows:rows.map((r,i)=>i===2?{...r,classe:'pendente'}:r),directory,header});assert.ok(pending.errors.length>0);
 const noheader=toCanonicalReview({rows,directory,header:{...header,confirmEnterprise:false}});assert.ok(noheader.errors.length>0);
 console.log('PASS bridge sorting, human confirmation and blocked conflicts');
+
+const {companyDraw}=require('../gemini-review-bridge.js');
+assert.deepEqual(companyDraw('tegra_share','1',''),{mode:'tegra_share',tegra_positions:[2,3],helbor_positions:[1]});
+assert.deepEqual(companyDraw('tegra_share','2',''),{mode:'tegra_share',tegra_positions:[1,3],helbor_positions:[2]});
+assert.deepEqual(companyDraw('tegra_share','3',''),{mode:'tegra_share',tegra_positions:[1,2],helbor_positions:[3]});
+assert.deepEqual(companyDraw('helbor_share','2',''),{mode:'helbor_share',tegra_positions:[2],helbor_positions:[1,3]});
+assert.deepEqual(companyDraw('none','1','3'),{mode:'none',tegra_positions:[1],helbor_positions:[3]});
+assert.equal(companyDraw('none','1','1'),null);
