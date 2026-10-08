@@ -9,7 +9,7 @@ function dateInfo(v){const s=brDate(v),m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s);i
 function companyDraw(mode,a,b){a=integer(a);b=integer(b);const all=[1,2,3];if(!all.includes(a))return null;if(mode==='tegra_share')return {mode,tegra_positions:all.filter(n=>n!==a),helbor_positions:[a]};if(mode==='helbor_share')return {mode,tegra_positions:[a],helbor_positions:all.filter(n=>n!==a)};if(mode==='none'&&all.includes(b)&&a!==b)return {mode,tegra_positions:[a],helbor_positions:[b]};return null;}
 function toCanonicalReview({source,rows,directory,header}){
 const errors=[];const fail=m=>errors.push(m);
-if(!source||!Array.isArray(rows)||!rows.length)fail('Leitura sem participantes.');
+if(!Array.isArray(rows)||!rows.length)fail('Leitura sem participantes.');
 const brokers=Array.isArray(directory)?directory:directory?.brokers||[];
 const registry=new Map();for(const b of brokers){let k=norm(b.nome);registry.set(k,[...(registry.get(k)||[]),b]);}
 if(!header?.confirmEnterprise)fail('Confirme o empreendimento na folha original.');
