@@ -1,0 +1,25 @@
+name: Gemini intake safety
+on:
+  pull_request:
+    paths:
+      - 'api/roleta-ocr.js'
+      - 'gemini-intake-converter.js'
+      - 'gemini-draft-ui.js'
+      - 'tests/**'
+      - '.github/workflows/gemini-intake.yml'
+  push:
+    branches:
+      - 'feat/gemini-draft-rlt-v2-20261008'
+jobs:
+  node-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check api/roleta-ocr.js
+      - run: node --check gemini-draft-ui.js
+      - run: node --check gemini-intake-converter.js
+      - run: node tests/gemini-intake-converter.test.cjs
+      - run: node tests/roleta-ocr-relay.test.cjs
