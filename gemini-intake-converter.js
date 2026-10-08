@@ -33,14 +33,24 @@ if(sorteado!==null&&seenNum.has(sorteado))add('SORTEIO_DUPLICADO','Número sorte
 if(sorteado!==null)seenNum.add(sorteado);
 return {posicao_impressa:pos,numero_sorteado:sorteado,nome_lido,nome:b?.nome||'',creci:b?.creci||'',gerente:b?.gerente||'',diretor:b?.diretor||'',status_creci:b?.status_creci||'',cadastro_confirmado:!!b,confianca_visual:l?.confianca||null};
 });
-const N=linhas.length,permutacao=N>0&&linhas.every(l=>l.numero_sorteado!==null)&&Array.from({length:N},(_,i)=>i+1).every(x=>seenNum.has(x));
-if(!permutacao)add('ORDEM_INCOMPLETA','Sorteios não formam sequência completa 1..N.');
-if(num(src.quantidade_corretores)!==N)add('QUANTIDADE_CONFLITANTE','Quantidade declarada difere das linhas extraídas.');
-add('HELBOR_PENDENTE','Quantidade Helbor não confirmada.');
+// Only records carrying a unique, positive drawn number are SALÃO candidates.
+// Rows without a drawn number stay in a separate pending bucket; class must be confirmed by a human.
+const sorteados=linhas.filter(l=>l.numero_sorteado!==null&&l.numero_sorteado>0);
+const semSorteio=linhas.filter(l=>l.numero_sorteado===null||l.numero_sorteado<1);
+const N=sorteados.length;
+const permutacao=N>0&&seenNum.size===N&&Array.from({length:N},(_,i)=>i+1).every(x=>seenNum.has(x));
+if(!permutacao)add('ORDEM_INCOMPLETA','Números sorteados não formam sequência completa 1..N.');
+// Gemini's quantidade_corretores may refer to HELBOR, so it is never an authority for Tegra N.
+if(num(src.quantidade_corretores)!==N)add('QUANTIDADE_DECLARADA_DIVERGENTE','Quantidade declarada ('+String(src.quantidade_corretores??'?')+') diverge do SALÃO sorteado ('+N+'); conferir se corresponde a HELBOR.');
+if(semSorteio.length)add('LINHAS_SEM_SORTEIO','Há '+semSorteio.length+' nomes sem sorteio: confirmar STAND BY/ON-LINE ou excluir após conferência.');
+add('HELBOR_PENDENTE','Quantidade Helbor deve ser confirmada na folha; não é a quantidade Tegra.');
 add('SHARE_PENDENTE','Posições de empresa/share não confirmadas.');
 add('CLASSES_PENDENTES','SALÃO/STAND BY/ON-LINE requerem classificação humana.');
-const payload={schema:'rlt-print-v2',empreendimento:empreendimento==='CAMINHOS DA LAPA'?'CAMINHOS DA LAPA':String(src.empreendimento||''),data,periodo:periodo==='MANHA'?'MANHÃ':periodo,empresa:'TEGRA',tegra_qtd:N,helbor_qtd:null,resultado:{empresa:'TEGRA',numero:null,numero_exposto:false},salao:linhas.map(l=>({ordem_final:permutacao?l.numero_sorteado:null,nome:l.nome,creci:l.creci,gerente:l.gerente,diretor:l.diretor,status_creci:l.status_creci})),standby:[],online:[],pendencias};
-return {status:'PENDENTE_REVISAO',aprovado:false,impressao_liberada:false,salvamento_liberado:false,payload,pendencias,leitura_original:{...src,linhas}};
+const ordenadas=[...sorteados].sort((a,b)=>a.numero_sorteado-b.numero_sorteado);
+const payload={schema:'rlt-print-v2',empreendimento:empreendimento==='CAMINHOS DA LAPA'?'CAMINHOS DA LAPA':String(src.empreendimento||''),data,periodo:periodo==='MANHA'?'MANHÃ':periodo,empresa:'TEGRA',
+tegra_qtd:N,helbor_qtd:null,resultado:{empresa:'TEGRA',numero:null,numero_exposto:false},
+salao:ordenadas.map(l=>({ordem_final:permutacao?l.numero_sorteado:null,nome:l.nome,creci:l.creci,gerente:l.gerente,diretor:l.diretor,status_creci:l.status_creci})),standby:[],online:[],pendencias};
+return {status:'PENDENTE_REVISAO',aprovado:false,impressao_liberada:false,salvamento_liberado:false,payload,pendencias,leitura_original:{...src,linhas},sorteados:ordenadas,sem_sorteio:semSorteio};
 }
 return {convertGeminiDraft};
 });
