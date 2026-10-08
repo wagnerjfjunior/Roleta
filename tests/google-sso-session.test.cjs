@@ -1,0 +1,18 @@
+const assert=require('node:assert/strict');
+const a=require('../auth/google.js');
+const old=process.env.ROLETA_SESSION_SECRET;
+process.env.ROLETA_SESSION_SECRET='test-only-session-secret-with-over-32-characters';
+process.env.ROLETA_GOOGLE_ALLOWED_EMAILS='allowed1@example.test,allowed2@example.test';
+const payload={typ:'session',email:'allowed1@example.test',sub:'123',exp:Date.now()+60000};
+const signed=a.seal(payload);
+assert.deepEqual(a.unseal(signed),payload);
+assert.equal(a.unseal(signed+'z'),null);
+assert.ok(a.allowed().has('allowed2@example.test'));
+assert.equal(a.session({headers:{cookie:'rlt_session='+signed}}).email,'allowed1@example.test');
+const outsider=a.seal({...payload,email:'unknown@example.org'});
+assert.equal(a.session({headers:{cookie:'rlt_session='+outsider}}),null);
+assert.equal(a.session({headers:{cookie:'rlt_session='+a.seal({...payload,exp:Date.now()-1000})}}),null);
+assert.match(a.cookie('rlt_session',signed,300),/HttpOnly; Secure; SameSite=Lax/);
+const token=a.csrfForSub('123');assert.equal(token,a.csrfForSub('123'));assert.notEqual(token,a.csrfForSub('456'));
+process.env.ROLETA_SESSION_SECRET=old;
+console.log('PASS: Google session signature, allowlist, expiry and cookie security');

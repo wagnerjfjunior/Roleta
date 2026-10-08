@@ -37,3 +37,5 @@ require('./gemini-review-bridge.test.cjs');
 require('./print-layout-blank-pages.test.cjs');
 
 require('./gemini-row-checks.test.cjs');
+
+require('./google-sso-session.test.cjs');
