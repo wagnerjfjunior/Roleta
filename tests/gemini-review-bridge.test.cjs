@@ -1,0 +1,9 @@
+const assert=require('node:assert/strict');const {toCanonicalReview}=require('../gemini-review-bridge.js');
+const directory={brokers:[{nome:'Paola',creci:'284.754-F',gerente:'Wislane',diretor:'Renan',status_creci:'Definitivo'},{nome:'Monara',creci:'192.223-F',gerente:'Cazarim',diretor:'Renan',status_creci:'Definitivo'},{nome:'Globz',creci:'217.171-F',gerente:'Cazarim',diretor:'Renan',status_creci:'Definitivo'}]};
+const rows=[{posicao_impressa:16,nome:'Paola',numero_sorteado:'01',classe:'salao'},{posicao_impressa:18,nome:'Monara',numero_sorteado:'02',classe:'salao'},{posicao_impressa:29,nome:'Globz',numero_sorteado:'',classe:'standby'}];
+const header={confirmEnterprise:true,data:'06/10/2026',periodo:'TARDE',helbor:'17',share:'tegra_share',position1:'3',position2:'2'};
+const a=toCanonicalReview({rows,directory,header});assert.deepEqual(a.errors,[]);assert.equal(a.payload.salao[0].nome,'Paola');assert.equal(a.payload.salao[0].ordem_final,1);assert.equal(a.payload.standby.length,1);assert.equal(a.payload.evento.tegra_qtd,2);assert.equal(a.payload.evento.helbor_qtd,17);assert.deepEqual(a.payload.evento.company_draw.helbor_positions,[3]);assert.equal(a.payload.evento.resultado.numero_exposto,false);
+const bad=toCanonicalReview({rows:rows.map((r,i)=>i===0?{...r,numero_sorteado:'02'}:r),directory,header});assert.ok(bad.errors.some(e=>e.includes('1..2')));assert.equal(bad.payload,null);
+const pending=toCanonicalReview({rows:rows.map((r,i)=>i===2?{...r,classe:'pendente'}:r),directory,header});assert.ok(pending.errors.length>0);
+const noheader=toCanonicalReview({rows,directory,header:{...header,confirmEnterprise:false}});assert.ok(noheader.errors.length>0);
+console.log('PASS bridge sorting, human confirmation and blocked conflicts');

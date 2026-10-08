@@ -126,6 +126,74 @@ async function mount(host){
      pending.innerHTML='<h3>Sem número sorteado — confirmar classe de participação</h3>'+tableHeader+extras.map(rowHtml).join('')+'</tbody></table>';
      details.appendChild(pending);
    }
+
+   // Isolated human correction surface. Does not modify the GPT intake until the
+   // operator explicitly transfers a complete, validated draft.
+   if(window.RoletaHumanBridge){
+     const human=document.createElement('section');
+     human.className='rltv2-review-card';
+     human.style.marginTop='20px';
+     const sorted=[...draft.leitura_original.linhas].sort((a,b)=>{
+       const x=Number(a.numero_sorteado),y=Number(b.numero_sorteado);
+       return (a.numero_sorteado===null?Infinity:x)-(b.numero_sorteado===null?Infinity:y);
+     });
+     const opts=dto.brokers.map(b=>'<option value="'+escapeHtml(b.nome)+'"></option>').join('');
+     const body=sorted.map(l=>'<tr data-correction-row data-pos="'+escapeHtml(l.posicao_impressa)+'">'+
+       '<td>'+escapeHtml(l.posicao_impressa)+'</td>'+
+       '<td><input data-correct-number aria-label="Número sorteado na posição '+escapeHtml(l.posicao_impressa)+'" type="number" inputmode="numeric" min="1" value="'+escapeHtml(l.numero_sorteado??'')+'"></td>'+
+       '<td><input data-correct-name aria-label="Nome na posição '+escapeHtml(l.posicao_impressa)+'" list="geminiReviewBrokerNames" value="'+escapeHtml(l.nome||l.nome_lido)+'"></td>'+
+       '<td><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
+       '<option value="'+(l.numero_sorteado===null?'':'salao')+'">'+(l.numero_sorteado===null?'Confirmar classe':'SALÃO')+'</option>'+
+       (l.numero_sorteado===null?'<option value="salao">SALÃO</option>':'')+
+       '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></td></tr>').join('');
+     human.innerHTML='<h3>Correção humana assistida</h3><p class="small muted">Confira os números com a fotografia. Corrija 01/10 e qualquer duplicidade. Os números são usados apenas nesta etapa e não aparecem na impressão.</p>'+
+       '<datalist id="geminiReviewBrokerNames">'+opts+'</datalist>'+
+       '<div class="rltv2-review-wrap"><table class="rltv2-review-table"><thead><tr><th>Posição física</th><th>Nº manuscrito</th><th>Corretor</th><th>Classe</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
+       '<h3>Conferir cabeçalho operacional</h3>'+
+       '<div class="rltv2-company-review">'+
+       '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(value.data||'')+'"></label>'+
+       '<label><span>Período</span><select data-review-period><option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="INTEGRAL">INTEGRAL</option></select></label>'+
+       '<label><span>Helbor (quantidade)</span><input data-review-helbor type="number" min="0" placeholder="Conferir na foto"></label>'+
+       '<label><span>Share</span><select data-review-share><option value="">Escolher regra</option><option value="tegra_share">Share Tegra</option><option value="none">Sem share</option><option value="helbor_share">Share Helbor</option></select></label>'+
+       '<label><span>Posição principal (1–3)</span><select data-review-primary><option value="">Confirmar</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>'+
+       '<label><span>Posição Helbor sem share</span><select data-review-secondary><option value="">Se aplicável</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label></div>'+
+       '<label class="intake-confirm"><input data-review-enterprise type="checkbox"> Confirmei na fotografia que o empreendimento pertence ao conjunto CAMINHOS DA LAPA e revisei os dados acima.</label>'+
+       '<div class="intake-actions"><button type="button" data-review-transfer class="simulation-run">Transferir para conferência canônica</button></div>'+
+       '<div data-review-errors class="intake-gate blocked"><strong>TRANSFERÊNCIA NÃO AUTORIZADA</strong><div>Corrija as linhas, escolha as classes e confirme o cabeçalho antes de continuar.</div></div>';
+     details.appendChild(human);
+     human.querySelector('[data-review-period]').value=['MANHÃ','TARDE','INTEGRAL'].includes(String(value.periodo).toUpperCase())?String(value.periodo).toUpperCase():'TARDE';
+     human.querySelector('[data-review-transfer]').addEventListener('click',()=>{
+       const rows=[...human.querySelectorAll('[data-correction-row]')].map(tr=>({
+         posicao_impressa:tr.dataset.pos,
+         numero_sorteado:tr.querySelector('[data-correct-number]').value,
+         nome:tr.querySelector('[data-correct-name]').value,
+         classe:tr.querySelector('[data-correct-class]').value
+       }));
+       const header={
+         confirmEnterprise:human.querySelector('[data-review-enterprise]').checked,
+         data:human.querySelector('[data-review-date]').value,
+         periodo:human.querySelector('[data-review-period]').value,
+         helbor:human.querySelector('[data-review-helbor]').value,
+         share:human.querySelector('[data-review-share]').value,
+         position1:human.querySelector('[data-review-primary]').value,
+         position2:human.querySelector('[data-review-secondary]').value
+       };
+       const checked=window.RoletaHumanBridge.toCanonicalReview({source:value,rows,directory:dto,header});
+       const errors=human.querySelector('[data-review-errors]');
+       if(checked.errors.length){
+         errors.className='intake-gate blocked';
+         errors.innerHTML='<strong>CORREÇÃO NECESSÁRIA</strong>'+checked.errors.map(e=>'<div>• '+escapeHtml(e)+'</div>').join('');
+         return;
+       }
+       const canonicalInput=host.querySelector('#rltv2Json');
+       const canonicalButton=host.querySelector('#rltv2Validate');
+       if(!canonicalInput||!canonicalButton){errors.textContent='Importador canônico indisponível.';return;}
+       canonicalInput.value=JSON.stringify(checked.payload,null,2);
+       canonicalButton.click();
+       errors.className='intake-gate clear';
+       errors.innerHTML='<strong>ENVIADO À CONFERÊNCIA CANÔNICA</strong><div>Ainda é obrigatório revisar SALÃO, STAND BY, ON-LINE e confirmar a prévia para imprimir.</div>';
+     });
+   }
   }catch(e){
    status.className='intake-gate blocked';
    status.innerHTML='<strong>LEITURA BLOQUEADA</strong><div>'+escapeHtml(e.message||e)+'</div>';

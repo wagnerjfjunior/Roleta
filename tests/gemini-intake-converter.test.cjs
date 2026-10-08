@@ -31,3 +31,4 @@ assert.ok(duplicate.pendencias.some(p=>p.code==='ORDEM_INCOMPLETA'));
 assert.equal(duplicate.payload.salao[0].ordem_final,null);
 assert.throws(()=>convertGeminiDraft({},dto));
 console.log('PASS: Gemini sorted SALÃO / undrawn participants / safe pending assertions');
+require('./gemini-review-bridge.test.cjs');
