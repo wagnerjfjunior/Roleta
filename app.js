@@ -392,7 +392,8 @@ async function upgradeWorkspace(){
   sidebar.className='workspace-sidebar';
   sidebar.innerHTML=
     '<div class="workspace-brand"><b>Roleta Intelligence</b><span>WORKSPACE V3</span></div>'+
-    '<nav class="workspace-nav">'+
+    '<button class="workspace-menu-toggle" type="button" aria-controls="workspaceNavigation" aria-expanded="false" aria-label="Abrir menu de navegação">☰ <span>Menu</span></button>'+
+    '<nav id="workspaceNavigation" class="workspace-nav" aria-label="Navegação principal">'+
       '<button class="active" data-workspace-page="overview">Visão geral</button>'+
       '<button data-workspace-page="intake">Nova Roleta</button>'+
       '<button data-workspace-page="family">Minha família</button>'+
@@ -574,8 +575,17 @@ async function upgradeWorkspace(){
   function openPage(name){
     document.querySelectorAll('.workspace-page').forEach(p=>p.classList.toggle('active',p.id==='workspace-'+name));
     document.querySelectorAll('.workspace-nav button').forEach(b=>b.classList.toggle('active',b.dataset.workspacePage===name));
+    sidebar.classList.remove('menu-open');
+    const toggle=sidebar.querySelector('.workspace-menu-toggle');
+    if(toggle){toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Abrir menu de navegação');}
     window.scrollTo({top:0,behavior:'smooth'});
   }
+  const menuToggle=sidebar.querySelector('.workspace-menu-toggle');
+  if(menuToggle)menuToggle.addEventListener('click',()=>{
+    const expanded=sidebar.classList.toggle('menu-open');
+    menuToggle.setAttribute('aria-expanded',String(expanded));
+    menuToggle.setAttribute('aria-label',expanded?'Fechar menu de navegação':'Abrir menu de navegação');
+  });
   document.querySelectorAll('.workspace-nav button').forEach(b=>b.addEventListener('click',()=>openPage(b.dataset.workspacePage)));
   document.querySelectorAll('[data-open-workspace]').forEach(b=>b.addEventListener('click',()=>openPage(b.dataset.openWorkspace)));
 }
