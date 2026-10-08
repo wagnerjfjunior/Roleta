@@ -285,6 +285,8 @@
       '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
 
+    if(window.RoletaGeminiDraftUI)window.RoletaGeminiDraftUI.mount(host);
+
     const ta=host.querySelector('#rltv2Json');
     const file=host.querySelector('#rltv2File');
     const paste=host.querySelector('#rltv2Paste');
