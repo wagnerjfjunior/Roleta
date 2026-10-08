@@ -1,5 +1,6 @@
 'use strict';
 const {timingSafeEqual}=require('node:crypto');
+const auth=require('../auth/google');
 const MAX_BYTES=4*1024*1024;
 const ALLOWED=new Set(['image/jpeg','image/png','image/webp']);
 function equalSecret(input,expected){
@@ -35,9 +36,13 @@ module.exports=async function handler(req,res){
  }
  const expected=process.env.ROLETA_UPLOAD_ACCESS_TOKEN;
  const webhook=process.env.ROLETA_MAKE_WEBHOOK_URL;
- if(!expected||expected.length<24||!webhook)return res.status(503).json({error:'Integração não configurada no servidor.'});
+ if(!webhook)return res.status(503).json({error:'Integração Make indisponível.'});
+ let currentSession=null;
+ try{currentSession=auth.session(req);}catch{}
+ const authorizedBySession=currentSession&&auth.requireSameOrigin(req)&&req.headers['x-roleta-csrf']===auth.csrfForSub(currentSession.sub);
  const supplied=req.headers['x-roleta-access-token'];
- if(!equalSecret(supplied,expected))return res.status(401).json({error:'Código de acesso inválido.'});
+ const authorizedByLegacy=expected&&expected.length>=24&&equalSecret(supplied,expected);
+ if(!authorizedBySession&&!authorizedByLegacy)return res.status(401).json({error:'Faça login com Google ou informe o código de acesso.'});
  const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
  if(!ALLOWED.has(mime))return res.status(415).json({error:'Formato de imagem não permitido.'});
  const length=Number(req.headers['content-length']||0);
