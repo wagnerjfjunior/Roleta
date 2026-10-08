@@ -162,7 +162,7 @@ async function mount(host){
      });
      const opts=dto.brokers.map(b=>'<option value="'+escapeHtml(b.nome)+'"></option>').join('');
      const body=sorted.map(l=>'<tr data-correction-row data-pos="'+escapeHtml(l.posicao_impressa)+'">'+
-       '<td>'+escapeHtml(l.posicao_impressa)+'</td>'+
+       '<td><input data-correct-position aria-label="Nº Escolhido (posição impressa)" type="number" inputmode="numeric" min="1" max="100" value="'+escapeHtml(l.posicao_impressa??'')+'"></td>'+
        '<td><input data-correct-number aria-label="Número sorteado na posição '+escapeHtml(l.posicao_impressa)+'" type="number" inputmode="numeric" min="1" value="'+escapeHtml(l.numero_sorteado??'')+'"></td>'+
        '<td><input data-correct-name aria-label="Nome na posição '+escapeHtml(l.posicao_impressa)+'" list="geminiReviewBrokerNames" value="'+escapeHtml(l.nome||l.nome_lido)+'"></td>'+
        '<td><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
@@ -191,15 +191,23 @@ async function mount(host){
      const lineProgress=human.querySelector('[data-line-progress]');
      const transferButton=human.querySelector('[data-review-transfer]');
      function refreshChecks(){
-       const tallies=new Map();
-       correctionRows.forEach(tr=>{const n=tr.querySelector('[data-correct-number]').value;if(n)tallies.set(n,(tallies.get(n)||0)+1);});
+       const tallies=new Map(),positions=new Map();
+       correctionRows.forEach(tr=>{
+         const n=tr.querySelector('[data-correct-number]').value;
+         const p=tr.querySelector('[data-correct-position]').value;
+         if(n)tallies.set(n,(tallies.get(n)||0)+1);
+         if(p)positions.set(p,(positions.get(p)||0)+1);
+       });
        let confirmed=0;
        correctionRows.forEach(tr=>{
          const check=tr.querySelector('[data-correct-confirm]');
          const n=tr.querySelector('[data-correct-number]').value;
+         const physical=tr.querySelector('[data-correct-position]').value;
          const name=tr.querySelector('[data-correct-name]').value.trim();
          const category=tr.querySelector('[data-correct-class]').value;
-         const warning=!name||!category||(category==='salao'&&!n)||(n&&tallies.get(n)>1);
+         const invalidPhysical=!/^[1-9]\d*$/.test(physical)||Number(physical)>100||(positions.get(physical)>1);
+         const warning=invalidPhysical||!name||!category||(category==='salao'&&!n)||(n&&tallies.get(n)>1);
+         if(warning&&check.checked)check.checked=false;
          tr.classList.toggle('rlt-line-verified',check.checked);
          tr.classList.toggle('rlt-line-attention',!check.checked&&!!warning);
          tr.querySelector('[data-line-state]').textContent=check.checked?'Conferido':(warning?'Atenção':'Revisar');
@@ -211,7 +219,7 @@ async function mount(host){
      }
      correctionRows.forEach(tr=>{
        tr.querySelector('[data-correct-confirm]').addEventListener('change',refreshChecks);
-       ['[data-correct-number]','[data-correct-name]','[data-correct-class]'].forEach(sel=>{
+       ['[data-correct-position]','[data-correct-number]','[data-correct-name]','[data-correct-class]'].forEach(sel=>{
          const field=tr.querySelector(sel);
          function invalidate(){tr.querySelector('[data-correct-confirm]').checked=false;refreshChecks();}
          field.addEventListener('input',invalidate);
@@ -255,7 +263,7 @@ async function mount(host){
          return;
        }
        const rows=[...human.querySelectorAll('[data-correction-row]')].map(tr=>({
-         posicao_impressa:tr.dataset.pos,
+         posicao_impressa:tr.querySelector('[data-correct-position]').value,
          numero_sorteado:tr.querySelector('[data-correct-number]').value,
          nome:tr.querySelector('[data-correct-name]').value,
          classe:tr.querySelector('[data-correct-class]').value
