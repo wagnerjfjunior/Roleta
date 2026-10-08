@@ -35,3 +35,5 @@ require('./gemini-review-bridge.test.cjs');
 
 // Cross-cutting print/PDF regression: the legacy GPT and Gemini paths share this layout.
 require('./print-layout-blank-pages.test.cjs');
+
+require('./gemini-row-checks.test.cjs');
