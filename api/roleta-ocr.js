@@ -14,7 +14,7 @@ async function readStream(req){
  return Buffer.concat(chunks);
 }
 function validResponse(value){
- return !!(value&&typeof value==='object'&&!Array.isArray(value)&&Array.isArray(value.linhas)&&value.linhas.length>0&&value.linhas.length<=100&&value.linhas.every(l=>l&&typeof l==='object'&&!Array.isArray(l)&&Number.isInteger(Number(l.posicao_impressa))&&Number(l.posicao_impressa)>=1&&Number(l.posicao_impressa)<=100&&(l.nome_lido===null||typeof l.nome_lido==='string')&&(l.numero_sorteado===null||typeof l.numero_sorteado==='string'||typeof l.numero_sorteado==='number')));
+ return !!(value&&typeof value==='object'&&!Array.isArray(value)&&Array.isArray(value.linhas)&&value.linhas.length>0&&value.linhas.length<=100&&value.linhas.every(l=>l&&typeof l==='object'&&!Array.isArray(l)&&(l.posicao_impressa===null||(Number.isInteger(Number(l.posicao_impressa))&&Number(l.posicao_impressa)>=1&&Number(l.posicao_impressa)<=100))&&(l.nome_lido===null||typeof l.nome_lido==='string')&&(l.numero_sorteado===null||typeof l.numero_sorteado==='string'||typeof l.numero_sorteado==='number')));
 }
 module.exports=async function handler(req,res){
  res.setHeader('Cache-Control','no-store');
