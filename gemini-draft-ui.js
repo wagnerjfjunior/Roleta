@@ -12,7 +12,9 @@ async function mount(host){
  '<input data-photo-camera-file type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>'+
  '<input data-photo-gallery-file type="file" accept="image/jpeg,image/png,image/webp" hidden>'+
  '<div data-photo-review hidden><img data-photo-preview alt="Pré-visualização da roleta selecionada" style="width:100%;max-height:420px;object-fit:contain;border-radius:8px;margin-top:12px"><p class="small muted" data-photo-meta></p><label class="intake-confirm"><input data-photo-confirm type="checkbox"> Conferi orientação, legibilidade e enquadramento da fotografia.</label><div class="intake-actions"><button type="button" data-photo-send class="simulation-run" disabled>Enviar para leitura automática</button><button type="button" data-photo-remove class="simulation-run">Substituir fotografia</button></div></div>'+
- '<label class="rltv2-file" style="display:block;margin-top:12px">Código de acesso à leitura automática <input data-photo-access type="password" autocomplete="off" placeholder="Código de acesso configurado na Vercel"></label>'+
+ '<div data-google-auth class="intake-gate blocked"><strong>ACESSO À LEITURA AUTOMÁTICA</strong><div>Verificando login Google…</div></div>'+
+ '<div class="intake-actions"><a data-google-login href="/api/auth/google/start" class="simulation-run" style="text-decoration:none">Entrar com Google</a><button data-google-logout type="button" class="simulation-run" hidden>Sair do Google</button></div>'+
+ '<label data-legacy-access class="rltv2-file" style="display:block;margin-top:12px">Código de acesso (contingência) <input data-photo-access type="password" autocomplete="off" placeholder="Código de acesso configurado na Vercel"></label>'+
  '<div data-photo-status class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Selecione a fotografia, confira a prévia e informe o código de acesso. O envio será processado pela API protegida.</div></div>'+
  '<label class="rltv2-file">Carregar resposta Gemini (.json)<input data-gemini-file type="file" accept=".json,application/json"></label>'+
  '<textarea data-gemini-json class="rltv2-json" rows="5" spellcheck="false" placeholder="Ou cole aqui o JSON preliminar do Gemini"></textarea>'+
@@ -38,8 +40,33 @@ async function mount(host){
  let selected=null,objectURL=null;
  const access=article.querySelector('[data-photo-access]');
  const maxBytes=4*1024*1024;
+ const authIndicator=article.querySelector('[data-google-auth]');
+ const loginLink=article.querySelector('[data-google-login]');
+ const logoutButton=article.querySelector('[data-google-logout]');
+ const legacyLabel=article.querySelector('[data-legacy-access]');
+ let googleSession=null;
+ async function checkGoogleSession(){
+   try{
+     const result=await fetch('/api/auth/session',{cache:'no-store'});
+     if(!result.ok)throw Error('Sessão indisponível');
+     const data=await result.json();
+     googleSession=data.authenticated&&data.csrfToken?data:null;
+   }catch{googleSession=null;}
+   authIndicator.className='intake-gate '+(googleSession?'clear':'blocked');
+   authIndicator.textContent=googleSession?'Conectado com Google: '+googleSession.email:'Login Google disponível após configuração das credenciais na Vercel. Até lá, utilize o código de contingência.';
+   loginLink.hidden=!!googleSession;
+   logoutButton.hidden=!googleSession;
+   legacyLabel.hidden=!!googleSession;
+   refreshSend();
+ }
+ logoutButton.addEventListener('click',async()=>{
+   if(!googleSession)return;
+   const response=await fetch('/api/auth/logout',{method:'POST',headers:{'X-Roleta-CSRF':googleSession.csrfToken}});
+   if(response.ok)await checkGoogleSession();
+ });
+
  let busy=false;
- function canSend(){return !!selected&&confirmation.checked&&access.value.trim().length>0&&!busy;}
+ function canSend(){return !!selected&&confirmation.checked&&(!!googleSession||access.value.trim().length>0)&&!busy;}
  function refreshSend(){send.disabled=!canSend();}
  function resetPhoto(){
    if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
@@ -68,6 +95,7 @@ async function mount(host){
  gallery.addEventListener('change',()=>setPhoto(gallery.files?.[0]));
  confirmation.addEventListener('change',refreshSend);
  access.addEventListener('input',refreshSend);
+ checkGoogleSession();
  send.addEventListener('click',async()=>{
    if(!canSend())return;
    busy=true;refreshSend();
@@ -78,7 +106,7 @@ async function mount(host){
        method:'POST',headers:{
          'Content-Type':selected.type,
          'X-Roleta-Filename':selected.name,
-         'X-Roleta-Access-Token':access.value.trim()
+         ...(googleSession?{'X-Roleta-CSRF':googleSession.csrfToken}:{'X-Roleta-Access-Token':access.value.trim()})
        },body:selected,cache:'no-store'
      });
      const json=await response.json();
