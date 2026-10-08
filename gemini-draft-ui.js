@@ -153,15 +153,44 @@ async function mount(host){
        '<div class="rltv2-company-review">'+
        '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(value.data||'')+'"></label>'+
        '<label><span>Período</span><select data-review-period><option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="INTEGRAL">INTEGRAL</option></select></label>'+
-       '<label><span>Helbor (quantidade)</span><input data-review-helbor type="number" min="0" placeholder="Conferir na foto"></label>'+
-       '<label><span>Share</span><select data-review-share><option value="">Escolher regra</option><option value="tegra_share">Share Tegra</option><option value="none">Sem share</option><option value="helbor_share">Share Helbor</option></select></label>'+
-       '<label><span>Posição principal (1–3)</span><select data-review-primary><option value="">Confirmar</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>'+
-       '<label><span>Posição Helbor sem share</span><select data-review-secondary><option value="">Se aplicável</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label></div>'+
+       '<label><span>Helbor (quantidade na folha)</span><input data-review-helbor type="number" min="0" placeholder="Digitar e conferir na foto"></label>'+
+       '<label><span>Tipo de sorteio de empresa</span><select data-review-share><option value="">Escolher regra</option><option value="tegra_share">Share Tegra (2 posições)</option><option value="none">Sem share</option><option value="helbor_share">Share Helbor (2 posições)</option></select></label>'+
+       '<label data-review-primary-wrap><span data-review-primary-label>Posição da empresa sem share</span><select data-review-primary><option value="">Confirmar</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>'+
+       '<label data-review-secondary-wrap hidden><span>Posição HELBOR</span><select data-review-secondary><option value="">Confirmar</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label></div>'+
+       '<div data-review-derived class="intake-gate blocked" aria-live="polite"><strong>SORTEIO DE EMPRESA</strong><div>Escolha o tipo de share e a posição da empresa sem share. O par da outra empresa é calculado automaticamente.</div></div>'+
        '<label class="intake-confirm"><input data-review-enterprise type="checkbox"> Confirmei na fotografia que o empreendimento pertence ao conjunto CAMINHOS DA LAPA e revisei os dados acima.</label>'+
        '<div class="intake-actions"><button type="button" data-review-transfer class="simulation-run">Transferir para conferência canônica</button></div>'+
        '<div data-review-errors class="intake-gate blocked"><strong>TRANSFERÊNCIA NÃO AUTORIZADA</strong><div>Corrija as linhas, escolha as classes e confirme o cabeçalho antes de continuar.</div></div>';
      details.appendChild(human);
      human.querySelector('[data-review-period]').value=['MANHÃ','TARDE','INTEGRAL'].includes(String(value.periodo).toUpperCase())?String(value.periodo).toUpperCase():'TARDE';
+
+     const modeInput=human.querySelector('[data-review-share]');
+     const firstInput=human.querySelector('[data-review-primary]');
+     const secondInput=human.querySelector('[data-review-secondary]');
+     const primaryLabel=human.querySelector('[data-review-primary-label]');
+     const secondaryWrap=human.querySelector('[data-review-secondary-wrap]');
+     const derived=human.querySelector('[data-review-derived]');
+     function updateCompanyChoice(){
+       const mode=modeInput.value;
+       primaryLabel.textContent=mode==='tegra_share'?'Posição HELBOR (sem share)':mode==='helbor_share'?'Posição TEGRA (sem share)':'Posição TEGRA';
+       secondaryWrap.hidden=mode!=='none';
+       if(mode!=='none')secondInput.value='';
+       const computed=window.RoletaHumanBridge.companyDraw(mode,firstInput.value,secondInput.value);
+       if(computed){
+         const tg=computed.tegra_positions.join(' - ');
+         const hb=computed.helbor_positions.join(' - ');
+         derived.className='intake-gate clear';
+         derived.innerHTML='<strong>SORTEIO DE EMPRESA CALCULADO</strong><div>TEGRA '+escapeHtml(tg)+' · HELBOR '+escapeHtml(hb)+'</div><div>Confirme o resultado com o cabeçalho da fotografia.</div>';
+       }else{
+         derived.className='intake-gate blocked';
+         derived.innerHTML='<strong>SORTEIO DE EMPRESA PENDENTE</strong><div>Selecione o tipo e a posição necessária para calcular automaticamente as demais posições.</div>';
+       }
+     }
+     modeInput.addEventListener('change',()=>{firstInput.value='';secondInput.value='';updateCompanyChoice();});
+     firstInput.addEventListener('change',updateCompanyChoice);
+     secondInput.addEventListener('change',updateCompanyChoice);
+     updateCompanyChoice();
+
      human.querySelector('[data-review-transfer]').addEventListener('click',()=>{
        const rows=[...human.querySelectorAll('[data-correction-row]')].map(tr=>({
          posicao_impressa:tr.dataset.pos,
