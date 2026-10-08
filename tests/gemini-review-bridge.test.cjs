@@ -15,3 +15,17 @@ assert.deepEqual(companyDraw('tegra_share','3',''),{mode:'tegra_share',tegra_pos
 assert.deepEqual(companyDraw('helbor_share','2',''),{mode:'helbor_share',tegra_positions:[2],helbor_positions:[1,3]});
 assert.deepEqual(companyDraw('none','1','3'),{mode:'none',tegra_positions:[1],helbor_positions:[3]});
 assert.equal(companyDraw('none','1','1'),null);
+
+const blankExcluded={posicao_impressa:'',nome:'',numero_sorteado:'',classe:'excluir'};
+const excluded=toCanonicalReview({rows:[...rows,blankExcluded],directory,header});
+assert.deepEqual(excluded.errors,[]);
+assert.equal(excluded.payload.salao.length,2);
+assert.equal(excluded.payload.standby.length,1);
+assert.equal(excluded.payload.evento.tegra_qtd,2);
+const duplicateExcluded=toCanonicalReview({rows:[...rows,{...blankExcluded,posicao_impressa:'16',nome:'Desconhecido'}],directory,header});
+assert.deepEqual(duplicateExcluded.errors,[]);
+const duplicateActive=toCanonicalReview({rows:[...rows,{...rows[0],nome:'Monara',numero_sorteado:'03'}],directory,header});
+assert.ok(duplicateActive.errors.some(e=>e.includes('Posição impressa')));
+const missingActive=toCanonicalReview({rows:[...rows,{...blankExcluded,classe:'salao'}],directory,header});
+assert.ok(missingActive.errors.length>0);
+console.log('PASS excluded rows bypass physical registry only when explicitly classified excluir');

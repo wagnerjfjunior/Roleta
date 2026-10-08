@@ -13,3 +13,7 @@ assert.equal(numericPosition('101'),null);
 assert.equal(numericPosition('1.5'),null);
 const count=new Map();for(const p of ['01','1']){const n=numericPosition(p);count.set(n,(count.get(n)||0)+1);}
 assert.equal(count.get(1),2);
+
+assert.ok(s.includes("if(tr.querySelector('[data-correct-class]').value==='excluir')return;"));
+assert.ok(s.includes("category==='excluir'?false:"));
+console.log('PASS excluded rows still require check but never block on missing position or name');

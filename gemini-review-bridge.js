@@ -20,9 +20,12 @@ const draw=companyDraw(header?.share,header?.position1,header?.position2);if(!dr
 const active=[],standby=[],online=[],seenPhysical=new Set(),seenBroker=new Set();
 for(const [i,r] of rows.entries()){
 const pos=integer(r.posicao_impressa),n=integer(r.numero_sorteado),classification=r.classe;
-if(pos===null||seenPhysical.has(pos))fail('Posição impressa duplicada/ausente na linha '+(i+1)+'.');seenPhysical.add(pos);
 if(!['salao','standby','online','excluir'].includes(classification)){fail('Classifique a linha impressa '+pos+'.');continue;}
+// Excluded source rows were explicitly reviewed and do not enter canonical data.
+// Missing names, positions and duplicate source positions are permitted only here.
 if(classification==='excluir')continue;
+if(pos===null||pos<1||pos>100||seenPhysical.has(pos)){fail('Posição impressa duplicada/ausente na linha '+(i+1)+'.');continue;}
+seenPhysical.add(pos);
 const matches=registry.get(norm(r.nome))||[];if(matches.length!==1){fail('Corretor não confirmado unicamente no cadastro: '+r.nome+' (posição '+pos+').');continue;}
 const broker=matches[0],key=norm(broker.nome);
 if(seenBroker.has(key))fail('Corretor duplicado: '+broker.nome+'.');seenBroker.add(key);

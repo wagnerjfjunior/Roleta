@@ -196,6 +196,7 @@ async function mount(host){
        correctionRows.forEach(tr=>{
          const n=tr.querySelector('[data-correct-number]').value;
          const p=numericPosition(tr.querySelector('[data-correct-position]').value);
+         if(tr.querySelector('[data-correct-class]').value==='excluir')return;
          if(n)tallies.set(n,(tallies.get(n)||0)+1);
          if(p!==null)positions.set(p,(positions.get(p)||0)+1);
        });
@@ -208,7 +209,8 @@ async function mount(host){
          const category=tr.querySelector('[data-correct-class]').value;
          const parsedPhysical=numericPosition(physical);
          const invalidPhysical=parsedPhysical===null||(positions.get(parsedPhysical)>1);
-         const warning=invalidPhysical||!name||!category||(category==='salao'&&!n)||(n&&tallies.get(n)>1);
+         // Exclusion requires explicit human confirmation, not a broker/position match.
+         const warning=category==='excluir'?false:(invalidPhysical||!name||!category||(category==='salao'&&!n)||(n&&tallies.get(n)>1));
          if(warning&&check.checked)check.checked=false;
          tr.classList.toggle('rlt-line-verified',check.checked);
          tr.classList.toggle('rlt-line-attention',!check.checked&&!!warning);
