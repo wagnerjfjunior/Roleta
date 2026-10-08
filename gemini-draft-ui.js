@@ -12,7 +12,8 @@ async function mount(host){
  '<input data-photo-camera-file type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>'+
  '<input data-photo-gallery-file type="file" accept="image/jpeg,image/png,image/webp" hidden>'+
  '<div data-photo-review hidden><img data-photo-preview alt="Pré-visualização da roleta selecionada" style="width:100%;max-height:420px;object-fit:contain;border-radius:8px;margin-top:12px"><p class="small muted" data-photo-meta></p><label class="intake-confirm"><input data-photo-confirm type="checkbox"> Conferi orientação, legibilidade e enquadramento da fotografia.</label><div class="intake-actions"><button type="button" data-photo-send class="simulation-run" disabled>Enviar para leitura automática</button><button type="button" data-photo-remove class="simulation-run">Substituir fotografia</button></div></div>'+
- '<div data-photo-status class="intake-gate blocked"><strong>ENVIO AINDA NÃO CONFIGURADO</strong><div>Câmera, galeria e conferência estão disponíveis nesta branch de testes. O envio permanece bloqueado até a criação de uma API segura para comunicação com o Make.</div></div>'+
+ '<label class="rltv2-file" style="display:block;margin-top:12px">Código de acesso à leitura automática <input data-photo-access type="password" autocomplete="off" placeholder="Código de acesso configurado na Vercel"></label>'+
+ '<div data-photo-status class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Selecione a fotografia, confira a prévia e informe o código de acesso. O envio será processado pela API protegida.</div></div>'+
  '<label class="rltv2-file">Carregar resposta Gemini (.json)<input data-gemini-file type="file" accept=".json,application/json"></label>'+
  '<textarea data-gemini-json class="rltv2-json" rows="5" spellcheck="false" placeholder="Ou cole aqui o JSON preliminar do Gemini"></textarea>'+
  '<div class="intake-actions"><button type="button" data-gemini-check class="simulation-run">Analisar rascunho</button></div>'+
@@ -35,7 +36,11 @@ async function mount(host){
  const remove=article.querySelector('[data-photo-remove]');
  const photoStatus=article.querySelector('[data-photo-status]');
  let selected=null,objectURL=null;
- const maxBytes=12*1024*1024;
+ const access=article.querySelector('[data-photo-access]');
+ const maxBytes=4*1024*1024;
+ let busy=false;
+ function canSend(){return !!selected&&confirmation.checked&&access.value.trim().length>0&&!busy;}
+ function refreshSend(){send.disabled=!canSend();}
  function resetPhoto(){
    if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
    selected=null;camera.value='';gallery.value='';review.hidden=true;
@@ -47,27 +52,48 @@ async function mount(host){
    const accepted=['image/jpeg','image/png','image/webp'];
    if(!accepted.includes(file.type)||file.size===0||file.size>maxBytes){
      photoStatus.className='intake-gate blocked';
-     photoStatus.innerHTML='<strong>FOTOGRAFIA NÃO ACEITA</strong><div>Selecione JPEG, PNG ou WebP de até 12 MB.</div>';
+     photoStatus.innerHTML='<strong>FOTOGRAFIA NÃO ACEITA</strong><div>Selecione JPEG, PNG ou WebP de até 4 MB.</div>';
      return;
    }
    selected=file;objectURL=URL.createObjectURL(file);preview.src=objectURL;
    meta.textContent=file.name+' · '+(file.size/1024/1024).toFixed(2)+' MB';
    review.hidden=false;
    photoStatus.className='intake-gate blocked';
-   photoStatus.innerHTML='<strong>FOTOGRAFIA SELECIONADA</strong><div>Confirme a imagem. O envio ao Make ainda está bloqueado nesta etapa.</div>';
+   photoStatus.innerHTML='<strong>FOTOGRAFIA SELECIONADA</strong><div>Confira a imagem e informe o código de acesso.</div>';
+   refreshSend();
  }
  article.querySelector('[data-photo-camera]').addEventListener('click',()=>camera.click());
  article.querySelector('[data-photo-gallery]').addEventListener('click',()=>gallery.click());
  camera.addEventListener('change',()=>setPhoto(camera.files?.[0]));
  gallery.addEventListener('change',()=>setPhoto(gallery.files?.[0]));
- confirmation.addEventListener('change',()=>{
-   // Do not enable upload without a vetted server-side relay.
-   send.disabled=true;
-   photoStatus.innerHTML=confirmation.checked
-     ?'<strong>FOTOGRAFIA CONFERIDA</strong><div>Aguardando conexão segura com Make; não houve envio.</div>'
-     :'<strong>CONFERÊNCIA PENDENTE</strong><div>Confira a imagem antes de solicitar a leitura.</div>';
+ confirmation.addEventListener('change',refreshSend);
+ access.addEventListener('input',refreshSend);
+ send.addEventListener('click',async()=>{
+   if(!canSend())return;
+   busy=true;refreshSend();
+   photoStatus.className='intake-gate blocked';
+   photoStatus.innerHTML='<strong>PROCESSANDO FOTOGRAFIA</strong><div>Aguardando resposta do Make e do Gemini…</div>';
+   try{
+     const response=await fetch('/api/roleta-ocr',{
+       method:'POST',headers:{
+         'Content-Type':selected.type,
+         'X-Roleta-Filename':selected.name,
+         'X-Roleta-Access-Token':access.value.trim()
+       },body:selected,cache:'no-store'
+     });
+     const json=await response.json();
+     if(!response.ok)throw Error(json.error||'Falha no processamento da fotografia.');
+     const data=json?.result;
+     if(!data||!Array.isArray(data.linhas))throw Error('O Make retornou resposta incompleta.');
+     textarea.value=JSON.stringify(data,null,2);
+     article.querySelector('[data-gemini-check]').click();
+     photoStatus.className='intake-gate blocked';
+     photoStatus.innerHTML='<strong>LEITURA RECEBIDA</strong><div>JSON preliminar preenchido. Confira nomes, posições e pendências na seção abaixo; nenhuma impressão foi liberada.</div>';
+   }catch(e){
+     photoStatus.className='intake-gate blocked';
+     photoStatus.innerHTML='<strong>ENVIO NÃO CONCLUÍDO</strong><div>'+escapeHtml(e.message||e)+'</div>';
+   }finally{busy=false;access.value='';refreshSend();}
  });
- send.addEventListener('click',()=>{send.disabled=true;}); // fail closed
  remove.addEventListener('click',()=>{
    resetPhoto();
    photoStatus.innerHTML='<strong>FOTOGRAFIA REMOVIDA</strong><div>Selecione outra imagem.</div>';
