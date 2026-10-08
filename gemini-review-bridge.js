@@ -39,5 +39,5 @@ const ordered=active.sort((a,b)=>a.n-b.n).map(({record,n})=>({...record,ordem_fi
 const payload={status:'VALIDADO',evento:{empreendimento:'CAMINHOS DA LAPA',data:date.data,dia_semana:date.dia_semana,periodo:periodo==='MANHA'?'MANHÃ':periodo,tegra_qtd:N,helbor_qtd:helbor,resultado:{empresa:'TEGRA',numero:null,numero_exposto:false},company_draw:draw},salao:ordered,standby,online,pendencias:[]};
 return {errors:[],payload};
 }
-return {toCanonicalReview};
+return {toCanonicalReview,companyDraw};
 });
