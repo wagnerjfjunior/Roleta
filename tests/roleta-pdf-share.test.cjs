@@ -40,7 +40,7 @@ const input={
  assert.match(ui,/savePdf\.addEventListener\('click',saveReadyPdf\)/);
  assert.match(ui,/navigator\\.canShare\\(\\{files:\\[file\\]\\}\\)/);
  assert.match(ui,/id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar foto/);
- assert.match(ui,/new File\\(\\[photoBlob\\],jpegFilename\\(\\),\\{type:'image\\/jpeg'\\}\\)/);
+ assert.ok(ui.includes("new File([photoBlob],jpegFilename(),{type:'image/jpeg'})"));
  assert.match(ui,/await renderPdfAsJpeg\\(blob\\)/);
  assert.match(ui,/pdfjs\\.getDocument\\(\\{data:bytes\\}\\)/);
  assert.match(ui,/canvas\\.toBlob\\(/);
