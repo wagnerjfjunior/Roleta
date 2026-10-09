@@ -15,7 +15,7 @@ assert.match(ui,/details\.insertBefore\(human,technicalTables\)/,'human review f
 assert.match(ui,/data-correct-confirm/);
 assert.match(ui,/data-review-transfer/);
 assert.match(ui,/rlt-five-column-table/);
-assert.match(ui,/<th>Nº Escolhido<\/th><th>Nº Sorteado<\/th><th>Corretor<\/th><th>Classe<\/th><th>Conferido<\/th>/);
+assert.match(ui,/<th>Nº Escolhido<\/th><th>Nº Sorteado<\/th><th>Corretor<\/th><th>Classe<\/th><th>Check<\/th>/);
 for(const required of ['data-correct-class','value="standby"','value="online"','value="excluir"','data-correct-confirm'])assert.ok(ui.includes(required),required);
 assert.doesNotMatch(ui,/rlt-operational-scroll/);
 assert.match(css,/rlt-five-column-review\{[^}]*overflow:visible/);
