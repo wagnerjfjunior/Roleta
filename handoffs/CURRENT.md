@@ -1,5 +1,14 @@
 # Roleta — Current Handoff
 
+## Atualização pontual de produção — 09/10/2026 (fluxo Nova Roleta)
+
+- **Marco da UI operacional:** `main@2ca0165992c97a7e5db601863236788fe1f18729` (PR #39).
+- **Deployment verificado READY:** `dpl_BYrkeBBcqJtHEA2ockrFh93z3NPf`, https://roleta-tgv.vercel.app.
+- **Operador homologou no iPhone:** impressão PDF A4 com margens, download PDF e compartilhamento da folha JPG como foto no WhatsApp.
+- **Rollback de aplicativo conhecido:** `dpl_HQFiFsh4h3oUU9PAuKgPsJvXD2DX` (PR #38, PDF compartilhado em vez de JPG).
+- **Documento canônico de fotografia:** `docs/OPERATIONAL_SNAPSHOT_2026-10-09.md`.
+- Escopo exclusivamente de impressão/compartilhamento; **não altera ou revalida contagens históricas, semanas frozen ou ingestão estatística**. As seções históricas abaixo permanecem como registro de seus próprios checkpoints; não as interpretar como HEAD atual.
+
 ## CURRENT STATE — 2026-10-07
 
 canonical repo: `wagnerjfjunior/Roleta`
