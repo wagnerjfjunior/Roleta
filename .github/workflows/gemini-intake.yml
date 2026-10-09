@@ -7,6 +7,11 @@ on:
       - 'gemini-draft-ui.js'
       - 'styles.css'
       - 'roulette-intake.js'
+      - 'lib/roleta-pdf.js'
+      - 'api/roleta-pdf.js'
+      - 'scripts/local-pdf-server.cjs'
+      - 'tests/local-pdf-server.test.cjs'
+      - 'package.json'
       - 'tests/**'
       - '.github/workflows/gemini-intake.yml'
   push:
@@ -23,8 +28,14 @@ jobs:
       - run: node --check api/roleta-ocr.js
       - run: node --check gemini-draft-ui.js
       - run: node --check roulette-intake.js
+      - run: node --check lib/roleta-pdf.js
+      - run: node --check api/roleta-pdf.js
+      - run: node --check scripts/local-pdf-server.cjs
+      - run: npm install --no-package-lock --ignore-scripts
       - run: node --check gemini-intake-converter.js
       - run: node tests/gemini-intake-converter.test.cjs
       - run: node tests/roleta-ocr-relay.test.cjs
       - run: node tests/ios-print-gesture.test.cjs
       - run: node tests/backfill-mobile-review-ui.test.cjs
+      - run: node tests/roleta-pdf-share.test.cjs
+      - run: node tests/local-pdf-server.test.cjs

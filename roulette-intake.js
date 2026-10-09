@@ -280,8 +280,8 @@
         '<div class="section-head"><div><span class="eyebrow">3 · PRÉVIA FINAL</span><h2>RLT-PRINT-V2</h2></div><span id="rltv2Counts" class="intake-counts"></span></div>'+
         '<div id="rltv2Preview" class="rltv2-screen-preview"></div>'+
         '<label class="intake-confirm"><input id="rltv2Confirm" type="checkbox"> Conferi a folha final após as correções humanas.</label>'+
-        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Imprimir roleta</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar em PDF</button></div>'+
-        '<p class="small muted">Salvar em PDF abre o diálogo de impressão; selecione “Salvar como PDF” como destino.</p>'+
+        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Abrir PDF para imprimir</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar PDF</button><button id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar</button></div>'+
+        '<p id="rltv2PdfStatus" class="small muted" role="status" aria-live="polite">Confirme a folha final para preparar o PDF de compartilhamento.</p>'+
       '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
 
@@ -310,6 +310,9 @@
     const confirm=host.querySelector('#rltv2Confirm');
     const print=host.querySelector('#rltv2Print');
     const savePdf=host.querySelector('#rltv2SavePdf');
+    const sharePdf=host.querySelector('#rltv2SharePdf');
+    const pdfStatus=host.querySelector('#rltv2PdfStatus');
+    let pdfBlob=null,pdfVersion=0;
     const printHost=host.querySelector('#rltv2PrintHost');
 
     loadBrokerDirectory().then(x=>{brokers=x}).catch(err=>{
@@ -323,7 +326,7 @@
     });
 
     function invalidateFinal(){
-      reviewedPayload=null;card.hidden=true;confirm.checked=false;print.disabled=true;savePdf.disabled=true;
+      reviewedPayload=null;pdfBlob=null;pdfVersion++;card.hidden=true;confirm.checked=false;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
       reviewGate.className='intake-gate blocked';
       reviewGate.innerHTML='<strong>ALTERAÇÕES PENDENTES</strong><div>Clique em Aplicar correções e validar antes da impressão.</div>';
     }
@@ -474,63 +477,102 @@
         reviewedPayload=null;card.hidden=true;return;
       }
       reviewedPayload=result.payload;
+      pdfBlob=null;pdfVersion++;print.disabled=true;sharePdf.disabled=true;pdfStatus.textContent='Confirme a folha final para preparar o PDF.';
       reviewGate.className='intake-gate clear';
       reviewGate.innerHTML='<strong>CONFERÊNCIA HUMANA VALIDADA</strong>'+
         (result.corrections.length?'<div>Correções aplicadas:</div>'+result.corrections.map(x=>'<div>• '+esc(x)+'</div>').join(''):'<div>Nenhuma alteração necessária; transcrição confirmada.</div>');
       counts.innerHTML=previewSummary(reviewedPayload);
       renderCanonical(preview,reviewedPayload);
-      card.hidden=false;confirm.checked=false;print.disabled=true;savePdf.disabled=true;
+      card.hidden=false;confirm.checked=false;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
       card.scrollIntoView({behavior:'smooth',block:'start'});
     });
 
-    confirm.addEventListener('change',()=>{
-      const disabled=!confirm.checked||!reviewedPayload;
-      print.disabled=disabled;
-      savePdf.disabled=disabled;
-    });
-    let printInProgress=false;
-    function openPrintDialog(){
-      if(!reviewedPayload||printInProgress)return;
-      printInProgress=true;
-      renderCanonical(printHost,reviewedPayload);
-      const originalParent=printHost.parentNode;
-      const originalNextSibling=printHost.nextSibling;
-      // Print outside the SPA layout: hidden workspace sections otherwise
-      // keep their height and produce blank A4 pages after the roleta.
-      document.body.appendChild(printHost);
-      printHost.hidden=false;
-      let restored=false;
-      function restorePrintHost(){
-        if(restored)return;
-        restored=true;
-        window.removeEventListener('afterprint',restorePrintHost);
-        printHost.hidden=true;
-        if(originalParent&&originalParent.isConnected){
-          if(originalNextSibling&&originalNextSibling.parentNode===originalParent){
-            originalParent.insertBefore(printHost,originalNextSibling);
-          }else{
-            originalParent.appendChild(printHost);
-          }
-        }else{
-          printHost.remove();
-        }
-        printInProgress=false;
-      }
-      window.addEventListener('afterprint',restorePrintHost);
-      // iOS Safari requires print() to run in the original user tap.
-      // A setTimeout here loses transient user activation and silently blocks printing.
+    function pdfFilename(){
+      const e=reviewedPayload.evento;
+      return 'Roleta-'+String(e.data).split('/').join('-')+'-'+String(e.periodo).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()+'.pdf';
+    }
+    async function preparePdf(version){
       try{
-        window.print();
+        const isLocalPdfTest=(location.hostname==='localhost'||location.hostname==='127.0.0.1')&&location.port==='8082';
+        let endpoint='/api/roleta-pdf',headers={'Content-Type':'application/json'};
+        if(isLocalPdfTest){
+          // SFJM static Live Sync at 8082 has no Vercel API. Dedicated loopback-only
+          // helper listens at 8083 and never changes the production auth requirements.
+          endpoint='http://127.0.0.1:8083/pdf';
+        }else{
+          const auth=await fetch('/api/auth/session',{cache:'no-store'}).then(r=>r.json());
+          if(!auth.authenticated||!auth.csrfToken)throw Error('Entre com Google para gerar e compartilhar o PDF.');
+          headers['X-Roleta-CSRF']=auth.csrfToken;
+        }
+        const response=await fetch(endpoint,{
+          method:'POST',headers,
+          body:JSON.stringify(reviewedPayload),
+          cache:'no-store'
+        });
+        if(!response.ok){
+          const data=await response.json().catch(()=>({}));
+          throw Error(data.error|| (isLocalPdfTest?'Não foi possível gerar o PDF local. Abra INICIAR-PDF-LOCAL.bat antes de testar.':'Não foi possível gerar o PDF.'));
+        }
+        const blob=await response.blob();
+        if(blob.type!=='application/pdf'||blob.size<100)throw Error('Arquivo PDF inválido.');
+        if(version!==pdfVersion||!confirm.checked)return;
+        pdfBlob=blob;
+        print.disabled=false;
+        savePdf.disabled=false;
+        sharePdf.disabled=false;
+        pdfStatus.textContent='PDF pronto para salvar ou compartilhar no WhatsApp.';
       }catch(error){
-        restorePrintHost();
-        throw error;
+        if(version!==pdfVersion)return;
+        pdfBlob=null;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
+        pdfStatus.textContent=String(error.message||error)+(location.port==='8082'?' Verifique se INICIAR-PDF-LOCAL.bat está aberto.':'');
       }
-      // Some mobile browsers don't dispatch afterprint (or have no print UI).
-      // Never leave the detached print host permanently attached to <body>.
-      setTimeout(restorePrintHost,20000);
+    }
+    confirm.addEventListener('change',()=>{
+      pdfVersion++;
+      pdfBlob=null;
+      print.disabled=true;
+      savePdf.disabled=true;sharePdf.disabled=true;
+      if(confirm.checked&&reviewedPayload){
+        pdfStatus.textContent='Gerando PDF...';
+        preparePdf(pdfVersion);
+      }else pdfStatus.textContent='Confirme a folha final para preparar o PDF.';
+    });
+    function saveReadyPdf(){
+      if(!confirm.checked||!pdfBlob)return;
+      const url=URL.createObjectURL(pdfBlob);
+      const a=document.createElement('a');a.href=url;a.download=pdfFilename();
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),30000);
+    }
+    function shareReadyPdf(){
+      if(!confirm.checked||!pdfBlob)return;
+      const file=new File([pdfBlob],pdfFilename(),{type:'application/pdf'});
+      // Invoke share directly on the user gesture; async fetch here breaks iOS activation.
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        navigator.share({files:[file],title:'Roleta '+reviewedPayload.evento.data})
+          .catch(e=>{if(e.name!=='AbortError')pdfStatus.textContent='Não foi possível compartilhar. Use Salvar PDF.';});
+      }else{
+        pdfStatus.textContent='O compartilhamento de arquivos não está disponível neste navegador. Use Salvar PDF e envie pelo WhatsApp.';
+      }
+    }
+    function openPrintDialog(){
+      // The same PDF bytes are used for print, save and WhatsApp share.
+      // On iOS PWAs the native PDF viewer is more reliable than browser page printing.
+      if(!confirm.checked||!pdfBlob)return;
+      const url=URL.createObjectURL(pdfBlob);
+      const popup=window.open(url,'_blank');
+      if(!popup){
+        const a=document.createElement('a');
+        a.href=url;a.target='_blank';a.rel='noopener';a.click();
+        pdfStatus.textContent='PDF aberto para impressão. Use a opção Imprimir do visualizador.';
+      }else{
+        pdfStatus.textContent='Use a opção Imprimir do visualizador do PDF.';
+      }
+      setTimeout(()=>URL.revokeObjectURL(url),120000);
     }
     print.addEventListener('click',openPrintDialog);
-    savePdf.addEventListener('click',openPrintDialog);
+    savePdf.addEventListener('click',saveReadyPdf);
+    sharePdf.addEventListener('click',shareReadyPdf);
   }
 
   window.RouletteIntake={mount,normalizePayload,validatePayload,renderCanonical,applyHumanReview,deriveCompanyDraw};
