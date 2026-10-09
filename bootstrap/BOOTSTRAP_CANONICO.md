@@ -30,6 +30,10 @@ Este repositório aplica SFJM, mas não redefine o protocolo.
 13. ler `docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md` quando houver regressão ou dúvida sobre decisões de implementação do fluxo de impressão.
 14. ler `docs/ARCHITECTURE.md` quando a tarefa alterar fronteiras de domínio, dados, simulação, prospectivo ou infraestrutura.
 
+## Marco de interface operacional 09/10/2026
+
+Para qualquer mudança nos botões da folha final (imprimir PDF, salvar PDF, compartilhar foto JPG), na API de PDF ou no fluxo humano, ler obrigatoriamente `docs/OPERATIONAL_SNAPSHOT_2026-10-09.md` junto com `docs/PRINT_TEMPLATE_V2.md`. O snapshot é a evidência fixada no commit `2ca0165992c97a7e5db601863236788fe1f18729`; **não** é substituto do `main` live nem implica permissão de merge.
+
 ## 3. Regra de autoridade
 
 GitHub/versionado controla o estado atual.
