@@ -20,6 +20,7 @@ const input={
  assert.equal(pdf.getPageCount(),1,'normal roleta must fit one A4 page');
  assert.deepEqual(pdf.getPage(0).getSize(),{width:PageSizes.A4[0],height:PageSizes.A4[1]});
  assert.equal(validate(input),input);
+ for(const bad of [null,'',' ',undefined])assert.throws(()=>validate({...input,evento:{...input.evento,helbor_qtd:bad}}),/Quantidade HELBOR inválida/);
  assert.throws(()=>validate({...input,status:'RASCUNHO'}),/Dados canônicos inválidos/);
  assert.throws(()=>validate({...input,evento:{...input.evento,tegra_qtd:5}}),/Quantidade/);
  assert.throws(()=>validate({...input,salao:input.salao.map((r,i)=>i===0?{...r,creci:'FALSO'}:r)}),/Dados cadastrais divergentes/);
