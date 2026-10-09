@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableExtensions
+setlocal EnableExtensions EnableDelayedExpansion
 cd /d "%~dp0"
 echo ============================================================
 echo   ROLETA - SFJM PDF LOCAL
@@ -43,7 +43,7 @@ if not exist "node_modules\pdf-lib\package.json" (
  if exist "%NODE_DIR%npm.cmd" set "NPM_CMD=%NODE_DIR%npm.cmd"
  if not defined NPM_CMD for /f "delims=" %%N in ('where npm.cmd 2^>nul') do if not defined NPM_CMD set "NPM_CMD=%%N"
  if defined NPM_CMD (
-  call "%NPM_CMD%" install --no-package-lock --ignore-scripts
+  call "!NPM_CMD!" install --no-package-lock --ignore-scripts
  ) else (
   if exist "%NODE_DIR%node_modules\npm\bin\npm-cli.js" (
    "%NODE_EXE%" "%NODE_DIR%node_modules\npm\bin\npm-cli.js" install --no-package-lock --ignore-scripts
