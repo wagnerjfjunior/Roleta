@@ -71,3 +71,11 @@ Uma fotografia integral pode apresentar o diretor **Renan repetido em todas as l
 - As posições após a última linha sorteada podem incluir Stand-by, Online ou linhas vazias; o parser **não determina a classe operacional** automaticamente.
 
 A segunda amostra contém coluna DIRETOR repetida e cabeçalho fora da ordem textual esperada. O teste de regressão usa padrão reduzido representativo, não todo o texto OCR original. Antes de produção, anexar como fixture auditável com hash/proveniência e executar validação com a amostra integral.
+
+## Gate estrutural independente — 09/10/2026
+
+`scripts/ocrspace-shadow-structural-gate.cjs` inspeciona a saída original do Gemini sem modificar nenhum campo. Separa números válidos, números inválidos, duplicidades, lacunas, nomes sem sorteio e posições vazias; contesta `quantidade_corretores` quando difere de linhas numeradas. Em modo SHADOW, nenhuma condição libera impressão ou gravação.
+
+**Não deduzir STAND BY ou ON-LINE apenas de nome sem número**. A classe exige revisão humana e evidência da folha. Para a amostra 06/10 TARDE, os nomes das posições 29 e 30 são STAND BY exclusivamente porque foram confirmados pelo usuário, em referência parcial separada.
+
+O gate não valida a leitura visual da fotografia: uma permutação numericamente válida pode conter transcrição errada. Não reescrever `quantidade_corretores` nem completar a sequência por heurística.
