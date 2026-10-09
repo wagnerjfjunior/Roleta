@@ -18,6 +18,24 @@ const p={status:'VALIDADO',evento:{empreendimento:'CAMINHOS DA LAPA',data:'09/10
   assert.equal(response.headers.get('access-control-allow-origin'),'http://localhost:8082');
   const bytes=Buffer.from(await response.arrayBuffer());
   assert.equal(bytes.subarray(0,5).toString(),'%PDF-');
+  // Force HTTP chunks to split inside UTF-8 characters (MANHÃ and accented weekdays).
+  const http=require('node:http');
+  const utf8=Buffer.from(JSON.stringify(p),'utf8');
+  const marker=Buffer.from('Ã','utf8');
+  const at=utf8.indexOf(marker);
+  assert.ok(at>0,'test payload includes a multibyte UTF-8 character');
+  const parts=[utf8.subarray(0,at+1),utf8.subarray(at+1)];
+  const rawPdf=await new Promise((resolve,reject)=>{
+   const chunks=[];
+   const request=http.request(url,{method:'POST',headers:{Origin:'http://localhost:8082','Content-Type':'application/json'}},response=>{
+    response.on('data',chunk=>chunks.push(chunk));
+    response.on('end',()=>resolve({status:response.statusCode,data:Buffer.concat(chunks)}));
+   });
+   request.on('error',reject);
+   request.write(parts[0]);setImmediate(()=>{request.end(parts[1]);});
+  });
+  assert.equal(rawPdf.status,200,'split UTF-8 transport chunks still generate a valid PDF');
+  assert.equal(rawPdf.data.subarray(0,5).toString(),'%PDF-');
   console.log('PASS: SFJM loopback-only PDF API works without Google, and blocks other origins');
  }finally{await new Promise((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}
 })().catch(e=>{console.error(e);process.exitCode=1;});
