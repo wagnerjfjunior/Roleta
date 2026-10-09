@@ -1,101 +1,148 @@
-# RLT-ARCH-01 — Marco de separação V1/V2 e rollback controlado
+# RLT-ARCH-01 — V1/V2 com infraestrutura compartilhada e rollback controlado
 
-Estado: **PROPOSTA DE ARQUITETURA — NÃO IMPLEMENTADA EM PRODUÇÃO**  
-Branch de documentação: `feat/ocrspace-shadow-reconciler-20261009`  
+Estado: **PROPOSTA DE ARQUITETURA — NÃO IMPLEMENTADA EM PRODUÇÃO**
+Branch: `feat/ocrspace-shadow-reconciler-20261009` — PR #41
 Data: 2026-10-09
 
-## 1. Decisão
+## 1. Decisões e limites desta etapa
 
-- **V1**: sistema operacional atual, linha estável e candidata a recuperação; não incorporar a ela o novo pipeline como apêndice.
-- **V2**: nova plataforma modular, com instâncias próprias de aplicação, Make e configurações. Pode reaproveitar bibliotecas puras versionadas, nunca acoplamento operacional que inviabilize V1.
-- O nome de produto existente `Roleta Intelligence V3` não deve ser confundido com a nomenclatura de **marcos operacionais V1/V2**. A definição exata do identificador de release da V1 exige verificação do deployment atual.
-- V1 deve permanecer implantável e operacional mesmo após a promoção de V2.
+V1 é a linha estável de recuperação; V2 é a evolução modular, com releases identificáveis e retorno operacional testável. O nome de produto `Roleta Intelligence V3` e a versão do pacote não identificam esses marcos operacionais.
 
-## 2. Evidências da situação atual e limites
+Por decisão do usuário, V1 e V2 **compartilham um único cenário Make ativo**, as credenciais/segredos e uma base oficial única. Não se exige outro cenário ativo nem outro conjunto de segredos para rollback. As rotas das duas versões coexistirão no mesmo cenário; somente a versão selecionada processará oficialmente cada requisição. Blueprints arquivados são artefatos de recuperação, não cenários mantidos ativos.
 
-- `vercel.json` permite deployment automático de `main` e desabilita demais branches por padrão; uma branch experimental **não é** um ambiente de homologação publicado.
-- `api/roleta-ocr.js` contém a entrada atual autenticada por Google SSO + CSRF, valida MIME e encaminha para `ROLETA_MAKE_WEBHOOK_URL`. Isto pertence ao pipeline atual.
-- O Make corrente contém o caminho Gemini e uma ramificação experimental OCR.space no mesmo cenário: **não constitui isolamento V1/V2**.
-- A V2/PR #41 tem comparador e gates locais SHADOW, sem persistência e sem fallback operacional. Testes locais apresentados: 20/20 aprovados; evidências de duas fotografias e referência humana parcial na amostra de 06/10/2026 TARDE.
-- Não há prova aqui de releases V1 imutáveis, cenários Make V2 segregados, roteamento atômico de versões, restore de dados ou testes de rollback completos. Não declarar esses itens implantados.
+Alternar versão preserva todos os dados de ambas. Rollback de execução não desfaz dados; exclusão crítica é uma operação excepcional independente, descrita na seção 7. Segurança, modularização, rastreabilidade e DevSecOps continuam obrigatórios. Isolamento lógico reduz propagação de falhas, mas não equivale a isolamento físico: cenário, quotas, credenciais e armazenamento compartilhados mantêm riscos comuns.
 
-## 3. Topologia-alvo
+Esta revisão altera somente este documento. Não autoriza merge, deploy, edição do Make, migração, backfill ou exclusão de dados.
 
-### V1 — serviço de recuperação
-- Artifact/deployment imutável identificado por Git SHA e ID Vercel.
-- Configuração e secrets versionados por **identificador/referência**, jamais os valores em Git.
-- Make V1 separado e congelado; webhook próprio.
-- URL de verificação do serviço V1 que não dependa do alias de produção.
-- Uma revisão pontual de segurança na V1 será uma release corretiva formal, não a inserção de funcionalidades V2.
+## 2. Estado inspecionado e lacunas
 
-### V2 — serviço evolutivo
-- Projeto/ambiente Vercel isolado; pipeline de build/deploy e segredos independentes.
-- Make V2 próprio, rotas Gemini e OCR.space com tempos limite, tratamento de erros e segregação de falhas.
-- Módulos: intake/autenticação, motores OCR, normalização, reconciliação oficial, gate estrutural, revisão humana, impressão, auditoria, persistência estatística.
-- Somente a validação humana autoriza publicação estatística; reimpressão nunca gera evento novo.
-- A Rota B OCR.space continua SHADOW até haver leitura de nomes **e números** comprovadamente confiável e gate de aprovação específico.
+Inspeção do repositório na cabeça `1d4dd1b824726a2d0bf1668bba65394e389a7ef0` da branch, com PR #41 aberto:
 
-### Entrada operacional
-- Um domínio principal destinado à versão ativa; implementado por mecanismo de roteamento/domínio testado, com acesso administrativo protegido.
-- Nenhum usuário escolhe a versão oficial por querystring ou localStorage.
-- Alternância operacional exige procedimento autenticado, registro auditável, health checks e rollback verificável.
-- Roteamento e propagação DNS/cache não têm latência zero garantida; definir objetivo de recuperação, medir tempo real e testar em homologação.
+| Evidência | Conclusão e limite |
+| --- | --- |
+| `vercel.json` | Habilita deployment de `main`, desabilita demais branches e contém regra para ignorar alterações documentais. Não comprova configuração efetiva da plataforma nem ambiente publicado para esta branch. |
+| `api/roleta-ocr.js` | Entrada com sessão Google, mesma origem, CSRF, validação MIME/assinatura e limite de tamanho; envia apenas `file` a `ROLETA_MAKE_WEBHOOK_URL`, com timeout de 55 s. Não há envelope de versão nessa chamada. |
+| `api/ocr-reconcile.js` e `docs/RLT_OPS_02_OCRSPACE_SHADOW.md` | Diagnóstico experimental SHADOW, sem persistência; não constitui fallback oficial. O histórico registra 20 testes locais aprovados, não repetidos nesta revisão documental. |
+| `docs/DATA_DICTIONARY.md` | Define `event_id` e proveniência em campos existentes, mas não formaliza os novos campos de versão abaixo. Não comprova schema do armazenamento em produção. |
+| `.github/workflows/gemini-intake.yml` | Há verificações de segurança/testes com filtros de arquivos e branches; não demonstra que todos os gates propostos estejam configurados ou que esta edição documental dispare CI. |
 
-## 4. Dados e compatibilidade de retorno
+O contexto operacional informado descreve Gemini e a ramificação OCR.space no mesmo cenário. **Não houve inspeção ao vivo de Make, credenciais, base ou deployments nesta etapa.** IDs, blueprint corrente, limites/filas, módulos de resposta, escritores reais, atomicidade disponível, backups e restauração devem ser inventariados antes da implementação. Não presumir roteador, kill switch, releases imutáveis ou rollback já implantados.
 
-- Dados oficiais independentes do lifecycle de deployment.
-- Desenhar contratos de leitura e escrita explicitamente versionados, com migrações **expand/contract**, nunca destrutivas enquanto V1 for opção de retorno.
-- Considerar V2 em modo leitura espelhada inicialmente, sem gravação na base oficial.
-- Antes de escrita V2, escolher estratégia validada para compatibilidade: formato comum retrocompatível **ou** adaptador de compatibilidade/dual-write transacional com replay e reconciliação. Proibir dual-write ingênuo sem atomicidade.
-- Identidade de evento, idempotency key, provenance e histórico de revisões são obrigatórios.
-- Backup imutável e teste real de restore antes do cutover. Rollback de código **não é** rollback automático de dados. Nunca reverter banco cegamente apagando eventos novos.
+## 3. Arquitetura e controles de execução
 
-## 5. Gates de DevSecOps
+### Releases e módulos
 
-1. Threat model e revisão de fronteiras de confiança (imagem, Gemini, OCR.space, Make, Vercel, cadastro, dados estatísticos).
-2. CI obrigatório: testes unitários/integração, SAST, secret scanning, auditoria de dependências, schema contract tests, políticas de branch e revisão por PR.
-3. Secrets em gerenciadores apropriados, menor privilégio, credenciais por ambiente, rotação e revogação.
-4. Observabilidade por `event_id`, `request_id`, `pipeline_version`, `model_version` sem logar fotos ou dados pessoais desnecessários.
-5. Feature flag e kill switch **somente internos à V2**, não substituem independência de implantação.
-6. Canary/dark launch sem escrita na base estatística; critérios de qualidade e erro definidos antes de ativação.
-7. Aprovação explícita para promover ou reverter versões; trilha de quem, quando, build, motivo e pós-verificação.
+- Preservar artefato V1 executável, Git SHA, ID do deployment, dependências, contrato e URL de verificação; confirmar qual release realmente atende produção.
+- Identificar V2 pelos mesmos elementos, sem exigir projeto Vercel separado. A disponibilidade simultânea dos artefatos e a troca de destino devem ser verificadas no ambiente real.
+- Versionar blueprint Make e configuração por revisão/hash, arquivando cópias sanitizadas com acesso restrito. Nunca salvar valores secretos ou URLs de webhook sensíveis no Git.
+- Separar módulos de entrada/autenticação, OCR, normalização, reconciliação, gate estrutural, revisão humana, impressão, auditoria e persistência. Bibliotecas puras podem ser compartilhadas; mudanças V2 não alteram silenciosamente o contrato V1.
+- Só validação humana autoriza publicação estatística. Reimpressão não gera evento novo. OCR.space permanece SHADOW, sem autorizar impressão, persistência oficial ou substituição automática do Gemini.
 
-## 6. Procedimentos (a implementar e testar, não instruções para executar agora)
+### Roteamento no Make compartilhado — contrato a implementar
 
-### Freeze V1
-- Identificar e confirmar a implantação exata atendendo produção e o SHA correspondente.
-- Registrar IDs de deploy, bundle de configuração (sem valores secretos), dependências e estado do cenário Make.
-- Salvar artefato e blueprint exportado com acesso restrito; preservar uma URL fixa do deployment.
-- Testar acesso, autenticação Google, upload, geração de PDF e caminho de restauração V1.
+1. Manter configuração administrativa protegida com `active_version` (`v1`/`v2`), `v2_enabled` (kill switch), revisão e referência dos artefatos compatíveis. Nomes são propostos; mecanismo e local de armazenamento dependem do inventário.
+2. Resolver a versão no ingresso confiável e fixá-la na execução junto com `request_id`, `event_id`, chave de idempotência e revisão de configuração. Não aceitar seleção oficial por querystring, localStorage, filename ou campo arbitrário do cliente.
+3. Validar autenticidade do envelope servidor → Make e impedir acesso que contorne a decisão. Requisições antigas sem envelope só podem seguir V1 por caminho legado explicitamente identificado e protegido; nunca inferir versão pelo conteúdo OCR.
+4. Usar filtros mutuamente exclusivos, cobrindo também versão inválida e erro. Uma requisição executa uma única rota oficial. Versão/configuração inválida falha de forma controlada; indisponibilidade do controle só admite V1 se houver configuração V1 previamente validada, caso contrário bloqueia o processamento.
+5. Garantir **uma única resposta webhook por requisição**, com um único responsável lógico pela resposta, inclusive em timeout, rejeição e tratamento de erros. Verificar no blueprint real se isso exige módulo comum ou saídas exclusivas; não presumir convergência de rotas. Rota SHADOW jamais responde ao webhook nem escreve dados oficiais. Não confiar na resposta automática do Make como sucesso de negócio.
+6. Reservar orçamento de tempo compatível com os 55 s do relay atual, limites de operações, tamanho, concorrência e retries. Diagnósticos V2/SHADOW não podem bloquear a resposta V1; a forma de desacoplar ou dispensar diagnóstico deve ser provada no cenário disponível.
+7. Tratar erro V2 localmente com limite de tentativas, circuito de interrupção e registro para reconciliação. Não encadear V1 automaticamente após resultado V2 incerto, pois a gravação pode ter ocorrido. Falha ou lentidão OCR.space não deve parar Gemini/V1 nem desativar o cenário inteiro.
+8. O kill switch bloqueia novas admissões V2 e novas gravações V2 ainda não confirmadas mediante verificação na fronteira de escrita. Execuções em andamento mantêm sua versão de origem; drenar, concluir sob política aprovada ou colocar em quarentena, nunca relabelar/reexecutar cegamente como V1.
 
-### Promote V2
-- Rodar CI + homologação de ponta a ponta com imagem de teste, login, Make V2 e revisão humana.
-- Validar compatibilidade de dados, backups, idempotência e saúde da V1.
-- Executar canary sem mutação e checklist de aprovação.
-- Alterar destino do domínio/roteador seguindo runbook, registrando deployment ativo.
-- Observar métricas e autorizar escrita somente se gates específicos forem aprovados.
+O bloqueio de escrita e a gravação precisam de proteção contra corrida (transação, trava ou mecanismo equivalente comprovado). Se o armazenamento não a oferecer, suspender admissões e drenar escritores antes da troca. Duplicatas e retries preservam a identidade do evento, independentemente da versão ativa. Não prometer isolamento absoluto: exaustão de quota, falha do Make ou revogação de segredo compartilhado podem afetar ambas as versões.
 
-### Rollback V2 → V1
-- Bloquear primeiro novos writes V2 se necessário; preservar fila/estado para replay.
-- Confirmar integridade de dados compatível com V1.
-- Retornar o roteamento ao **deployment V1 previamente testado**, não recompilar uma branch arbitrária.
-- Verificar login, foto, processamento Make V1 e impressão sem duplicações.
-- Registrar operação, tempo de recuperação e ocorrências; não apagar registros V2 de auditoria.
+## 4. Base única, proveniência e compatibilidade
+
+Todo registro novo, inclusive produzido por V1 após a instrumentação, deve ter versão geradora confiável. A atribuição ocorre na fronteira de escrita controlada, sem exigir que a interface antiga forneça campos novos. Inventariar todos os escritores para não deixar caminhos sem identificação.
+
+Contrato proposto, a adaptar ao armazenamento real:
+
+| Campo | Regra |
+| --- | --- |
+| `event_id`, `record_id`, `request_id`, `run_id` | Identificam evento, registro, requisição e tentativa; preservar identidade nos retries e revisões. |
+| `generator_version` | `v1`, `v2` ou `unknown/legacy` para histórico sem prova; imutável na criação, atribuído por origem confiável. |
+| `pipeline_version` | Revisão imutável do pipeline, vinculando código, blueprint e configuração; não apenas “versão ativa agora”. |
+| `schema_version` | Versão do contrato efetivamente gravado e aceito pelo leitor. |
+| `created_at` | Momento de criação do registro, UTC, imutável e distinto da data do sorteio e do momento de importação. Ausência histórica não deve ser preenchida com data fictícia. |
+| `audit_metadata` | Ator/serviço, fonte, referência de release, revisão da configuração, correlação, motivo e aprovação humana; sem segredos ou fotos desnecessárias. |
+| Revisão/proveniência | Cada alteração registra versão autora e vínculo com original; uma revisão V2 de evento V1 não transforma a origem do evento em V2. |
+
+A versão atual fica na configuração de execução; a versão geradora fica nos dados e nunca muda com o cutover. Metadados desconhecidos devem permanecer explicitamente desconhecidos, inclusive pipeline/schema históricos sem evidência.
+
+- Adotar formato comum retrocompatível ou adaptador na fronteira, com testes de leitura **e escrita** V1 sobre registros V1, V2 e legados. Se V1 regravar objetos inteiros, o adaptador deve preservar metadados e campos adicionais.
+- Migrações aditivas em etapas; não renomear/remover campos, mudar semântica ou impor obrigatoriedade que quebre escritores V1. A fase destrutiva de expand/contract permanece proibida enquanto V1 for opção de retorno.
+- Se houver efeitos V2 que V1 não compreenda, mapear sem perda comprovada ou bloquear promoção/escrita V2. Não resolver com exclusão automática ou dual-write ingênuo.
+- Dados das duas versões seguem disponíveis ao alternar; não filtrar histórico pela versão ativa. Dados oficiais continuam separados logicamente dos diagnósticos, com vínculos auditáveis.
+- Idempotência deve funcionar entre versões e tentativas; revisão humana cria revisão rastreável, reimpressão não duplica evento. Backup e restore testados são pré-condições para cutover, mas restaurar snapshot antigo sobre a base inteira não é rollback de aplicação.
+
+### Backfill dos registros antigos
+
+Executar posteriormente como migração separada, revisada e reversível: inventariar, fazer backup, gerar dry-run com IDs/contagens, aplicar em lotes e reconciliar. A ausência de versão recebe `unknown/legacy`, nunca V1 por aproximação de data, nome de produto ou branch. Não sobrescrever proveniência válida nem inferir pipeline/schema sem evidência. Registrar ID da migração, horário de execução e valores anteriores separadamente de `created_at`. Reexecutar não altera linhas já tratadas; reversão restaura apenas os campos da migração se não houve atualização concorrente. Legados continuam legíveis/graváveis e ficam excluídos de expurgos por V1/V2.
+
+## 5. Segredos compartilhados e DevSecOps
+
+Compartilhar segredos não elimina gestão segura: guardar em gerenciadores apropriados, referenciar por nome/ID, restringir acesso administrativo e conceder somente permissões necessárias. Evitar exposição em frontend, logs, blueprint exportado ou documentação. Rotação/revogação é coordenada e validada nas duas versões; rollback de código não deve reintroduzir credencial revogada. Registrar responsáveis, validade e dependências sem valores. Reconhecer o impacto comum de comprometimento; segregação por função quando disponível não pressupõe conjuntos separados por versão.
+
+Gates obrigatórios, a comprovar antes de operação:
+
+1. Threat model das fronteiras imagem/OCR, relay, Make, autenticação, revisão humana e persistência; validação de entrada e negação por padrão.
+2. Revisão por PR, políticas de branch, testes unitários/integração, SAST, secret scanning, auditoria de dependências e contratos de schema; registrar cobertura real e lacunas do CI.
+3. Auditoria protegida contra alteração, correlação por evento/requisição/versão, acesso mínimo, retenção definida e minimização de dados pessoais.
+4. Homologação sem escrita oficial, testes de falhas, idempotência, uma resposta webhook e concorrência durante troca; OCR.space permanece SHADOW.
+5. Controles administrativos autenticados, aprovação explícita de promoção/retorno e evidência de quem, quando, motivo, artefatos e revisão antes/depois. O kill switch deve ter autoridade de emergência previamente aprovada, sem depender de novo deploy.
+6. Monitorar erros, latência, duplicatas, execução pendente e uso de quotas por versão; reservar capacidade V1 e interromper carga V2 ao atingir limites homologados. Definir limiares e RTO antes da promoção, medir o ciclo completo sem prometer tempo zero.
+
+## 6. Runbook de cutover e recuperação (a implementar e ensaiar)
+
+### Preparação / freeze V1
+
+1. Confirmar SHA/deployment V1 ativo, caminho de retorno, contrato de dados e autores de escrita; salvar manifesto de release e blueprint do cenário único com revisão/hash.
+2. Inventariar roteamento, filas, retries, handlers, respostas webhook e configurações por nome; validar capacidades reais de trava, idempotência, auditoria, backup e restauração.
+3. Preparar V1 preservada e V2 modular no cenário único, com V2 desabilitada por padrão. Testar o caminho V1 e mudanças comuns; arquivar blueprint V1 como recuperação de desastre sem manter outro cenário ativo.
+4. Definir responsável, aprovador, RTO e limiares numéricos de abortar/retornar; comprovar acesso ao controle mesmo com V2 indisponível. Se não houver homologação isolada, usar janela aprovada com ingresso suspenso, drenagem e dados de teste sem escrita oficial; não improvisar teste em tráfego real.
+
+### Promoção V1 → V2
+
+1. Confirmar gates, integridade da base, backup recuperável e compatibilidade de ambos os artefatos com o cenário compartilhado. Executar teste autenticado de login, foto, processamento, revisão humana e impressão.
+2. Validar V2 em diagnóstico sem gravação oficial; comprovar resposta única, erro/timeout SHADOW inofensivos à V1 e proteção contra duplicações.
+3. Registrar aprovação e manifesto da troca (artefatos, blueprint, revisão, IDs em voo, métricas e backup). Serializar mudanças administrativas; rejeitar revisão de configuração obsoleta.
+4. Suspender novas admissões durante troca não atômica e drenar requisições antigas. Atualizar roteamento de aplicação e decisão de pipeline como par compatível; usar revisão única se o mecanismo permitir, ou manter suspensão até ambos estarem consistentes. Não confiar apenas em flag do frontend ou propagação de domínio/cache.
+5. Habilitar V2 e selecionar `active_version=v2`; confirmar leitura da revisão efetiva, executar smoke test controlado e reabrir ingresso. Escrita oficial somente após gates e aprovação humana, com proveniência V2. Monitorar pelos limiares aprovados.
+
+### Rollback rápido V2 → V1
+
+1. Operador autorizado aciona `v2_enabled=false`; bloquear novas admissões/gravações V2, preservar requisições e tentativas pendentes para reconciliação. Não desligar o cenário inteiro como mecanismo normal de rollback.
+2. Drenar/quarentenar execuções em andamento conforme política; apurar commits de resultado incerto antes de replay. Registros confirmados V2 permanecem na base.
+3. Selecionar `active_version=v1` e o artefato V1 previamente testado, usando a mesma disciplina de revisão/suspensão da promoção. **Não recriar cenário, trocar segredos ou recompilar branch arbitrária.** Confirmar filtros e contrato V1 no cenário compartilhado.
+4. Verificar login, foto, resposta webhook única, revisão/impressão, leitura dos dados V2 e gravação identificada V1 sem duplicação. Reabrir ingresso e registrar tempo real de recuperação e integridade.
+5. Se o cenário comum estiver corrompido, suspender ingresso e restaurar blueprint compatível previamente validado no mesmo cenário, verificando conexões e filas. É recuperação de desastre, com RTO próprio; não prometer que o kill switch resolve falha da infraestrutura comum.
 
 ### Roll-forward V1 → V2
-- Validar build V2 ainda íntegro, reconciliar eventos gerados enquanto V1 estava ativa e verificar schema.
-- Restaurar V2 por roteamento controlado, repetir smoke tests e monitoramento.
 
-## 7. Critérios de aceite antes de qualquer merge/deploy
+Corrigir e homologar a causa, confirmar artefato e blueprint V2, reconciliar pendências sem repetir eventos e validar registros escritos por V1 durante o retorno. Repetir aprovação, troca controlada e smoke tests da promoção. Preservar todos os dados anteriores e a trilha do incidente.
 
-- Identidade do V1 congelada e reimplantável comprovada.
-- Make V1/V2 realmente isolados e testados.
-- Segregação Vercel/domínios/segredos auditada.
-- Contratos de dados e recuperação aprovados.
-- Testes completos V1 → V2 → V1 → V2 com evidências e RTO medido.
-- Aprovação explícita do usuário.
-- **Sem merge do PR #41, sem ajuste no Make ativo, sem mudança em produção nesta etapa.**
+## 7. Exclusão crítica por versão e período — procedimento separado
 
-## 8. Próxima ação segura
+Não existe autorização de exclusão nesta etapa nem se presume ferramenta pronta. Preferir quarentena/tombstone reversível; remoção física exige justificativa e aprovação específicas, compatíveis com retenção e integridade.
 
-Inventariar deployment V1 ativo: Git SHA, ID Vercel, variáveis por nomes, cenário Make e contratos de armazenamento, sem divulgar segredos. Elaborar runbook de congelamento e teste de restauração antes de implementar o roteador V2.
+1. **Escopo fechado:** indicar ambiente/base/tabelas, versão geradora exata, campo temporal e intervalo `[início, fim)` com timezone explícito convertido para UTC. O padrão proposto é `created_at` confiável, não data do sorteio ou `updated_at`; outro critério exige nova especificação e aprovação. Rejeitar versão vazia, curinga, período aberto/invertido, timestamps ausentes/ambíguos e `unknown/legacy`.
+2. **Seleção conjunta:** versão **E** intervalo **E** escopo; nunca `OR`. Selecionar por proveniência imutável do registro, não versão ativa nem última edição. Eventos compartilhados, referências cruzadas, revisões de outra versão ou origem duvidosa bloqueiam exclusão automática e exigem plano próprio. Proibir cascade que remova dados de outra versão.
+3. **Dry-run obrigatório:** produzir manifesto protegido com IDs exatos, revisões/hashes, contagens por tabela/versão, dependências e impactos estatísticos; incluir controles negativos comprovando zero candidatos V1/legados ao selecionar V2 (e vice-versa). Não expor dados pessoais no relatório público.
+4. **Backup e integridade:** snapshot/export consistente dos candidatos e vínculos necessários, criptografado e com acesso/retenção restritos; validar checksum e ensaiar restauração seletiva sem sobrescrever registros novos. Registrar contagens e invariantes antes da operação.
+5. **Aprovação forte:** solicitante e aprovador autorizado distinto, autenticação reforçada, confirmação explícita do ambiente, versão, datas, quantidade, motivo e hash do manifesto, com validade curta. Nenhuma aprovação genérica de rollback ou desta documentação autoriza expurgo.
+6. **Execução protegida:** credencial administrativa de privilégio mínimo, bloqueio de escritores relevantes ou isolamento comprovado, limites de lote e teto total aprovados. Revalidar versões, hashes e dependências imediatamente antes da mutação; qualquer desvio invalida o manifesto e exige novo dry-run/aprovação. Executar somente IDs aprovados com predicado de versão/período novamente aplicado, não uma consulta aberta recalculada.
+7. **Verificação e recuperação:** registrar cada resultado de lote e estado parcial; interromper diante de divergência. Comparar contagens, integridade referencial, agregados e controles de dados fora do escopo, especialmente da outra versão. Reconstruir derivados somente por plano validado. Usar restauração seletiva se necessário, preservando escritas posteriores.
+8. **Auditoria independente do conjunto excluído:** guardar quem solicitou/aprovou/executou, motivo, IDs, período, versão, manifesto/hash, backup, resultado e evidência pós-operação. Não apagar a trilha junto com os registros. Um novo ciclo ou ampliação de escopo exige novo manifesto e aprovação.
+
+## 8. Critérios de aceite e próximo passo
+
+Antes de promoção operacional (esta documentação não autoriza merge/deploy):
+
+- V1 e V2 identificadas, recuperáveis, com contratos e artefatos comprovados.
+- Cenário único inventariado; filtros exclusivos, resposta única, isolamento lógico de erros e kill switch testados, inclusive em concorrência e exaustão de recursos.
+- Gestão de segredos compartilhados auditada; rotação compatível com ambas.
+- Base única preservada, todas as escritas identificadas, leitura/escrita V1 compatíveis e backfill `unknown/legacy` validado sem inferência fictícia.
+- Backup/restore e ensaio de exclusão em dados de teste comprovam ausência de apagamento cruzado; nenhuma exclusão real é requisito para promover.
+- Ciclo completo V1 → V2 → V1 → V2 com evidências de continuidade, idempotência, integridade e RTO medido; aprovação explícita do usuário.
+
+**Próximo passo:** inventário somente leitura do deployment V1, blueprint/filas/respostas do Make compartilhado e contratos/escritores da base; registrar IDs e referências sem segredos. Com esse inventário, especificar mecanismo concreto de roteamento, controle de escrita e ensaio de recuperação. Até lá, manter PR #41 sem merge e nenhuma alteração em produção.
