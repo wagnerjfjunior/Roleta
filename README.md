@@ -47,6 +47,12 @@ Comece sempre por:
 Padrões históricos podem ser acompanhados, mas não devem ser apresentados como aumento comprovado da probabilidade futura sem validação prospectiva adequada.
 
 
+## Marco operacional homologado — 09/10/2026
+
+A fotografia técnica do PDF A4, impressão iPhone, download de PDF, compartilhamento de JPG via WhatsApp, APIs, segurança, SFJM e rollback está em **[docs/OPERATIONAL_SNAPSHOT_2026-10-09.md](docs/OPERATIONAL_SNAPSHOT_2026-10-09.md)**.
+
+Âncora do marco: `main@2ca0165992c97a7e5db601863236788fe1f18729`; Vercel `dpl_BYrkeBBcqJtHEA2ockrFh93z3NPf`. Para código corrente, resolver `main` novamente — fotografia não substitui estado live. Não confundir exportação/compartilhamento com ingestão estatística.
+
 ## Fluxo canônico de Nova Roleta / impressão
 
 Para qualquer alteração no fluxo operacional de validação e impressão, ler obrigatoriamente:
