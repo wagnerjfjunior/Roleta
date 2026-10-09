@@ -33,3 +33,24 @@ This is an **offline, read-only diagnostic**. Not linked to Make, Vercel product
 ## Sample
 
 The 06/10/2026 morning image OCR returns 15 exact salon names + Ashley exact; 6 approximate salon names retained for human confirmation, and blank rows blocked. PDF human validation is a reference **only for tests/evaluation**, never input to the reconciler.
+
+
+## Vercel internal endpoint (branch only, NOT deployed)
+
+`POST /api/ocr-reconcile` with server-side environment variable `ROLETA_OCR_SHADOW_TOKEN` (random, at least 32 characters). Authenticate from Make with `Authorization: Bearer <secret>`; use HTTPS and application/json. Do not commit the secret; do not send it to ChatGPT. The endpoint rejects missing or invalid auth, unexpected methods/content type and payloads above size constraints. The Make HTTP 26 `data.ParsedResults[1].ParsedText` is the value to map into `parsedText`, not the full HTTP module object.
+
+Sample diagnostic request (illustrative; secret omitted):
+
+```json
+{"event_id":"20261006-M-001","parsedText":"***Corretor***\n1 Gloszy\n2 Prina\nDATA - 06/10/2026"}
+```
+
+**No persistence exists in this endpoint.** To measure accuracy reliably, version the official human-approved source and persist original Gemini, original OCR.space, corrected OCR, and human truth using a single event ID, unique run ID and atomic idempotency controls. Store independently from statistical draw records but linked by event ID. Reprints do not produce new events or evaluations; human revisions create versioned truth, not a rewrite of prior snapshots. Define access control, PII retention and audit policy before creating writable endpoints.
+
+**Fallback is NOT active.** A real fallback needs:
+1. A failover selector in the official Make/Vercel pipeline with one authoritative Webhook Response.
+2. Sufficiently validated physical-position-to-number parsing: the current parser only handles names and cannot generate safe RLT-PRINT-V2 diagnostic JSON.
+3. Strict timeouts/error handlers with independent OCR.space failure and no retries that double-store events.
+4. Separate feature flag, dark launches and human review; never auto-save official statistics based on machine output.
+
+**Hardening gate:** run all Node tests, perform adversarial auth/body/schema testing, review Vercel branch deployment policies and operational rollback, then obtain explicit approval before merging or wiring Make.
