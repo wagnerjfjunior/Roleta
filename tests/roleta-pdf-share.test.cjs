@@ -29,11 +29,16 @@ const input={
  assert.throws(()=>validate({...input,evento:{...input.evento,dia_semana:'SEGUNDA-FEIRA'}}),/Dia da semana/);
  const oldShare={...input,evento:{...input.evento,company_draw:null,resultado:null,sorteio_empresa:{tg:'1 - 2',hb:'3'}}};
  assert.equal((await PDFDocument.load(await createPdf(oldShare))).getPageCount(),1,'legacy sorteio_empresa representation must work');
+ const prefixed={...input,evento:{...input.evento,company_draw:null,resultado:null,sorteio_empresa:{tg:'TG 1 - 2',hb:'HB 3'}}};
+ assert.equal((await PDFDocument.load(await createPdf(prefixed))).getPageCount(),1,'prefixed legacy company positions');
+ const hbOnly={...input,evento:{...input.evento,company_draw:null,resultado:null,sorteio_empresa:{tg:'  ',hb:'HB 3'}}};
+ assert.equal((await PDFDocument.load(await createPdf(hbOnly))).getPageCount(),1,'whitespace TG must not crash HB-only PDF');
  const ui=fs.readFileSync('roulette-intake.js','utf8');
  for(const k of ['id="rltv2Print"','id="rltv2SavePdf"','id="rltv2SharePdf"','data-review-transfer']){if(k==='data-review-transfer')continue;assert.ok(ui.includes(k),k);}
  assert.match(ui,/sharePdf\.addEventListener\('click',shareReadyPdf\)/);
  assert.match(ui,/savePdf\.addEventListener\('click',saveReadyPdf\)/);
  assert.match(ui,/navigator\.canShare\(\{files:\[file\]\}\)/);
- assert.match(ui,/fetch\('\/api\/roleta-pdf'/);
+ assert.match(ui,/endpoint='\/api\/roleta-pdf'/);
+ assert.match(ui,/endpoint='http:\/\/127\.0\.0\.1:8083\/pdf'/);
  console.log('PASS: validated A4 PDF, official directory, canonical and legacy formats, mobile share actions');
 })().catch(e=>{console.error(e);process.exitCode=1});
