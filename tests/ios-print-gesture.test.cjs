@@ -12,5 +12,6 @@ assert.ok(handler.indexOf('window.print()')<handler.indexOf('setTimeout(restoreP
 assert.match(handler,/document\.body\.appendChild\(printHost\)/,'print DOM must remain isolated');
 assert.match(handler,/window\.addEventListener\('afterprint',restorePrintHost\)/,'print host restoration must remain');
 assert.match(source,/print\.addEventListener\('click',openPrintDialog\)/);
-assert.match(source,/savePdf\.addEventListener\('click',openPrintDialog\)/);
+assert.match(source,/savePdf\.addEventListener\('click',saveReadyPdf\)/);
+assert.match(source,/sharePdf\.addEventListener\('click',shareReadyPdf\)/);
 console.log('PASS: print and save actions use synchronous gesture-safe print with cleanup and isolated layout');
