@@ -986,3 +986,19 @@ body{overflow-x:hidden}
 .rlt-operational-table .rlt-line-check span{font-size:10px}
 .rlt-operational-table tr.rlt-line-verified td:nth-child(3){background:#123b30}
 .rlt-operational-table tr.rlt-line-attention td:nth-child(3){background:#483516}
+
+/* Keep both lottery numbers next to the broker name while scrolling on phones. */
+.rlt-operational-table tbody td:nth-child(1),.rlt-operational-table thead th:nth-child(1){position:sticky;left:0;z-index:2;background:#091523}
+.rlt-operational-table tbody td:nth-child(2),.rlt-operational-table thead th:nth-child(2){position:sticky;left:67px;z-index:2;background:#091523}
+.rlt-operational-table tbody td:nth-child(3),.rlt-operational-table thead th:nth-child(3){left:134px}
+.rlt-operational-table thead th:nth-child(-n+3){z-index:5;background:#0f1d30}
+.rlt-operational-table tr.rlt-line-verified td:nth-child(-n+3){background:#123b30}
+.rlt-operational-table tr.rlt-line-attention td:nth-child(-n+3){background:#483516}
+@media(max-width:700px){
+ .rlt-operational-table{min-width:560px}
+ .rlt-operational-table th:nth-child(1),.rlt-operational-table td:nth-child(1),.rlt-operational-table th:nth-child(2),.rlt-operational-table td:nth-child(2){width:54px}
+ .rlt-operational-table th:nth-child(3),.rlt-operational-table td:nth-child(3){width:174px;left:108px}
+ .rlt-operational-table tbody td:nth-child(2),.rlt-operational-table thead th:nth-child(2){left:54px}
+ .rlt-operational-table th:nth-child(4),.rlt-operational-table td:nth-child(4){width:120px}
+ .rlt-operational-table th:nth-child(5),.rlt-operational-table td:nth-child(5){width:92px}
+}
