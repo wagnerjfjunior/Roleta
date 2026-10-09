@@ -555,7 +555,7 @@
       document.body.appendChild(a);a.click();a.remove();
       setTimeout(()=>URL.revokeObjectURL(url),30000);
     }
-    function jpegFilename(){return pdfFilename().replace(/\\.pdf$/i,'.jpg');}
+    function jpegFilename(){return pdfFilename().replace(/\.pdf$/i,'.jpg');}
     let pdfJsLoading=null;
     function loadPdfJs(){
       if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);
