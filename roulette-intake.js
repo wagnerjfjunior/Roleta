@@ -517,10 +517,17 @@
         printInProgress=false;
       }
       window.addEventListener('afterprint',restorePrintHost);
-      setTimeout(()=>{
-        try{window.print();}
-        catch(error){restorePrintHost();throw error;}
-      },50);
+      // iOS Safari requires print() to run in the original user tap.
+      // A setTimeout here loses transient user activation and silently blocks printing.
+      try{
+        window.print();
+      }catch(error){
+        restorePrintHost();
+        throw error;
+      }
+      // Some mobile browsers don't dispatch afterprint (or have no print UI).
+      // Never leave the detached print host permanently attached to <body>.
+      setTimeout(restorePrintHost,20000);
     }
     print.addEventListener('click',openPrintDialog);
     savePdf.addEventListener('click',openPrintDialog);
