@@ -26,7 +26,7 @@ Inspeção do repositório na cabeça `1d4dd1b824726a2d0bf1668bba65394e389a7ef0`
 | `docs/DATA_DICTIONARY.md` | Define `event_id` e proveniência em campos existentes, mas não formaliza os novos campos de versão abaixo. Não comprova schema do armazenamento em produção. |
 | `.github/workflows/gemini-intake.yml` | Há verificações de segurança/testes com filtros de arquivos e branches; não demonstra que todos os gates propostos estejam configurados ou que esta edição documental dispare CI. |
 
-O contexto operacional informado descreve Gemini e a ramificação OCR.space no mesmo cenário. **Não houve inspeção ao vivo de Make, credenciais, base ou deployments nesta etapa.** IDs, blueprint corrente, limites/filas, módulos de resposta, escritores reais, atomicidade disponível, backups e restauração devem ser inventariados antes da implementação. Não presumir roteador, kill switch, releases imutáveis ou rollback já implantados.
+O contexto operacional informado descreve Gemini e a ramificação OCR.space no mesmo cenário. **Na revisão inicial não houve inspeção ao vivo.** O inventário posterior de 09/10/2026 está em [RLT_ARCH_V1_V2_INVENTORY_20261009.md](RLT_ARCH_V1_V2_INVENTORY_20261009.md): confirmou deployment/aliases e estrutura do cenário compartilhado, sem ler valores secretos ou executar requisições de teste. A configuração completa, limites/filas, escritores externos, atomicidade, backups e restauração ainda precisam de verificação antes da implementação. Não presumir roteador, kill switch, releases imutáveis ou rollback já implantados.
 
 ## 3. Arquitetura e controles de execução
 
@@ -72,6 +72,7 @@ A versão atual fica na configuração de execução; a versão geradora fica no
 - Adotar formato comum retrocompatível ou adaptador na fronteira, com testes de leitura **e escrita** V1 sobre registros V1, V2 e legados. Se V1 regravar objetos inteiros, o adaptador deve preservar metadados e campos adicionais.
 - Migrações aditivas em etapas; não renomear/remover campos, mudar semântica ou impor obrigatoriedade que quebre escritores V1. A fase destrutiva de expand/contract permanece proibida enquanto V1 for opção de retorno.
 - Se houver efeitos V2 que V1 não compreenda, mapear sem perda comprovada ou bloquear promoção/escrita V2. Não resolver com exclusão automática ou dual-write ingênuo.
+- **Bloqueador identificado no inventário:** o painel atual lê arquivos `/data/*` incluídos em cada deployment. Trocar para um artefato antigo também troca o snapshot visível. Definir e homologar uma fonte canônica comum independente dos releases, com caminhos/contratos compatíveis com V1, antes de considerar o rollback apto a preservar dados operacionalmente.
 - Dados das duas versões seguem disponíveis ao alternar; não filtrar histórico pela versão ativa. Dados oficiais continuam separados logicamente dos diagnósticos, com vínculos auditáveis.
 - Idempotência deve funcionar entre versões e tentativas; revisão humana cria revisão rastreável, reimpressão não duplica evento. Backup e restore testados são pré-condições para cutover, mas restaurar snapshot antigo sobre a base inteira não é rollback de aplicação.
 
@@ -145,4 +146,4 @@ Antes de promoção operacional (esta documentação não autoriza merge/deploy)
 - Backup/restore e ensaio de exclusão em dados de teste comprovam ausência de apagamento cruzado; nenhuma exclusão real é requisito para promover.
 - Ciclo completo V1 → V2 → V1 → V2 com evidências de continuidade, idempotência, integridade e RTO medido; aprovação explícita do usuário.
 
-**Próximo passo:** inventário somente leitura do deployment V1, blueprint/filas/respostas do Make compartilhado e contratos/escritores da base; registrar IDs e referências sem segredos. Com esse inventário, especificar mecanismo concreto de roteamento, controle de escrita e ensaio de recuperação. Até lá, manter PR #41 sem merge e nenhuma alteração em produção.
+**Próximo passo:** detalhar base comum e controle de versão a partir do [inventário realizado](RLT_ARCH_V1_V2_INVENTORY_20261009.md), completando a verificação de filas, autenticação, escritores externos e recuperação. Especificar mecanismo concreto de roteamento, controle de escrita e ensaio antes da implementação. Até lá, manter PR #41 sem merge e nenhuma alteração em produção.
