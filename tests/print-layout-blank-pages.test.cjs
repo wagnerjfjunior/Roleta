@@ -9,5 +9,6 @@ assert.match(js,/document\.body\.appendChild\(printHost\)/,'Print host must deta
 assert.match(js,/window\.addEventListener\('afterprint',restorePrintHost\)/,'Print must restore host after dialog');
 assert.match(js,/printHost\.hidden=true/,'Host must be hidden once dialog closes');
 assert.match(js,/print\.addEventListener\('click',openPrintDialog\)/);
-assert.match(js,/savePdf\.addEventListener\('click',openPrintDialog\)/);
-console.log('PASS: print-only layout, cleanup and common print/PDF handler');
+assert.match(js,/savePdf\.addEventListener\('click',saveReadyPdf\)/);
+assert.match(js,/sharePdf\.addEventListener\('click',shareReadyPdf\)/);
+console.log('PASS: print-only layout, cleanup and separate print, PDF and share handlers');
