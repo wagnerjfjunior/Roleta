@@ -5,6 +5,7 @@ on:
       - 'api/roleta-ocr.js'
       - 'gemini-intake-converter.js'
       - 'gemini-draft-ui.js'
+      - 'styles.css'
       - 'roulette-intake.js'
       - 'tests/**'
       - '.github/workflows/gemini-intake.yml'
@@ -26,3 +27,4 @@ jobs:
       - run: node tests/gemini-intake-converter.test.cjs
       - run: node tests/roleta-ocr-relay.test.cjs
       - run: node tests/ios-print-gesture.test.cjs
+      - run: node tests/backfill-mobile-review-ui.test.cjs
