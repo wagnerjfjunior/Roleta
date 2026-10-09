@@ -493,17 +493,25 @@
     }
     async function preparePdf(version){
       try{
-        const auth=await fetch('/api/auth/session',{cache:'no-store'}).then(r=>r.json());
-        if(!auth.authenticated||!auth.csrfToken)throw Error('Entre com Google para gerar e compartilhar o PDF.');
-        const response=await fetch('/api/roleta-pdf',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','X-Roleta-CSRF':auth.csrfToken},
+        const isLocalPdfTest=(location.hostname==='localhost'||location.hostname==='127.0.0.1')&&location.port==='8082';
+        let endpoint='/api/roleta-pdf',headers={'Content-Type':'application/json'};
+        if(isLocalPdfTest){
+          // SFJM static Live Sync at 8082 has no Vercel API. Dedicated loopback-only
+          // helper listens at 8083 and never changes the production auth requirements.
+          endpoint='http://127.0.0.1:8083/pdf';
+        }else{
+          const auth=await fetch('/api/auth/session',{cache:'no-store'}).then(r=>r.json());
+          if(!auth.authenticated||!auth.csrfToken)throw Error('Entre com Google para gerar e compartilhar o PDF.');
+          headers['X-Roleta-CSRF']=auth.csrfToken;
+        }
+        const response=await fetch(endpoint,{
+          method:'POST',headers,
           body:JSON.stringify(reviewedPayload),
           cache:'no-store'
         });
         if(!response.ok){
           const data=await response.json().catch(()=>({}));
-          throw Error(data.error||'Não foi possível gerar o PDF.');
+          throw Error(data.error|| (isLocalPdfTest?'Não foi possível gerar o PDF local. Abra INICIAR-PDF-LOCAL.bat antes de testar.':'Não foi possível gerar o PDF.'));
         }
         const blob=await response.blob();
         if(blob.type!=='application/pdf'||blob.size<100)throw Error('Arquivo PDF inválido.');
@@ -516,7 +524,7 @@
       }catch(error){
         if(version!==pdfVersion)return;
         pdfBlob=null;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
-        pdfStatus.textContent=String(error.message||error);
+        pdfStatus.textContent=String(error.message||error)+(location.port==='8082'?' Verifique se INICIAR-PDF-LOCAL.bat está aberto.':'');
       }
     }
     confirm.addEventListener('change',()=>{
