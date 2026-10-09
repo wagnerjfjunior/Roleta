@@ -36,7 +36,7 @@ test('canonical manifest: source files exist and declared event count is consist
  assert.ok(Number.isInteger(manifest.canonical_event_count)&&manifest.canonical_event_count>0);
  assert.ok(Array.isArray(manifest.sources)&&manifest.sources.length>0);
  const total=manifest.sources.reduce((sum,s)=>{
-  assert.ok(fs.existsSync(path.join(root,s.path.replace(/^\\//,''))),'Missing source: '+s.path);
+  assert.ok(fs.existsSync(path.join(root,s.path.startsWith('/')?s.path.slice(1):s.path)),'Missing source: '+s.path);
   assert.ok(Number.isInteger(s.events)&&s.events>=0);
   return sum+s.events;
  },0);
