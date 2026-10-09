@@ -20,7 +20,9 @@ function createServer(){
   if(req.method!=='POST'||req.url!=='/pdf'){res.writeHead(404);return res.end('Not found');}
   if(!String(req.headers['content-type']||'').startsWith('application/json')){res.writeHead(415);return res.end('JSON required');}
   try{
-   let raw='';for await(const chunk of req){raw+=chunk;if(raw.length>200000){res.writeHead(413);return res.end('Too large');}}
+   const chunks=[];let bytes=0;
+   for await(const chunk of req){bytes+=chunk.length;if(bytes>200000){res.writeHead(413);return res.end('Too large');}chunks.push(chunk);}
+   const raw=Buffer.concat(chunks).toString('utf8');
    const pdf=await createPdf(JSON.parse(raw));
    res.setHeader('Content-Type','application/pdf');
    res.setHeader('Content-Disposition','attachment; filename="Roleta-local-teste.pdf"');
