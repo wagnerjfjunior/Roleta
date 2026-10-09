@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const source=fs.readFileSync('roulette-intake.js','utf8');
+const begin=source.indexOf('function openPrintDialog()');
+const end=source.indexOf("print.addEventListener('click',openPrintDialog)",begin);
+assert.ok(begin>=0&&end>begin,'print dialog handler must exist');
+const handler=source.slice(begin,end);
+assert.match(handler,/window\.print\(\)/,'must call native browser print');
+assert.doesNotMatch(handler,/setTimeout\s*\(\s*\(\s*\)\s*=>\s*\{\s*try\s*\{\s*window\.print\(\)/,'must not defer print outside tap');
+assert.ok(handler.indexOf('window.print()')<handler.indexOf('setTimeout(restorePrintHost'),'print must precede cleanup timer');
+assert.match(handler,/document\.body\.appendChild\(printHost\)/,'print DOM must remain isolated');
+assert.match(handler,/window\.addEventListener\('afterprint',restorePrintHost\)/,'print host restoration must remain');
+assert.match(source,/print\.addEventListener\('click',openPrintDialog\)/);
+assert.match(source,/savePdf\.addEventListener\('click',openPrintDialog\)/);
+console.log('PASS: print and save actions use synchronous gesture-safe print with cleanup and isolated layout');
