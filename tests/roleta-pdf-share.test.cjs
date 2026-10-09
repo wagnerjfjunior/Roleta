@@ -26,6 +26,9 @@ const input={
  assert.throws(()=>validate({...input,salao:[input.salao[0],...input.salao.slice(1).map((r,i)=>({...r,ordem_final:i+3}))]}),/Ordem do SALÃO inválida/);
  const legacy={...input,evento:{...input.evento,company_draw:null,resultado:{empresa:'TEGRA',numero:null,numero_exposto:false}}};
  assert.equal((await PDFDocument.load(await createPdf(legacy))).getPageCount(),1,'legacy importer must still export');
+ assert.throws(()=>validate({...input,evento:{...input.evento,dia_semana:'SEGUNDA-FEIRA'}}),/Dia da semana/);
+ const oldShare={...input,evento:{...input.evento,company_draw:null,resultado:null,sorteio_empresa:{tg:'1 - 2',hb:'3'}}};
+ assert.equal((await PDFDocument.load(await createPdf(oldShare))).getPageCount(),1,'legacy sorteio_empresa representation must work');
  const ui=fs.readFileSync('roulette-intake.js','utf8');
  for(const k of ['id="rltv2Print"','id="rltv2SavePdf"','id="rltv2SharePdf"','data-review-transfer']){if(k==='data-review-transfer')continue;assert.ok(ui.includes(k),k);}
  assert.match(ui,/sharePdf\.addEventListener\('click',shareReadyPdf\)/);
