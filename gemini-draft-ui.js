@@ -173,7 +173,7 @@ async function mount(host){
        '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></td><td><label class="rlt-line-check"><input data-correct-confirm type="checkbox"><span data-line-state>Revisar</span></label></td></tr>').join('');
      human.innerHTML='<h3>Correção humana assistida</h3><p class="small muted">Confira os números com a fotografia. Corrija 01/10 e qualquer duplicidade. Os números são usados apenas nesta etapa e não aparecem na impressão.</p>'+
        '<datalist id="geminiReviewBrokerNames">'+opts+'</datalist>'+
-       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><p class="small muted">Deslize horizontalmente para comparar nome e número sorteado.</p><div class="rltv2-review-wrap rlt-operational-scroll" role="region" tabindex="0" aria-label="Conferência de corretores"><table class="rltv2-review-table rlt-operational-table"><thead><tr><th>Nº Escolhido</th><th>Nº Sorteado</th><th>Corretor</th><th>Classe</th><th>Conferido</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
+       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rltv2-review-wrap rlt-five-column-review" role="region" aria-label="Conferência de corretores"><table class="rltv2-review-table rlt-five-column-table"><thead><tr><th>Nº Escolhido</th><th>Nº Sorteado</th><th>Corretor</th><th>Classe</th><th>Conferido</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
        '<h3>Conferir cabeçalho operacional</h3>'+
        '<div class="rltv2-company-review">'+
        '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(value.data||'')+'"></label>'+
