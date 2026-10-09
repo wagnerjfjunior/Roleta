@@ -46,6 +46,8 @@ const input={
  assert.ok(ui.includes('canvas.toBlob('));
  assert.ok(ui.includes('sharePdf.disabled=true'));
  assert.ok(ui.includes('photoBlob=image'));
+ assert.ok(ui.includes("replace(/\\.pdf$/i,'.jpg')"),'JPG filename must replace PDF extension');
+ assert.ok(!ui.includes("replace(/\\\\.pdf$/i,'.jpg')"),'do not match a literal backslash in PDF extension');
  assert.match(ui,/endpoint='\/api\/roleta-pdf'/);
  assert.match(ui,/endpoint='http:\/\/127\.0\.0\.1:8083\/pdf'/);
  console.log('PASS: validated A4 PDF, official directory, canonical and legacy formats, mobile share actions');
