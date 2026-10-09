@@ -1,5 +1,7 @@
 # Roleta — Project Status
 
+> **Nota de atualização operacional (09/10/2026):** a interface Nova Roleta de produção foi homologada no commit `2ca0165992c97a7e5db601863236788fe1f18729` (PR #39): conferência humana → PDF A4 (impressão/download) → JPG (foto/WhatsApp). Evidência, Vercel, segurança e rollback: `docs/OPERATIONAL_SNAPSHOT_2026-10-09.md`. Esta atualização não recontou o dataset nem altera as conclusões estatísticas abaixo. Para contagens atuais, consultar os manifestos versionados.
+
 ## State — 2026-10-07
 
 - canonical repository: `wagnerjfjunior/Roleta`.
