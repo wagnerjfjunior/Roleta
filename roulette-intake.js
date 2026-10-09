@@ -280,7 +280,7 @@
         '<div class="section-head"><div><span class="eyebrow">3 · PRÉVIA FINAL</span><h2>RLT-PRINT-V2</h2></div><span id="rltv2Counts" class="intake-counts"></span></div>'+
         '<div id="rltv2Preview" class="rltv2-screen-preview"></div>'+
         '<label class="intake-confirm"><input id="rltv2Confirm" type="checkbox"> Conferi a folha final após as correções humanas.</label>'+
-        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Abrir PDF para imprimir</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar PDF</button><button id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar</button></div>'+
+        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Abrir PDF para imprimir</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar PDF</button><button id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar foto</button></div>'+
         '<p id="rltv2PdfStatus" class="small muted" role="status" aria-live="polite">Confirme a folha final para preparar o PDF de compartilhamento.</p>'+
       '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
@@ -312,7 +312,7 @@
     const savePdf=host.querySelector('#rltv2SavePdf');
     const sharePdf=host.querySelector('#rltv2SharePdf');
     const pdfStatus=host.querySelector('#rltv2PdfStatus');
-    let pdfBlob=null,pdfVersion=0;
+    let pdfBlob=null,photoBlob=null,pdfVersion=0;
     const printHost=host.querySelector('#rltv2PrintHost');
 
     loadBrokerDirectory().then(x=>{brokers=x}).catch(err=>{
@@ -326,7 +326,7 @@
     });
 
     function invalidateFinal(){
-      reviewedPayload=null;pdfBlob=null;pdfVersion++;card.hidden=true;confirm.checked=false;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
+      reviewedPayload=null;pdfBlob=null;photoBlob=null;pdfVersion++;card.hidden=true;confirm.checked=false;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
       reviewGate.className='intake-gate blocked';
       reviewGate.innerHTML='<strong>ALTERAÇÕES PENDENTES</strong><div>Clique em Aplicar correções e validar antes da impressão.</div>';
     }
@@ -477,7 +477,7 @@
         reviewedPayload=null;card.hidden=true;return;
       }
       reviewedPayload=result.payload;
-      pdfBlob=null;pdfVersion++;print.disabled=true;sharePdf.disabled=true;pdfStatus.textContent='Confirme a folha final para preparar o PDF.';
+      pdfBlob=null;photoBlob=null;pdfVersion++;print.disabled=true;sharePdf.disabled=true;pdfStatus.textContent='Confirme a folha final para preparar o PDF.';
       reviewGate.className='intake-gate clear';
       reviewGate.innerHTML='<strong>CONFERÊNCIA HUMANA VALIDADA</strong>'+
         (result.corrections.length?'<div>Correções aplicadas:</div>'+result.corrections.map(x=>'<div>• '+esc(x)+'</div>').join(''):'<div>Nenhuma alteração necessária; transcrição confirmada.</div>');
@@ -519,17 +519,28 @@
         pdfBlob=blob;
         print.disabled=false;
         savePdf.disabled=false;
-        sharePdf.disabled=false;
-        pdfStatus.textContent='PDF pronto para salvar ou compartilhar no WhatsApp.';
+        sharePdf.disabled=true;
+        pdfStatus.textContent='PDF pronto. Preparando foto da roleta para compartilhar...';
+        try{
+          const image=await renderPdfAsJpeg(blob);
+          if(version!==pdfVersion||!confirm.checked)return;
+          photoBlob=image;
+          sharePdf.disabled=false;
+          pdfStatus.textContent='PDF pronto. Foto da roleta pronta para o WhatsApp.';
+        }catch(imageError){
+          if(version!==pdfVersion||!confirm.checked)return;
+          photoBlob=null;
+          pdfStatus.textContent='PDF pronto para imprimir e salvar. Foto indisponível: '+String(imageError.message||imageError);
+        }
       }catch(error){
         if(version!==pdfVersion)return;
-        pdfBlob=null;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
+        pdfBlob=null;photoBlob=null;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
         pdfStatus.textContent=String(error.message||error)+(location.port==='8082'?' Verifique se INICIAR-PDF-LOCAL.bat está aberto.':'');
       }
     }
     confirm.addEventListener('change',()=>{
       pdfVersion++;
-      pdfBlob=null;
+      pdfBlob=null;photoBlob=null;
       print.disabled=true;
       savePdf.disabled=true;sharePdf.disabled=true;
       if(confirm.checked&&reviewedPayload){
@@ -544,19 +555,63 @@
       document.body.appendChild(a);a.click();a.remove();
       setTimeout(()=>URL.revokeObjectURL(url),30000);
     }
-    function shareReadyPdf(){
-      if(!confirm.checked||!pdfBlob)return;
-      const file=new File([pdfBlob],pdfFilename(),{type:'application/pdf'});
-      // Invoke share directly on the user gesture; async fetch here breaks iOS activation.
+    function jpegFilename(){return pdfFilename().replace(/\.pdf$/i,'.jpg');}
+    let pdfJsLoading=null;
+    function loadPdfJs(){
+      if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);
+      if(!pdfJsLoading){
+        pdfJsLoading=new Promise((resolve,reject)=>{
+          const script=document.createElement('script');
+          script.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+          script.async=true;
+          script.onload=()=>window.pdfjsLib?resolve(window.pdfjsLib):reject(new Error('Biblioteca de imagem indisponível.'));
+          script.onerror=()=>reject(new Error('Falha ao carregar conversor de PDF para foto.'));
+          document.head.appendChild(script);
+        }).catch(error=>{pdfJsLoading=null;throw error;});
+      }
+      return pdfJsLoading;
+    }
+    async function renderPdfAsJpeg(blob){
+      const pdfjs=await loadPdfJs();
+      pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const bytes=new Uint8Array(await blob.arrayBuffer());
+      const task=pdfjs.getDocument({data:bytes});
+      let pdf;
+      try{
+        pdf=await task.promise;
+        if(pdf.numPages!==1)throw new Error('A roleta ocupa mais de uma página; não é possível compartilhar como uma única foto.');
+        const page=await pdf.getPage(1);
+        // A4 at 180 dpi: legible names and low compression artefacts in WhatsApp.
+        const viewport=page.getViewport({scale:2.5});
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+        const ctx=canvas.getContext('2d',{alpha:false});
+        if(!ctx)throw new Error('Canvas de imagem não está disponível.');
+        ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);
+        await page.render({canvasContext:ctx,viewport}).promise;
+        const jpeg=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Falha na conversão para JPG.')),'image/jpeg',0.94));
+        canvas.width=0;canvas.height=0;
+        if(jpeg.size<1000)throw new Error('Foto gerada incorretamente.');
+        return jpeg;
+      }finally{
+        if(pdf)await pdf.destroy();
+        else await task.destroy();
+      }
+    }
+    function shareReadyPhoto(){
+      if(!confirm.checked||!pdfBlob||!photoBlob)return;
+      const file=new File([photoBlob],jpegFilename(),{type:'image/jpeg'});
+      // JPG is pre-rendered before enabling the button. Keep the native share
+      // invocation in the original tap; never await rendering here on iOS.
       if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
         navigator.share({files:[file],title:'Roleta '+reviewedPayload.evento.data})
-          .catch(e=>{if(e.name!=='AbortError')pdfStatus.textContent='Não foi possível compartilhar. Use Salvar PDF.';});
+          .catch(e=>{if(e.name!=='AbortError')pdfStatus.textContent='Não foi possível compartilhar a foto. Tente novamente.';});
       }else{
-        pdfStatus.textContent='O compartilhamento de arquivos não está disponível neste navegador. Use Salvar PDF e envie pelo WhatsApp.';
+        pdfStatus.textContent='Compartilhamento de fotos indisponível neste navegador.';
       }
     }
     function openPrintDialog(){
-      // The same PDF bytes are used for print, save and WhatsApp share.
+      // Printing and downloading continue using the original validated PDF bytes.
       // On iOS PWAs the native PDF viewer is more reliable than browser page printing.
       if(!confirm.checked||!pdfBlob)return;
       const url=URL.createObjectURL(pdfBlob);
@@ -572,7 +627,7 @@
     }
     print.addEventListener('click',openPrintDialog);
     savePdf.addEventListener('click',saveReadyPdf);
-    sharePdf.addEventListener('click',shareReadyPdf);
+    sharePdf.addEventListener('click',shareReadyPhoto);
   }
 
   window.RouletteIntake={mount,normalizePayload,validatePayload,renderCanonical,applyHumanReview,deriveCompanyDraw};

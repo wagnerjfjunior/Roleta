@@ -36,9 +36,18 @@ const input={
  assert.equal((await PDFDocument.load(await createPdf(hbOnly))).getPageCount(),1,'whitespace TG must not crash HB-only PDF');
  const ui=fs.readFileSync('roulette-intake.js','utf8');
  for(const k of ['id="rltv2Print"','id="rltv2SavePdf"','id="rltv2SharePdf"','data-review-transfer']){if(k==='data-review-transfer')continue;assert.ok(ui.includes(k),k);}
- assert.match(ui,/sharePdf\.addEventListener\('click',shareReadyPdf\)/);
+ assert.match(ui,/sharePdf\.addEventListener\('click',shareReadyPhoto\)/);
  assert.match(ui,/savePdf\.addEventListener\('click',saveReadyPdf\)/);
- assert.match(ui,/navigator\.canShare\(\{files:\[file\]\}\)/);
+ assert.ok(ui.includes('navigator.canShare({files:[file]})'));
+ assert.ok(ui.includes('>Compartilhar foto</button>'));
+ assert.ok(ui.includes("new File([photoBlob],jpegFilename(),{type:'image/jpeg'})"));
+ assert.ok(ui.includes('await renderPdfAsJpeg(blob)'));
+ assert.ok(ui.includes('pdfjs.getDocument({data:bytes})'));
+ assert.ok(ui.includes('canvas.toBlob('));
+ assert.ok(ui.includes('sharePdf.disabled=true'));
+ assert.ok(ui.includes('photoBlob=image'));
+ assert.ok(ui.includes("replace(/\\.pdf$/i,'.jpg')"),'JPG filename must replace PDF extension');
+ assert.ok(!ui.includes("replace(/\\\\.pdf$/i,'.jpg')"),'do not match a literal backslash in PDF extension');
  assert.match(ui,/endpoint='\/api\/roleta-pdf'/);
  assert.match(ui,/endpoint='http:\/\/127\.0\.0\.1:8083\/pdf'/);
  console.log('PASS: validated A4 PDF, official directory, canonical and legacy formats, mobile share actions');
