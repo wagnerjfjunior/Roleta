@@ -549,7 +549,7 @@
     }
     function openPrintDialog(){
       // The same PDF bytes are used for print, save and WhatsApp share.
-      // Opening the native PDF viewer is more reliable than window.print() in iOS PWAs.
+      // On iOS PWAs the native PDF viewer is more reliable than browser page printing.
       if(!confirm.checked||!pdfBlob)return;
       const url=URL.createObjectURL(pdfBlob);
       const popup=window.open(url,'_blank');
