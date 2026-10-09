@@ -54,3 +54,20 @@ Sample diagnostic request (illustrative; secret omitted):
 4. Separate feature flag, dark launches and human review; never auto-save official statistics based on machine output.
 
 **Hardening gate:** run all Node tests, perform adversarial auth/body/schema testing, review Vercel branch deployment policies and operational rollback, then obtain explicit approval before merging or wiring Make.
+
+
+## Proveniência de DIRETOR/GERENTE — 09/10/2026
+
+Uma fotografia integral pode apresentar o diretor **Renan repetido em todas as linhas**, porque DIRETOR é uma coluna por participante. Fotografias cortadas podem omitir essa coluna. **Não tratar repetições legítimas como spam e não exigir que a coluna esteja visível**.
+
+- `diretor_oficial` e `gerente_oficial`: dados obtidos **somente após match exato e único** com o cadastro oficial.
+- `diretor_ocr` e `gerente_ocr`: `null` quando não há associação visual confiável à posição física.
+- `evidencia_diretor.diretor_ocr_nao_vinculado`: texto que apareceu no bloco de diretor sem coordenadas alinhadas, apenas evidência geral.
+- `evidencia_diretor.diretor_ocorrencias`: quantidade de tokens textuais plausíveis no bloco, **não é contagem de corretores nem prova de correspondência individual**.
+- `evidencia_diretor.alinhamento_por_linha=false`: impede atribuir um texto OCR solto a uma posição específica.
+- As correções fuzzy mantêm `confirmado=null` e exigem revisão humana.
+- Cabeçalho DATA/PERÍODO pode vir antes dos nomes; não interromper o bloco apenas por isso.
+- Quando OCR mistura colunas ou reinicia índices, sinalizar `OCR_COLUMN_ALIGNMENT_UNVERIFIED`. Não completar números ou gerentes por ordem suposta.
+- As posições após a última linha sorteada podem incluir Stand-by, Online ou linhas vazias; o parser **não determina a classe operacional** automaticamente.
+
+A segunda amostra contém coluna DIRETOR repetida e cabeçalho fora da ordem textual esperada. O teste de regressão usa padrão reduzido representativo, não todo o texto OCR original. Antes de produção, anexar como fixture auditável com hash/proveniência e executar validação com a amostra integral.
