@@ -1,0 +1,9 @@
+{
+  "name": "roleta-intelligence",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Serverless PDF export for validated Roleta Intelligence",
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
+  }
+}
