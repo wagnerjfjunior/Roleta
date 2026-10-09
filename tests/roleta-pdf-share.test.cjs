@@ -36,9 +36,16 @@ const input={
  assert.equal((await PDFDocument.load(await createPdf(hbOnly))).getPageCount(),1,'whitespace TG must not crash HB-only PDF');
  const ui=fs.readFileSync('roulette-intake.js','utf8');
  for(const k of ['id="rltv2Print"','id="rltv2SavePdf"','id="rltv2SharePdf"','data-review-transfer']){if(k==='data-review-transfer')continue;assert.ok(ui.includes(k),k);}
- assert.match(ui,/sharePdf\.addEventListener\('click',shareReadyPdf\)/);
+ assert.match(ui,/sharePdf\.addEventListener\('click',shareReadyPhoto\)/);
  assert.match(ui,/savePdf\.addEventListener\('click',saveReadyPdf\)/);
- assert.match(ui,/navigator\.canShare\(\{files:\[file\]\}\)/);
+ assert.match(ui,/navigator\\.canShare\\(\\{files:\\[file\\]\\}\\)/);
+ assert.match(ui,/id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar foto/);
+ assert.match(ui,/new File\\(\\[photoBlob\\],jpegFilename\\(\\),\\{type:'image\\/jpeg'\\}\\)/);
+ assert.match(ui,/await renderPdfAsJpeg\\(blob\\)/);
+ assert.match(ui,/pdfjs\\.getDocument\\(\\{data:bytes\\}\\)/);
+ assert.match(ui,/canvas\\.toBlob\\(/);
+ assert.match(ui,/sharePdf\\.disabled=true/);
+ assert.match(ui,/photoBlob=image/);
  assert.match(ui,/endpoint='\/api\/roleta-pdf'/);
  assert.match(ui,/endpoint='http:\/\/127\.0\.0\.1:8083\/pdf'/);
  console.log('PASS: validated A4 PDF, official directory, canonical and legacy formats, mobile share actions');
