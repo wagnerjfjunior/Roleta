@@ -1,39 +1,85 @@
 {
   "project_id": "roleta",
-  "project_name": "Roleta",
+  "as_of": "2026-10-09",
+  "scope": "RLT-ARCH-01 experimental continuity; other workstreams not fully revalidated",
   "canonical_source": "wagnerjfjunior/Roleta",
-  "canonical_ref_rule": "resolve_live_main",
-  "bootstrap": "bootstrap/BOOTSTRAP_CANONICO.md",
-  "continuity": "handoffs/CURRENT.md",
-  "status": "docs/PROJECT_STATUS.md",
+  "canonical_production_ref": "main",
+  "resolved_main_sha": "2ca0165992c97a7e5db601863236788fe1f18729",
+  "active_development_branch": "feat/ocrspace-shadow-reconciler-20261009",
+  "pull_request": 41,
+  "experimental_evidence_head_before_reconciliation": "22a92b5ad944abc89488ad1d452fba9cdabce1f0",
+  "publication_status": "EXPERIMENTAL_BRANCH_NOT_MERGED",
+  "primary_objective_status": "ACTIVE",
+  "active_workstream": "RLT-ARCH-01 V1/V2 shared infrastructure and reversible releases",
+  "current_gate": "Architecture and read-only inventory documented; detailed specification pending",
+  "next_safe_action_source": "docs/NEXT_SAFE_ACTION.md#rlt-arch-01",
   "next_safe_action": "docs/NEXT_SAFE_ACTION.md",
-  "blocked_actions": "docs/BLOCKED_ACTIONS.md",
-  "state": {
-    "usable_events": 81,
-    "full_permutation_events": 80,
-    "quality_A": 77,
-    "quality_B": 4,
-    "dashboard_version": "V3_WORKSPACE",
-    "dashboard_status": "RELEASED_PRODUCTION",
-    "viability": "EVIDENCIA_INSUFICIENTE",
-    "presence_status": "RECONCILIATION_REQUIRED"
-  },
-  "active_workstream": "RLT-M3 Prospective Statistical Monitoring",
-  "parallel_workstream": "RLT-M2 Broker Identity Layer",
-  "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
-  "frozen_context": {
-    "sunday": {
-      "Wagner": 9,
-      "Brenda": 5,
-      "Laura": 25,
-      "Helena": 23
-    }
-  },
+  "continuity_source": "docs/sfjm/RLT_ARCH_01_CONTINUITY.md",
+  "data_state_source": "docs/sfjm/CURRENT_DATA_STATE.json",
+  "data_authority": "data/manifest.json",
+  "continuity_classification": "CONDITIONAL",
   "delivery_policy": {
     "mode": "local-first-remote-on-promotion",
     "preview": false,
     "remote_iteration": false,
     "push_requires_explicit_intent": true,
     "deploy_requires_explicit_intent": true
-  }
+  },
+  "operational_authorization": {
+    "documentation_on_pr_41": true,
+    "merge": false,
+    "deploy": false,
+    "make_mutation": false,
+    "data_mutation": false
+  },
+  "legacy_snapshot": {
+    "freshness": "NOT_REVALIDATED_OUTSIDE_RLT_ARCH_01",
+    "source_as_of": "2026-10-04",
+    "state": {
+      "project_id": "roleta",
+      "project_name": "Roleta",
+      "canonical_source": "wagnerjfjunior/Roleta",
+      "canonical_ref_rule": "resolve_live_main",
+      "bootstrap": "bootstrap/BOOTSTRAP_CANONICO.md",
+      "continuity": "handoffs/CURRENT.md",
+      "status": "docs/PROJECT_STATUS.md",
+      "next_safe_action": "docs/NEXT_SAFE_ACTION.md",
+      "blocked_actions": "docs/BLOCKED_ACTIONS.md",
+      "state": {
+        "usable_events": 81,
+        "full_permutation_events": 80,
+        "quality_A": 77,
+        "quality_B": 4,
+        "dashboard_version": "V3_WORKSPACE",
+        "dashboard_status": "RELEASED_PRODUCTION",
+        "viability": "EVIDENCIA_INSUFICIENTE",
+        "presence_status": "RECONCILIATION_REQUIRED"
+      },
+      "active_workstream": "RLT-M3 Prospective Statistical Monitoring",
+      "parallel_workstream": "RLT-M2 Broker Identity Layer",
+      "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
+      "frozen_context": {
+        "sunday": {
+          "Wagner": 9,
+          "Brenda": 5,
+          "Laura": 25,
+          "Helena": 23
+        }
+      },
+      "delivery_policy": {
+        "mode": "local-first-remote-on-promotion",
+        "preview": false,
+        "remote_iteration": false,
+        "push_requires_explicit_intent": true,
+        "deploy_requires_explicit_intent": true
+      }
+    }
+  },
+  "project_name": "Roleta",
+  "bootstrap": "bootstrap/BOOTSTRAP_CANONICO.md",
+  "continuity": "handoffs/CURRENT.md",
+  "status": "docs/PROJECT_STATUS.md",
+  "blocked_actions": "docs/BLOCKED_ACTIONS.md",
+  "canonical_ref_rule": "resolve_live_main_and_explicit_experimental_branch_for_this_workstream",
+  "next_safe_action_summary": "Elaborar no Chat a especificação de base comum e controle V1/V2, com contratos e critérios de ensaio; sem implementação ou mutação operacional."
 }

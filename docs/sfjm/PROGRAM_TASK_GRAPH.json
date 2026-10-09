@@ -1,16 +1,20 @@
 {
   "project_id": "roleta",
-  "graph_version": 3,
+  "graph_version": 4,
   "nodes": [
     {
       "id": "RLT-M0",
       "type": "milestone",
-      "status": "COMPLETE"
+      "status": "COMPLETE",
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M1",
       "type": "milestone",
-      "status": "COMPLETE_WITH_QUARANTINE"
+      "status": "COMPLETE_WITH_QUARANTINE",
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M2",
@@ -19,19 +23,25 @@
       "children": [
         "RLT-M2-01",
         "RLT-M2-02"
-      ]
+      ],
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M2-01",
       "type": "task",
       "status": "ACTIVE",
-      "title": "Normalize broker identities and rank outcomes"
+      "title": "Normalize broker identities and rank outcomes",
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M2-02",
       "type": "task",
       "status": "NEXT_SAFE_ACTION",
-      "title": "Reconcile weekly presence from original evidence"
+      "title": "Reconcile weekly presence from original evidence",
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M3",
@@ -42,36 +52,66 @@
         "RLT-M3-02",
         "RLT-M3-03",
         "RLT-M3-04"
-      ]
+      ],
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M3-01",
       "type": "task",
       "status": "COMPLETE",
-      "title": "Release Workspace V3 dashboard"
+      "title": "Release Workspace V3 dashboard",
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M3-02",
       "type": "task",
       "status": "ACTIVE",
-      "title": "Prospective Champion vs Challengers validation"
+      "title": "Prospective Champion vs Challengers validation",
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M3-03",
       "type": "task",
       "status": "ACTIVE_SUNDAY_FROZEN",
-      "title": "Weekend forecast cycle"
+      "title": "Weekend forecast cycle",
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M3-04",
       "type": "task",
       "status": "NEXT_SAFE_ACTION",
-      "title": "Presence reconciliation + Workspace V3 mobile stabilization"
+      "title": "Presence reconciliation + Workspace V3 mobile stabilization",
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
     },
     {
       "id": "RLT-M4",
       "type": "milestone",
-      "status": "PLANNED"
+      "status": "PLANNED",
+      "status_evidence_as_of": "2026-10-04",
+      "freshness": "NOT_REVALIDATED_IN_THIS_CHANGE"
+    },
+    {
+      "id": "RLT-ARCH-01",
+      "type": "workstream",
+      "status": "ACTIVE",
+      "title": "V1/V2 shared infrastructure and reversible releases",
+      "evidence_ref": "docs/sfjm/RLT_ARCH_01_CONTINUITY.md",
+      "completed_deliverables": [
+        "docs/RLT_ARCH_V1_V2_RELEASE_ROLLBACK.md",
+        "docs/RLT_ARCH_V1_V2_INVENTORY_20261009.md"
+      ],
+      "pending_deliverable": "Detailed specification of common data source and V1/V2 control",
+      "next_safe_action_source": "docs/NEXT_SAFE_ACTION.md#rlt-arch-01",
+      "task_decomposition": "N/A; no new material implementation split approved",
+      "completion_condition": "Operational readiness requires compatibility, recovery and cutover evidence; documentation alone does not complete this workstream",
+      "implementation_authorized": false
     }
-  ]
+  ],
+  "as_of": "2026-10-09",
+  "scope": "Add RLT-ARCH-01 continuity; pre-existing node states remain historical, not revalidated"
 }

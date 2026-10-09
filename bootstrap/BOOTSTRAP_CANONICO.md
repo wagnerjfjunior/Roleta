@@ -13,6 +13,14 @@ WORKSPACE_PRODUCT: `wagnerjfjunior/sfjm-workspace`
 
 Este repositório aplica SFJM, mas não redefine o protocolo.
 
+## Continuidade experimental vigente — 2026-10-09
+
+Para RLT-ARCH-01, resolver live `main` **e** a branch `feat/ocrspace-shadow-reconciler-20261009` / PR #41. Documentos novos deste workstream ainda não existem em main. Última main verificada: `2ca0165992c97a7e5db601863236788fe1f18729`.
+
+Mapeamento incremental SFJM: identidade/autoridade neste bootstrap e `docs/SFJM_BOUNDARY.md`; objetivo/estratégia/posição, decisões, rejeições, lições, evidências e autorizações em `docs/sfjm/RLT_ARCH_01_CONTINUITY.md`; índices em `docs/sfjm/CURRENT_PROGRAM_STATE.json`, `PROJECT_READ_MODEL.json` e `PROGRAM_TASK_GRAPH.json`; próxima ação autoritativa em `docs/NEXT_SAFE_ACTION.md#rlt-arch-01`; bloqueios em `docs/BLOCKED_ACTIONS.md`; handoff derivado em `handoffs/CURRENT.md`; dados em manifest/estado derivado.
+
+Não confundir estado experimental versionado com promoção a produção. Decomposição material formal: N/A neste trabalho documental. Snapshots históricos abaixo preservam datas e não prevalecem sobre fontes atuais. Contexto antigo fora deste escopo não foi integralmente revalidado.
+
 ## 2. Ordem mínima de leitura
 
 1. resolver live `main`;
@@ -44,7 +52,7 @@ READY != MERGE_AUTHORITY
 TOOL_CAPABILITY != MUTATION_AUTHORITY
 ```
 
-## 4. Estado atual resumido — 01/10/2026
+## 4. Snapshot histórico resumido — 01/10/2026
 
 - dataset lógico canônico: 77 roletas utilizáveis;
 - 73 qualidade A;

@@ -1,46 +1,85 @@
 {
   "project_id": "roleta",
-  "as_of": "2026-10-04",
+  "as_of": "2026-10-09",
+  "scope": "RLT-ARCH-01 experimental continuity; other workstreams not fully revalidated",
+  "canonical_source": "wagnerjfjunior/Roleta",
+  "canonical_production_ref": "main",
+  "resolved_main_sha": "2ca0165992c97a7e5db601863236788fe1f18729",
+  "active_development_branch": "feat/ocrspace-shadow-reconciler-20261009",
+  "pull_request": 41,
+  "experimental_evidence_head_before_reconciliation": "22a92b5ad944abc89488ad1d452fba9cdabce1f0",
+  "publication_status": "EXPERIMENTAL_BRANCH_NOT_MERGED",
   "primary_objective_status": "ACTIVE",
-  "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
-  "next_safe_action": "Reconcile disputed weekly presence from original evidence, fix mobile responsiveness locally, preserve frozen Sunday picks, then adjudicate Sunday without hindsight.",
-  "data": {
-    "logical_events": 81,
-    "full_permutation_events": 80,
-    "quality_A": 77,
-    "quality_B": 4
-  },
-  "dashboard": {
-    "version": "V3_WORKSPACE",
-    "status": "RELEASED_PRODUCTION",
-    "known_issue": "MOBILE_RESPONSIVENESS"
-  },
-  "model_lab": {
-    "status": "ACTIVE",
-    "viability": "EVIDENCIA_INSUFICIENTE"
-  },
-  "weekend_cycle": {
-    "saturday": "OBSERVED_COMPLETE",
-    "sunday": "FROZEN_AFTER_SATURDAY_RESULT",
-    "sunday_assignments": {
-      "Wagner": 9,
-      "Brenda": 5,
-      "Laura": 25,
-      "Helena": 23
-    }
-  },
-  "presence": {
-    "status": "RECONCILIATION_REQUIRED",
-    "disputed": [
-      "Sabrina/Brenda",
-      "Laura"
-    ]
-  },
+  "active_workstream": "RLT-ARCH-01 V1/V2 shared infrastructure and reversible releases",
+  "current_gate": "Architecture and read-only inventory documented; detailed specification pending",
+  "next_safe_action_source": "docs/NEXT_SAFE_ACTION.md#rlt-arch-01",
+  "next_safe_action": "Elaborar no Chat a especificação de base comum e controle V1/V2, com contratos e critérios de ensaio; sem implementação ou mutação operacional.",
+  "continuity_source": "docs/sfjm/RLT_ARCH_01_CONTINUITY.md",
+  "data_state_source": "docs/sfjm/CURRENT_DATA_STATE.json",
+  "data_authority": "data/manifest.json",
+  "continuity_classification": "CONDITIONAL",
   "delivery_policy": {
     "mode": "LOCAL_FIRST",
     "preview": false,
     "remote_iteration": false,
     "push_requires_explicit_intent": true,
     "deploy_requires_explicit_intent": true
+  },
+  "operational_authorization": {
+    "documentation_on_pr_41": true,
+    "merge": false,
+    "deploy": false,
+    "make_mutation": false,
+    "data_mutation": false
+  },
+  "legacy_snapshot": {
+    "freshness": "NOT_REVALIDATED_OUTSIDE_RLT_ARCH_01",
+    "source_as_of": "2026-10-04",
+    "state": {
+      "project_id": "roleta",
+      "as_of": "2026-10-04",
+      "primary_objective_status": "ACTIVE",
+      "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
+      "next_safe_action": "Reconcile disputed weekly presence from original evidence, fix mobile responsiveness locally, preserve frozen Sunday picks, then adjudicate Sunday without hindsight.",
+      "data": {
+        "logical_events": 81,
+        "full_permutation_events": 80,
+        "quality_A": 77,
+        "quality_B": 4
+      },
+      "dashboard": {
+        "version": "V3_WORKSPACE",
+        "status": "RELEASED_PRODUCTION",
+        "known_issue": "MOBILE_RESPONSIVENESS"
+      },
+      "model_lab": {
+        "status": "ACTIVE",
+        "viability": "EVIDENCIA_INSUFICIENTE"
+      },
+      "weekend_cycle": {
+        "saturday": "OBSERVED_COMPLETE",
+        "sunday": "FROZEN_AFTER_SATURDAY_RESULT",
+        "sunday_assignments": {
+          "Wagner": 9,
+          "Brenda": 5,
+          "Laura": 25,
+          "Helena": 23
+        }
+      },
+      "presence": {
+        "status": "RECONCILIATION_REQUIRED",
+        "disputed": [
+          "Sabrina/Brenda",
+          "Laura"
+        ]
+      },
+      "delivery_policy": {
+        "mode": "LOCAL_FIRST",
+        "preview": false,
+        "remote_iteration": false,
+        "push_requires_explicit_intent": true,
+        "deploy_requires_explicit_intent": true
+      }
+    }
   }
 }

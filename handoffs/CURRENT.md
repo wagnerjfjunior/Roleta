@@ -1,5 +1,19 @@
 # Roleta — Current Handoff
 
+## CURRENT DELTA — 2026-10-09 — RLT-ARCH-01
+
+- Estado de continuidade registrado na branch `feat/ocrspace-shadow-reconciler-20261009`, PR #41; **não incorporado a main**.
+- Main resolvida: `2ca0165992c97a7e5db601863236788fe1f18729`; cabeça experimental anterior à reconciliação: `22a92b5ad944abc89488ad1d452fba9cdabce1f0`.
+- Mudança: arquitetura compartilhada documentada e inventário Vercel/Make/código concluído. Especificação detalhada ainda não criada.
+- Decisões, evidências, rejeições, lacunas, lição observada e autorizações: [registro SFJM](../docs/sfjm/RLT_ARCH_01_CONTINUITY.md).
+- Próxima ação autoritativa: [RLT-ARCH-01 em NEXT_SAFE_ACTION](../docs/NEXT_SAFE_ACTION.md#rlt-arch-01); resumo derivado: elaborar a especificação no Chat.
+- Risco central: trocar deployment também troca snapshot `/data/*`; base comum independente ainda pendente.
+- Restrição: documentação/planejamento; sem merge, deploy, edição do Make ou dados. Mudança de Chat/Work não transfere autorização nem garante contexto automático.
+- Recepção: resolver main e a branch, ler bootstrap → este delta → status → dados derivados → próxima ação → bloqueios → registro SFJM. Classificação `CONDITIONAL` para planejamento documental; não houve homologação operacional.
+- Contexto histórico abaixo preservado; branches, contagens e próximas ações antigas não substituem a seção vigente deste workstream. Gates de domínio/prospectivo/impressão continuam aplicáveis.
+
+## HISTORICAL HANDOFF — registros até 07/10/2026
+
 ## CURRENT STATE — 2026-10-07
 
 canonical repo: `wagnerjfjunior/Roleta`
