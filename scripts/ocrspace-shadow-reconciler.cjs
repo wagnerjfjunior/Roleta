@@ -44,26 +44,54 @@ function loadRoster(brokers) {
   return [...byName.values()].flat();
 }
 function parseOcrSpaceText(text) {
-  if (typeof text !== 'string' || text.length > DEFAULT_MAX_TEXT) throw new Error('Invalid OCR text');
+  if (typeof text !== 'string' || Buffer.byteLength(text, 'utf8') > DEFAULT_MAX_TEXT) throw new Error('Invalid OCR text');
   const lines = text.split(/\r?\n/).map(s => s.trim());
-  const header = lines.findIndex(s => /^\*{0,3}corretor\*{0,3}$/i.test(s));
-  if (header < 0) return { rows: [], issues: ['MISSING_CORRETOR_HEADER'] };
-  const rows = []; const issues = [];
-  let lastPosition = 0;
+  const cleanHeader = s => s.replace(/\*/g, '').trim().toLowerCase();
+  const header = lines.findIndex(s => cleanHeader(s) === 'corretor');
+  if (header < 0) return {rows: [], issues: ['MISSING_CORRETOR_HEADER'], diretor_ocr_nao_vinculado: null, diretor_ocorrencias: 0};
+  const rows = [], issues = [];
+  let lastPosition = 0, seenNames = false;
+  const meta = /^(?:n[º°o]\s*$|data\s*[-:]|per[ií]odo\s*[-:]|empreendimento\s*$)/i;
+  const endSections = /^(?:\*{0,3}(?:gerente|diretor)\*{0,3}|corretores\s+helbor|sorteio\s+da\s+empresa)/i;
   for (const line of lines.slice(header + 1)) {
-    if (/^data\s*[-:]/i.test(line) || /^per[ií]odo\s*[-:]/i.test(line) || /gerente/i.test(line)) break;
-    if (!line) continue;
+    if (endSections.test(line)) break;
+    if (!line || meta.test(line)) continue;
     const match = line.match(/^(\d{1,3})(?:\s+(.+))?$/);
-    if (!match) { issues.push('UNPARSEABLE_NAME_ROW'); continue; }
+    if (!match) {
+      if (seenNames && rows.length && /^[a-zA-Z]{2,}/.test(line)) {
+        // Column interleaving can begin after the roster. Do not infer a name/number association.
+        issues.push('OCR_COLUMN_ALIGNMENT_UNVERIFIED');
+      }
+      continue;
+    }
     const posicao_fisica = Number(match[1]);
-    if (posicao_fisica < 1 || posicao_fisica > 200 || posicao_fisica <= lastPosition) {
-      issues.push('INVALID_OR_OUT_OF_ORDER_POSITION'); continue;
+    if (posicao_fisica <= lastPosition && seenNames) {
+      // OCR has returned to the start of the next column: stop the name block.
+      issues.push('OCR_COLUMN_ALIGNMENT_UNVERIFIED');
+      break;
+    }
+    if (posicao_fisica < 1 || posicao_fisica > 100 || posicao_fisica <= lastPosition) {
+      issues.push('INVALID_OR_OUT_OF_ORDER_POSITION');
+      continue;
     }
     if (lastPosition && posicao_fisica !== lastPosition + 1) issues.push('POSITION_GAP');
-    rows.push({ posicao_fisica, nome_ocr: safeString(match[2] || '') });
+    rows.push({posicao_fisica, nome_ocr: safeString(match[2] || '')});
     lastPosition = posicao_fisica;
+    seenNames = true;
   }
-  return { rows, issues: [...new Set(issues)] };
+  // Director entries are observed but OCR.space provides no reliable row-level coordinates.
+  // Never equate an occurrence count with the number of active salon brokers.
+  const directorAt = lines.findIndex(s => cleanHeader(s) === 'diretor');
+  let diretor_ocorrencias = 0;
+  let diretor_ocr_nao_vinculado = null;
+  if (directorAt >= 0) {
+    const directorLines = lines.slice(directorAt + 1);
+    const tokens = directorLines.filter(s => s && /^[a-zA-ZÀ-ÿ]{3,40}$/.test(s));
+    diretor_ocorrencias = tokens.length;
+    const exactRenan = tokens.filter(s => normalize(s) === 'renan').length;
+    if (exactRenan > 0) diretor_ocr_nao_vinculado = 'Renan';
+  }
+  return {rows, issues: [...new Set(issues)], diretor_ocr_nao_vinculado, diretor_ocorrencias};
 }
 /**
  * Match policy: exact unique is accepted as roster identity; fuzzy is a
@@ -72,7 +100,7 @@ function parseOcrSpaceText(text) {
  */
 function reconcileOcrSpace({ parsedText, brokers }) {
   const roster = loadRoster(brokers);
-  const {rows, issues} = parseOcrSpaceText(parsedText);
+  const {rows, issues, diretor_ocr_nao_vinculado, diretor_ocorrencias} = parseOcrSpaceText(parsedText);
   const result = [];
   const exactNames = new Map();
   for (const broker of roster) {
@@ -99,6 +127,14 @@ function reconcileOcrSpace({ parsedText, brokers }) {
     result.push({...row, status: ranked.length ? 'REVISAO_HUMANA' : 'SEM_MATCH',
       confirmado: null, candidatos: ranked});
   }
+  // Provenance boundary: an OCR column without verified coordinates cannot be joined
+  // to a physical row, even when every candidate belongs to the same director.
+  for (const line of result) {
+    line.diretor_ocr = null;
+    line.diretor_oficial = line.confirmado ? line.confirmado.diretor : null;
+    line.gerente_ocr = null;
+    line.gerente_oficial = line.confirmado ? line.confirmado.gerente : null;
+  }
   const duplicate = new Map();
   for (const row of result) {
     if (row.confirmado) duplicate.set(normalize(row.confirmado.nome), (duplicate.get(normalize(row.confirmado.nome)) || 0) + 1);
@@ -109,6 +145,7 @@ function reconcileOcrSpace({ parsedText, brokers }) {
     autorizado_impressao: false,
     autorizado_base_estatistica: false,
     referencia_cadastro: 'data/print-brokers.json',
+    evidencia_diretor: {diretor_ocr_nao_vinculado, diretor_ocorrencias, alinhamento_por_linha: false},
     linhas: result,
     inconsistencias: [...new Set(issues)],
     resumo: {
