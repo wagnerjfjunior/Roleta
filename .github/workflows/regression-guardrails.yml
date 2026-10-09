@@ -1,0 +1,26 @@
+name: Roleta regression guardrails
+on:
+  pull_request:
+    paths:
+      - 'domain/**'
+      - 'simulation/**'
+      - 'data/events.csv'
+      - 'data/incoming/**'
+      - 'data/manifest.json'
+      - 'tests/regression/**'
+      - '.github/workflows/regression-guardrails.yml'
+  push:
+    branches:
+      - 'test/regression-guardrails-20261009'
+jobs:
+  regression:
+    name: canonical ledger and simulation invariants
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/regression/*.test.cjs
