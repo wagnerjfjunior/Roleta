@@ -38,7 +38,7 @@ const input={
  for(const k of ['id="rltv2Print"','id="rltv2SavePdf"','id="rltv2SharePdf"','data-review-transfer']){if(k==='data-review-transfer')continue;assert.ok(ui.includes(k),k);}
  assert.match(ui,/sharePdf\.addEventListener\('click',shareReadyPhoto\)/);
  assert.match(ui,/savePdf\.addEventListener\('click',saveReadyPdf\)/);
- assert.match(ui,/navigator\\.canShare\\(\\{files:\\[file\\]\\}\\)/);
+ assert.ok(ui.includes('navigator.canShare({files:[file]})'));
  assert.ok(ui.includes('>Compartilhar foto</button>'));
  assert.ok(ui.includes("new File([photoBlob],jpegFilename(),{type:'image/jpeg'})"));
  assert.ok(ui.includes('await renderPdfAsJpeg(blob)'));
