@@ -6,7 +6,7 @@ async function mount(host){
  const article=document.createElement('article');
  article.className='card rltv2-import-card';
  article.innerHTML='<div class="section-head"><div><span class="eyebrow">0 · LEITURA AUTOMÁTICA</span><h2>Conferir extração Gemini</h2></div><span class="intake-risk">NÃO VALIDADO</span></div>'+
- '<p class="small muted">Importe a resposta JSON preliminar do Make/Gemini. Esta etapa é apenas diagnóstico: não autoriza impressão, não importa dados para o SALÃO e não grava na base.</p>'+
+ '<p class="small muted">Importe a resposta JSON preliminar do Make/Gemini. Confira os participantes diretamente na tabela. Nenhuma impressão ou gravação ocorre sem validação humana.</p>'+
  '<div class="section-head"><div><span class="eyebrow">FOTOGRAFIA</span><h3>Escolher origem</h3></div></div>'+
  '<div class="intake-actions"><button type="button" class="simulation-run" data-photo-camera>Tirar foto</button><button type="button" class="simulation-run" data-photo-gallery>Escolher da galeria</button></div>'+
  '<input data-photo-camera-file type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>'+
@@ -14,16 +14,21 @@ async function mount(host){
  '<div data-photo-review hidden><img data-photo-preview alt="Pré-visualização da roleta selecionada" style="width:100%;max-height:420px;object-fit:contain;border-radius:8px;margin-top:12px"><p class="small muted" data-photo-meta></p><label class="intake-confirm"><input data-photo-confirm type="checkbox"> Conferi orientação, legibilidade e enquadramento da fotografia.</label><div class="intake-actions"><button type="button" data-photo-send class="simulation-run" disabled>Enviar para leitura automática</button><button type="button" data-photo-remove class="simulation-run">Substituir fotografia</button></div></div>'+
  '<div data-google-auth class="intake-gate blocked"><strong>ACESSO À LEITURA AUTOMÁTICA</strong><div>Verificando login Google…</div></div>'+
  '<div class="intake-actions"><a data-google-login href="/api/auth/google/start" class="simulation-run" style="text-decoration:none">Entrar com Google</a><button data-google-logout type="button" class="simulation-run" hidden>Sair do Google</button></div>'+
- '<div data-photo-status class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Faça login com Google, selecione uma foto e confirme o enquadramento.</div></div>'+
- '<label class="rltv2-file">Carregar resposta Gemini (.json)<input data-gemini-file type="file" accept=".json,application/json"></label>'+
+ '<div data-photo-status class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Faça login com Google, selecione uma foto e confirme o enquadramento.</div></div><div data-upload-progress class="rlt-upload-progress" role="status" aria-live="polite" hidden><span data-upload-label></span><progress data-upload-meter max="100" value="0"></progress></div>'+
+ '<details class="rlt-technical-backup"><summary>Backup técnico · JSON Gemini</summary><label class="rltv2-file">Carregar resposta Gemini (.json)<input data-gemini-file type="file" accept=".json,application/json"></label>'+
  '<textarea data-gemini-json class="rltv2-json" rows="5" spellcheck="false" placeholder="Ou cole aqui o JSON preliminar do Gemini"></textarea>'+
- '<div class="intake-actions"><button type="button" data-gemini-check class="simulation-run">Analisar rascunho</button></div>'+
+ '<div class="intake-actions"><button type="button" data-gemini-check class="simulation-run">Analisar JSON manual</button><button type="button" data-json-copy class="simulation-run">Copiar JSON</button><button type="button" data-json-download class="simulation-run">Baixar JSON</button></div></details>'+
  '<div data-gemini-status class="intake-gate blocked"><strong>AGUARDANDO JSON DO GEMINI</strong></div>'+
  '<div data-gemini-detail></div>';
  const target=host.querySelector('.rltv2-import-card');
  if(target)host.insertBefore(article,target);else host.prepend(article);
  const textarea=article.querySelector('[data-gemini-json]'),file=article.querySelector('[data-gemini-file]');
  const status=article.querySelector('[data-gemini-status]'),details=article.querySelector('[data-gemini-detail]');
+ const progressBox=article.querySelector('[data-upload-progress]'),progressLabel=article.querySelector('[data-upload-label]'),progressMeter=article.querySelector('[data-upload-meter]');
+ function progress(label,n){progressBox.hidden=false;progressLabel.textContent=label;if(n===null)progressMeter.removeAttribute('value');else progressMeter.value=n;}
+ function upload(file,csrf){return new Promise((resolve,reject)=>{const x=new XMLHttpRequest();x.open('POST','/api/roleta-ocr');x.setRequestHeader('Content-Type',file.type);x.setRequestHeader('X-Roleta-Filename',file.name);x.setRequestHeader('X-Roleta-CSRF',csrf);x.upload.onprogress=e=>{if(e.lengthComputable){const n=Math.round(100*e.loaded/e.total);progress('Enviando imagem: '+n+'%',n);}};x.upload.onload=()=>progress('Foto enviada. Make/Gemini processando…',null);x.onerror=()=>reject(Error('Falha de conexão.'));x.onabort=()=>reject(Error('Envio cancelado.'));x.onload=()=>{let json;try{json=JSON.parse(x.responseText);}catch{return reject(Error('Resposta inválida do servidor.'));}if(x.status<200||x.status>=300)return reject(Error(json.error||'Falha na leitura.'));resolve(json);};x.send(file);});}
+ article.querySelector('[data-json-copy]').addEventListener('click',async()=>{if(!textarea.value)return;try{await navigator.clipboard.writeText(textarea.value);}catch{textarea.focus();textarea.select();}});
+ article.querySelector('[data-json-download]').addEventListener('click',()=>{if(!textarea.value)return;const url=URL.createObjectURL(new Blob([textarea.value],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='roleta-gemini-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
  file.addEventListener('change',async()=>{const f=file.files?.[0];if(f)textarea.value=await f.text();});
 
  // Keep the existing GPT JSON import and manual Gemini JSON inspection untouched.
@@ -96,25 +101,21 @@ async function mount(host){
    busy=true;refreshSend();
    photoStatus.className='intake-gate blocked';
    photoStatus.innerHTML='<strong>PROCESSANDO FOTOGRAFIA</strong><div>Aguardando resposta do Make e do Gemini…</div>';
+   progress('Iniciando envio: 0%',0);
    try{
-     const response=await fetch('/api/roleta-ocr',{
-       method:'POST',headers:{
-         'Content-Type':selected.type,
-         'X-Roleta-Filename':selected.name,
-         'X-Roleta-CSRF':googleSession.csrfToken
-       },body:selected,cache:'no-store'
-     });
-     const json=await response.json();
-     if(!response.ok)throw Error(json.error||'Falha no processamento da fotografia.');
+     const json=await upload(selected,googleSession.csrfToken);
      const data=json?.result;
      if(!data||!Array.isArray(data.linhas))throw Error('O Make retornou resposta incompleta.');
      textarea.value=JSON.stringify(data,null,2);
+     progress('Leitura recebida. Preparando conferência…',null);
      article.querySelector('[data-gemini-check]').click();
      photoStatus.className='intake-gate blocked';
-     photoStatus.innerHTML='<strong>LEITURA RECEBIDA</strong><div>JSON preliminar preenchido. Confira nomes, posições e pendências na seção abaixo; nenhuma impressão foi liberada.</div>';
+     photoStatus.innerHTML='<strong>LEITURA RECEBIDA</strong><div>Confira nomes e números na tabela; a conferência humana continua obrigatória.</div>';
+     progress('Leitura concluída · pronto para revisão',100);
    }catch(e){
      photoStatus.className='intake-gate blocked';
      photoStatus.innerHTML='<strong>ENVIO NÃO CONCLUÍDO</strong><div>'+escapeHtml(e.message||e)+'</div>';
+     progressBox.hidden=true;
    }finally{busy=false;refreshSend();}
  });
  remove.addEventListener('click',()=>{
@@ -136,18 +137,19 @@ async function mount(host){
    const extras=draft.sem_sorteio;
    status.className='intake-gate blocked';
    status.innerHTML='<strong>RASCUNHO NÃO APROVADO</strong><div>SALÃO sorteado: '+lines.length+' · sem sorteio: '+extras.length+' · pendências: '+draft.pendencias.length+'. A ordem abaixo é a do sorteio; compare com a folha original.</div>';
+   const technicalTables=document.createElement('details');technicalTables.className='rlt-technical-backup';technicalTables.innerHTML='<summary>Diagnóstico · leitura preliminar</summary>';details.appendChild(technicalTables);
    const problems=document.createElement('div');
    problems.innerHTML='<h3>Pendências</h3>'+draft.pendencias.map(p=>'<div>• '+escapeHtml(p.code)+': '+escapeHtml(p.message)+(p.posicao===undefined?'':' (linha '+escapeHtml(p.posicao)+')')+'</div>').join('');
-   details.appendChild(problems);
+   technicalTables.appendChild(problems);
    const wrap=document.createElement('div');wrap.className='rltv2-review-wrap';
    const tableHeader='<table class="rltv2-review-table"><thead><tr><th>Ordem sorteada</th><th>Posição impressa</th><th>Nome lido</th><th>Nome oficial</th><th>CRECI</th><th>Cadastro</th></tr></thead><tbody>';
    const rowHtml=l=>'<tr><td>'+escapeHtml(l.numero_sorteado??'—')+'</td><td>'+escapeHtml(l.posicao_impressa)+'</td><td>'+escapeHtml(l.nome_lido)+'</td><td>'+escapeHtml(l.nome||'PENDENTE')+'</td><td>'+escapeHtml(l.creci)+'</td><td>'+(l.cadastro_confirmado?'Correspondência única':'Verificar')+'</td></tr>';
    wrap.innerHTML='<h3>SALÃO — ordem do sorteio (conferência preliminar)</h3>'+tableHeader+lines.map(rowHtml).join('')+'</tbody></table>';
-   details.appendChild(wrap);
+   technicalTables.appendChild(wrap);
    if(extras.length){
      const pending=document.createElement('div');pending.className='rltv2-review-wrap';
      pending.innerHTML='<h3>Sem número sorteado — confirmar classe de participação</h3>'+tableHeader+extras.map(rowHtml).join('')+'</tbody></table>';
-     details.appendChild(pending);
+     technicalTables.appendChild(pending);
    }
 
    // Isolated human correction surface. Does not modify the GPT intake until the
@@ -171,7 +173,7 @@ async function mount(host){
        '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></td><td><label class="rlt-line-check"><input data-correct-confirm type="checkbox"><span data-line-state>Revisar</span></label></td></tr>').join('');
      human.innerHTML='<h3>Correção humana assistida</h3><p class="small muted">Confira os números com a fotografia. Corrija 01/10 e qualquer duplicidade. Os números são usados apenas nesta etapa e não aparecem na impressão.</p>'+
        '<datalist id="geminiReviewBrokerNames">'+opts+'</datalist>'+
-       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rltv2-review-wrap"><table class="rltv2-review-table"><thead><tr><th>Nº Escolhido</th><th>Nº Sorteado</th><th>Corretor</th><th>Classe</th><th>Conferido</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
+       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><p class="small muted">Deslize horizontalmente para comparar nome e número sorteado.</p><div class="rltv2-review-wrap rlt-operational-scroll" role="region" tabindex="0" aria-label="Conferência de corretores"><table class="rltv2-review-table rlt-operational-table"><thead><tr><th>Nº Escolhido</th><th>Nº Sorteado</th><th>Corretor</th><th>Classe</th><th>Conferido</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
        '<h3>Conferir cabeçalho operacional</h3>'+
        '<div class="rltv2-company-review">'+
        '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(value.data||'')+'"></label>'+
@@ -184,7 +186,7 @@ async function mount(host){
        '<label class="intake-confirm"><input data-review-enterprise type="checkbox"> Confirmei na fotografia que o empreendimento pertence ao conjunto CAMINHOS DA LAPA e revisei os dados acima.</label>'+
        '<div class="intake-actions"><button type="button" data-review-transfer class="simulation-run">Transferir para conferência canônica</button></div>'+
        '<div data-review-errors class="intake-gate blocked"><strong>TRANSFERÊNCIA NÃO AUTORIZADA</strong><div>Corrija as linhas, escolha as classes e confirme o cabeçalho antes de continuar.</div></div>';
-     details.appendChild(human);
+     details.insertBefore(human,technicalTables);
      human.querySelector('[data-review-period]').value=['MANHÃ','TARDE','INTEGRAL'].includes(String(value.periodo).toUpperCase())?String(value.periodo).toUpperCase():'TARDE';
 
      const correctionRows=[...human.querySelectorAll('[data-correction-row]')];
