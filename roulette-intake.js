@@ -489,7 +489,7 @@
 
     function pdfFilename(){
       const e=reviewedPayload.evento;
-      return 'Roleta-'+String(e.data).replace(/\\//g,'-')+'-'+String(e.periodo).normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase()+'.pdf';
+      return 'Roleta-'+String(e.data).split('/').join('-')+'-'+String(e.periodo).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()+'.pdf';
     }
     async function preparePdf(version){
       try{
