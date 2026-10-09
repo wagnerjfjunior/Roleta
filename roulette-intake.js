@@ -280,7 +280,7 @@
         '<div class="section-head"><div><span class="eyebrow">3 · PRÉVIA FINAL</span><h2>RLT-PRINT-V2</h2></div><span id="rltv2Counts" class="intake-counts"></span></div>'+
         '<div id="rltv2Preview" class="rltv2-screen-preview"></div>'+
         '<label class="intake-confirm"><input id="rltv2Confirm" type="checkbox"> Conferi a folha final após as correções humanas.</label>'+
-        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Imprimir roleta</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar PDF</button><button id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar</button></div>'+
+        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Abrir PDF para imprimir</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar PDF</button><button id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar</button></div>'+
         '<p id="rltv2PdfStatus" class="small muted" role="status" aria-live="polite">Confirme a folha final para preparar o PDF de compartilhamento.</p>'+
       '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
@@ -477,7 +477,7 @@
         reviewedPayload=null;card.hidden=true;return;
       }
       reviewedPayload=result.payload;
-      pdfBlob=null;pdfVersion++;sharePdf.disabled=true;pdfStatus.textContent='Confirme a folha final para preparar o PDF.';
+      pdfBlob=null;pdfVersion++;print.disabled=true;sharePdf.disabled=true;pdfStatus.textContent='Confirme a folha final para preparar o PDF.';
       reviewGate.className='intake-gate clear';
       reviewGate.innerHTML='<strong>CONFERÊNCIA HUMANA VALIDADA</strong>'+
         (result.corrections.length?'<div>Correções aplicadas:</div>'+result.corrections.map(x=>'<div>• '+esc(x)+'</div>').join(''):'<div>Nenhuma alteração necessária; transcrição confirmada.</div>');
@@ -509,19 +509,20 @@
         if(blob.type!=='application/pdf'||blob.size<100)throw Error('Arquivo PDF inválido.');
         if(version!==pdfVersion||!confirm.checked)return;
         pdfBlob=blob;
+        print.disabled=false;
         savePdf.disabled=false;
         sharePdf.disabled=false;
         pdfStatus.textContent='PDF pronto para salvar ou compartilhar no WhatsApp.';
       }catch(error){
         if(version!==pdfVersion)return;
-        pdfBlob=null;savePdf.disabled=true;sharePdf.disabled=true;
+        pdfBlob=null;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
         pdfStatus.textContent=String(error.message||error);
       }
     }
     confirm.addEventListener('change',()=>{
       pdfVersion++;
       pdfBlob=null;
-      print.disabled=!confirm.checked||!reviewedPayload;
+      print.disabled=true;
       savePdf.disabled=true;sharePdf.disabled=true;
       if(confirm.checked&&reviewedPayload){
         pdfStatus.textContent='Gerando PDF...';
@@ -546,46 +547,20 @@
         pdfStatus.textContent='O compartilhamento de arquivos não está disponível neste navegador. Use Salvar PDF e envie pelo WhatsApp.';
       }
     }
-    let printInProgress=false;
     function openPrintDialog(){
-      if(!reviewedPayload||printInProgress)return;
-      printInProgress=true;
-      renderCanonical(printHost,reviewedPayload);
-      const originalParent=printHost.parentNode;
-      const originalNextSibling=printHost.nextSibling;
-      // Print outside the SPA layout: hidden workspace sections otherwise
-      // keep their height and produce blank A4 pages after the roleta.
-      document.body.appendChild(printHost);
-      printHost.hidden=false;
-      let restored=false;
-      function restorePrintHost(){
-        if(restored)return;
-        restored=true;
-        window.removeEventListener('afterprint',restorePrintHost);
-        printHost.hidden=true;
-        if(originalParent&&originalParent.isConnected){
-          if(originalNextSibling&&originalNextSibling.parentNode===originalParent){
-            originalParent.insertBefore(printHost,originalNextSibling);
-          }else{
-            originalParent.appendChild(printHost);
-          }
-        }else{
-          printHost.remove();
-        }
-        printInProgress=false;
+      // The same PDF bytes are used for print, save and WhatsApp share.
+      // Opening the native PDF viewer is more reliable than window.print() in iOS PWAs.
+      if(!confirm.checked||!pdfBlob)return;
+      const url=URL.createObjectURL(pdfBlob);
+      const popup=window.open(url,'_blank');
+      if(!popup){
+        const a=document.createElement('a');
+        a.href=url;a.target='_blank';a.rel='noopener';a.click();
+        pdfStatus.textContent='PDF aberto para impressão. Use a opção Imprimir do visualizador.';
+      }else{
+        pdfStatus.textContent='Use a opção Imprimir do visualizador do PDF.';
       }
-      window.addEventListener('afterprint',restorePrintHost);
-      // iOS Safari requires print() to run in the original user tap.
-      // A setTimeout here loses transient user activation and silently blocks printing.
-      try{
-        window.print();
-      }catch(error){
-        restorePrintHost();
-        throw error;
-      }
-      // Some mobile browsers don't dispatch afterprint (or have no print UI).
-      // Never leave the detached print host permanently attached to <body>.
-      setTimeout(restorePrintHost,20000);
+      setTimeout(()=>URL.revokeObjectURL(url),120000);
     }
     print.addEventListener('click',openPrintDialog);
     savePdf.addEventListener('click',saveReadyPdf);
