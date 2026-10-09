@@ -29,3 +29,16 @@ assert.ok(duplicateActive.errors.some(e=>e.includes('Posição impressa')));
 const missingActive=toCanonicalReview({rows:[...rows,{...blankExcluded,classe:'salao'}],directory,header});
 assert.ok(missingActive.errors.length>0);
 console.log('PASS excluded rows bypass physical registry only when explicitly classified excluir');
+
+const shortYear=toCanonicalReview({rows,directory,header:{...header,data:'02/10/26'}});
+assert.deepEqual(shortYear.errors,[]);
+assert.equal(shortYear.payload.evento.data,'02/10/2026');
+assert.equal(shortYear.payload.evento.dia_semana,'SEXTA-FEIRA');
+const isoDate=toCanonicalReview({rows,directory,header:{...header,data:'2026-10-02'}});
+assert.deepEqual(isoDate.errors,[]);
+assert.equal(isoDate.payload.evento.data,'02/10/2026');
+for(const invalid of ['31/02/26','32/10/26','02/13/26','02/10/2']){
+ const result=toCanonicalReview({rows,directory,header:{...header,data:invalid}});
+ assert.ok(result.errors.includes('Data inválida.'),invalid);
+}
+console.log('PASS calendar normalization for short/long/ISO dates; impossible dates blocked');

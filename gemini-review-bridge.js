@@ -4,7 +4,7 @@ const api=factory();if(typeof module==='object'&&module.exports)module.exports=a
 'use strict';
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
 const integer=v=>/^\d+$/.test(String(v??'').trim())?Number(v):null;
-function brDate(v){const s=String(v||'').trim();if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4);return s;}
+function brDate(v){const s=String(v||'').trim();if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4);const short=/^(\d{2})\/(\d{2})\/(\d{2})$/.exec(s);if(short)return short[1]+'/'+short[2]+'/20'+short[3];return s;}
 function dateInfo(v){const s=brDate(v),m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s);if(!m)return null;const d=new Date(Date.UTC(+m[3],+m[2]-1,+m[1],12));if(d.getUTCDate()!==+m[1]||d.getUTCMonth()!==+m[2]-1||d.getUTCFullYear()!==+m[3])return null;return {data:s,dia_semana:['DOMINGO','SEGUNDA-FEIRA','TERÇA-FEIRA','QUARTA-FEIRA','QUINTA-FEIRA','SEXTA-FEIRA','SÁBADO'][d.getUTCDay()]};}
 function companyDraw(mode,a,b){a=integer(a);b=integer(b);const all=[1,2,3];if(!all.includes(a))return null;if(mode==='tegra_share')return {mode,tegra_positions:all.filter(n=>n!==a),helbor_positions:[a]};if(mode==='helbor_share')return {mode,tegra_positions:[a],helbor_positions:all.filter(n=>n!==a)};if(mode==='none'&&all.includes(b)&&a!==b)return {mode,tegra_positions:[a],helbor_positions:[b]};return null;}
 function toCanonicalReview({source,rows,directory,header}){
