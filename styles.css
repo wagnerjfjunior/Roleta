@@ -958,3 +958,31 @@ body{overflow-x:hidden}
 .rlt-line-check input{width:20px;height:20px;accent-color:#32c782;padding:0}
 .rlt-line-verified [data-line-state]{color:#4ae6a5}
 .rlt-line-attention [data-line-state]{color:#ffcf79}
+
+/* Backfill operator surface: compact controls and readable horizontal review. */
+.rlt-upload-progress{margin:12px 0;padding:12px;border:1px solid #2a405a;border-radius:10px}
+.rlt-upload-progress[hidden]{display:none!important}
+.rlt-upload-progress span{display:block;margin-bottom:8px;font-weight:700;font-size:13px}
+.rlt-upload-progress progress{display:block;width:100%;height:12px;accent-color:#32c782}
+.rlt-technical-backup{margin:12px 0;padding:10px;border:1px solid #20344b;border-radius:10px}
+.rlt-technical-backup>summary{cursor:pointer;font-weight:700}
+.rlt-technical-backup[open]>summary{margin-bottom:12px}
+.rlt-operational-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.rlt-operational-table{min-width:610px;width:100%;table-layout:fixed}
+.rlt-operational-table th,.rlt-operational-table td{padding:6px 5px}
+.rlt-operational-table th:nth-child(1),.rlt-operational-table td:nth-child(1){width:67px}
+.rlt-operational-table th:nth-child(2),.rlt-operational-table td:nth-child(2){width:67px}
+.rlt-operational-table th:nth-child(3),.rlt-operational-table td:nth-child(3){width:200px;position:sticky;left:0;z-index:1;background:#091523;box-shadow:2px 0 0 #20344b}
+.rlt-operational-table thead th:nth-child(3){z-index:3;background:#0f1d30}
+.rlt-operational-table th:nth-child(4),.rlt-operational-table td:nth-child(4){width:122px}
+.rlt-operational-table th:nth-child(5),.rlt-operational-table td:nth-child(5){width:84px}
+.rlt-operational-table thead th{position:sticky;top:0;z-index:2}
+.rlt-operational-table thead th:nth-child(3){z-index:4}
+.rlt-operational-table input[data-correct-position],.rlt-operational-table input[data-correct-number]{width:100%;padding:8px 2px;text-align:center;font-size:14px;min-width:0}
+.rlt-operational-table input[data-correct-name]{min-width:0;width:100%;font-size:14px}
+.rlt-operational-table select[data-correct-class]{width:100%;max-width:100%;font-size:12px;padding:8px 2px}
+.rlt-operational-table .rlt-line-check{gap:3px;flex-wrap:wrap}
+.rlt-operational-table .rlt-line-check input{width:20px;height:20px}
+.rlt-operational-table .rlt-line-check span{font-size:10px}
+.rlt-operational-table tr.rlt-line-verified td:nth-child(3){background:#123b30}
+.rlt-operational-table tr.rlt-line-attention td:nth-child(3){background:#483516}
