@@ -1,5 +1,20 @@
 # Roleta — Next Safe Action
 
+## RLT-ARCH-01
+
+**Próxima ação vigente para o trabalho desta sessão — 2026-10-09.**
+
+Elaborar e discutir **no Chat** a especificação de base comum independente dos deployments e controle V1/V2 no Make compartilhado, com contratos de leitura/escrita, proveniência, roteamento exclusivo, resposta única, kill switch e critérios de ensaio.
+
+- Fontes: [continuidade SFJM](sfjm/RLT_ARCH_01_CONTINUITY.md), [arquitetura](RLT_ARCH_V1_V2_RELEASE_ROLLBACK.md) e [inventário](RLT_ARCH_V1_V2_INVENTORY_20261009.md).
+- Pré-condições: resolver main e a branch experimental do PR #41; distinguir decisões de propostas e evidência inspecionada de recursos ainda ausentes.
+- Resultado esperado: especificação revisável, com lacunas e etapas claramente marcadas; não declarar escolha de serviço/armazenamento já aprovada.
+- Limites: não implementar, alterar Make/segredos/dados, executar testes em produção, fazer merge ou deploy. Registro futuro no repositório depende de etapa delimitada solicitada pelo usuário.
+- Continuidade: não inferir versão histórica; manter `unknown/legacy`; não apagar dados ao retornar V1; preservar domínio, revisão humana e prospectivo.
+- Escopo: esta prioridade vale para RLT-ARCH-01; não cancela backfill nominal ou outros workstreams. Ações históricas abaixo são contexto paralelo e exigem reconfirmação antes de execução.
+
+## Próximas ações históricas/paralelas — não são a ação vigente de RLT-ARCH-01
+
 ## RLT-M5-01 — Week 05–11/10 Frozen
 
 ### Canonical state

@@ -1,5 +1,15 @@
 # Roleta — Project Status
 
+## Estado vigente deste workstream — 2026-10-09
+
+RLT-ARCH-01 está ativo na branch experimental `feat/ocrspace-shadow-reconciler-20261009`, PR #41, sem merge. Main verificada: `2ca0165992c97a7e5db601863236788fe1f18729`.
+
+Arquitetura e inventário somente leitura estão documentados. A especificação de base comum e controle V1/V2 permanece pendente; nenhuma implementação, migração ou homologação operacional foi concluída nesta sessão.
+
+Fonte de continuidade: [RLT_ARCH_01_CONTINUITY](sfjm/RLT_ARCH_01_CONTINUITY.md). Próxima ação: [RLT-ARCH-01](NEXT_SAFE_ACTION.md#rlt-arch-01). Contagens atuais: `data/manifest.json` e `docs/sfjm/CURRENT_DATA_STATE.json`; números históricos abaixo mantêm seu corte temporal. Outros workstreams não foram revalidados integralmente.
+
+## Snapshot histórico — não usar como estado corrente de RLT-ARCH-01
+
 ## State — 2026-10-07
 
 - canonical repository: `wagnerjfjunior/Roleta`.
