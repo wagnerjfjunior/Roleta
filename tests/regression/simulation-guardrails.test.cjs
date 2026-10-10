@@ -50,3 +50,18 @@ test('simulation audit metadata does not hardcode obsolete canonical counts',()=
   assert.match(source,/structural_source:/,'Missing provenance metadata in '+filename);
  }
 });
+
+test('weekly duel: paired bootstrap is deterministic and does not modify legacy metrics',()=>{
+ const first=weekly.run(weeklyConfig);
+ const second=weekly.run(weeklyConfig);
+ const b=first.paired_valid.bootstrap_delta_hits;
+ assert.deepEqual(b,second.paired_valid.bootstrap_delta_hits);
+ assert.equal(b.replicates,1000);
+ assert.equal(b.unit,'synthetic_week');
+ assert.equal(b.confidence_level,0.95);
+ assert.ok(b.ci95_low<=b.ci95_high);
+ assert.equal(b.mean,first.paired_valid.mean_delta_hits);
+ assert.equal(first.paired_valid.weekly.opportunities,first.paired_valid.current.opportunities);
+ const other=weekly.run({...weeklyConfig,seed:'regression-v2'});
+ assert.equal(other.paired_valid.bootstrap_delta_hits.replicates,1000);
+});
