@@ -14,7 +14,7 @@ REVOKE ALL ON SCHEMA roleta_audit FROM anon, authenticated;
 CREATE TABLE roleta_audit.prospective_evidence (
  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
  event_id text NOT NULL CHECK(event_id ~ '^[A-Za-z0-9_-]{1,128}$'),
- kind text NOT NULL CHECK(kind IN ('prediction','outcome','correction')),
+ kind text NOT NULL CHECK(kind IN ('prediction','outcome')),
  policy text,
  idempotency_key text NOT NULL UNIQUE CHECK(idempotency_key ~ '^[A-Za-z0-9_-]{16,128}$'),
  request_sha256 text NOT NULL CHECK(request_sha256 ~ '^[0-9a-f]{64}$'),
@@ -24,7 +24,7 @@ CREATE TABLE roleta_audit.prospective_evidence (
  received_at timestamptz NOT NULL DEFAULT clock_timestamp(),
  actor_subject text NOT NULL CHECK(length(actor_subject) BETWEEN 1 AND 256),
  CHECK ((kind='prediction' AND policy IN ('WEEKLY_FROZEN','CURRENT_SHADOW'))
-     OR (kind IN ('outcome','correction') AND policy IS NULL))
+     OR (kind='outcome' AND policy IS NULL))
 );
 CREATE UNIQUE INDEX prospective_prediction_once
  ON roleta_audit.prospective_evidence(event_id,policy) WHERE kind='prediction';
