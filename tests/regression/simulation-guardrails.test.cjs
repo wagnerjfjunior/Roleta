@@ -88,3 +88,25 @@ test('simulation workers preload domain core before importing engines',()=>{
   assert.ok(domain>=0&&engine>domain,filename+' must load domain/core.js first');
  }
 });
+
+test('weekly duel F2-03 observed multiseed golden: immutable arithmetic and bootstrap sanity',()=>{
+ const golden=JSON.parse(fs.readFileSync(path.join(root,'tests/golden/weekly-duel-multiseed-null-20261010.json'),'utf8'));
+ const {expected:e,provenance:p}=golden;
+ assert.equal(golden.schema,'rlt-weekly-duel-multiseed-golden-v1');
+ assert.equal(e.runs.length,p.seed_count);
+ assert.equal(e.total_synthetic_events,p.seed_count*p.weeks_per_seed*12);
+ assert.equal(new Set(e.runs.map(r=>r.seed)).size,p.seed_count);
+ const values=e.runs.map((r,i)=>{
+  assert.equal(r.seed,p.seed_prefix+'|replicate-'+String(i+1).padStart(2,'0'));
+  assert.equal(r.current_hits-r.weekly_hits,r.mean_delta_hits*p.weeks_per_seed);
+  assert.ok(r.paired_opportunities>0&&r.paired_opportunities<=p.weeks_per_seed*12*4);
+  assert.ok(r.bootstrap_ci95_low<=r.mean_delta_hits&&r.mean_delta_hits<=r.bootstrap_ci95_high);
+  assert.ok(r.operational_delta_valid_opportunities>=0);
+  return r.mean_delta_hits;
+ });
+ const mean=values.reduce((a,b)=>a+b,0)/values.length;
+ const sd=Math.sqrt(values.reduce((s,v)=>s+(v-mean)**2,0)/(values.length-1));
+ assert.ok(Math.abs(mean-e.mean_delta_hits_across_seeds)<1e-12);
+ assert.ok(Math.abs(sd-e.sd_delta_hits_across_seeds)<1e-12);
+ assert.equal(values.filter(v=>v>0).length,e.seeds_with_positive_delta);
+});
