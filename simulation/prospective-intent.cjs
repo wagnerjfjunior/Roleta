@@ -1,18 +1,23 @@
 'use strict';
 const crypto=require('node:crypto');
-const ALLOWED_TYPES=new Set(['prediction','outcome','correction']);
+const ALLOWED_TYPES=new Set(['prediction','outcome']);
 const MAX_PAYLOAD_BYTES=64*1024;
 function canonical(value){
  if(value===null||typeof value==='string'||typeof value==='boolean')return JSON.stringify(value);
  if(typeof value==='number'){if(!Number.isFinite(value))throw new Error('non-finite value');return JSON.stringify(value)}
- if(Array.isArray(value))return '['+value.map(canonical).join(',')+']';
+ if(Array.isArray(value)){
+  for(let i=0;i<value.length;i++)if(!Object.prototype.hasOwnProperty.call(value,i))throw new Error('sparse array');
+  return '['+value.map(canonical).join(',')+']';
+ }
  if(value&&typeof value==='object'&&Object.getPrototypeOf(value)===Object.prototype){
-  return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+canonical(value[k])).join(',')+'}';
+  const keys=Object.keys(value).sort();
+  if(keys.some(k=>k==='__proto__'||k==='constructor'||k==='prototype'))throw new Error('reserved canonical key');
+  return '{'+keys.map(k=>JSON.stringify(k)+':'+canonical(value[k])).join(',')+'}';
  }
  throw new Error('unsupported canonical value');
 }
 function prepareEvidenceIntent(input){
- if(!input||typeof input!=='object'||Array.isArray(input))throw new Error('intent required');
+ if(!input||typeof input!=='object'||Array.isArray(input)||Object.getPrototypeOf(input)!==Object.prototype)throw new Error('intent required');
  const {event_id,kind,policy,payload,idempotency_key}=input;
  if(typeof event_id!=='string'||!/^[-A-Za-z0-9_]{1,128}$/.test(event_id))throw new Error('invalid event_id');
  if(!ALLOWED_TYPES.has(kind))throw new Error('invalid kind');
