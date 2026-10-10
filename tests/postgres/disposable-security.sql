@@ -30,7 +30,7 @@ BEGIN
 END $$;
 
 -- Contract rejects correction records until a dedicated correction workflow is approved.
-DO $
+DO $correction_check$
 BEGIN
  BEGIN
   INSERT INTO roleta_audit.prospective_evidence(event_id,kind,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
@@ -38,7 +38,7 @@ BEGIN
   RAISE EXCEPTION 'unsupported correction accepted';
  EXCEPTION WHEN check_violation THEN NULL;
  END;
-END $;
+END $correction_check$;
 
 -- Assert trigger fires even when table owner attempts an UPDATE/DELETE.
 INSERT INTO roleta_audit.prospective_evidence(event_id,kind,policy,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
