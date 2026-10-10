@@ -7,6 +7,30 @@
   let lastTest=null;
   let realEvents=[];
 
+
+  // F2-03: hash exactly the ordered, normalized input sent to the worker.
+  // A new run must be exported to obtain provenance; historical exports are not retroactively attested.
+  async function inputProvenance(events,config){
+    if(!globalThis.crypto?.subtle)throw new Error('SHA-256 indisponível neste contexto; execução bloqueada para preservar auditoria.');
+    const ordered=events.map(e=>({
+      N:e.N,period:e.period||'desconhecido',
+      occupied:Array.isArray(e.occupied)?e.occupied.slice():[],
+      first:e.first??null,last:e.last??null,
+      second:e.second??null,courtesy:e.courtesy??null
+    }));
+    const bytes=new TextEncoder().encode(JSON.stringify(ordered));
+    const digest=await crypto.subtle.digest('SHA-256',bytes);
+    const sha256=Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
+    return {
+      schema:'rlt-simulation-input-provenance-v1',
+      algorithm:'SHA-256',encoding:'UTF-8',serialization:'JSON.stringify ordered selected engine fields',
+      real_events_count:events.length,ordered_engine_input_sha256:sha256,
+      engine:'simulation/weekly-duel.js',
+      configuration:{weeks:config.weeks,scenario:config.scenario,signalStrength:config.signalStrength,signalAnchor:config.signalAnchor,randomStreamMode:config.randomStreamMode,seed:config.seed,seedCount:config.seedCount},
+      warning:'Hash covers selected ordered engine input fields, not raw source files or engine revision. Does not establish historical export provenance.'
+    };
+  }
+
   function readRuns(){
     try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(_){return[]}
   }
@@ -29,6 +53,8 @@
       scenario:{
         type:config.scenario,
         signal_strength:config.signalStrength,
+        signal_anchor:config.signalAnchor||'weekly',
+        random_stream_mode:config.randomStreamMode||'legacy',
         target:'2X = Nº1 ou Último'
       },
       workload:{
@@ -40,7 +66,7 @@
       },
       reproducibility:{
         seed:config.seed,
-        structural_source:'83 eventos canônicos; somente permutações completas são elegíveis como moldes/estado inicial',
+        structural_source:'Moldes estruturais derivados da base real carregada; a quantidade elegível é registrada no resultado',
         chronology:'Weekly congela no início; Current recalcula somente após revelar cada evento; ambos usam o mesmo resultado sintético.'
       },
       evaluation:{
@@ -95,9 +121,12 @@
       '<div class="simulation-control-grid">'+
         '<label><span>Semanas simuladas</span><select id="weeklyDuelWeeks"><option value="1000">1.000</option><option value="10000" selected>10.000</option><option value="50000">50.000</option><option value="100000">100.000</option></select></label>'+
         '<label><span>Cenário</span><select id="weeklyDuelScenario"><option value="null">NULL · acaso puro</option><option value="stable_period">Sinal estável por período</option><option value="regime_shift">Mudança de regime no meio da semana</option><option value="weak_noise">Sinal fraco + ruído</option></select></label>'+
+        '<label><span>Fluxo aleatório (auditoria F2-08)</span><select id="weeklyDuelStream"><option value="legacy">Legado · reproduz F2-04</option><option value="isolated">Isolado · comparação causal</option></select></label>'+
+        '<label><span>Âncora do sinal (auditoria F2-07)</span><select id="weeklyDuelAnchor"><option value="weekly">WEEKLY · original</option><option value="exogenous">Exógeno · independente</option><option value="current">CURRENT · pré-evento</option></select></label>'+
         '<label><span>Força do sinal</span><select id="weeklyDuelStrength"><option value="0.01">1%</option><option value="0.03" selected>3%</option><option value="0.05">5%</option><option value="0.10">10%</option></select></label>'+
         '<label><span>Seed</span><input id="weeklyDuelSeed" value="weekly-duel-2026"></label>'+
         '<button id="runWeeklyDuel" class="simulation-run">Rodar duelo</button>'+
+        '<button id="runWeeklyMultiseed" class="simulation-run">Multiseed · 5 seeds</button>'+
         '<button id="cancelWeeklyDuel" class="simulation-run simulation-cancel" disabled>Cancelar</button>'+
       '</div>'+
       '<div class="simulation-progress-wrap"><div class="simulation-progress"><i id="weeklyDuelProgressBar"></i></div><span id="weeklyDuelProgressText">0,0%</span></div>'+
@@ -110,7 +139,8 @@
     if(firstControls) firstControls.insertAdjacentElement('beforebegin',host);
     else page.appendChild(host);
 
-    document.querySelector('#runWeeklyDuel').addEventListener('click',run);
+    document.querySelector('#runWeeklyDuel').addEventListener('click',()=>run(false));
+    document.querySelector('#runWeeklyMultiseed').addEventListener('click',()=>run(true));
     document.querySelector('#cancelWeeklyDuel').addEventListener('click',cancel);
     document.querySelector('#exportWeeklyDuel').addEventListener('click',exportRun);
     updateSavedCount();
@@ -164,18 +194,30 @@
       '</div>'+
       '<p class="small muted">Paired-valid: <b>'+int(p.weekly.opportunities)+'</b> oportunidades idênticas de comparação. Weekly O/E <b>'+num(p.weekly.oe,3)+'</b> · Current O/E <b>'+num(p.current.oe,3)+'</b>.</p>'+
       '<p class="small muted">Mudanças que ajudaram: <b>'+int(u.helped)+'</b> · prejudicaram: <b>'+int(u.hurt)+'</b> · neutras: <b>'+int(u.neutral)+'</b> · empates semanais: <b>'+int(p.ties)+'</b>.</p>'+
+      '<p class="small muted">IC 95% da média Δ hits/semana (bootstrap pareado por semana): <b>'+num(p.bootstrap_delta_hits?.ci95_low,3)+' a '+num(p.bootstrap_delta_hits?.ci95_high,3)+'</b> · '+int(p.bootstrap_delta_hits?.replicates)+' reamostragens. Faixa de incerteza da média simulada, não prova de vantagem preditiva real.</p>'+
       '<p class="small muted">Faixa paired-valid Δ hits P05/P50/P95: <b>'+num(p.delta_hits_p05,0)+' / '+num(p.delta_hits_p50,0)+' / '+num(p.delta_hits_p95,0)+'</b> · Δ O/E: <b>'+num(p.delta_oe_p05,2)+' / '+num(p.delta_oe_p50,2)+' / '+num(p.delta_oe_p95,2)+'</b>.</p>'+
       '<p class="small muted">O bloco operacional mede disponibilidade; o paired-valid mede qualidade da escolha. O resultado continua sendo comportamento simulado da política, não evidência preditiva real.</p>';
   }
 
-  function run(){
-    if(worker)worker.terminate();
+  function clearDisplayedStatistics(message='Aguardando resultado da nova execução.'){
+    const summary=document.querySelector('#weeklyDuelSummary');
+    const updates=document.querySelector('#weeklyDuelUpdates');
+    if(summary)summary.textContent=message;
+    if(updates)updates.textContent='Estatísticas anteriores ocultadas; histórico auditável preservado.';
+    setProgress(0);
+  }
+
+  async function run(multiseed=false){
+    if(worker)return; // Impede execuções concorrentes, inclusive durante a preparação assíncrona.
     const weeks=Number(document.querySelector('#weeklyDuelWeeks').value);
     const scenario=document.querySelector('#weeklyDuelScenario').value;
+    const signalAnchor=document.querySelector('#weeklyDuelAnchor').value;
+    const randomStreamMode=document.querySelector('#weeklyDuelStream').value;
     const signalStrength=scenario==='null'?0:Number(document.querySelector('#weeklyDuelStrength').value);
     const seed=document.querySelector('#weeklyDuelSeed').value||'weekly-duel-2026';
     const status=document.querySelector('#weeklyDuelStatus');
     const runBtn=document.querySelector('#runWeeklyDuel');
+    const multiBtn=document.querySelector('#runWeeklyMultiseed');
     const cancelBtn=document.querySelector('#cancelWeeklyDuel');
     const exportBtn=document.querySelector('#exportWeeklyDuel');
 
@@ -187,13 +229,29 @@
       return;
     }
 
-    const testDefinition=buildTestDefinition({weeks,scenario,signalStrength,seed});
+    const testDefinition=buildTestDefinition({weeks,scenario,signalStrength,signalAnchor,randomStreamMode,seed});
     lastTest=null;
     lastResult=null;
     if(exportBtn)exportBtn.disabled=true;
-    worker=new Worker('/simulation/weekly-duel-worker.js');
-    runBtn.disabled=true;cancelBtn.disabled=false;setProgress(0);
-    status.textContent='Executando '+weeks.toLocaleString('pt-BR')+' semanas pareadas…';
+    clearDisplayedStatistics('Preparando nova simulação…');
+    runBtn.disabled=true;multiBtn.disabled=true;cancelBtn.disabled=true;
+    const config={realEvents,weeks,scenario,signalStrength,signalAnchor,randomStreamMode,seed,seedCount:5};
+    let provenance;
+    try{
+      provenance=await inputProvenance(realEvents,config);
+    }catch(err){
+      status.textContent='AUDITORIA BLOQUEADA · '+err.message;
+      runBtn.disabled=false;multiBtn.disabled=false;
+      return;
+    }
+    lastTest={...testDefinition,experiment_mode:multiseed?'multiseed':'single_seed',input_provenance:provenance};
+    try{worker=new Worker('/simulation/weekly-duel-worker.js')}catch(err){
+      status.textContent='Erro ao iniciar worker: '+err.message;
+      runBtn.disabled=false;multiBtn.disabled=false;
+      return;
+    }
+    cancelBtn.disabled=false;
+    status.textContent='Executando '+(multiseed?'Multiseed · 5 seeds':'duelo')+' · '+testDefinition.name+' · âncora '+signalAnchor+' · fluxo '+randomStreamMode+' · sinal '+(signalStrength*100).toFixed(0)+'% · '+weeks.toLocaleString('pt-BR')+' semanas por seed…';
 
     worker.onmessage=e=>{
       const msg=e.data||{};
@@ -203,38 +261,48 @@
       }else if(msg.type==='complete'){
         const result=msg.result;
         const sameScenario=result.scenario===testDefinition.scenario.type;
-        const sameStrength=Math.abs(Number(result.signal_strength)-Number(testDefinition.scenario.signal_strength))<1e-12;
-        if(!sameScenario||!sameStrength){
+        const sameAnchor=(result.signal_anchor||'weekly')===testDefinition.scenario.signal_anchor;
+        const sameStream=(result.random_stream_mode||'legacy')===(testDefinition.scenario.random_stream_mode==='isolated'?'isolated-v1':'legacy');
+        const sameStrength=multiseed?result.runs.every(r=>r.weeks===weeks):Math.abs(Number(result.signal_strength)-Number(testDefinition.scenario.signal_strength))<1e-12;
+        if(!sameScenario||!sameStrength||!sameAnchor||!sameStream){
           status.textContent='AUDITORIA BLOQUEADA · configuração e resultado não coincidem. Run não salvo.';
-          worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+          worker.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
           lastTest=null;lastResult=null;
           if(exportBtn)exportBtn.disabled=true;
           return;
         }
-        lastTest=testDefinition;
-        setProgress(1);render(result);saveRun(testDefinition,result);
+        // Preserve the input provenance captured before posting to the worker.
+        setProgress(1);
+        if(multiseed){
+          lastResult=result;
+          document.querySelector('#weeklyDuelSummary').innerHTML='<h3>Multiseed · '+result.seed_count+' sementes</h3><p>Δ hits/semana médio entre seeds: <b>'+num(result.mean_delta_hits_across_seeds,3)+'</b> · desvio-padrão: <b>'+num(result.sd_delta_hits_across_seeds,3)+'</b> · mínimo/máximo: <b>'+num(result.min_delta_hits,3)+' / '+num(result.max_delta_hits,3)+'</b> · seeds positivas: <b>'+int(result.seeds_with_positive_delta)+'/'+int(result.seed_count)+'</b>.</p><p class="small muted">Variação entre simulações sintéticas; não demonstra vantagem preditiva real.</p>';
+          document.querySelector('#weeklyDuelUpdates').innerHTML='<div class="small muted">Resultados individuais por seed disponíveis no JSON auditável.</div>';
+        }else render(result);
+        saveRun(lastTest,result);
         if(exportBtn)exportBtn.disabled=false;
         status.textContent='Concluído · '+result.total_synthetic_events.toLocaleString('pt-BR')+' roletas sintéticas · run salvo localmente.';
-        worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+        worker.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
       }else if(msg.type==='error'){
         status.textContent='Erro: '+msg.message;
-        worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+        worker.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
       }
     };
     worker.onerror=e=>{
       status.textContent='Erro no worker: '+e.message;
-      worker?.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+      worker?.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
     };
-    worker.postMessage({type:'run',config:{realEvents,weeks,scenario,signalStrength,seed}});
+    worker.postMessage({type:multiseed?'multiseed':'run',config});
   }
 
   function cancel(){
     if(worker){worker.terminate();worker=null}
     lastTest=null;lastResult=null;
     document.querySelector('#runWeeklyDuel').disabled=false;
+    document.querySelector('#runWeeklyMultiseed').disabled=false;
     document.querySelector('#cancelWeeklyDuel').disabled=true;
     const exportBtn=document.querySelector('#exportWeeklyDuel');
     if(exportBtn)exportBtn.disabled=true;
+    clearDisplayedStatistics('Simulação cancelada; nenhum resultado atual.');
     document.querySelector('#weeklyDuelStatus').textContent='Simulação cancelada.';
   }
 

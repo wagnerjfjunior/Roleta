@@ -1,0 +1,70 @@
+{
+  "schema": "rlt-weekly-duel-multiseed-golden-v1",
+  "provenance": {
+    "source": "user-exported Roleta Intelligence Weekly Policy Duel JSON",
+    "exported_at": "2026-10-10T12:27:09.240Z",
+    "scenario": "null",
+    "seed_prefix": "weekly-duel-2026",
+    "seed_count": 5,
+    "weeks_per_seed": 10000
+  },
+  "expected": {
+    "total_synthetic_events": 600000,
+    "mean_delta_hits_across_seeds": -0.0006000000000000001,
+    "sd_delta_hits_across_seeds": 0.0043566041821583934,
+    "seeds_with_positive_delta": 2,
+    "runs": [
+      {
+        "seed": "weekly-duel-2026|replicate-01",
+        "mean_delta_hits": -0.0044,
+        "paired_opportunities": 450387,
+        "weekly_hits": 44529,
+        "current_hits": 44485,
+        "bootstrap_ci95_low": -0.0267,
+        "bootstrap_ci95_high": 0.018,
+        "operational_delta_valid_opportunities": 7384
+      },
+      {
+        "seed": "weekly-duel-2026|replicate-02",
+        "mean_delta_hits": 0.0046,
+        "paired_opportunities": 450547,
+        "weekly_hits": 44614,
+        "current_hits": 44660,
+        "bootstrap_ci95_low": -0.0157,
+        "bootstrap_ci95_high": 0.0278,
+        "operational_delta_valid_opportunities": 7336
+      },
+      {
+        "seed": "weekly-duel-2026|replicate-03",
+        "mean_delta_hits": -0.005,
+        "paired_opportunities": 450665,
+        "weekly_hits": 45245,
+        "current_hits": 45195,
+        "bootstrap_ci95_low": -0.0277,
+        "bootstrap_ci95_high": 0.0176,
+        "operational_delta_valid_opportunities": 7182
+      },
+      {
+        "seed": "weekly-duel-2026|replicate-04",
+        "mean_delta_hits": -0.0014,
+        "paired_opportunities": 450416,
+        "weekly_hits": 44775,
+        "current_hits": 44761,
+        "bootstrap_ci95_low": -0.0223,
+        "bootstrap_ci95_high": 0.0207,
+        "operational_delta_valid_opportunities": 7377
+      },
+      {
+        "seed": "weekly-duel-2026|replicate-05",
+        "mean_delta_hits": 0.0032,
+        "paired_opportunities": 450630,
+        "weekly_hits": 45133,
+        "current_hits": 45165,
+        "bootstrap_ci95_low": -0.0202,
+        "bootstrap_ci95_high": 0.0257,
+        "operational_delta_valid_opportunities": 7340
+      }
+    ]
+  },
+  "limitations": "Observed-output reference only. Replaying this golden requires exact canonical realEvents inputs and engine revision; synthetic test fixture regression is separate."
+}

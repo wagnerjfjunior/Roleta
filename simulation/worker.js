@@ -1,3 +1,4 @@
+importScripts('/domain/core.js');
 importScripts('/simulation/engine.js');
 
 self.onmessage=function(event){

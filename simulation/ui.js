@@ -62,7 +62,7 @@
       },
       reproducibility:{
         seed:config.seed,
-        structural_source:'81 eventos canônicos; somente permutações completas são elegíveis como moldes/estado inicial',
+        structural_source:'Moldes estruturais derivados da base real carregada; a quantidade elegível é registrada no resultado',
         engine_protocol:'posição física -> gaps preservados -> ordem efetiva -> permutação 1..N sem reposição -> resultado final'
       },
       evaluation:{
