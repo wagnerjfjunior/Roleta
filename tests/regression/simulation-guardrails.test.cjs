@@ -178,10 +178,10 @@ test('F2-07 invalid signal anchor rejected',()=>{
 
 test('F2-07 UI exposes three audited anchors and checks worker provenance',()=>{
  const source=fs.readFileSync(path.join(root,'simulation/weekly-duel-ui.js'),'utf8');
- assert.match(source,/id=\\"weeklyDuelAnchor\\"/);
- assert.match(source,/value=\\"weekly\\"/);
- assert.match(source,/value=\\"exogenous\\"/);
- assert.match(source,/value=\\"current\\"/);
+ assert.match(source,/id="weeklyDuelAnchor"/);
+ assert.match(source,/value="weekly"/);
+ assert.match(source,/value="exogenous"/);
+ assert.match(source,/value="current"/);
  assert.match(source,/signalAnchor:config.signalAnchor/);
  assert.match(source,/const sameAnchor=\(result.signal_anchor\|\|'weekly'\)===testDefinition.scenario.signal_anchor/);
  assert.match(source,/!sameScenario\|\|!sameStrength\|\|!sameAnchor/);
