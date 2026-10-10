@@ -29,6 +29,17 @@ BEGIN
  IF NOT EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='roleta_audit' AND c.relname='prospective_evidence' AND c.relrowsecurity AND c.relforcerowsecurity) THEN RAISE EXCEPTION 'RLS not forced'; END IF;
 END $$;
 
+-- Contract rejects correction records until a dedicated correction workflow is approved.
+DO $
+BEGIN
+ BEGIN
+  INSERT INTO roleta_audit.prospective_evidence(event_id,kind,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
+  VALUES ('CI-CORRECTION','correction','ci-correction-000001',repeat('c',64),repeat('d',64),'{}'::jsonb,'ci');
+  RAISE EXCEPTION 'unsupported correction accepted';
+ EXCEPTION WHEN check_violation THEN NULL;
+ END;
+END $;
+
 -- Assert trigger fires even when table owner attempts an UPDATE/DELETE.
 INSERT INTO roleta_audit.prospective_evidence(event_id,kind,policy,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
 VALUES ('CI-01','prediction','WEEKLY_FROZEN','ci-test-key-00000001',repeat('a',64),repeat('b',64),'{}'::jsonb,'ci');
