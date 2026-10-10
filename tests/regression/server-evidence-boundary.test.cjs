@@ -11,7 +11,7 @@ test('derives server actor and canonical hash without client claims',()=>{
  assert.equal(value.actor_subject,'google:google-test-123');
  assert.equal(value.request_sha256,crypto.createHash('sha256').update(value.canonical_bytes).digest('hex'));
  assert.equal(value.body.event_id,body.event_id);
- assert.equal(value.canonical_bytes,JSON.stringify(JSON.parse(value.canonical_bytes),Object.keys(body).sort())===value.canonical_bytes?value.canonical_bytes:value.canonical_bytes);
+ assert.deepEqual(JSON.parse(value.canonical_bytes),body);
 });
 test('denies unauthenticated, missing CSRF, or foreign origin',()=>{
  assert.throws(()=>prepareAuthenticatedEvidence({...input(),session:null}),/authenticated/);
