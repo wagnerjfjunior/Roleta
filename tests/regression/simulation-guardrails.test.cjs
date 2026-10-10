@@ -186,3 +186,10 @@ test('F2-07 UI exposes three audited anchors and checks worker provenance',()=>{
  assert.match(source,/const sameAnchor=\(result.signal_anchor\|\|'weekly'\)===testDefinition.scenario.signal_anchor/);
  assert.match(source,/!sameScenario\|\|!sameStrength\|\|!sameAnchor/);
 });
+
+test('F2-07 weekly duel UI parses as JavaScript before browser initialization',()=>{
+ const {spawnSync}=require('node:child_process');
+ const file=path.join(root,'simulation/weekly-duel-ui.js');
+ const check=spawnSync(process.execPath,['--check',file],{encoding:'utf8'});
+ assert.equal(check.status,0,check.stderr||check.stdout);
+});
