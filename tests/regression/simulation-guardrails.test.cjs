@@ -42,3 +42,11 @@ test('canonical manifest: source files exist and declared event count is consist
  },0);
  assert.equal(total,manifest.canonical_event_count,'Declared source counts changed; reconcile manifest before merging');
 });
+
+test('simulation audit metadata does not hardcode obsolete canonical counts',()=>{
+ for(const filename of ['simulation/ui.js','simulation/weekly-duel-ui.js']){
+  const source=fs.readFileSync(path.join(root,filename),'utf8');
+  assert.doesNotMatch(source,/structural_source:\s*['"`]\d+ eventos canônicos/,'Stale structural source in '+filename);
+  assert.match(source,/structural_source:/,'Missing provenance metadata in '+filename);
+ }
+});
