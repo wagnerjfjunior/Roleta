@@ -116,6 +116,21 @@
     return a[Math.min(a.length-1,Math.max(0,Math.floor((a.length-1)*p)))];
   }
 
+  // F2: paired bootstrap over whole weeks; diagnostic only, never changes picks.
+  function bootstrapMeanCI(values,seed,replicates=1000){
+    if(!Array.isArray(values)||!values.length||values.some(x=>!Number.isFinite(x)))throw new Error('Bootstrap: invalid weekly deltas');
+    const rng=mulberry32(hashSeed('paired-bootstrap-v1|'+seed));
+    const n=values.length,means=[];
+    for(let b=0;b<replicates;b++){
+      let total=0;
+      for(let i=0;i<n;i++)total+=values[Math.floor(rng()*n)];
+      means.push(total/n);
+    }
+    return {method:'paired-week-cluster-bootstrap-percentile',replicates,confidence_level:0.95,
+      unit:'synthetic_week',mean:values.reduce((a,b)=>a+b,0)/n,
+      ci95_low:pct(means,.025),ci95_high:pct(means,.975)};
+  }
+
   function runWeek(seedEvents,templates,rng,scenario,strength){
     const stats=seedStats(seedEvents);
     const weeklyPlan=makePlan(stats);
@@ -246,6 +261,7 @@
         current_win_rate:weeks.length?currentWins/weeks.length:0,
         weekly_win_rate:weeks.length?weeklyWins/weeks.length:0,
         mean_delta_hits:deltas.reduce((s,x)=>s+x,0)/Math.max(1,deltas.length),
+        bootstrap_delta_hits:bootstrapMeanCI(deltas,config.seed),
         mean_delta_oe:deltaOe.reduce((s,x)=>s+x,0)/Math.max(1,deltaOe.length),
         mean_delta_excess:deltaExcess.reduce((s,x)=>s+x,0)/Math.max(1,deltaExcess.length),
         delta_hits_p05:pct(deltas,.05),delta_hits_p50:pct(deltas,.5),delta_hits_p95:pct(deltas,.95),
