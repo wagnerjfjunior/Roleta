@@ -2,9 +2,10 @@ importScripts('/simulation/weekly-duel.js');
 
 self.onmessage=function(event){
   const msg=event.data||{};
-  if(msg.type!=='run')return;
+  if(msg.type!=='run'&&msg.type!=='multiseed')return;
   try{
-    const result=self.RoletaWeeklyDuel.run({
+    const execute=msg.type==='multiseed'?self.RoletaWeeklyDuel.runMultiseed:self.RoletaWeeklyDuel.run;
+    const result=execute({
       ...msg.config,
       onProgress:progress=>self.postMessage({type:'progress',...progress})
     });
