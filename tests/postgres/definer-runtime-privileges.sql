@@ -22,9 +22,9 @@ END $test$;
 SET ROLE roleta_runtime;
 DO $test$
 DECLARE v_canonical text:='{"event_id":"CI-DEF-1","idempotency_key":"ci-definer-key-0001","kind":"prediction","payload":{"N":10},"policy":"WEEKLY_FROZEN"}';
-DECLARE v_sha text;
+DECLARE v_sha text:='f4d12b498a2cb7dddf57610cd8301d1bcc93cb4ea4788a8749922197d02f1a93';
 BEGIN
- v_sha:=encode(extensions.digest(convert_to(v_canonical,'UTF8'),'sha256'),'hex');
+ -- Expected digest calculated independently from canonical UTF-8 fixture bytes.
  IF roleta_audit.append_authenticated_evidence_ci(v_canonical,v_sha,'CI-DEF-1','prediction','WEEKLY_FROZEN','ci-definer-key-0001','{"N":10}'::jsonb,'google:ci-user')<1
  THEN RAISE EXCEPTION 'expected append'; END IF;
  BEGIN
