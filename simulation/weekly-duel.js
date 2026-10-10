@@ -75,7 +75,9 @@
     for(const p of [rec.primary,...(rec.fallbacks||[])])if(Number.isFinite(p)&&set.has(p))return p;
     return null;
   }
-  function scenarioTarget(period,eventIndex,plan,scenario,rng){
+  function scenarioTarget(period,eventIndex,plan,scenario,rng,occupied,anchor='weekly',currentPlan=null){
+    if(anchor==='exogenous')return scenario==='null'||!occupied.length?null:occupied[Math.floor(rng()*occupied.length)];
+    if(anchor==='current'&&currentPlan)plan=currentPlan;
     const base=(plan[period]||[])[0]?.primary;
     const alt=(plan[period]||[])[1]?.primary;
     if(scenario==='null')return null;
@@ -87,10 +89,10 @@
     }
     return null;
   }
-  function simulateEvent(template,rng,eventIndex,scenario,weeklyPlan,strength){
+  function simulateEvent(template,rng,eventIndex,scenario,weeklyPlan,strength,anchor='weekly',currentPlan=null){
     const occupied=[...template.occupied].sort((a,b)=>a-b);
     const permutation=shuffle(template.N,rng);
-    const target=scenarioTarget(template.period,eventIndex,weeklyPlan,scenario,rng);
+    const target=scenarioTarget(template.period,eventIndex,weeklyPlan,scenario,rng,occupied,anchor,currentPlan);
     const applies=Number.isFinite(target)&&occupied.includes(target)&&rng()<strength;
     if(applies){
       const ti=occupied.indexOf(target), desired=rng()<.5?1:template.N, di=permutation.indexOf(desired);
@@ -131,7 +133,7 @@
       ci95_low:pct(means,.025),ci95_high:pct(means,.975)};
   }
 
-  function runWeek(seedEvents,templates,rng,scenario,strength){
+  function runWeek(seedEvents,templates,rng,scenario,strength,anchor='weekly'){
     const stats=seedStats(seedEvents);
     const weeklyPlan=makePlan(stats);
     const weekly=metric(),current=metric(),random=metric(),pairedWeekly=metric(),pairedCurrent=metric();
@@ -151,7 +153,7 @@
       const randomPositions=[...template.occupied];
       for(let j=randomPositions.length-1;j>0;j--){const k=Math.floor(rng()*(j+1));[randomPositions[j],randomPositions[k]]=[randomPositions[k],randomPositions[j]]}
 
-      const e=simulateEvent(template,rng,i,scenario,weeklyPlan,strength);
+      const e=simulateEvent(template,rng,i,scenario,weeklyPlan,strength,anchor,currentPlan);
 
       for(let pi=0;pi<PEOPLE.length;pi++){
         const wp=resolvePick(weeklyRecs[pi],e.occupied);
@@ -285,6 +287,8 @@
     for(const p of ['manha','tarde','integral'])if(!templates.some(t=>t.period===p))throw new Error('Sem molde '+p);
     const weeks=Math.max(1,Math.min(100000,Number(config.weeks)||10000));
     const scenario=config.scenario||'null';
+    const anchor=config.signalAnchor||'weekly';
+    if(!['weekly','current','exogenous'].includes(anchor))throw new Error('Invalid signalAnchor');
     const requestedStrength=Number(config.signalStrength);
     const defaultStrength=scenario==='null'?0:(scenario==='weak_noise'?.01:.03);
     const strength=Math.max(0,Math.min(.25,Number.isFinite(requestedStrength)?requestedStrength:defaultStrength));
@@ -293,10 +297,12 @@
     const out=[];
     for(let w=0;w<weeks;w++){
       const rng=mulberry32((base+Math.imul(w+1,2654435761))>>>0);
-      out.push(runWeek(realEvents,templates,rng,scenario,strength));
+      out.push(runWeek(realEvents,templates,rng,scenario,strength,anchor));
       if(typeof config.onProgress==='function'&&(w===weeks-1||w%100===0))config.onProgress({completed_weeks:w+1,total_weeks:weeks,pct:(w+1)/weeks});
     }
-    return aggregate(out,{scenario,signalStrength:strength,seed},templates.length);
+    const result=aggregate(out,{scenario,signalStrength:strength,seed},templates.length);
+    if(anchor!=='weekly')result.signal_anchor=anchor;
+    return result;
   }
 
   // F2-02: multiple independent simulator seeds; preserve individual runs and policy.
@@ -323,7 +329,7 @@
     const mean=values.reduce((a,b)=>a+b,0)/count;
     const variance=values.reduce((a,b)=>a+(b-mean)**2,0)/(count-1);
     return {version:'RLT-M4-07-multiseed-v1',experiment:'WEEKLY_FROZEN_VS_CURRENT',
-      scenario:config.scenario||'null',seed_prefix:prefix,seed_count:count,
+      scenario:config.scenario||'null',...(config.signalAnchor&&config.signalAnchor!=='weekly'?{signal_anchor:config.signalAnchor}:{}),seed_prefix:prefix,seed_count:count,
       weeks_per_seed:runs[0].weeks,total_synthetic_events:runs.reduce((a,r)=>a+r.weeks*12,0),
       mean_delta_hits_across_seeds:mean,sd_delta_hits_across_seeds:Math.sqrt(variance),
       min_delta_hits:Math.min(...values),max_delta_hits:Math.max(...values),
