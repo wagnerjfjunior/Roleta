@@ -6,6 +6,7 @@ BEGIN
 END $guard$;
 CREATE ROLE roleta_append_owner NOLOGIN NOSUPERUSER NOBYPASSRLS NOCREATEDB NOCREATEROLE NOREPLICATION;
 GRANT USAGE ON SCHEMA roleta_audit TO roleta_append_owner;
+GRANT USAGE ON SCHEMA extensions TO roleta_append_owner;
 GRANT SELECT,INSERT ON roleta_audit.prospective_evidence TO roleta_append_owner;
 GRANT USAGE ON SEQUENCE roleta_audit.prospective_evidence_id_seq TO roleta_append_owner;
 CREATE POLICY roleta_append_owner_select ON roleta_audit.prospective_evidence
