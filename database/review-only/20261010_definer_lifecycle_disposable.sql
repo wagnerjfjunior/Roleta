@@ -52,9 +52,13 @@ BEGIN
  SELECT record_sha256 INTO v_prev FROM roleta_audit.prospective_evidence ORDER BY id DESC LIMIT 1;
  v_ts:=clock_timestamp();
  -- CI-local digest; canonical envelope integration pending.
+ v_ts:=date_trunc('milliseconds',v_ts);
  v_hash:=encode(extensions.digest(convert_to(
-  coalesce(v_prev,'')||':'||p_sha||':'||p_actor||':'||
-  to_char(v_ts AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'),
+  '{"actor_subject":'||to_json(p_actor)::text||
+  ',"previous_hash":'||coalesce(to_json(v_prev)::text,'null')||
+  ',"received_at":'||to_json(to_char(v_ts AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'))::text||
+  ',"request_sha256":'||to_json(p_sha)::text||
+  ',"version":"rlt-evidence-envelope-v1"}',
   'UTF8'),'sha256'),'hex');
  INSERT INTO roleta_audit.prospective_evidence
  (event_id,kind,policy,idempotency_key,request_sha256,record_sha256,
