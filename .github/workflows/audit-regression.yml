@@ -20,6 +20,7 @@ jobs:
         run: |
           node --check simulation/historical-walk-forward.cjs
           node --check simulation/historical-walk-forward-cli.cjs
-          node --test tests/regression/historical-walk-forward.test.cjs tests/regression/simulation-guardrails.test.cjs
+          node --check simulation/prospective-ledger.cjs
+          node --test tests/regression/historical-walk-forward.test.cjs tests/regression/simulation-guardrails.test.cjs tests/regression/prospective-ledger.test.cjs
       - name: Read-only canonical audit
         run: node simulation/historical-walk-forward-cli.cjs > "$RUNNER_TEMP/historical-audit.json"
