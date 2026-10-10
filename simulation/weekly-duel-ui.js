@@ -248,7 +248,7 @@
       return;
     }
     cancelBtn.disabled=false;
-    status.textContent='Executando '+(multiseed?'Multiseed · 5 seeds':'duelo')+' · '+testDefinition.name+' · âncora '+signalAnchor+' · sinal '+(signalStrength*100).toFixed(0)+'% · +weeks.toLocaleString('pt-BR')+' semanas por seed…';
+    status.textContent='Executando '+(multiseed?'Multiseed · 5 seeds':'duelo')+' · '+testDefinition.name+' · âncora '+signalAnchor+' · sinal '+(signalStrength*100).toFixed(0)+'% · '+weeks.toLocaleString('pt-BR')+' semanas por seed…';
 
     worker.onmessage=e=>{
       const msg=e.data||{};
