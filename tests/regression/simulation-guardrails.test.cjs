@@ -193,3 +193,25 @@ test('F2-07 weekly duel UI parses as JavaScript before browser initialization',(
  const check=spawnSync(process.execPath,['--check',file],{encoding:'utf8'});
  assert.equal(check.status,0,check.stderr||check.stdout);
 });
+
+test('F2-08 isolated streams deterministic, paired and explicitly labeled',()=>{
+ const config={...weeklyConfig,weeks:40,scenario:'stable_period',signalStrength:0.05,seed:'F2-08-control',signalAnchor:'exogenous',randomStreamMode:'isolated'};
+ const a=weekly.run(config),b=weekly.run(config);
+ assert.deepEqual(a,b);
+ assert.equal(a.random_stream_mode,'isolated-v1');
+ assert.equal(a.paired_valid.weekly.opportunities,a.paired_valid.current.opportunities);
+ assert.equal(a.paired_valid.weekly.expected,a.paired_valid.current.expected);
+ assert.notDeepEqual(a,weekly.run({...config,randomStreamMode:'legacy'}));
+ assert.throws(()=>weekly.run({...config,randomStreamMode:'invalid'}),/Invalid randomStreamMode/);
+});
+test('F2-08 browser scripts parse and stream selector is wired',()=>{
+ const {spawnSync}=require('node:child_process');
+ for(const filename of ['simulation/weekly-duel.js','simulation/weekly-duel-ui.js']){
+  const checked=spawnSync(process.execPath,['--check',path.join(root,filename)],{encoding:'utf8'});
+  assert.equal(checked.status,0,checked.stderr||checked.stdout);
+ }
+ const source=fs.readFileSync(path.join(root,'simulation/weekly-duel-ui.js'),'utf8');
+ assert.match(source,/id="weeklyDuelStream"/);
+ assert.match(source,/randomStreamMode:config.randomStreamMode/);
+ assert.match(source,/sameStream/);
+});
