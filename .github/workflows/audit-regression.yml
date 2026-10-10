@@ -1,0 +1,25 @@
+name: Roleta audit regression
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and regression tests
+        run: |
+          node --check simulation/historical-walk-forward.cjs
+          node --check simulation/historical-walk-forward-cli.cjs
+          node --test tests/regression/historical-walk-forward.test.cjs tests/regression/simulation-guardrails.test.cjs
+      - name: Read-only canonical audit
+        run: node simulation/historical-walk-forward-cli.cjs > "$RUNNER_TEMP/historical-audit.json"
