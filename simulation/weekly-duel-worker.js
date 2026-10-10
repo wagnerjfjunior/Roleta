@@ -1,3 +1,4 @@
+importScripts('/domain/core.js');
 importScripts('/simulation/weekly-duel.js');
 
 self.onmessage=function(event){
