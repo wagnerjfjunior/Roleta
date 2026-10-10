@@ -25,6 +25,6 @@ jobs:
           node --check simulation/promotion-gate.cjs
           node --check simulation/chronological-holdout.cjs
           node --check simulation/prospective-commands.cjs
-          node --test tests/regression/historical-walk-forward.test.cjs tests/regression/simulation-guardrails.test.cjs tests/regression/prospective-ledger.test.cjs tests/regression/prospective-integrity.test.cjs tests/regression/prospective-metrics.test.cjs tests/regression/promotion-gate.test.cjs tests/regression/chronological-holdout.test.cjs tests/regression/prospective-commands.test.cjs tests/regression/shared-supabase-contract.test.cjs tests/regression/prospective-intent.test.cjs tests/regression/roleta-private-schema-candidate.test.cjs
+          node --test tests/regression/historical-walk-forward.test.cjs tests/regression/simulation-guardrails.test.cjs tests/regression/prospective-ledger.test.cjs tests/regression/prospective-integrity.test.cjs tests/regression/prospective-metrics.test.cjs tests/regression/promotion-gate.test.cjs tests/regression/chronological-holdout.test.cjs tests/regression/prospective-commands.test.cjs tests/regression/shared-supabase-contract.test.cjs tests/regression/prospective-intent.test.cjs tests/regression/roleta-private-schema-candidate.test.cjs tests/regression/append-prototype-review.test.cjs
       - name: Read-only canonical audit
         run: node simulation/historical-walk-forward-cli.cjs > "$RUNNER_TEMP/historical-audit.json"
