@@ -35,3 +35,17 @@ test('stable hash across payload key permutations, and changed payload changes h
  assert.equal(a.request_sha256,b.request_sha256);
  assert.notEqual(a.request_sha256,c.request_sha256);
 });
+
+test('rejects excessive nesting before recursive canonicalization',()=>{
+ let payload={value:1};
+ for(let i=0;i<40;i++)payload={child:payload};
+ assert.throws(()=>prepareAuthenticatedEvidence({...input(),body:{...body,payload}}),/nesting too deep/);
+});
+test('rejects oversized structural fanout before hashing',()=>{
+ const payload=Array.from({length:12001},(_,i)=>i);
+ assert.throws(()=>prepareAuthenticatedEvidence({...input(),body:{...body,payload}}),/array too large|structure too complex/);
+});
+test('rejects cyclic payloads before hashing',()=>{
+ const payload={};payload.self=payload;
+ assert.throws(()=>prepareAuthenticatedEvidence({...input(),body:{...body,payload}}),/cyclic/);
+});
