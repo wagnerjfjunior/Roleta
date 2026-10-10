@@ -7,6 +7,30 @@
   let lastTest=null;
   let realEvents=[];
 
+
+  // F2-03: hash exactly the ordered, normalized input sent to the worker.
+  // A new run must be exported to obtain provenance; historical exports are not retroactively attested.
+  async function inputProvenance(events,config){
+    if(!globalThis.crypto?.subtle)throw new Error('SHA-256 indisponível neste contexto; execução bloqueada para preservar auditoria.');
+    const ordered=events.map(e=>({
+      N:e.N,period:e.period||'desconhecido',
+      occupied:Array.isArray(e.occupied)?e.occupied.slice():[],
+      first:e.first??null,last:e.last??null,
+      second:e.second??null,courtesy:e.courtesy??null
+    }));
+    const bytes=new TextEncoder().encode(JSON.stringify(ordered));
+    const digest=await crypto.subtle.digest('SHA-256',bytes);
+    const sha256=Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
+    return {
+      schema:'rlt-simulation-input-provenance-v1',
+      algorithm:'SHA-256',encoding:'UTF-8',serialization:'JSON.stringify ordered selected engine fields',
+      real_events_count:events.length,ordered_engine_input_sha256:sha256,
+      engine:'simulation/weekly-duel.js',
+      configuration:{weeks:config.weeks,scenario:config.scenario,signalStrength:config.signalStrength,seed:config.seed,seedCount:config.seedCount},
+      warning:'Hash covers selected ordered engine input fields, not raw source files or engine revision. Does not establish historical export provenance.'
+    };
+  }
+
   function readRuns(){
     try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]')}catch(_){return[]}
   }
@@ -171,7 +195,7 @@
       '<p class="small muted">O bloco operacional mede disponibilidade; o paired-valid mede qualidade da escolha. O resultado continua sendo comportamento simulado da política, não evidência preditiva real.</p>';
   }
 
-  function run(multiseed=false){
+  async function run(multiseed=false){
     if(worker)worker.terminate();
     const weeks=Number(document.querySelector('#weeklyDuelWeeks').value);
     const scenario=document.querySelector('#weeklyDuelScenario').value;
@@ -195,6 +219,15 @@
     lastTest=null;
     lastResult=null;
     if(exportBtn)exportBtn.disabled=true;
+    const config={realEvents,weeks,scenario,signalStrength,seed,seedCount:5};
+    let provenance;
+    try{
+      provenance=await inputProvenance(realEvents,config);
+    }catch(err){
+      status.textContent='AUDITORIA BLOQUEADA · '+err.message;
+      return;
+    }
+    lastTest={...testDefinition,experiment_mode:multiseed?'multiseed':'single_seed',input_provenance:provenance};
     worker=new Worker('/simulation/weekly-duel-worker.js');
     runBtn.disabled=true;multiBtn.disabled=true;cancelBtn.disabled=false;setProgress(0);
     status.textContent='Executando '+weeks.toLocaleString('pt-BR')+' semanas pareadas…';
@@ -215,7 +248,7 @@
           if(exportBtn)exportBtn.disabled=true;
           return;
         }
-        lastTest={...testDefinition,experiment_mode:multiseed?'multiseed':'single_seed'};
+        // Preserve the input provenance captured before posting to the worker.
         setProgress(1);
         if(multiseed){
           lastResult=result;
@@ -235,7 +268,7 @@
       status.textContent='Erro no worker: '+e.message;
       worker?.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
     };
-    worker.postMessage({type:multiseed?'multiseed':'run',config:{realEvents,weeks,scenario,signalStrength,seed,seedCount:5}});
+    worker.postMessage({type:multiseed?'multiseed':'run',config});
   }
 
   function cancel(){
