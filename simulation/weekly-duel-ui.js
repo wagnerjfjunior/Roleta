@@ -258,15 +258,15 @@
         saveRun(lastTest,result);
         if(exportBtn)exportBtn.disabled=false;
         status.textContent='Concluído · '+result.total_synthetic_events.toLocaleString('pt-BR')+' roletas sintéticas · run salvo localmente.';
-        worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+        worker.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
       }else if(msg.type==='error'){
         status.textContent='Erro: '+msg.message;
-        worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+        worker.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
       }
     };
     worker.onerror=e=>{
       status.textContent='Erro no worker: '+e.message;
-      worker?.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+      worker?.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
     };
     worker.postMessage({type:multiseed?'multiseed':'run',config});
   }
