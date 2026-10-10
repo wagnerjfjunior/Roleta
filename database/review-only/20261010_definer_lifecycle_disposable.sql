@@ -51,7 +51,7 @@ BEGIN
  END IF;
  SELECT record_sha256 INTO v_prev FROM roleta_audit.prospective_evidence ORDER BY id DESC LIMIT 1;
  v_ts:=clock_timestamp();
- -- CI-local chain digest; NOT the final canonical envelope hash.
+ -- CI-local digest; canonical envelope integration pending.
  v_hash:=encode(extensions.digest(convert_to(
   coalesce(v_prev,'')||':'||p_sha||':'||p_actor||':'||
   to_char(v_ts AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'),
