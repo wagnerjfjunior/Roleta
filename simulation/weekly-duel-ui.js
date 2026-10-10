@@ -26,7 +26,7 @@
       algorithm:'SHA-256',encoding:'UTF-8',serialization:'JSON.stringify ordered selected engine fields',
       real_events_count:events.length,ordered_engine_input_sha256:sha256,
       engine:'simulation/weekly-duel.js',
-      configuration:{weeks:config.weeks,scenario:config.scenario,signalStrength:config.signalStrength,seed:config.seed,seedCount:config.seedCount},
+      configuration:{weeks:config.weeks,scenario:config.scenario,signalStrength:config.signalStrength,signalAnchor:config.signalAnchor,seed:config.seed,seedCount:config.seedCount},
       warning:'Hash covers selected ordered engine input fields, not raw source files or engine revision. Does not establish historical export provenance.'
     };
   }
@@ -53,6 +53,7 @@
       scenario:{
         type:config.scenario,
         signal_strength:config.signalStrength,
+        signal_anchor:config.signalAnchor||'weekly',
         target:'2X = Nº1 ou Último'
       },
       workload:{
@@ -119,6 +120,7 @@
       '<div class="simulation-control-grid">'+
         '<label><span>Semanas simuladas</span><select id="weeklyDuelWeeks"><option value="1000">1.000</option><option value="10000" selected>10.000</option><option value="50000">50.000</option><option value="100000">100.000</option></select></label>'+
         '<label><span>Cenário</span><select id="weeklyDuelScenario"><option value="null">NULL · acaso puro</option><option value="stable_period">Sinal estável por período</option><option value="regime_shift">Mudança de regime no meio da semana</option><option value="weak_noise">Sinal fraco + ruído</option></select></label>'+
+        '<label><span>Âncora do sinal (auditoria F2-07)</span><select id="weeklyDuelAnchor"><option value="weekly">WEEKLY · original</option><option value="exogenous">Exógeno · independente</option><option value="current">CURRENT · pré-evento</option></select></label>'+
         '<label><span>Força do sinal</span><select id="weeklyDuelStrength"><option value="0.01">1%</option><option value="0.03" selected>3%</option><option value="0.05">5%</option><option value="0.10">10%</option></select></label>'+
         '<label><span>Seed</span><input id="weeklyDuelSeed" value="weekly-duel-2026"></label>'+
         '<button id="runWeeklyDuel" class="simulation-run">Rodar duelo</button>'+
@@ -207,6 +209,7 @@
     if(worker)return; // Impede execuções concorrentes, inclusive durante a preparação assíncrona.
     const weeks=Number(document.querySelector('#weeklyDuelWeeks').value);
     const scenario=document.querySelector('#weeklyDuelScenario').value;
+    const signalAnchor=document.querySelector('#weeklyDuelAnchor').value;
     const signalStrength=scenario==='null'?0:Number(document.querySelector('#weeklyDuelStrength').value);
     const seed=document.querySelector('#weeklyDuelSeed').value||'weekly-duel-2026';
     const status=document.querySelector('#weeklyDuelStatus');
@@ -223,13 +226,13 @@
       return;
     }
 
-    const testDefinition=buildTestDefinition({weeks,scenario,signalStrength,seed});
+    const testDefinition=buildTestDefinition({weeks,scenario,signalStrength,signalAnchor,seed});
     lastTest=null;
     lastResult=null;
     if(exportBtn)exportBtn.disabled=true;
     clearDisplayedStatistics('Preparando nova simulação…');
     runBtn.disabled=true;multiBtn.disabled=true;cancelBtn.disabled=true;
-    const config={realEvents,weeks,scenario,signalStrength,seed,seedCount:5};
+    const config={realEvents,weeks,scenario,signalStrength,signalAnchor,seed,seedCount:5};
     let provenance;
     try{
       provenance=await inputProvenance(realEvents,config);
@@ -245,7 +248,7 @@
       return;
     }
     cancelBtn.disabled=false;
-    status.textContent='Executando '+(multiseed?'Multiseed · 5 seeds':'duelo')+' · '+testDefinition.name+' · sinal '+(signalStrength*100).toFixed(0)+'% · '+weeks.toLocaleString('pt-BR')+' semanas por seed…';
+    status.textContent='Executando '+(multiseed?'Multiseed · 5 seeds':'duelo')+' · '+testDefinition.name+' · âncora '+signalAnchor+' · sinal '+(signalStrength*100).toFixed(0)+'% · +weeks.toLocaleString('pt-BR')+' semanas por seed…';
 
     worker.onmessage=e=>{
       const msg=e.data||{};
@@ -255,8 +258,9 @@
       }else if(msg.type==='complete'){
         const result=msg.result;
         const sameScenario=result.scenario===testDefinition.scenario.type;
+        const sameAnchor=(result.signal_anchor||'weekly')===testDefinition.scenario.signal_anchor;
         const sameStrength=multiseed?result.runs.every(r=>r.weeks===weeks):Math.abs(Number(result.signal_strength)-Number(testDefinition.scenario.signal_strength))<1e-12;
-        if(!sameScenario||!sameStrength){
+        if(!sameScenario||!sameStrength||!sameAnchor){
           status.textContent='AUDITORIA BLOQUEADA · configuração e resultado não coincidem. Run não salvo.';
           worker.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
           lastTest=null;lastResult=null;
