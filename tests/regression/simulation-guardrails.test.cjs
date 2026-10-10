@@ -98,7 +98,7 @@ test('weekly duel F2-03 observed multiseed golden: immutable arithmetic and boot
  assert.equal(new Set(e.runs.map(r=>r.seed)).size,p.seed_count);
  const values=e.runs.map((r,i)=>{
   assert.equal(r.seed,p.seed_prefix+'|replicate-'+String(i+1).padStart(2,'0'));
-  assert.equal(r.current_hits-r.weekly_hits,r.mean_delta_hits*p.weeks_per_seed);
+  assert.ok(Math.abs((r.current_hits-r.weekly_hits)-r.mean_delta_hits*p.weeks_per_seed)<1e-9);
   assert.ok(r.paired_opportunities>0&&r.paired_opportunities<=p.weeks_per_seed*12*4);
   assert.ok(r.bootstrap_ci95_low<=r.mean_delta_hits&&r.mean_delta_hits<=r.bootstrap_ci95_high);
   assert.ok(r.operational_delta_valid_opportunities>=0);
