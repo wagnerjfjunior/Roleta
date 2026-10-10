@@ -43,3 +43,4 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/disposable-security.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/hash-equivalence.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/intent-binding.sql
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/transactional-prototype.sql
