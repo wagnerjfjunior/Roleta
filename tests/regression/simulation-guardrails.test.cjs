@@ -79,3 +79,12 @@ test('weekly duel multiseed: deterministic, distinct seeds, aggregate integrity'
  for(const r of a.runs)assert.equal(r.paired_valid.weekly.opportunities,r.paired_valid.current.opportunities);
  assert.throws(()=>weekly.runMultiseed({...config,seedCount:1}),/seedCount/);
 });
+
+test('simulation workers preload domain core before importing engines',()=>{
+ for(const filename of ['simulation/worker.js','simulation/weekly-duel-worker.js']){
+  const source=fs.readFileSync(path.join(root,filename),'utf8');
+  const domain=source.indexOf("importScripts('/domain/core.js')");
+  const engine=source.indexOf("importScripts('/simulation/");
+  assert.ok(domain>=0&&engine>domain,filename+' must load domain/core.js first');
+ }
+});
