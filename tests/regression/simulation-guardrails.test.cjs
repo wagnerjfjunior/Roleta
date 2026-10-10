@@ -142,7 +142,7 @@ for(const scenario of ['stable_period','regime_shift','weak_noise']){
 
 test('F2-05 multiseed control re-enables after success, worker error and onerror',()=>{
  const source=fs.readFileSync(path.join(root,'simulation/weekly-duel-ui.js'),'utf8');
- assert.match(source,/status\.textContent='Concluído[\\s\\S]*?multiBtn\.disabled=false;cancelBtn\.disabled=true;/);
- assert.match(source,/status\.textContent='Erro: '\+msg\.message;[\\s\\S]*?multiBtn\.disabled=false;cancelBtn\.disabled=true;/);
- assert.match(source,/status\.textContent='Erro no worker: '\+e\.message;[\\s\\S]*?multiBtn\.disabled=false;cancelBtn\.disabled=true;/);
+ assert.match(source,/status\.textContent='Concluído[\s\S]*?multiBtn\.disabled=false;cancelBtn\.disabled=true;/);
+ assert.match(source,/status\.textContent='Erro: '\+msg\.message;[\s\S]*?multiBtn\.disabled=false;cancelBtn\.disabled=true;/);
+ assert.match(source,/status\.textContent='Erro no worker: '\+e\.message;[\s\S]*?multiBtn\.disabled=false;cancelBtn\.disabled=true;/);
 });
