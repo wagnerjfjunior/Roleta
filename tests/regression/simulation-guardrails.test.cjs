@@ -157,3 +157,21 @@ test('F2-06 new simulation clears stale statistics and protects audit export',()
  assert.match(source,/clearDisplayedStatistics\('Simulação cancelada; nenhum resultado atual\.'\)/);
  assert.match(source,/Estatísticas anteriores ocultadas; histórico auditável preservado/);
 });
+
+for(const anchor of ['weekly','current','exogenous']){
+ test('F2-07 signal anchor '+anchor+': deterministic, paired and legacy-safe',()=>{
+  const config={...weeklyConfig,weeks:30,scenario:'weak_noise',signalStrength:0.05,seed:'F2-07-'+anchor,signalAnchor:anchor};
+  const a=weekly.run(config),b=weekly.run(config);
+  assert.deepEqual(a,b);
+  assert.equal(a.paired_valid.weekly.opportunities,a.paired_valid.current.opportunities);
+  assert.ok(Math.abs(a.paired_valid.weekly.expected-a.paired_valid.current.expected)<1e-9);
+  assert.equal(a.paired_valid.current_wins+a.paired_valid.weekly_wins+a.paired_valid.ties,30);
+  if(anchor==='weekly'){
+   const legacy=weekly.run({...config,signalAnchor:undefined});
+   assert.deepEqual(a,legacy);
+  }else assert.equal(a.signal_anchor,anchor);
+ });
+}
+test('F2-07 invalid signal anchor rejected',()=>{
+ assert.throws(()=>weekly.run({...weeklyConfig,signalAnchor:'unknown'}),/Invalid signalAnchor/);
+});
