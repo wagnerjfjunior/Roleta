@@ -45,3 +45,4 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/intent-binding.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/transactional-prototype.sql
           bash tests/postgres/concurrent-replay.sh
+          bash tests/postgres/competing-outcomes.sh
