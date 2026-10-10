@@ -110,3 +110,13 @@ test('weekly duel F2-03 observed multiseed golden: immutable arithmetic and boot
  assert.ok(Math.abs(sd-e.sd_delta_hits_across_seeds)<1e-12);
  assert.equal(values.filter(v=>v>0).length,e.seeds_with_positive_delta);
 });
+
+test('F2-03 weekly duel export captures ordered input SHA-256 and full run configuration',()=>{
+ const source=fs.readFileSync(path.join(root,'simulation/weekly-duel-ui.js'),'utf8');
+ assert.match(source,/crypto\.subtle\.digest\('SHA-256',bytes\)/);
+ assert.match(source,/ordered_engine_input_sha256:sha256/);
+ assert.match(source,/real_events_count:events\.length/);
+ assert.match(source,/input_provenance:provenance/);
+ assert.match(source,/worker\.postMessage\(\{type:multiseed\?'multiseed':'run',config\}\)/);
+ assert.match(source,/serialization:'JSON\.stringify ordered selected engine fields'/);
+});
