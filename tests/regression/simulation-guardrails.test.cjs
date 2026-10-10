@@ -120,3 +120,22 @@ test('F2-03 weekly duel export captures ordered input SHA-256 and full run confi
  assert.match(source,/worker\.postMessage\(\{type:multiseed\?'multiseed':'run',config\}\)/);
  assert.match(source,/serialization:'JSON\.stringify ordered selected engine fields'/);
 });
+
+for(const scenario of ['stable_period','regime_shift','weak_noise']){
+ test('F2-04 scenario '+scenario+': deterministic paired integrity and no policy mutation',()=>{
+  const config={...weeklyConfig,weeks:40,scenario,signalStrength:0.05,seed:'F2-04-'+scenario};
+  const first=weekly.run(config),second=weekly.run(config);
+  assert.deepEqual(first,second);
+  assert.equal(first.scenario,scenario);
+  assert.equal(first.signal_strength,0.05);
+  assert.equal(first.total_synthetic_events,480);
+  assert.equal(first.policy,'PROSPECTIVE-V1.0.0 / RLT-M5-WEEKLY-V1');
+  assert.equal(first.paired_valid.weekly.opportunities,first.paired_valid.current.opportunities);
+  assert.ok(Math.abs(first.paired_valid.weekly.expected-first.paired_valid.current.expected)<1e-9);
+  assert.equal(first.paired_valid.current_wins+first.paired_valid.weekly_wins+first.paired_valid.ties,40);
+  assert.equal(first.updates.helped+first.updates.hurt+first.updates.neutral,first.updates.churn);
+  assert.equal(first.operational.delta_valid_opportunities,first.operational.current_valid_opportunities-first.operational.weekly_valid_opportunities);
+  assert.equal(first.paired_valid.bootstrap_delta_hits.replicates,1000);
+  assert.ok(first.paired_valid.bootstrap_delta_hits.ci95_low<=first.paired_valid.bootstrap_delta_hits.ci95_high);
+ });
+}
