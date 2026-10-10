@@ -1,3 +1,5 @@
+> **Current F2-11 status (2026-10-10):** PRs #73–#76 merged into main. Server-authenticated actor binding, positional SQL arguments, canonical envelope SHA and disposable PostgreSQL isolation tests are implemented; production migration and capture remain disabled. Four workflows passed on PR #76. Supabase read-only audit confirms PostgreSQL 17.6, existing shared Discador schemas, and absence of `roleta_audit` and dedicated Roleta roles. Production Gate A (schema DDL) and Gate B (prospective writes) require distinct explicit approvals. See `handoffs/CURRENT.md`, `docs/NEXT_SAFE_ACTION.md`, and `docs/F2-11_SHARED_SUPABASE_READINESS_20261010.md`. Older state snapshots below are historical and must not be treated as the current HEAD or active branch.
+
 # Roleta — Project Status
 
 ## State — 2026-10-07

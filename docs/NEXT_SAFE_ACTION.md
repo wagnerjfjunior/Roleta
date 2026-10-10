@@ -1,3 +1,17 @@
+# CURRENT NEXT SAFE ACTION — 2026-10-10 / F2-11
+
+The following supersedes older next-action and branch references below; older sections remain as historical records.
+
+1. Verify live `main` and CI; read `handoffs/CURRENT.md` and `docs/F2-11_SHARED_SUPABASE_READINESS_20261010.md`.
+2. Finish read-only effective-grants inventory in the shared Supabase, including inherited roles, PUBLIC, default ACLs, existing functions, and all non-system schemas.
+3. Prepare a **separate**, reviewable production SQL migration (not disposable CI scripts) with explicit minimum privileges, fixed search path, FORCE RLS and non-exposed private schema.
+4. Review isolated staging dry-run, negative permissions, backup, monitoring, disable and rollback procedures.
+5. STOP for explicit Gate A authorization before any production schema/role DDL. STOP again for separate Gate B authorization before prospective writes or a public endpoint.
+
+No change to the existing Discador database security or historical/frozen ledger is authorized. LOCAL-FIRST / NO PREVIEW remains in force.
+
+---
+
 # Roleta — Next Safe Action
 
 ## RLT-M5-01 — Week 05–11/10 Frozen

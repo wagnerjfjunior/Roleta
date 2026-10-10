@@ -1,3 +1,17 @@
+> **SFJM continuity checkpoint — 2026-10-10 (F2-11)**
+>
+> Repository `wagnerjfjunior/Roleta`, canonical branch `main`, LOCAL-FIRST / NO PREVIEW. PRs #73–#76 merged; #76 merge commit `2b949fbdf7282026035e3556ed5f03f8526f9174`. These are historical anchors, **not** a substitute for resolving the live main HEAD.
+>
+> F2-11: authenticated server identity, private parameterized SQL command, canonical envelope hash, and disposable PostgreSQL cross-schema tests implemented. Four CI workflows passed for PR #76. **No Roleta schema/roles in production and no prospective write endpoint activated.** Shared Supabase project `uobxxgzshrmbtjfdolxd` remains untouched by migration.
+>
+> **Next safe action:** complete effective-grants matrix for existing shared schemas/tables/functions/default ACLs; review a separate production migration and disable/rollback plan; test against representative isolated staging. See `docs/F2-11_SHARED_SUPABASE_READINESS_20261010.md`.
+>
+> **Hard gates:** explicit approval A for production DDL, and separate explicit approval B for enabling prospective writes. Generic authorization to continue does not cover either. Do not alter Discador grants, RLS, tables, or data. Historical and WEEKLY_FROZEN records remain immutable.
+>
+> **Document precedence:** this checkpoint supersedes older F2-11 branch/next-step statements below. Dataset counts must be read from `data/manifest.json` and `docs/sfjm/CURRENT_DATA_STATE.json`, not copied historical numbers.
+
+---
+
 # Roleta — Current Handoff
 
 ## CURRENT STATE — 2026-10-07

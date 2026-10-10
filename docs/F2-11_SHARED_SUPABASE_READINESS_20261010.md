@@ -20,3 +20,9 @@ Ten non-internal schemas were inspected. `public` grants schema USAGE to every r
 Gate A: separate explicit authorization for reviewed production schema migration. Gate B: separate explicit authorization to activate prospective write traffic. Generic instructions to continue do not authorize either gate.
 
 **Current status: Gate A blocked pending production migration review and complete effective-grants analysis.** All database inspection was read-only.
+
+## F2-11 implementation checkpoint (2026-10-10)
+
+PRs #73 through #76 were merged into main. CI validates canonical envelope hash, real sealed-session identity, parameterized private server command preparation, and disposable PostgreSQL cross-schema isolation. The latter uses a synthetic sentinel schema and does not prove effective permissions on existing Discador objects. No production SQL migration or prospective capture was activated.
+
+The read-only audit also found 10 non-internal schemas. No existing public table has an explicit grant to PostgreSQL PUBLIC for SELECT, INSERT, UPDATE or DELETE; no existing public function has an explicit PUBLIC EXECUTE grant. This does not eliminate privileges inherited from other roles or future default grants. There are 24 default ACL records. Full effective-grant matrix remains required before Gate A.
