@@ -29,6 +29,7 @@ Este repositório aplica SFJM, mas não redefine o protocolo.
 12. ler `docs/PRINT_TEMPLATE_V2.md` sempre que a tarefa envolver Nova Roleta, validação, prévia, impressão ou PDF;
 13. ler `docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md` quando houver regressão ou dúvida sobre decisões de implementação do fluxo de impressão.
 14. ler `docs/ARCHITECTURE.md` quando a tarefa alterar fronteiras de domínio, dados, simulação, prospectivo ou infraestrutura.
+15. ler `docs/F2-11_SHARED_SUPABASE_READINESS_20261010.md` antes de qualquer trabalho envolvendo Supabase, papéis, permissões ou evidências prospectivas; respeitar os gates A e B.
 
 ## 3. Regra de autoridade
 
