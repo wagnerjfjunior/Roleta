@@ -299,6 +299,39 @@
     return aggregate(out,{scenario,signalStrength:strength,seed},templates.length);
   }
 
+  // F2-02: multiple independent simulator seeds; preserve individual runs and policy.
+  function runMultiseed(config){
+    const count=Number(config.seedCount??5);
+    if(!Number.isInteger(count)||count<2||count>20)throw new Error('Multiseed: seedCount must be 2..20');
+    const prefix=String(config.seedPrefix||config.seed||'weekly-duel-2026').trim();
+    if(!prefix)throw new Error('Multiseed: empty seed prefix');
+    const runs=[];
+    for(let i=0;i<count;i++){
+      const seed=prefix+'|replicate-'+String(i+1).padStart(2,'0');
+      const result=run({...config,seed,onProgress:progress=>{
+        if(typeof config.onProgress==='function')config.onProgress({
+          completed_weeks:i*progress.total_weeks+progress.completed_weeks,
+          total_weeks:count*progress.total_weeks,
+          pct:(i+progress.pct)/count,
+          completed_seeds:i,total_seeds:count
+        });
+      }});
+      runs.push({seed,weeks:result.weeks,paired_valid:result.paired_valid,
+        operational:result.operational,updates:result.updates});
+    }
+    const values=runs.map(r=>r.paired_valid.mean_delta_hits);
+    const mean=values.reduce((a,b)=>a+b,0)/count;
+    const variance=values.reduce((a,b)=>a+(b-mean)**2,0)/(count-1);
+    return {version:'RLT-M4-07-multiseed-v1',experiment:'WEEKLY_FROZEN_VS_CURRENT',
+      scenario:config.scenario||'null',seed_prefix:prefix,seed_count:count,
+      weeks_per_seed:runs[0].weeks,total_synthetic_events:runs.reduce((a,r)=>a+r.weeks*12,0),
+      mean_delta_hits_across_seeds:mean,sd_delta_hits_across_seeds:Math.sqrt(variance),
+      min_delta_hits:Math.min(...values),max_delta_hits:Math.max(...values),
+      seeds_with_positive_delta:values.filter(x=>x>0).length,
+      interpretation_guard:'Between-seed variation of synthetic experiments; not a confidence interval for real-world predictive advantage.',
+      runs};
+  }
+
   function selfTest(realEvents){
     const r=run({realEvents,weeks:20,scenario:'null',seed:'weekly-duel-self-test',signalStrength:0});
     const planned=20*12*4;
@@ -308,5 +341,5 @@
     };
   }
 
-  global.RoletaWeeklyDuel={run,selfTest};
+  global.RoletaWeeklyDuel={run,runMultiseed,selfTest};
 })(globalThis);
