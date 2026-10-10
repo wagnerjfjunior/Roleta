@@ -146,3 +146,14 @@ test('F2-05 multiseed control re-enables after success, worker error and onerror
  assert.match(source,/status\.textContent='Erro: '\+msg\.message;[\s\S]*?multiBtn\.disabled=false;cancelBtn\.disabled=true;/);
  assert.match(source,/status\.textContent='Erro no worker: '\+e\.message;[\s\S]*?multiBtn\.disabled=false;cancelBtn\.disabled=true;/);
 });
+
+test('F2-06 new simulation clears stale statistics and protects audit export',()=>{
+ const source=fs.readFileSync(path.join(root,'simulation/weekly-duel-ui.js'),'utf8');
+ assert.match(source,/function clearDisplayedStatistics\(/);
+ assert.match(source,/clearDisplayedStatistics\('Preparando nova simulação…'\)/);
+ assert.match(source,/if\(exportBtn\)exportBtn\.disabled=true;\s*clearDisplayedStatistics/);
+ assert.match(source,/if\(worker\)return; \/\/ Impede execuções concorrentes/);
+ assert.match(source,/runBtn\.disabled=true;multiBtn\.disabled=true;cancelBtn\.disabled=true;/);
+ assert.match(source,/clearDisplayedStatistics\('Simulação cancelada; nenhum resultado atual\.'\)/);
+ assert.match(source,/Estatísticas anteriores ocultadas; histórico auditável preservado/);
+});
