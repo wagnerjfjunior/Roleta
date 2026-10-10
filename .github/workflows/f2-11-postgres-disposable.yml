@@ -53,3 +53,4 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/definer-lifecycle.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/definer-concurrency-setup.sql
           bash tests/postgres/definer-concurrency.sh
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/definer-envelope-persistence.sql
