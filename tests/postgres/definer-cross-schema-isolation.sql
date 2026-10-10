@@ -26,7 +26,7 @@ BEGIN
  IF (SELECT pg_get_userbyid(proowner) FROM pg_proc WHERE oid=f)<>'roleta_append_owner'
  THEN RAISE EXCEPTION 'unexpected function owner'; END IF;
  IF (SELECT proconfig FROM pg_proc WHERE oid=f) IS NULL
- OR NOT ('search_path=pg_catalog'::text=ANY((SELECT proconfig FROM pg_proc WHERE oid=f)))
+ OR NOT (array_position((SELECT proconfig FROM pg_proc WHERE oid=f),'search_path=pg_catalog') IS NOT NULL)
  THEN RAISE EXCEPTION 'unsafe function search_path'; END IF;
 END $check$;
 SET ROLE roleta_runtime;
