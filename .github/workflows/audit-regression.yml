@@ -23,6 +23,7 @@ jobs:
           node --check simulation/prospective-ledger.cjs
           node --check simulation/prospective-metrics.cjs
           node --check simulation/promotion-gate.cjs
-          node --test tests/regression/historical-walk-forward.test.cjs tests/regression/simulation-guardrails.test.cjs tests/regression/prospective-ledger.test.cjs tests/regression/prospective-metrics.test.cjs tests/regression/promotion-gate.test.cjs
+          node --check simulation/chronological-holdout.cjs
+          node --test tests/regression/historical-walk-forward.test.cjs tests/regression/simulation-guardrails.test.cjs tests/regression/prospective-ledger.test.cjs tests/regression/prospective-metrics.test.cjs tests/regression/promotion-gate.test.cjs tests/regression/chronological-holdout.test.cjs
       - name: Read-only canonical audit
         run: node simulation/historical-walk-forward-cli.cjs > "$RUNNER_TEMP/historical-audit.json"
