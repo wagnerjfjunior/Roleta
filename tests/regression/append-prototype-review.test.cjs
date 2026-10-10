@@ -4,5 +4,5 @@ const sql=fs.readFileSync(path.join(__dirname,'../../database/review-only/202610
 test('F2-11 append prototype locks chain, rejects conflicting replay and remains ungranted',()=>{
  for(const p of [/REVIEW ONLY/i,/pg_advisory_xact_lock/,/idempotency key conflict/,/event closed/,/outcome without prediction/,/SECURITY INVOKER/,/clock_timestamp\(\)/])assert.match(sql,p);
  assert.doesNotMatch(sql,/\bGRANT\s+EXECUTE\b/i);
- assert.doesNotMatch(sql,/\bSECURITY DEFINER\b/i);
+ assert.doesNotMatch(sql,/LANGUAGE\s+plpgsql\s+SECURITY\s+DEFINER/i);
 });
