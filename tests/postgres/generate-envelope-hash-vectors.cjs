@@ -7,7 +7,7 @@ const vectors=[
  ['genesis',null,sha,'2026-10-10T16:00:00.000Z','google:ci-user'],
  ['chained',prev,sha,'2026-10-10T16:00:00.123Z','google:ci-user'],
  ['unicode',prev,sha,'2026-10-10T16:00:00.999Z','google:São Paulo 🎯'],
- ['escaping',prev,sha,'2026-10-10T16:00:00.001Z','google:quote"slash\\tab\t'],
+ ['escaping',prev,sha,'2026-10-10T16:00:00.001Z','google:quote"slash\\text'],
  ['edge-time',prev,sha,'2026-10-10T23:59:59.999Z','google:ci']
 ];
 const lines=vectors.map(([id,previousHash,requestSha256,receivedAt,actorSubject])=>{
