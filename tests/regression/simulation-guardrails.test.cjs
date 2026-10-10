@@ -65,3 +65,17 @@ test('weekly duel: paired bootstrap is deterministic and does not modify legacy 
  const other=weekly.run({...weeklyConfig,seed:'regression-v2'});
  assert.equal(other.paired_valid.bootstrap_delta_hits.replicates,1000);
 });
+
+test('weekly duel multiseed: deterministic, distinct seeds, aggregate integrity',()=>{
+ const config={...weeklyConfig,weeks:5,seed:'multiseed-regression',seedCount:3};
+ const a=weekly.runMultiseed(config);
+ const b=weekly.runMultiseed(config);
+ assert.deepEqual(a,b);
+ assert.equal(a.seed_count,3);
+ assert.equal(new Set(a.runs.map(r=>r.seed)).size,3);
+ assert.equal(a.total_synthetic_events,3*5*12);
+ const deltas=a.runs.map(r=>r.paired_valid.mean_delta_hits);
+ assert.ok(Math.abs(a.mean_delta_hits_across_seeds-deltas.reduce((s,x)=>s+x,0)/3)<1e-12);
+ for(const r of a.runs)assert.equal(r.paired_valid.weekly.opportunities,r.paired_valid.current.opportunities);
+ assert.throws(()=>weekly.runMultiseed({...config,seedCount:1}),/seedCount/);
+});
