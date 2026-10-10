@@ -19,6 +19,7 @@ function prepareEvidenceFromHttp(req,{auth=googleAuth}={}){
  if(!session)throw new Error('authentication required');
  const csrfValid=csrfMatches(headers['x-roleta-csrf'],auth.csrfForSub(session.sub));
  if(!csrfValid)throw new Error('CSRF rejected');
+ if(typeof req.body==='string'&&Buffer.byteLength(req.body,'utf8')>MAX_BODY_BYTES)throw new Error('request too large');
  const body=typeof req.body==='string'?JSON.parse(req.body):req.body;
  if(!body||Buffer.isBuffer(body))throw new Error('JSON body required');
  return prepareAuthenticatedEvidence({session,body,csrfValid:true,originValid:true});
