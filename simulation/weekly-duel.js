@@ -106,6 +106,22 @@
       injected:applies,target
     };
   }
+  // F2-08: counterfactual comparison uses common template/permutation and independent signal streams.
+  function simulateEventIsolated(template,eventRng,eventIndex,scenario,weeklyPlan,strength,anchor,currentPlan){
+    const occupied=[...template.occupied].sort((a,b)=>a-b);
+    const permutation=shuffle(template.N,eventRng('permutation'));
+    const target=scenarioTarget(template.period,eventIndex,weeklyPlan,scenario,eventRng('target'),occupied,anchor,currentPlan);
+    const applies=Number.isFinite(target)&&occupied.includes(target)&&eventRng('application')()<strength;
+    if(applies){
+      const ti=occupied.indexOf(target),desired=eventRng('endpoint')()<.5?1:template.N,di=permutation.indexOf(desired);
+      [permutation[ti],permutation[di]]=[permutation[di],permutation[ti]];
+    }
+    const byNumber=new Map();
+    for(let i=0;i<occupied.length;i++)byNumber.set(permutation[i],occupied[i]);
+    return {id:'WEEK-E'+eventIndex,period:template.period,N:template.N,occupied,
+      first:byNumber.get(1),last:byNumber.get(template.N),injected:applies,target};
+  }
+
   function metric(){return {opportunities:0,hits:0,expected:0,invalid:0}}
   function observe(m,pick,e){
     if(!Number.isFinite(pick)){m.invalid++;return false}
@@ -133,7 +149,7 @@
       ci95_low:pct(means,.025),ci95_high:pct(means,.975)};
   }
 
-  function runWeek(seedEvents,templates,rng,scenario,strength,anchor='weekly'){
+  function runWeek(seedEvents,templates,rng,scenario,strength,anchor='weekly',streamSeed=null){
     const stats=seedStats(seedEvents);
     const weeklyPlan=makePlan(stats);
     const weekly=metric(),current=metric(),random=metric(),pairedWeekly=metric(),pairedCurrent=metric();
@@ -145,15 +161,17 @@
       const period=WEEK_PATTERN[i];
       const pool=templates.filter(t=>t.period===period);
       if(!pool.length)throw new Error('Sem molde estrutural para período '+period);
-      const template=pool[Math.floor(rng()*pool.length)];
+      const eventRng=streamSeed===null?null:label=>mulberry32(hashSeed('F2-08|'+streamSeed+'|event:'+i+'|'+label));
+      const template=pool[Math.floor((eventRng?eventRng('template'):rng)()*pool.length)];
 
       const weeklyRecs=weeklyPlan[period];
       const currentRecs=currentPlan[period];
 
       const randomPositions=[...template.occupied];
-      for(let j=randomPositions.length-1;j>0;j--){const k=Math.floor(rng()*(j+1));[randomPositions[j],randomPositions[k]]=[randomPositions[k],randomPositions[j]]}
+      const randomRng=eventRng?eventRng('random-baseline'):rng;
+      for(let j=randomPositions.length-1;j>0;j--){const k=Math.floor(randomRng()*(j+1));[randomPositions[j],randomPositions[k]]=[randomPositions[k],randomPositions[j]]}
 
-      const e=simulateEvent(template,rng,i,scenario,weeklyPlan,strength,anchor,currentPlan);
+      const e=streamSeed===null?simulateEvent(template,rng,i,scenario,weeklyPlan,strength,anchor,currentPlan):simulateEventIsolated(template,eventRng,i,scenario,weeklyPlan,strength,anchor,currentPlan);
 
       for(let pi=0;pi<PEOPLE.length;pi++){
         const wp=resolvePick(weeklyRecs[pi],e.occupied);
@@ -294,14 +312,17 @@
     const strength=Math.max(0,Math.min(.25,Number.isFinite(requestedStrength)?requestedStrength:defaultStrength));
     const seed=config.seed||'weekly-duel-2026';
     const base=hashSeed(seed);
+    const streamMode=config.randomStreamMode||'legacy';
+    if(!['legacy','isolated'].includes(streamMode))throw new Error('Invalid randomStreamMode');
     const out=[];
     for(let w=0;w<weeks;w++){
       const rng=mulberry32((base+Math.imul(w+1,2654435761))>>>0);
-      out.push(runWeek(realEvents,templates,rng,scenario,strength,anchor));
+      out.push(runWeek(realEvents,templates,rng,scenario,strength,anchor,streamMode==='isolated'?seed+'|week:'+w:null));
       if(typeof config.onProgress==='function'&&(w===weeks-1||w%100===0))config.onProgress({completed_weeks:w+1,total_weeks:weeks,pct:(w+1)/weeks});
     }
     const result=aggregate(out,{scenario,signalStrength:strength,seed},templates.length);
     if(anchor!=='weekly')result.signal_anchor=anchor;
+    if(streamMode==='isolated')result.random_stream_mode='isolated-v1';
     return result;
   }
 
@@ -329,7 +350,7 @@
     const mean=values.reduce((a,b)=>a+b,0)/count;
     const variance=values.reduce((a,b)=>a+(b-mean)**2,0)/(count-1);
     return {version:'RLT-M4-07-multiseed-v1',experiment:'WEEKLY_FROZEN_VS_CURRENT',
-      scenario:config.scenario||'null',...(config.signalAnchor&&config.signalAnchor!=='weekly'?{signal_anchor:config.signalAnchor}:{}),seed_prefix:prefix,seed_count:count,
+      scenario:config.scenario||'null',...(config.randomStreamMode==='isolated'?{random_stream_mode:'isolated-v1'}:{}),...(config.signalAnchor&&config.signalAnchor!=='weekly'?{signal_anchor:config.signalAnchor}:{}),seed_prefix:prefix,seed_count:count,
       weeks_per_seed:runs[0].weeks,total_synthetic_events:runs.reduce((a,r)=>a+r.weeks*12,0),
       mean_delta_hits_across_seeds:mean,sd_delta_hits_across_seeds:Math.sqrt(variance),
       min_delta_hits:Math.min(...values),max_delta_hits:Math.max(...values),
