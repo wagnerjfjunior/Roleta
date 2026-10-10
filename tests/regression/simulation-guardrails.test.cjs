@@ -215,3 +215,10 @@ test('F2-08 browser scripts parse and stream selector is wired',()=>{
  assert.match(source,/randomStreamMode:config.randomStreamMode/);
  assert.match(source,/sameStream/);
 });
+
+test('F2-08 audit definition preserves isolated stream selection',()=>{
+ const source=fs.readFileSync(path.join(root,'simulation/weekly-duel-ui.js'),'utf8');
+ assert.ok(source.includes('buildTestDefinition({weeks,scenario,signalStrength,signalAnchor,randomStreamMode,seed})'));
+ assert.ok(source.includes("random_stream_mode:config.randomStreamMode||'legacy'"));
+ assert.ok(source.includes("(result.random_stream_mode||'legacy')===(testDefinition.scenario.random_stream_mode==='isolated'?'isolated-v1':'legacy')"));
+});
