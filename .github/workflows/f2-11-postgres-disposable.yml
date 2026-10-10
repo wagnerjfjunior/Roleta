@@ -32,6 +32,7 @@ jobs:
           node tests/postgres/generate-hash-vectors.cjs
           node tests/postgres/generate-intent-binding-vectors.cjs
           node tests/postgres/generate-envelope-hash-vectors.cjs
+          node tests/postgres/generate-definer-concurrency-vectors.cjs
       - name: Verify disposable target and run negative privilege tests
         env:
           PGHOST: localhost
@@ -50,3 +51,5 @@ jobs:
           bash tests/postgres/competing-outcomes.sh
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/definer-runtime-privileges.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/definer-lifecycle.sql
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/definer-concurrency-setup.sql
+          bash tests/postgres/definer-concurrency.sh
