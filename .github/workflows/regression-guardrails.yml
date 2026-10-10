@@ -1,14 +1,7 @@
 name: Roleta regression guardrails
 on:
   pull_request:
-    paths:
-      - 'domain/**'
-      - 'simulation/**'
-      - 'data/events.csv'
-      - 'data/incoming/**'
-      - 'data/manifest.json'
-      - 'tests/regression/**'
-      - '.github/workflows/regression-guardrails.yml'
+    branches: [main]
   push:
     branches:
       - 'test/regression-guardrails-20261009'
