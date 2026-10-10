@@ -98,6 +98,7 @@
         '<label><span>Força do sinal</span><select id="weeklyDuelStrength"><option value="0.01">1%</option><option value="0.03" selected>3%</option><option value="0.05">5%</option><option value="0.10">10%</option></select></label>'+
         '<label><span>Seed</span><input id="weeklyDuelSeed" value="weekly-duel-2026"></label>'+
         '<button id="runWeeklyDuel" class="simulation-run">Rodar duelo</button>'+
+        '<button id="runWeeklyMultiseed" class="simulation-run">Multiseed · 5 seeds</button>'+
         '<button id="cancelWeeklyDuel" class="simulation-run simulation-cancel" disabled>Cancelar</button>'+
       '</div>'+
       '<div class="simulation-progress-wrap"><div class="simulation-progress"><i id="weeklyDuelProgressBar"></i></div><span id="weeklyDuelProgressText">0,0%</span></div>'+
@@ -110,7 +111,8 @@
     if(firstControls) firstControls.insertAdjacentElement('beforebegin',host);
     else page.appendChild(host);
 
-    document.querySelector('#runWeeklyDuel').addEventListener('click',run);
+    document.querySelector('#runWeeklyDuel').addEventListener('click',()=>run(false));
+    document.querySelector('#runWeeklyMultiseed').addEventListener('click',()=>run(true));
     document.querySelector('#cancelWeeklyDuel').addEventListener('click',cancel);
     document.querySelector('#exportWeeklyDuel').addEventListener('click',exportRun);
     updateSavedCount();
@@ -169,7 +171,7 @@
       '<p class="small muted">O bloco operacional mede disponibilidade; o paired-valid mede qualidade da escolha. O resultado continua sendo comportamento simulado da política, não evidência preditiva real.</p>';
   }
 
-  function run(){
+  function run(multiseed=false){
     if(worker)worker.terminate();
     const weeks=Number(document.querySelector('#weeklyDuelWeeks').value);
     const scenario=document.querySelector('#weeklyDuelScenario').value;
@@ -177,6 +179,7 @@
     const seed=document.querySelector('#weeklyDuelSeed').value||'weekly-duel-2026';
     const status=document.querySelector('#weeklyDuelStatus');
     const runBtn=document.querySelector('#runWeeklyDuel');
+    const multiBtn=document.querySelector('#runWeeklyMultiseed');
     const cancelBtn=document.querySelector('#cancelWeeklyDuel');
     const exportBtn=document.querySelector('#exportWeeklyDuel');
 
@@ -193,7 +196,7 @@
     lastResult=null;
     if(exportBtn)exportBtn.disabled=true;
     worker=new Worker('/simulation/weekly-duel-worker.js');
-    runBtn.disabled=true;cancelBtn.disabled=false;setProgress(0);
+    runBtn.disabled=true;multiBtn.disabled=true;cancelBtn.disabled=false;setProgress(0);
     status.textContent='Executando '+weeks.toLocaleString('pt-BR')+' semanas pareadas…';
 
     worker.onmessage=e=>{
@@ -204,16 +207,22 @@
       }else if(msg.type==='complete'){
         const result=msg.result;
         const sameScenario=result.scenario===testDefinition.scenario.type;
-        const sameStrength=Math.abs(Number(result.signal_strength)-Number(testDefinition.scenario.signal_strength))<1e-12;
+        const sameStrength=multiseed||Math.abs(Number(result.signal_strength)-Number(testDefinition.scenario.signal_strength))<1e-12;
         if(!sameScenario||!sameStrength){
           status.textContent='AUDITORIA BLOQUEADA · configuração e resultado não coincidem. Run não salvo.';
-          worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
+          worker.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
           lastTest=null;lastResult=null;
           if(exportBtn)exportBtn.disabled=true;
           return;
         }
-        lastTest=testDefinition;
-        setProgress(1);render(result);saveRun(testDefinition,result);
+        lastTest={...testDefinition,experiment_mode:multiseed?'multiseed':'single_seed'};
+        setProgress(1);
+        if(multiseed){
+          lastResult=result;
+          document.querySelector('#weeklyDuelSummary').innerHTML='<h3>Multiseed · '+result.seed_count+' sementes</h3><p>Δ hits/semana médio entre seeds: <b>'+num(result.mean_delta_hits_across_seeds,3)+'</b> · desvio-padrão: <b>'+num(result.sd_delta_hits_across_seeds,3)+'</b> · mínimo/máximo: <b>'+num(result.min_delta_hits,3)+' / '+num(result.max_delta_hits,3)+'</b> · seeds positivas: <b>'+int(result.seeds_with_positive_delta)+'/'+int(result.seed_count)+'</b>.</p><p class="small muted">Variação entre simulações sintéticas; não demonstra vantagem preditiva real.</p>';
+          document.querySelector('#weeklyDuelUpdates').innerHTML='<div class="small muted">Resultados individuais por seed disponíveis no JSON auditável.</div>';
+        }else render(result);
+        saveRun(lastTest,result);
         if(exportBtn)exportBtn.disabled=false;
         status.textContent='Concluído · '+result.total_synthetic_events.toLocaleString('pt-BR')+' roletas sintéticas · run salvo localmente.';
         worker.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
@@ -226,13 +235,14 @@
       status.textContent='Erro no worker: '+e.message;
       worker?.terminate();worker=null;runBtn.disabled=false;cancelBtn.disabled=true;
     };
-    worker.postMessage({type:'run',config:{realEvents,weeks,scenario,signalStrength,seed}});
+    worker.postMessage({type:multiseed?'multiseed':'run',config:{realEvents,weeks,scenario,signalStrength,seed,seedCount:5}});
   }
 
   function cancel(){
     if(worker){worker.terminate();worker=null}
     lastTest=null;lastResult=null;
     document.querySelector('#runWeeklyDuel').disabled=false;
+    document.querySelector('#runWeeklyMultiseed').disabled=false;
     document.querySelector('#cancelWeeklyDuel').disabled=true;
     const exportBtn=document.querySelector('#exportWeeklyDuel');
     if(exportBtn)exportBtn.disabled=true;
