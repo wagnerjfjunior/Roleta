@@ -27,3 +27,11 @@ git pull --ff-only origin audit/simulation-lab-phase2-20261010
 node --test tests/regression/historical-walk-forward.test.cjs tests/regression/simulation-guardrails.test.cjs
 node simulation/historical-walk-forward-cli.cjs
 ```
+
+
+## Homologação local executada — 2026-10-10
+Operador executou `git pull --ff-only` até commit `f4b44d9`, `node --test tests/regression/historical-walk-forward.test.cjs tests/regression/simulation-guardrails.test.cjs` e `node simulation/historical-walk-forward-cli.cjs` no MacBook. **30/30 PASS, 0 falhas** (evidência fornecida no terminal pelo operador; não é CI).
+
+Dataset `2026-10-06-86`, input SHA-256 `ba7bb7608a576128d19e1c567c953c489cec78c681e60b94d47de8c1df3f3a34`. 86 totais, 74 candidatos após 12 exclusões, 18 warm-up, 56 avaliados, 53 oportunidades pareadas. No subconjunto pareado: WEEKLY_FROZEN 3 acertos, CURRENT 4, esperado 5.0143961040024125 para ambos; diferença CURRENT−WEEKLY +1 acerto. Cobertura retrospectiva WEEKLY 55/56 e CURRENT 54/56. Esses valores não demonstram vantagem estatística e **não são avaliação prospectiva real**. `posthoc_eligible_pick` depende da ocupação observada e não comprova escolha operacional antes do sorteio.
+
+**Decisão:** F2-09 homologada como diagnóstico retrospectivo limitado; validação prospectiva real bloqueada pela falta de snapshots de recomendações, horários de disponibilidade dos resultados e posições pré-evento. Manter WEEKLY_FROZEN. Nada autoriza merge ou deploy.
