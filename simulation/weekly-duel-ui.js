@@ -229,7 +229,7 @@
       return;
     }
 
-    const testDefinition=buildTestDefinition({weeks,scenario,signalStrength,signalAnchor,seed});
+    const testDefinition=buildTestDefinition({weeks,scenario,signalStrength,signalAnchor,randomStreamMode,seed});
     lastTest=null;
     lastResult=null;
     if(exportBtn)exportBtn.disabled=true;
