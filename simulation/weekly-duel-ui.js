@@ -207,7 +207,7 @@
       }else if(msg.type==='complete'){
         const result=msg.result;
         const sameScenario=result.scenario===testDefinition.scenario.type;
-        const sameStrength=multiseed||Math.abs(Number(result.signal_strength)-Number(testDefinition.scenario.signal_strength))<1e-12;
+        const sameStrength=multiseed?result.runs.every(r=>r.weeks===weeks):Math.abs(Number(result.signal_strength)-Number(testDefinition.scenario.signal_strength))<1e-12;
         if(!sameScenario||!sameStrength){
           status.textContent='AUDITORIA BLOQUEADA · configuração e resultado não coincidem. Run não salvo.';
           worker.terminate();worker=null;runBtn.disabled=false;multiBtn.disabled=false;cancelBtn.disabled=true;
