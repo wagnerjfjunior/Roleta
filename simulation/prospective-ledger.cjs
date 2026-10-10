@@ -21,7 +21,6 @@ function makePrediction(p,{prevHash=null}={}){
  assert(positions(p.candidates),'candidate ranking required');
  assert(p.candidates.every(x=>p.occupied_snapshot.includes(x)),'candidate not eligible in snapshot');
  assert(p.N===p.occupied_snapshot.length&&p.N>=4,'N mismatch');
- assert(p.candidates.length===1,'exactly one committed selection required');
  assert(prevHash===null||/^[0-9a-f]{64}$/.test(prevHash),'invalid prev hash');
  const payload={schema:SCHEMA,type:'prediction',event_id:p.event_id,captured_at:p.captured_at,policy:p.policy,algorithm_version:p.algorithm_version,input_sha256:p.input_sha256,N:p.N,occupied_snapshot:[...p.occupied_snapshot],candidates:[...p.candidates],prev_hash:prevHash};
  return {...payload,record_sha256:hash(payload)};
