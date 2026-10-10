@@ -51,7 +51,7 @@ function verifyRecord(r){
  return hash(payload)===record_sha256;
 }
 function verifyChain(records){
- let previous=null;const seen=new Set();
+ let previous=null;const seen=new Set(),outcomes=new Set(),history=new Map();
  for(const r of records){
   if(!verifyRecord(r)||r.prev_hash!==previous)return false;
   if(r.type==='prediction'){
@@ -63,8 +63,8 @@ function verifyChain(records){
    if(outcomes.has(r.event_id))return false;
    outcomes.add(r.event_id);
    if(!Array.isArray(r.prediction_hashes)||!r.prediction_hashes.length||new Set(r.prediction_hashes).size!==r.prediction_hashes.length)return false;
-   const preds=records.filter(x=>x.type==='prediction'&&r.prediction_hashes.includes(x.record_sha256));
-   if(preds.length!==r.prediction_hashes.length||preds.some(x=>x.event_id!==r.event_id||Date.parse(x.captured_at)>=Date.parse(r.captured_at)||x.N!==r.occupied.length||x.occupied_snapshot.some(v=>!r.occupied.includes(v)))||new Set(preds.map(x=>x.policy)).size!==preds.length)return false;
+   const preds=r.prediction_hashes.map(h=>history.get(h));
+   if(preds.some(x=>!x||x.type!=='prediction')||preds.some(x=>x.event_id!==r.event_id||Date.parse(x.captured_at)>=Date.parse(r.captured_at)||x.N!==r.occupied.length||x.occupied_snapshot.some(v=>!r.occupied.includes(v)))||new Set(preds.map(x=>x.policy)).size!==preds.length)return false;
   }else return false;
   history.set(r.record_sha256,r);
   previous=r.record_sha256;
