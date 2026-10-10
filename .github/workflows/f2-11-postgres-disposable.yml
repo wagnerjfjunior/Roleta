@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install PostgreSQL client
         run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Generate JavaScript hash vectors
+        run: node tests/postgres/generate-hash-vectors.cjs
       - name: Verify disposable target and run negative privilege tests
         env:
           PGHOST: localhost
@@ -37,3 +39,4 @@ jobs:
         run: |
           test "$PGDATABASE" = roleta_ci
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/disposable-security.sql
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/hash-equivalence.sql
