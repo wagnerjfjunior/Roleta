@@ -66,6 +66,10 @@ BEGIN
  RETURN QUERY SELECT v_id,v_hash,v_ts,false;
 END;
 $$;
+-- PostgreSQL grants EXECUTE on new functions to PUBLIC by default. Explicitly revoke it.
+REVOKE ALL ON FUNCTION roleta_audit.append_prospective_evidence_review(text,text,text,text,text,jsonb,text) FROM PUBLIC, anon, authenticated;
+-- This REVOKE is necessary but not sufficient: existing default privileges and
+-- other roles must be audited before any execution in a real database.
 -- Deliberately no GRANT and no privileged SECURITY DEFINER wrapper.
 -- Explicit authorization and a separately reviewed least-privilege deployment
 -- are required before this SQL can be considered for execution.
