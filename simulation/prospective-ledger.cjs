@@ -34,6 +34,9 @@ function makeOutcome(p,{prevHash,predictions}={}){
  assert(typeof p.validated_by==='string'&&p.validated_by.length>0,'human validation required');
  assert(/^[0-9a-f]{64}$/.test(prevHash),'previous record hash required');
  assert(Array.isArray(predictions)&&predictions.length>0,'prediction records required');
+ assert(new Set(predictions.map(x=>x.policy)).size===predictions.length,'duplicate prediction policy');
+ assert(predictions.every(x=>x.N===p.occupied.length),'outcome N mismatch');
+ assert(predictions.every(x=>x.occupied_snapshot.length===p.occupied.length&&x.occupied_snapshot.every(v=>p.occupied.includes(v))),'occupied snapshot mismatch');
  for(const record of predictions){
   assert(record.type==='prediction'&&record.event_id===p.event_id,'wrong prediction');
   assert(Date.parse(record.captured_at)<Date.parse(p.captured_at),'prediction not prior to outcome');
@@ -48,18 +51,22 @@ function verifyRecord(r){
  return hash(payload)===record_sha256;
 }
 function verifyChain(records){
- let previous=null;const seen=new Set();
+ let previous=null;const seen=new Set(),outcomes=new Set(),history=new Map();
  for(const r of records){
   if(!verifyRecord(r)||r.prev_hash!==previous)return false;
   if(r.type==='prediction'){
+   if(outcomes.has(r.event_id))return false;
    const key=r.event_id+'|'+r.policy;
    if(seen.has(key))return false;
    seen.add(key);
   }else if(r.type==='outcome'){
-   if(!Array.isArray(r.prediction_hashes)||!r.prediction_hashes.length)return false;
-   const preds=records.filter(x=>x.type==='prediction'&&r.prediction_hashes.includes(x.record_sha256));
-   if(preds.length!==r.prediction_hashes.length||preds.some(x=>x.event_id!==r.event_id||Date.parse(x.captured_at)>=Date.parse(r.captured_at)))return false;
+   if(outcomes.has(r.event_id))return false;
+   outcomes.add(r.event_id);
+   if(!Array.isArray(r.prediction_hashes)||!r.prediction_hashes.length||new Set(r.prediction_hashes).size!==r.prediction_hashes.length)return false;
+   const preds=r.prediction_hashes.map(h=>history.get(h));
+   if(preds.some(x=>!x||x.type!=='prediction')||preds.some(x=>x.event_id!==r.event_id||Date.parse(x.captured_at)>=Date.parse(r.captured_at)||x.N!==r.occupied.length||x.occupied_snapshot.some(v=>!r.occupied.includes(v)))||new Set(preds.map(x=>x.policy)).size!==preds.length)return false;
   }else return false;
+  history.set(r.record_sha256,r);
   previous=r.record_sha256;
  }
  return true;
