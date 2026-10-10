@@ -46,3 +46,4 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/transactional-prototype.sql
           bash tests/postgres/concurrent-replay.sh
           bash tests/postgres/competing-outcomes.sh
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/definer-runtime-privileges.sql
