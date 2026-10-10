@@ -10,7 +10,7 @@ O arquivo `database/review-only/20261010_append_prospective_evidence_prototype.s
 - Horário do banco e hash encadeado com o registro anterior.
 
 ## Bloqueios de segurança ainda abertos
-1. **Autorização:** a função é `SECURITY INVOKER`, sem `GRANT` de EXECUTE. Ainda não há papel de execução dedicado nem mecanismo comprovado para garantir identidade do ator. Não ativar.
+1. **Autorização:** a função é `SECURITY INVOKER`, com `REVOKE` explícito de EXECUTE para `PUBLIC`, `anon` e `authenticated` (PostgreSQL concede EXECUTE a PUBLIC por padrão), e sem `GRANT` para o runtime. O `REVOKE` não substitui a auditoria dos privilégios efetivos de outros papéis e das default privileges. Ainda não há papel de execução dedicado nem mecanismo comprovado para garantir identidade do ator. Não ativar.
 2. **Hash:** `payload::text` e `v_ts::text` não implementam o contrato canônico JS de forma comprovada. Precisa de especificação única de bytes, vetores de teste e validação cruzada.
 3. **Integridade temporal:** o banco não sabe sozinho se o sorteio real ocorreu antes da predição. Exige fechamento por fonte verificável e processo operacional.
 4. **Validação:** falta garantir igualdade de `request_sha256` com os campos recebidos, limites de payload, identificadores e schema JSON. A função pode ser enganada se usada como está.
