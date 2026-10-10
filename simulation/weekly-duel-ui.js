@@ -40,7 +40,7 @@
       },
       reproducibility:{
         seed:config.seed,
-        structural_source:'83 eventos canônicos; somente permutações completas são elegíveis como moldes/estado inicial',
+        structural_source:'Moldes estruturais derivados da base real carregada; a quantidade elegível é registrada no resultado',
         chronology:'Weekly congela no início; Current recalcula somente após revelar cada evento; ambos usam o mesmo resultado sintético.'
       },
       evaluation:{
