@@ -195,8 +195,16 @@
       '<p class="small muted">O bloco operacional mede disponibilidade; o paired-valid mede qualidade da escolha. O resultado continua sendo comportamento simulado da política, não evidência preditiva real.</p>';
   }
 
+  function clearDisplayedStatistics(message='Aguardando resultado da nova execução.'){
+    const summary=document.querySelector('#weeklyDuelSummary');
+    const updates=document.querySelector('#weeklyDuelUpdates');
+    if(summary)summary.textContent=message;
+    if(updates)updates.textContent='Estatísticas anteriores ocultadas; histórico auditável preservado.';
+    setProgress(0);
+  }
+
   async function run(multiseed=false){
-    if(worker)worker.terminate();
+    if(worker)return; // Impede execuções concorrentes, inclusive durante a preparação assíncrona.
     const weeks=Number(document.querySelector('#weeklyDuelWeeks').value);
     const scenario=document.querySelector('#weeklyDuelScenario').value;
     const signalStrength=scenario==='null'?0:Number(document.querySelector('#weeklyDuelStrength').value);
@@ -219,18 +227,25 @@
     lastTest=null;
     lastResult=null;
     if(exportBtn)exportBtn.disabled=true;
+    clearDisplayedStatistics('Preparando nova simulação…');
+    runBtn.disabled=true;multiBtn.disabled=true;cancelBtn.disabled=true;
     const config={realEvents,weeks,scenario,signalStrength,seed,seedCount:5};
     let provenance;
     try{
       provenance=await inputProvenance(realEvents,config);
     }catch(err){
       status.textContent='AUDITORIA BLOQUEADA · '+err.message;
+      runBtn.disabled=false;multiBtn.disabled=false;
       return;
     }
     lastTest={...testDefinition,experiment_mode:multiseed?'multiseed':'single_seed',input_provenance:provenance};
-    worker=new Worker('/simulation/weekly-duel-worker.js');
-    runBtn.disabled=true;multiBtn.disabled=true;cancelBtn.disabled=false;setProgress(0);
-    status.textContent='Executando '+weeks.toLocaleString('pt-BR')+' semanas pareadas…';
+    try{worker=new Worker('/simulation/weekly-duel-worker.js')}catch(err){
+      status.textContent='Erro ao iniciar worker: '+err.message;
+      runBtn.disabled=false;multiBtn.disabled=false;
+      return;
+    }
+    cancelBtn.disabled=false;
+    status.textContent='Executando '+(multiseed?'Multiseed · 5 seeds':'duelo')+' · '+testDefinition.name+' · sinal '+(signalStrength*100).toFixed(0)+'% · '+weeks.toLocaleString('pt-BR')+' semanas por seed…';
 
     worker.onmessage=e=>{
       const msg=e.data||{};
@@ -279,6 +294,7 @@
     document.querySelector('#cancelWeeklyDuel').disabled=true;
     const exportBtn=document.querySelector('#exportWeeklyDuel');
     if(exportBtn)exportBtn.disabled=true;
+    clearDisplayedStatistics('Simulação cancelada; nenhum resultado atual.');
     document.querySelector('#weeklyDuelStatus').textContent='Simulação cancelada.';
   }
 
