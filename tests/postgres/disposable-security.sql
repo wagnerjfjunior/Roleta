@@ -12,6 +12,7 @@ CREATE SCHEMA extensions;
 ALTER EXTENSION pgcrypto SET SCHEMA extensions;
 \i database/review-only/20261010_roleta_private_ledger_candidate.sql
 \i database/review-only/20261010_append_prospective_evidence_prototype.sql
+\i database/review-only/20261010_append_only_trigger_candidate.sql
 DO $$
 DECLARE f regprocedure := 'roleta_audit.append_prospective_evidence_review(text,text,text,text,text,jsonb,text)'::regprocedure;
 BEGIN
@@ -26,4 +27,26 @@ BEGIN
  IF has_table_privilege('roleta_runtime','roleta_audit.prospective_evidence','UPDATE') THEN RAISE EXCEPTION 'runtime UPDATE'; END IF;
  IF has_table_privilege('roleta_runtime','roleta_audit.prospective_evidence','DELETE') THEN RAISE EXCEPTION 'runtime DELETE'; END IF;
  IF NOT EXISTS(SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='roleta_audit' AND c.relname='prospective_evidence' AND c.relrowsecurity AND c.relforcerowsecurity) THEN RAISE EXCEPTION 'RLS not forced'; END IF;
+END $$;
+
+-- Assert trigger fires even when table owner attempts an UPDATE/DELETE.
+INSERT INTO roleta_audit.prospective_evidence(event_id,kind,policy,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
+VALUES ('CI-01','prediction','WEEKLY_FROZEN','ci-test-key-00000001',repeat('a',64),repeat('b',64),'{}'::jsonb,'ci');
+DO $$
+BEGIN
+ BEGIN
+  UPDATE roleta_audit.prospective_evidence SET actor_subject='tamper' WHERE event_id='CI-01';
+  RAISE EXCEPTION 'UPDATE unexpectedly succeeded';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM <> 'prospective evidence is append-only' THEN RAISE; END IF;
+ END;
+ BEGIN
+  DELETE FROM roleta_audit.prospective_evidence WHERE event_id='CI-01';
+  RAISE EXCEPTION 'DELETE unexpectedly succeeded';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM <> 'prospective evidence is append-only' THEN RAISE; END IF;
+ END;
+ IF (SELECT count(*) FROM roleta_audit.prospective_evidence WHERE event_id='CI-01')<>1 THEN
+  RAISE EXCEPTION 'record missing after rejected mutations';
+ END IF;
 END $$;
