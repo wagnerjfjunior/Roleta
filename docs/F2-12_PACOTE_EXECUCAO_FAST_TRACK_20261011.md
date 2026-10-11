@@ -15,8 +15,9 @@ Objetivo: função auditável funcionando com segurança, sem alterar Discador/M
 
 ### P0 — Freeze baseline and establish running app trust boundary (REQUIRED)
 1. **Existing code identified:** `auth/google.js` verifies signed Google session cookies and `server/prospective-evidence-http.cjs` validates origin + CSRF. New `server/prospective-v2-google-http.cjs` reuses these safeguards; verify Vercel production secrets/configuration before enabling a route. `session.verified` is assigned internally only after server verification, never accepted from browser data.
-2. **Outstanding P0 blocker:** identify or create the **persisted server-side actor → authorized person IDs mapping**. `prepareV2FromHttp(req,{loadAuthorizedPersonIds})` refuses to proceed without an ACL loader. A client-supplied list, actor, Google sub or email must never become authority.
-3. Choose backend database transport (Supabase connection pooler/server process/edge runtime), with a distinct protected credential. Never put `postgres`, `service_role` keys or direct SQL access in browser bundles.
+2. **P0 implementation available, configuration not yet provisioned:** configure the **server-only actor → authorized person IDs mapping**. `prepareV2FromHttp(req,{loadAuthorizedPersonIds})` refuses to proceed without an ACL loader. A client-supplied list, actor, Google sub or email must never become authority.
+3. **Fast ACL option implemented:** `server/prospective-v2-person-acl-env.cjs` loads private `ROLETA_V2_PERSON_ACL_JSON` from Vercel backend environment, keyed by verified Google **sub** (not user-supplied email). Example syntax: `{"GOOGLE_SUB_VALUE":["wagner-person-id"]}`. Values must be **actual canonical person IDs**, not display names. Inject `loadAuthorizedPersonIdsFromEnv` into `prepareV2FromHttp`. No configured mapping = denial; do not commit real Google subject IDs or ACL contents.
+4. Choose backend database transport (Supabase connection pooler/server process/edge runtime), with a distinct protected credential. Never put `postgres`, `service_role` keys or direct SQL access in browser bundles.
 4. Do not unmask writes without all three prerequisites. Missing any item = stop at dry-run.
 
 ### P1 — Dry-run and code CI (NO production writes)
