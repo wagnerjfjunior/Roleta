@@ -25,6 +25,10 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@v4
+      - name: Verify backend V2 trust boundary (Node built-in tests)
+        run: |
+          node --test tests/regression/prospective-v2-verified-boundary.test.cjs
+          node --test tests/regression/prospective-person-db-command-v2.test.cjs
       - name: Install client
         run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
       - name: Initialize isolated Supabase-compatible role and extension fixtures
