@@ -35,7 +35,7 @@ BEGIN
  OR NOT has_function_privilege('roleta_v2_writer','roleta_audit.append_authenticated_person_evidence_v2(text,text,text,text,text,text,text,text,jsonb)','EXECUTE')
  OR EXISTS (SELECT 1 FROM pg_roles WHERE rolname='roleta_v2_writer'
      AND (rolsuper OR rolbypassrls OR rolcreaterole OR rolcreatedb OR rolreplication))
- OR (SELECT rolpassword IS NOT NULL FROM pg_authid WHERE rolname='roleta_v2_writer')
+ OR (SELECT rolpassword IS NOT NULL FROM pg_roles WHERE rolname='roleta_v2_writer')
  THEN RAISE EXCEPTION 'unsafe F2-12 runtime privileges/credential'; END IF;
 END $postflight$;
 COMMIT;
