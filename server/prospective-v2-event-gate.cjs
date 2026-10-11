@@ -10,8 +10,9 @@ function assertPreDraw(command,{now=()=>Date.now()}={}){
  const m=ID.exec(eventId||'');
  if(!m||m[2]==='integral')throw Error('unsupported target event cutoff');
  const date=m[1],time=m[2]==='manha'?'08:46':'13:46';
+ if(!/^2026-/.test(date))throw Error('unconfigured operational calendar');
  const cutoff=Date.parse(date+'T'+time+':00-03:00');
- if(!Number.isFinite(cutoff)||new Date(cutoff).toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'})!==date)
+ if(!Number.isFinite(cutoff)||date!==new Date(cutoff-3*3600000).toISOString().slice(0,10))
   throw Error('invalid target event date');
  const current=now(),generated=Date.parse(data.generated_at),frozen=data.frozen_at?Date.parse(data.frozen_at):null;
  if(!Number.isFinite(current)||!Number.isFinite(generated)
