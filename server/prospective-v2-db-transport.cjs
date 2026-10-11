@@ -18,7 +18,7 @@ function databaseUrl(env=process.env){
 }
 function verifiedTlsConfig(env=process.env){
  const ca=env.ROLETA_V2_TLS_CA_PEM;
- if(typeof ca!=='string'||ca.length>16384||!/^-----BEGIN CERTIFICATE-----\\r?\\n[\\s\\S]+\\r?\\n-----END CERTIFICATE-----\\s*$/.test(ca))
+ if(typeof ca!=='string'||ca.length>16384||!/^-----BEGIN CERTIFICATE-----\r?\n[\s\S]+\r?\n-----END CERTIFICATE-----\s*$/.test(ca))
   throw Error('F2-12 trusted pooler CA PEM missing or invalid');
  return {ca,rejectUnauthorized:true,servername:'aws-1-sa-east-1.pooler.supabase.com'};
 }
