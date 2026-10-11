@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const {validatePersonPrediction}=require('../../server/prospective-person-contract.cjs');
 const allowed=new Set(['wagner','laura']);
 const payload={
- person_id:'wagner',revision_number:1,supersedes_recommendation_id:null,
+ recommendation_id:'ci-recommendation-wagner-1',person_id:'wagner',revision_number:1,supersedes_recommendation_id:null,
  physical_position:14,generated_at:'2026-10-10T19:00:00Z',
  data_cutoff:'2026-10-10T18:00:00Z',frozen_at:'2026-10-10T19:00:00Z'
 };
@@ -15,7 +15,7 @@ function check(body,authorizedPersonIds=allowed){
  return validatePersonPrediction({body,authorizedPersonIds});
 }
 test('trusted person allowlist permits distinct authorized members in same event',()=>{
- assert.deepEqual(check(prediction()),{person_id:'wagner',revision_number:1,policy:'WEEKLY_FROZEN'});
+ assert.deepEqual(check(prediction()),{recommendation_id:'ci-recommendation-wagner-1',person_id:'wagner',revision_number:1,policy:'WEEKLY_FROZEN'});
  assert.equal(check(prediction('WEEKLY_FROZEN',{person_id:'laura'})).person_id,'laura');
 });
 test('rejects missing/forged user authorization, including browser-only claims',()=>{
@@ -43,6 +43,7 @@ test('rejects hindsight cutoff, invalid timestamps and positions',()=>{
  assert.throws(()=>check(prediction('WEEKLY_FROZEN',{generated_at:'2026-02-30T19:00:00Z'})),/generated_at/);
  assert.throws(()=>check(prediction('WEEKLY_FROZEN',{physical_position:0})),/physical_position/);
  assert.throws(()=>check(prediction('WEEKLY_FROZEN',{revision_number:1.5})),/revision_number/);
+ assert.throws(()=>check(prediction('WEEKLY_FROZEN',{recommendation_id:null})),/recommendation_id/);
 });
 test('rejects outcome at person-prediction validator boundary',()=>{
  assert.throws(()=>check({kind:'outcome',policy:null,payload}),/prediction policy/);
