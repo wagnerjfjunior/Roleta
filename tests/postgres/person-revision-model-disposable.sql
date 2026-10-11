@@ -58,8 +58,8 @@ $fn$;
 CREATE TRIGGER prospective_person_revision_ci_guard
  BEFORE INSERT OR UPDATE OR DELETE ON roleta_audit.prospective_person_revision_ci
  FOR EACH ROW EXECUTE FUNCTION roleta_audit.enforce_person_revision_ci();
-REVOKE ALL ON TABLE roleta_audit.prospective_person_revision_ci FROM PUBLIC,anon,authenticated,roleta_runtime,roleta_append_owner;
-REVOKE ALL ON FUNCTION roleta_audit.enforce_person_revision_ci() FROM PUBLIC,anon,authenticated,roleta_runtime,roleta_append_owner;
+REVOKE ALL ON TABLE roleta_audit.prospective_person_revision_ci FROM PUBLIC,anon,authenticated,roleta_runtime;
+REVOKE ALL ON FUNCTION roleta_audit.enforce_person_revision_ci() FROM PUBLIC,anon,authenticated,roleta_runtime;
 
 -- Test with local fixture roles only (superuser CI fixture insertion).
 INSERT INTO roleta_audit.prospective_person_revision_ci
