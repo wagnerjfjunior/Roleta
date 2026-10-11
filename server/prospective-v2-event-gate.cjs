@@ -15,11 +15,11 @@ function assertPreDraw(command,{now=()=>Date.now()}={}){
  if(!Number.isFinite(cutoff)||date!==new Date(cutoff-3*3600000).toISOString().slice(0,10))
   throw Error('invalid target event date');
  const current=now(),generated=Date.parse(data.generated_at),frozen=data.frozen_at?Date.parse(data.frozen_at):null;
+ if(current>=cutoff||generated>=cutoff||(frozen!==null&&(!Number.isFinite(frozen)||frozen>=cutoff)))
+  throw Error('target roulette already closed');
  if(!Number.isFinite(current)||!Number.isFinite(generated)
     ||generated>current+MAX_CLOCK_SKEW_MS||generated<current-MAX_CLOCK_SKEW_MS)
   throw Error('prediction generation must be server-current');
- if(current>=cutoff||generated>=cutoff||(frozen!==null&&(!Number.isFinite(frozen)||frozen>=cutoff)))
-  throw Error('target roulette already closed');
  // Does not prove an eligible physical line; independent trusted roster required.
  return {event_id:eventId,cutoff};
 }
