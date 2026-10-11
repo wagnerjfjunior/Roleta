@@ -127,3 +127,41 @@ BEGIN
    AND has_function_privilege(r.oid,f,'EXECUTE')
  ) THEN RAISE EXCEPTION 'privileged RPC exposed'; END IF;
 END $perms$;
+
+-- Reject format ambiguity even if a caller constructs a matching digest.
+DO $strict$
+DECLARE p jsonb; e jsonb; s text; h text;
+BEGIN
+ SELECT payload INTO p FROM roleta_audit.prospective_evidence
+ WHERE recommendation_id='ci-v2-wagner-weekly';
+ p:=jsonb_set(jsonb_set(p,'{recommendation_id}','"ci-v2-fractional-revision"'),
+ '{revision_number}','1.5'::jsonb);
+ e:=jsonb_build_object(
+  'version','rlt-person-evidence-v2','actor_subject','google:ci-operator',
+  'event_id','CI-V2-STRICT','kind','prediction','policy','WEEKLY_FROZEN',
+  'person_id','wagner','recommendation_id','ci-v2-fractional-revision',
+  'revision_number',1.5,'idempotency_key','ci-v2-fractional-key-01','payload',p);
+ s:=e::text;h:=encode(extensions.digest(convert_to(s,'UTF8'),'sha256'),'hex');
+ BEGIN
+  PERFORM roleta_audit.append_authenticated_person_evidence_v2(
+   s,h,'google:ci-operator','CI-V2-STRICT','wagner',
+   'ci-v2-fractional-revision','WEEKLY_FROZEN','ci-v2-fractional-key-01',p);
+  RAISE EXCEPTION 'fractional revision accepted';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM<>'invalid V2 number or UTC timestamp' THEN RAISE; END IF;
+ END;
+ p:=jsonb_set(jsonb_set(p,'{recommendation_id}','"ci-v2-local-clock"'),
+ '{revision_number}','1'::jsonb);
+ p:=jsonb_set(p,'{generated_at}','"2026-10-10 19:00:00"');
+ e:=jsonb_set(jsonb_set(jsonb_set(e,'{recommendation_id}','"ci-v2-local-clock"'),
+ '{revision_number}','1'::jsonb),'{payload}',p);
+ s:=e::text;h:=encode(extensions.digest(convert_to(s,'UTF8'),'sha256'),'hex');
+ BEGIN
+  PERFORM roleta_audit.append_authenticated_person_evidence_v2(
+   s,h,'google:ci-operator','CI-V2-STRICT','wagner',
+   'ci-v2-local-clock','WEEKLY_FROZEN','ci-v2-fractional-key-01',p);
+  RAISE EXCEPTION 'ambiguous local timestamp accepted';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM<>'invalid V2 number or UTC timestamp' THEN RAISE; END IF;
+ END;
+END $strict$;
