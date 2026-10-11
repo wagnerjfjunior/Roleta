@@ -77,7 +77,7 @@ function makeGitHub(token,transport=fetch){
     'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json',
     'User-Agent':'Roleta-Stat-Gate-E'},...(body===undefined?{}:{body:JSON.stringify(body)})});
   const data=await r.json().catch(()=>({}));
-  if(!r.ok)throw Object.assign(Error('GitHub operation rejected'),{status:r.status===422||r.status===409?409:502});
+  if(!r.ok)throw Object.assign(Error('GitHub operation rejected'),{status:r.status===404?404:(r.status===422||r.status===409?409:502)});
   return data;
  };
 }
@@ -87,19 +87,47 @@ async function stageStatisticalSubmission(input,{actorSub,token,transport=fetch,
  const e=prepare(input.reviewed,input.physicalByDraw,{source:input.source,acknowledged:input.acknowledged});
  assertOfficial(input.reviewed,e);
  const gh=makeGitHub(token,transport);
+ const existingBranch='stat-intake/'+e.event_id;
+ // A network failure after ref/PR creation must not provoke a duplicate.
+ // Reuse an existing OPEN review only when its server-derived complete
+ // submission digest AND actor match the current request.
+ let branchExists=false;
+ try{await gh('GET','/git/ref/heads/'+existingBranch);branchExists=true;}
+ catch(error){if(error.status!==404)throw error;}
+ if(branchExists){
+  let proof;
+  try{
+   const existing=await gh('GET','/contents/data/intake-proofs/'+e.event_id+
+    '.json?ref='+encodeURIComponent(existingBranch));
+   proof=JSON.parse(Buffer.from(existing.content||'','base64').toString('utf8'));
+  }catch(error){throw Object.assign(Error('unverified existing staged branch'),{status:409});}
+  const digest=crypto.createHash('sha256').update(JSON.stringify(e)).digest('hex');
+  const actor=crypto.createHash('sha256').update(actorSub).digest('hex').slice(0,16);
+  if(proof.schema!=='rlt-statistical-proof-v1'||proof.payload_sha256!==digest||
+     proof.actor_hash!==actor||proof.event_id!==e.event_id)
+   throw Object.assign(Error('staged submission conflict'),{status:409});
+  const prs=await gh('GET','/pulls?state=open&base=main&head='+
+    encodeURIComponent('wagnerjfjunior:'+existingBranch));
+  if(!Array.isArray(prs)||prs.length!==1||typeof prs[0].number!=='number'||
+     !/^https:\/\/github\.com\/wagnerjfjunior\/Roleta\/pull\/\d+$/.test(prs[0].html_url||''))
+   throw Object.assign(Error('staged branch requires manual reconciliation'),{status:409});
+  return {status:'pending_review',event_id:e.event_id,pr_number:prs[0].number,
+   pr_url:prs[0].html_url,replayed:true};
+ }
  const main=await gh('GET','/git/ref/heads/main');
  const mainSha=main.object?.sha;
  if(!/^[a-f0-9]{40}$/.test(mainSha||''))throw Error('invalid main SHA');
- const rawManifest=await gh('GET','/contents/data/manifest.json?ref=main');
+ const rawManifest=await gh('GET','/contents/data/manifest.json?ref='+mainSha);
  const manifest=JSON.parse(Buffer.from(rawManifest.content||'','base64').toString('utf8'));
  const sources=[];
  for(const item of manifest.sources){
   if(!/^\/data\/(?:events\.csv|incoming\/[0-9-]+\.csv)$/.test(item.path))throw Error('untrusted manifest source path');
-  const result=await gh('GET','/contents'+item.path+'?ref=main');
+  const result=await gh('GET','/contents'+item.path+'?ref='+mainSha);
   sources.push(csvRows(Buffer.from(result.content||'','base64').toString('utf8')));
  }
  assertUniqueEvent(manifest,sources,e);
  const path='data/incoming/'+e.event_id+'.csv';
+ const evidencePath='data/intake-proofs/'+e.event_id+'.json';
  const updated={...manifest,
   logical_dataset_version:'gate-e-'+e.event_id,
   canonical_event_count:manifest.canonical_event_count+1,
@@ -108,17 +136,31 @@ async function stageStatisticalSubmission(input,{actorSub,token,transport=fetch,
  const commit=await gh('GET','/git/commits/'+mainSha);
  const actorHash=crypto.createHash('sha256').update(actorSub).digest('hex').slice(0,16);
  const submittedAt=clock();
+ // Audit the ENTIRE row↔draw association, not just the four special numbers
+ // retained for the compact CSV statistical index. The proof is immutable
+ // in the same branch/commit as the CSV and manifest.
+ const evidence={
+  schema:'rlt-statistical-proof-v1',
+  event_id:e.event_id,event_date:e.event_date,period:e.period,
+  source:e.source,submitted_at:submittedAt,actor_hash:actorHash,
+  N:e.N,physical_positions:e.occupied,drawn_mapping:e.drawn_mapping,
+  human_review_confirmed:true,
+  payload_sha256:crypto.createHash('sha256').update(JSON.stringify(e)).digest('hex')
+ };
  const tree=await gh('POST','/git/trees',{
   base_tree:commit.tree.sha,
   tree:[{path,mode:'100644',type:'blob',content:buildCsv(e,actorHash,submittedAt)},
-   {path:'data/manifest.json',mode:'100644',type:'blob',content:JSON.stringify(updated,null,2)+'\n'}]
+   {path:'data/manifest.json',mode:'100644',type:'blob',content:JSON.stringify(updated,null,2)+'\n'},
+   {path:evidencePath,mode:'100644',type:'blob',content:JSON.stringify(evidence,null,2)+'\n'}]
  });
  const prepared=await gh('POST','/git/commits',{message:'data(statistics): stage '+e.event_id+' for audit',tree:tree.sha,parents:[mainSha]});
  const branch='stat-intake/'+e.event_id;
+ // If another request already created this branch, never replace it.
+ // Different proposals must be reconciled by a human, not rewritten.
  await gh('POST','/git/refs',{ref:'refs/heads/'+branch,sha:prepared.sha});
  const pr=await gh('POST','/pulls',{title:'Data: validar roleta '+e.event_id,head:branch,base:'main',
   body:'Gate E · revisão humana obrigatória antes do merge. Evento: '+e.event_id+'; data original: '+e.event_date+
-  '; responsável hash: '+actorHash+'. Confira a fonte, posições físicas originais, números sorteados, N, qualidade e manifest. Não faça merge sem auditoria.'});
+  '; responsável hash: '+actorHash+'. Confira a fonte, data, todas as correspondências linha↔bolinha em '+evidencePath+', N, qualidade e manifest.\n\nATENÇÃO: revalidar contra a main atual antes do merge. Não faça merge sem auditoria.'});
  return {status:'pending_review',event_id:e.event_id,pr_number:pr.number,pr_url:pr.html_url};
 }
 module.exports={csvRows,assertUniqueEvent,buildCsv,stageStatisticalSubmission};

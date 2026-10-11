@@ -33,9 +33,9 @@ function createHandler({env=process.env,authenticate=auth,stage=stageStatistical
    const result=await stage(input,{actorSub:session.sub,token:env.ROLETA_STAT_GITHUB_TOKEN});
    return res.status(202).json(result);
   }catch(e){
-   const code=e.status===409?409:e.status===503?503:e instanceof SyntaxError?422:422;
+   const code=e.status===409?409:e.status===503?503:e.status===502?502:e instanceof SyntaxError?422:422;
    // Never expose upstream provider errors, actor subject or raw payload.
-   return res.status(code).json({error:code===409?'Roleta já registrada ou em revisão. Correções exigem processo versionado.':code===503?'Integração de armazenamento indisponível.':'Não foi possível preparar a revisão. Confira os dados e tente novamente.'});
+   return res.status(code).json({error:code===409?'Roleta já registrada ou em revisão. Correções exigem processo versionado.':code===503?'Integração de armazenamento indisponível.':code===502?'Falha temporária na integração de armazenamento.':'Não foi possível preparar a revisão. Confira os dados e tente novamente.'});
   }
  };
 }
