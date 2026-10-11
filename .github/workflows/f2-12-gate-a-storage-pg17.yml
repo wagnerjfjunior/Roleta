@@ -60,4 +60,6 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 -f database/production-review/20261011_roleta_audit_storage_gate_a_candidate.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/gate-a-storage-pg17-rehearsal.sql
           psql -X -v ON_ERROR_STOP=1 -f database/production-review/20261011_roleta_v2_private_append_gate_a2_candidate.sql
+          psql -X -v ON_ERROR_STOP=1 -f database/production-review/20261011_roleta_v2_runtime_role_gate_b_candidate.sql
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/gate-b0-runtime-pg17.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/gate-a2-v2-append-pg17.sql
