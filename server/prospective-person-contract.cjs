@@ -20,7 +20,8 @@ function validatePersonPrediction({body,authorizedPersonIds}={}){
  const p=body.payload;
  if(!p||Array.isArray(p)||typeof p!=='object'||Object.getPrototypeOf(p)!==Object.prototype)
   throw new Error('prediction payload required');
- const {person_id,revision_number,supersedes_recommendation_id,physical_position,generated_at,data_cutoff,frozen_at}=p;
+ const {recommendation_id,person_id,revision_number,supersedes_recommendation_id,physical_position,generated_at,data_cutoff,frozen_at}=p;
+ if(typeof recommendation_id!=='string'||!ID.test(recommendation_id))throw new Error('invalid recommendation_id');
  if(typeof person_id!=='string'||!ID.test(person_id))throw new Error('invalid person_id');
  if(!authorizedPersonIds.has(person_id))throw new Error('person not authorized');
  if(!Number.isSafeInteger(revision_number)||revision_number<1)throw new Error('invalid revision_number');
@@ -40,6 +41,6 @@ function validatePersonPrediction({body,authorizedPersonIds}={}){
  }
  // These local checks alone DO NOT establish the predecessor exists, belongs
  // to the same event/person/track, or is the current tip. Enforce atomically in DB.
- return Object.freeze({person_id,revision_number,policy:body.policy});
+ return Object.freeze({recommendation_id,person_id,revision_number,policy:body.policy});
 }
 module.exports={validatePersonPrediction};
