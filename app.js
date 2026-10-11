@@ -483,7 +483,7 @@ async function upgradeWorkspace(){
       '<label><span>Universos</span><select id="simUniversesInput"><option>50</option><option selected>100</option><option>250</option><option>500</option><option>1000</option></select></label>'+
       '<label><span>Anos por universo</span><select id="simYearsInput"><option>1</option><option>5</option><option selected>10</option><option>20</option></select></label>'+
       '<label><span>Cenário</span><select id="simScenarioInput"><option value="null">NULL · acaso puro</option><option value="fixed_2x">Bias 2X · posição fixa</option><option value="morning_2x">Bias 2X · somente manhã</option><option value="high_n_2x">Bias 2X · N alto</option></select></label>'+
-      '<label><span>Posição do sinal</span><input id="simPositionInput" type="number" min="1" value="14"></label>'+
+      '<label><span>Posição física do sinal</span><input id="simPositionInput" type="number" min="1" value="14"></label>'+
       '<label><span>Força do sinal</span><select id="simStrengthInput"><option value="0.01">1%</option><option value="0.03" selected>3%</option><option value="0.05">5%</option><option value="0.10">10%</option></select></label>'+
       '<label id="simMinNWrap" hidden><span>N mínimo do sinal</span><input id="simMinNInput" type="number" min="4" step="1" value="25"></label>'+
       '<label><span>Seed</span><input id="simSeedInput" value="roleta-2026"></label>'+
@@ -530,7 +530,7 @@ async function upgradeWorkspace(){
   simMethod.className='card methodology';
   simMethod.innerHTML=
     '<div class="section-head"><div><span class="eyebrow">MECÂNICA</span><h2>Como cada roleta é simulada</h2></div></div>'+
-    '<p>O laboratório sorteia um molde real completo, preserva N, período, posições físicas e gaps, recalcula a ordem efetiva e gera uma nova permutação uniforme 1..N. Cada modelo escolhe antes do sorteio; somente depois o evento sintético é revelado e incorporado ao histórico daquele universo.</p>'+
+    '<p>O laboratório escolhe um molde real completo, preserva N, período, linhas físicas ocupadas e eventuais lacunas da folha original. Sorteia uma permutação das bolinhas 1..N e associa cada bolinha à linha física ocupada. Exemplo: a linha física 1 pode receber a bolinha 10 e ficar em 10º; a linha física 10 pode receber a bolinha 1 e ficar em 1º. Cada modelo escolhe posições físicas antes de revelar o resultado sintético; só depois o evento entra no histórico daquele universo.</p>'+
     '<p class="small muted"><strong>Isolamento:</strong> resultados sintéticos existem apenas no laboratório e nunca entram em data/manifest.json.</p>';
   simulation.appendChild(simMethod);
 
