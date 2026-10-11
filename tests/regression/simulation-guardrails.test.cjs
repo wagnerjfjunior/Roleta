@@ -35,8 +35,10 @@ test('F2-12 physical lines 2 and 13 crossed out: draw balls remain 1..23, not 1.
  // No synthetic draw ever chooses a crossed-out LINE; the balls 2 and 13
  // remain available because they are draw numbers, not physical lines.
  let seenBall2=false,seenBall13=false;
+ let seed=20261011;
+ const rng=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
  for(let i=0;i<250;i++){
-  const e=sim.simulateEvent(template,()=>Math.random(),i+1);
+  const e=sim.simulateEvent(template,rng,i+1);
   assert.deepEqual(e.occupied,occupied);
   assert.equal(e.permutation.length,23);
   assert.deepEqual([...e.permutation].sort((a,b)=>a-b),Array.from({length:23},(_,j)=>j+1));
