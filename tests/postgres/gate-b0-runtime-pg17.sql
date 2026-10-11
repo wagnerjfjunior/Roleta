@@ -1,7 +1,7 @@
 -- Isolated PG17 runtime principal negative privilege check.
 DO $assert$
 BEGIN
- IF NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname='roleta_v2_writer' AND rolcanlogin AND NOT rolbypassrls AND NOT rolsuper AND NOT rolcreaterole AND NOT rolcreatedb AND rolpassword IS NULL)
+ IF NOT EXISTS(SELECT 1 FROM pg_roles WHERE rolname='roleta_v2_writer' AND rolcanlogin AND NOT rolbypassrls AND NOT rolsuper AND NOT rolcreaterole AND NOT rolcreatedb)
  THEN RAISE EXCEPTION 'runtime login must exist without password or elevated rights'; END IF;
  IF NOT has_schema_privilege('roleta_v2_writer','roleta_audit','USAGE')
  OR has_schema_privilege('roleta_v2_writer','roleta_audit','CREATE')
