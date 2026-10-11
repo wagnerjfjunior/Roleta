@@ -8,7 +8,7 @@ const body={generated_at:'2026-10-12T11:40:00Z',data_cutoff:'2026-10-11T20:00:00
 const cmd={sql:'SELECT roleta_audit.append_authenticated_person_evidence_v2($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb) AS evidence_id',params:[
  'canonical','a'.repeat(64),'google:abc','2026-10-12-manha','brenda','rec123','WEEKLY_FROZEN','idempotency_key_123',JSON.stringify(body)
 ]};
-const env={ROLETA_V2_DATABASE_URL:'postgresql://roleta_v2_writer:test@db.example.com:5432/postgres?sslmode=verify-full',ROLETA_V2_WRITES_ENABLED:'true'};
+const env={ROLETA_V2_DATABASE_URL:'postgresql://roleta_v2_writer.uobxxgzshrmbtjfdolxd:test@aws-1-sa-east-1.pooler.supabase.com:5432/postgres?sslmode=verify-full',ROLETA_V2_WRITES_ENABLED:'true'};
 function result(){const state={status:null,body:null,headers:{}};return {
  state,setHeader(k,v){state.headers[k]=v;return this;},
  status(code){state.status=code;return this;},
@@ -21,10 +21,12 @@ test('default feature gate refuses without invoking auth or SQL',async()=>{
 });
 test('V2 SQL URL rejects privileged account and non-verified transport',()=>{
  for(const user of ['postgres','service_role','anon','authenticated','roleta_append_owner','roleta_runtime']){
-  assert.throws(()=>databaseUrl({ROLETA_V2_DATABASE_URL:'postgresql://'+user+':test@db.example.com/postgres?sslmode=verify-full'}));
+  assert.throws(()=>databaseUrl({ROLETA_V2_DATABASE_URL:'postgresql://'+user+':test@aws-1-sa-east-1.pooler.supabase.com:5432/postgres?sslmode=verify-full'}));
  }
- assert.throws(()=>databaseUrl({ROLETA_V2_DATABASE_URL:'postgresql://roleta_v2_writer:test@db.example.com/postgres?sslmode=require'}));
+ assert.throws(()=>databaseUrl({ROLETA_V2_DATABASE_URL:'postgresql://roleta_v2_writer.uobxxgzshrmbtjfdolxd:test@aws-1-sa-east-1.pooler.supabase.com:5432/postgres?sslmode=require'}));
  assert.equal(databaseUrl(env),env.ROLETA_V2_DATABASE_URL);
+ assert.throws(()=>databaseUrl({ROLETA_V2_DATABASE_URL:env.ROLETA_V2_DATABASE_URL.replace('aws-1-sa-east-1.pooler.supabase.com','db.example.com')}),/session pooler/);
+ assert.throws(()=>databaseUrl({ROLETA_V2_DATABASE_URL:env.ROLETA_V2_DATABASE_URL.replace('roleta_v2_writer.uobxxgzshrmbtjfdolxd','postgres.uobxxgzshrmbtjfdolxd')}),/dedicated/);
 });
 test('append validates private DB config and forwards only bound parameters',async()=>{
  let calls=0;const pool={query:async(sql,params)=>{calls++;assert.equal(sql,cmd.sql);assert.deepEqual(params,cmd.params);return {rows:[{evidence_id:'42'}]};}};
