@@ -7,8 +7,11 @@ function databaseUrl(env=process.env){
  const u=new URL(url);
  if(!['postgres:','postgresql:'].includes(u.protocol)||!u.hostname||!u.username||!u.password)
   throw Error('F2-12 database credential invalid');
- if(['postgres','service_role','anon','authenticated','supabase_admin','roleta_append_owner','roleta_runtime'].includes(decodeURIComponent(u.username)))
-  throw Error('F2-12 elevated or non-login database user rejected');
+ const user=decodeURIComponent(u.username);
+ if(user!=='roleta_v2_writer.uobxxgzshrmbtjfdolxd')
+  throw Error('F2-12 requires dedicated project-scoped writer login');
+ if(u.hostname!=='aws-1-sa-east-1.pooler.supabase.com'||u.port!=='5432'||u.pathname!=='/postgres')
+  throw Error('F2-12 requires verified project session pooler');
  if(u.searchParams.get('sslmode')!=='verify-full')
   throw Error('F2-12 verified TLS is mandatory');
  return url;
