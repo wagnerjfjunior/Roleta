@@ -38,7 +38,8 @@ test('current revisions require predecessor after first version',()=>{
 });
 test('rejects hindsight cutoff, invalid timestamps and positions',()=>{
  assert.throws(()=>check(prediction('WEEKLY_FROZEN',{data_cutoff:'2026-10-10T20:00:00Z'})),/cutoff/);
- assert.throws(()=>check(prediction('WEEKLY_FROZEN',{frozen_at:'2026-10-10T20:00:00Z'})),/freeze/);
+ assert.throws(()=>check(prediction('WEEKLY_FROZEN',{frozen_at:'2026-10-10T18:59:59Z'})),/freeze/);
+ assert.equal(check(prediction('WEEKLY_FROZEN',{frozen_at:'2026-10-10T20:00:00Z'})).person_id,'wagner');
  assert.throws(()=>check(prediction('WEEKLY_FROZEN',{generated_at:'2026-02-30T19:00:00Z'})),/generated_at/);
  assert.throws(()=>check(prediction('WEEKLY_FROZEN',{physical_position:0})),/physical_position/);
  assert.throws(()=>check(prediction('WEEKLY_FROZEN',{revision_number:1.5})),/revision_number/);
