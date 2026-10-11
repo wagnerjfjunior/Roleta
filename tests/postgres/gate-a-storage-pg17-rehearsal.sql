@@ -195,3 +195,26 @@ BEGIN
  OR has_function_privilege('roleta_runtime',p.oid,'EXECUTE'))
  ) THEN RAISE EXCEPTION 'Roleta function privilege unexpectedly exposed'; END IF;
 END $check$;
+
+-- Stable application ID cannot be reused across events or persons.
+DO $identity$
+BEGIN
+ INSERT INTO roleta_audit.prospective_evidence
+ (event_id,kind,person_id,recommendation_id,policy,revision_number,physical_position,
+  generated_at,data_cutoff,frozen_at,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
+ VALUES
+ ('CI-ID-A','prediction','wagner','ci-stable-recommendation-1','WEEKLY_FROZEN',1,3,
+  '2026-10-10T19:00Z','2026-10-10T18:00Z','2026-10-10T19:00Z',
+  'ci-stable-id-key-00001',repeat('1',64),repeat('3',64),'{}','ci');
+ BEGIN
+  INSERT INTO roleta_audit.prospective_evidence
+  (event_id,kind,person_id,recommendation_id,policy,revision_number,physical_position,
+   generated_at,data_cutoff,frozen_at,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
+  VALUES
+  ('CI-ID-B','prediction','laura','ci-stable-recommendation-1','WEEKLY_FROZEN',1,5,
+   '2026-10-10T19:00Z','2026-10-10T18:00Z','2026-10-10T19:00Z',
+   'ci-stable-id-key-00002',repeat('2',64),repeat('4',64),'{}','ci');
+  RAISE EXCEPTION 'stable recommendation ID reused';
+ EXCEPTION WHEN unique_violation THEN NULL;
+ END;
+END $identity$;
