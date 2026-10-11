@@ -133,3 +133,65 @@ BEGIN
  END;
 END $neg$;
 RESET ROLE;
+
+-- Negative role checks must be executable as each real SQL role,
+-- not inferred only from catalog metadata.
+SET ROLE service_role;
+DO $deny_service$
+BEGIN
+ BEGIN
+  EXECUTE 'SELECT id FROM roleta_audit.prospective_evidence LIMIT 1';
+  RAISE EXCEPTION 'service_role read unexpectedly succeeded';
+ EXCEPTION WHEN insufficient_privilege THEN NULL;
+ END;
+ BEGIN
+  EXECUTE 'INSERT INTO roleta_audit.prospective_evidence DEFAULT VALUES';
+  RAISE EXCEPTION 'service_role insert unexpectedly succeeded';
+ EXCEPTION WHEN insufficient_privilege THEN NULL;
+ END;
+END $deny_service$;
+RESET ROLE;
+
+SET ROLE roleta_runtime;
+DO $deny_runtime$
+BEGIN
+ BEGIN
+  EXECUTE 'SELECT id FROM roleta_audit.prospective_evidence LIMIT 1';
+  RAISE EXCEPTION 'runtime read unexpectedly succeeded';
+ EXCEPTION WHEN insufficient_privilege THEN NULL;
+ END;
+ BEGIN
+  EXECUTE 'INSERT INTO roleta_audit.prospective_evidence DEFAULT VALUES';
+  RAISE EXCEPTION 'runtime insert unexpectedly succeeded';
+ EXCEPTION WHEN insufficient_privilege THEN NULL;
+ END;
+END $deny_runtime$;
+RESET ROLE;
+
+SET ROLE roleta_append_owner;
+DO $deny_owner$
+BEGIN
+ BEGIN
+  EXECUTE 'SELECT id FROM roleta_audit.prospective_evidence LIMIT 1';
+  RAISE EXCEPTION 'unconfigured append owner read unexpectedly succeeded';
+ EXCEPTION WHEN insufficient_privilege THEN NULL;
+ END;
+ BEGIN
+  EXECUTE 'INSERT INTO roleta_audit.prospective_evidence DEFAULT VALUES';
+  RAISE EXCEPTION 'unconfigured append owner insert unexpectedly succeeded';
+ EXCEPTION WHEN insufficient_privilege THEN NULL;
+ END;
+END $deny_owner$;
+RESET ROLE;
+
+DO $check$
+BEGIN
+ IF EXISTS (
+ SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace
+ WHERE n.nspname='roleta_audit'
+ AND (p.prosecdef OR has_function_privilege('anon',p.oid,'EXECUTE')
+ OR has_function_privilege('authenticated',p.oid,'EXECUTE')
+ OR has_function_privilege('service_role',p.oid,'EXECUTE')
+ OR has_function_privilege('roleta_runtime',p.oid,'EXECUTE'))
+ ) THEN RAISE EXCEPTION 'Roleta function privilege unexpectedly exposed'; END IF;
+END $check$;
