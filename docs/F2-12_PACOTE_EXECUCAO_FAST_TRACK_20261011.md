@@ -9,13 +9,13 @@ Objetivo: função auditável funcionando com segurança, sem alterar Discador/M
 - Gate B: **off**. No route/automatic capture.
 - Do NOT rerun Gate A; migration `roleta_f2_12_private_storage_gate_a_20261011` is already applied.
 - Latest pre-package green baseline: `4f76e6c`, 5/5 CI.
-- New V2 verified server boundary: `server/prospective-v2-verified-boundary.cjs`, tests added.
+- New V2 verified server boundary: `server/prospective-v2-verified-boundary.cjs`, plus existing OAuth bridge `server/prospective-v2-google-http.cjs`; tests added.
 
 ## EXECUTION TRACK — follow gates in order, stop on first failure
 
 ### P0 — Freeze baseline and establish running app trust boundary (REQUIRED)
-1. Verify the actual Vercel auth middleware on the deployed Roleta app, its Google session verification and CSRF + origin handling. `session.verified` must be produced only by backend verification, never inferred from request/cookie text.
-2. Identify the **persisted server-side actor → authorized person IDs mapping**. A client-supplied `authorizedPersonIds`, actor, Google sub, or email must never become authority.
+1. **Existing code identified:** `auth/google.js` verifies signed Google session cookies and `server/prospective-evidence-http.cjs` validates origin + CSRF. New `server/prospective-v2-google-http.cjs` reuses these safeguards; verify Vercel production secrets/configuration before enabling a route. `session.verified` is assigned internally only after server verification, never accepted from browser data.
+2. **Outstanding P0 blocker:** identify or create the **persisted server-side actor → authorized person IDs mapping**. `prepareV2FromHttp(req,{loadAuthorizedPersonIds})` refuses to proceed without an ACL loader. A client-supplied list, actor, Google sub or email must never become authority.
 3. Choose backend database transport (Supabase connection pooler/server process/edge runtime), with a distinct protected credential. Never put `postgres`, `service_role` keys or direct SQL access in browser bundles.
 4. Do not unmask writes without all three prerequisites. Missing any item = stop at dry-run.
 
