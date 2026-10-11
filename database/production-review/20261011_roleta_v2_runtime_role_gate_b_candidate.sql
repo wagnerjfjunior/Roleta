@@ -33,6 +33,14 @@ BEGIN
  OR EXISTS (SELECT 1 FROM pg_roles WHERE rolname='roleta_v2_writer'
      AND (rolsuper OR rolbypassrls OR rolcreaterole OR rolcreatedb OR rolreplication))
  OR (SELECT rolpassword IS NOT NULL FROM pg_roles WHERE rolname='roleta_v2_writer')
- THEN RAISE EXCEPTION 'unsafe F2-12 runtime privileges/credential'; END IF;
+ THEN RAISE EXCEPTION 'unsafe F2-12 runtime privileges/credential (select %, insert %, update %, delete %, schema_create %, execute %, elevated %, has_password %)',
+ has_table_privilege('roleta_v2_writer','roleta_audit.prospective_evidence','SELECT'),
+ has_table_privilege('roleta_v2_writer','roleta_audit.prospective_evidence','INSERT'),
+ has_table_privilege('roleta_v2_writer','roleta_audit.prospective_evidence','UPDATE'),
+ has_table_privilege('roleta_v2_writer','roleta_audit.prospective_evidence','DELETE'),
+ has_schema_privilege('roleta_v2_writer','roleta_audit','CREATE'),
+ has_function_privilege('roleta_v2_writer','roleta_audit.append_authenticated_person_evidence_v2(text,text,text,text,text,text,text,text,jsonb)','EXECUTE'),
+ EXISTS (SELECT 1 FROM pg_roles WHERE rolname='roleta_v2_writer' AND (rolsuper OR rolbypassrls OR rolcreaterole OR rolcreatedb OR rolreplication)),
+ (SELECT rolpassword IS NOT NULL FROM pg_roles WHERE rolname='roleta_v2_writer'); END IF;
 END $postflight$;
 COMMIT;
