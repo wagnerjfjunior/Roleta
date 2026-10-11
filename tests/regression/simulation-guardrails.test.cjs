@@ -54,7 +54,7 @@ test('F2-12 physical lines 2 and 13 crossed out: draw balls remain 1..23, not 1.
  assert.equal(seenBall13,true);
  assert.equal(weekly.selfTest(Array.from({length:12},(_,i)=>({
   id:'gap-'+i,date:'2026-01-'+String(i+1).padStart(2,'0'),...template,
-  first:occupied[i],last:occupied[(i+7)%23],quality:'A'
+  period:i%2===0?'manha':'tarde',first:occupied[i],last:occupied[(i+7)%23],quality:'A'
  }))).pass,true);
 });
 
