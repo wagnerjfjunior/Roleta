@@ -85,6 +85,340 @@ BEGIN
   OR jsonb_typeof(p_payload->'revision_number') <> 'number'
   OR jsonb_typeof(p_payload->'physical_position') <> 'number'
  THEN RAISE EXCEPTION 'V2 person payload mismatch'; END IF;
+ -- Strict numeric and UTC encoding: PostgreSQL casts can otherwise accept
+ -- fractional revision values or permissive local timestamps.
+ IF p_payload->>'revision_number' !~ '^[1-9][0-9]*
+  v_position:=(p_payload->>'physical_position')::int;
+  v_generated:=(p_payload->>'generated_at')::timestamptz;
+  v_cutoff:=(p_payload->>'data_cutoff')::timestamptz;
+  v_frozen:=(p_payload->>'frozen_at')::timestamptz;
+ EXCEPTION WHEN others THEN
+  RAISE EXCEPTION 'invalid V2 typed fields'; 
+ END;
+ IF v_revision<1 OR v_position<1 OR v_generated IS NULL OR v_cutoff IS NULL
+    OR v_cutoff>v_generated OR v_generated>clock_timestamp()
+ THEN RAISE EXCEPTION 'invalid V2 temporal or revision fields'; END IF;
+ IF p_policy='WEEKLY_FROZEN' AND
+   (v_revision<>1 OR v_frozen IS NULL OR v_frozen<v_generated)
+ THEN RAISE EXCEPTION 'invalid frozen revision'; END IF;
+ IF p_policy='CURRENT_SHADOW' AND v_revision=1
+    AND p_payload->>'supersedes_recommendation_id' IS NOT NULL
+ THEN RAISE EXCEPTION 'initial shadow has predecessor'; END IF;
+ v_parent:=p_payload->>'supersedes_recommendation_id';
+ IF p_policy='CURRENT_SHADOW' AND v_revision>1 AND
+    (v_parent IS NULL OR v_parent !~ '^[A-Za-z0-9_-]{1,128}$')
+ THEN RAISE EXCEPTION 'missing shadow predecessor'; END IF;
+
+ -- Lock before idempotency and chain lookup. Matches trigger's advisory lock.
+ PERFORM pg_catalog.pg_advisory_xact_lock(1380731973,12);
+ SELECT * INTO v_existing FROM roleta_audit.prospective_evidence
+  WHERE idempotency_key=p_idempotency_key;
+ IF FOUND THEN
+  IF v_existing.request_sha256=p_request_sha256
+   AND v_existing.actor_subject=p_actor_subject
+   AND v_existing.recommendation_id=p_recommendation_id
+  THEN RETURN v_existing.id; END IF;
+  RAISE EXCEPTION 'idempotency conflict';
+ END IF;
+ IF EXISTS (SELECT 1 FROM roleta_audit.prospective_evidence
+            WHERE recommendation_id=p_recommendation_id)
+ THEN RAISE EXCEPTION 'recommendation ID conflict'; END IF;
+ IF v_parent IS NOT NULL THEN
+  SELECT id INTO v_supersedes FROM roleta_audit.prospective_evidence
+   WHERE recommendation_id=v_parent;
+  IF NOT FOUND THEN RAISE EXCEPTION 'unknown predecessor'; END IF;
+ END IF;
+ SELECT record_sha256 INTO v_previous
+ FROM roleta_audit.prospective_evidence ORDER BY id DESC LIMIT 1;
+ v_record:=encode(extensions.digest(
+   convert_to('rlt-chain-v2|'||coalesce(v_previous,'GENESIS')
+     ||'|'||p_request_sha256||'|'||p_actor_subject
+     ||'|'||p_recommendation_id,'UTF8'),'sha256'),'hex');
+
+ INSERT INTO roleta_audit.prospective_evidence(
+  event_id,kind,person_id,recommendation_id,policy,revision_number,
+  supersedes_id,physical_position,generated_at,data_cutoff,frozen_at,
+  idempotency_key,request_sha256,record_sha256,previous_record_sha256,
+  payload,actor_subject
+ ) VALUES(
+  p_event_id,'prediction',p_person_id,p_recommendation_id,p_policy,v_revision,
+  v_supersedes,v_position,v_generated,v_cutoff,v_frozen,
+  p_idempotency_key,p_request_sha256,v_record,v_previous,
+  p_payload,p_actor_subject
+ ) RETURNING id INTO v_inserted;
+ RETURN v_inserted;
+END $fn$;
+REVOKE ALL ON FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
+ text,text,text,text,text,text,text,text,jsonb)
+ FROM PUBLIC, anon, authenticated, service_role, roleta_runtime, roleta_append_owner;
+COMMIT;
+
+ OR p_payload->>'physical_position' !~ '^[1-9][0-9]*
+  v_position:=(p_payload->>'physical_position')::int;
+  v_generated:=(p_payload->>'generated_at')::timestamptz;
+  v_cutoff:=(p_payload->>'data_cutoff')::timestamptz;
+  v_frozen:=(p_payload->>'frozen_at')::timestamptz;
+ EXCEPTION WHEN others THEN
+  RAISE EXCEPTION 'invalid V2 typed fields'; 
+ END;
+ IF v_revision<1 OR v_position<1 OR v_generated IS NULL OR v_cutoff IS NULL
+    OR v_cutoff>v_generated OR v_generated>clock_timestamp()
+ THEN RAISE EXCEPTION 'invalid V2 temporal or revision fields'; END IF;
+ IF p_policy='WEEKLY_FROZEN' AND
+   (v_revision<>1 OR v_frozen IS NULL OR v_frozen<v_generated)
+ THEN RAISE EXCEPTION 'invalid frozen revision'; END IF;
+ IF p_policy='CURRENT_SHADOW' AND v_revision=1
+    AND p_payload->>'supersedes_recommendation_id' IS NOT NULL
+ THEN RAISE EXCEPTION 'initial shadow has predecessor'; END IF;
+ v_parent:=p_payload->>'supersedes_recommendation_id';
+ IF p_policy='CURRENT_SHADOW' AND v_revision>1 AND
+    (v_parent IS NULL OR v_parent !~ '^[A-Za-z0-9_-]{1,128}$')
+ THEN RAISE EXCEPTION 'missing shadow predecessor'; END IF;
+
+ -- Lock before idempotency and chain lookup. Matches trigger's advisory lock.
+ PERFORM pg_catalog.pg_advisory_xact_lock(1380731973,12);
+ SELECT * INTO v_existing FROM roleta_audit.prospective_evidence
+  WHERE idempotency_key=p_idempotency_key;
+ IF FOUND THEN
+  IF v_existing.request_sha256=p_request_sha256
+   AND v_existing.actor_subject=p_actor_subject
+   AND v_existing.recommendation_id=p_recommendation_id
+  THEN RETURN v_existing.id; END IF;
+  RAISE EXCEPTION 'idempotency conflict';
+ END IF;
+ IF EXISTS (SELECT 1 FROM roleta_audit.prospective_evidence
+            WHERE recommendation_id=p_recommendation_id)
+ THEN RAISE EXCEPTION 'recommendation ID conflict'; END IF;
+ IF v_parent IS NOT NULL THEN
+  SELECT id INTO v_supersedes FROM roleta_audit.prospective_evidence
+   WHERE recommendation_id=v_parent;
+  IF NOT FOUND THEN RAISE EXCEPTION 'unknown predecessor'; END IF;
+ END IF;
+ SELECT record_sha256 INTO v_previous
+ FROM roleta_audit.prospective_evidence ORDER BY id DESC LIMIT 1;
+ v_record:=encode(extensions.digest(
+   convert_to('rlt-chain-v2|'||coalesce(v_previous,'GENESIS')
+     ||'|'||p_request_sha256||'|'||p_actor_subject
+     ||'|'||p_recommendation_id,'UTF8'),'sha256'),'hex');
+
+ INSERT INTO roleta_audit.prospective_evidence(
+  event_id,kind,person_id,recommendation_id,policy,revision_number,
+  supersedes_id,physical_position,generated_at,data_cutoff,frozen_at,
+  idempotency_key,request_sha256,record_sha256,previous_record_sha256,
+  payload,actor_subject
+ ) VALUES(
+  p_event_id,'prediction',p_person_id,p_recommendation_id,p_policy,v_revision,
+  v_supersedes,v_position,v_generated,v_cutoff,v_frozen,
+  p_idempotency_key,p_request_sha256,v_record,v_previous,
+  p_payload,p_actor_subject
+ ) RETURNING id INTO v_inserted;
+ RETURN v_inserted;
+END $fn$;
+REVOKE ALL ON FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
+ text,text,text,text,text,text,text,text,jsonb)
+ FROM PUBLIC, anon, authenticated, service_role, roleta_runtime, roleta_append_owner;
+COMMIT;
+
+ OR p_payload->>'generated_at' !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]{1,3})?Z
+  v_position:=(p_payload->>'physical_position')::int;
+  v_generated:=(p_payload->>'generated_at')::timestamptz;
+  v_cutoff:=(p_payload->>'data_cutoff')::timestamptz;
+  v_frozen:=(p_payload->>'frozen_at')::timestamptz;
+ EXCEPTION WHEN others THEN
+  RAISE EXCEPTION 'invalid V2 typed fields'; 
+ END;
+ IF v_revision<1 OR v_position<1 OR v_generated IS NULL OR v_cutoff IS NULL
+    OR v_cutoff>v_generated OR v_generated>clock_timestamp()
+ THEN RAISE EXCEPTION 'invalid V2 temporal or revision fields'; END IF;
+ IF p_policy='WEEKLY_FROZEN' AND
+   (v_revision<>1 OR v_frozen IS NULL OR v_frozen<v_generated)
+ THEN RAISE EXCEPTION 'invalid frozen revision'; END IF;
+ IF p_policy='CURRENT_SHADOW' AND v_revision=1
+    AND p_payload->>'supersedes_recommendation_id' IS NOT NULL
+ THEN RAISE EXCEPTION 'initial shadow has predecessor'; END IF;
+ v_parent:=p_payload->>'supersedes_recommendation_id';
+ IF p_policy='CURRENT_SHADOW' AND v_revision>1 AND
+    (v_parent IS NULL OR v_parent !~ '^[A-Za-z0-9_-]{1,128}$')
+ THEN RAISE EXCEPTION 'missing shadow predecessor'; END IF;
+
+ -- Lock before idempotency and chain lookup. Matches trigger's advisory lock.
+ PERFORM pg_catalog.pg_advisory_xact_lock(1380731973,12);
+ SELECT * INTO v_existing FROM roleta_audit.prospective_evidence
+  WHERE idempotency_key=p_idempotency_key;
+ IF FOUND THEN
+  IF v_existing.request_sha256=p_request_sha256
+   AND v_existing.actor_subject=p_actor_subject
+   AND v_existing.recommendation_id=p_recommendation_id
+  THEN RETURN v_existing.id; END IF;
+  RAISE EXCEPTION 'idempotency conflict';
+ END IF;
+ IF EXISTS (SELECT 1 FROM roleta_audit.prospective_evidence
+            WHERE recommendation_id=p_recommendation_id)
+ THEN RAISE EXCEPTION 'recommendation ID conflict'; END IF;
+ IF v_parent IS NOT NULL THEN
+  SELECT id INTO v_supersedes FROM roleta_audit.prospective_evidence
+   WHERE recommendation_id=v_parent;
+  IF NOT FOUND THEN RAISE EXCEPTION 'unknown predecessor'; END IF;
+ END IF;
+ SELECT record_sha256 INTO v_previous
+ FROM roleta_audit.prospective_evidence ORDER BY id DESC LIMIT 1;
+ v_record:=encode(extensions.digest(
+   convert_to('rlt-chain-v2|'||coalesce(v_previous,'GENESIS')
+     ||'|'||p_request_sha256||'|'||p_actor_subject
+     ||'|'||p_recommendation_id,'UTF8'),'sha256'),'hex');
+
+ INSERT INTO roleta_audit.prospective_evidence(
+  event_id,kind,person_id,recommendation_id,policy,revision_number,
+  supersedes_id,physical_position,generated_at,data_cutoff,frozen_at,
+  idempotency_key,request_sha256,record_sha256,previous_record_sha256,
+  payload,actor_subject
+ ) VALUES(
+  p_event_id,'prediction',p_person_id,p_recommendation_id,p_policy,v_revision,
+  v_supersedes,v_position,v_generated,v_cutoff,v_frozen,
+  p_idempotency_key,p_request_sha256,v_record,v_previous,
+  p_payload,p_actor_subject
+ ) RETURNING id INTO v_inserted;
+ RETURN v_inserted;
+END $fn$;
+REVOKE ALL ON FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
+ text,text,text,text,text,text,text,text,jsonb)
+ FROM PUBLIC, anon, authenticated, service_role, roleta_runtime, roleta_append_owner;
+COMMIT;
+
+ OR p_payload->>'data_cutoff' !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]{1,3})?Z
+  v_position:=(p_payload->>'physical_position')::int;
+  v_generated:=(p_payload->>'generated_at')::timestamptz;
+  v_cutoff:=(p_payload->>'data_cutoff')::timestamptz;
+  v_frozen:=(p_payload->>'frozen_at')::timestamptz;
+ EXCEPTION WHEN others THEN
+  RAISE EXCEPTION 'invalid V2 typed fields'; 
+ END;
+ IF v_revision<1 OR v_position<1 OR v_generated IS NULL OR v_cutoff IS NULL
+    OR v_cutoff>v_generated OR v_generated>clock_timestamp()
+ THEN RAISE EXCEPTION 'invalid V2 temporal or revision fields'; END IF;
+ IF p_policy='WEEKLY_FROZEN' AND
+   (v_revision<>1 OR v_frozen IS NULL OR v_frozen<v_generated)
+ THEN RAISE EXCEPTION 'invalid frozen revision'; END IF;
+ IF p_policy='CURRENT_SHADOW' AND v_revision=1
+    AND p_payload->>'supersedes_recommendation_id' IS NOT NULL
+ THEN RAISE EXCEPTION 'initial shadow has predecessor'; END IF;
+ v_parent:=p_payload->>'supersedes_recommendation_id';
+ IF p_policy='CURRENT_SHADOW' AND v_revision>1 AND
+    (v_parent IS NULL OR v_parent !~ '^[A-Za-z0-9_-]{1,128}$')
+ THEN RAISE EXCEPTION 'missing shadow predecessor'; END IF;
+
+ -- Lock before idempotency and chain lookup. Matches trigger's advisory lock.
+ PERFORM pg_catalog.pg_advisory_xact_lock(1380731973,12);
+ SELECT * INTO v_existing FROM roleta_audit.prospective_evidence
+  WHERE idempotency_key=p_idempotency_key;
+ IF FOUND THEN
+  IF v_existing.request_sha256=p_request_sha256
+   AND v_existing.actor_subject=p_actor_subject
+   AND v_existing.recommendation_id=p_recommendation_id
+  THEN RETURN v_existing.id; END IF;
+  RAISE EXCEPTION 'idempotency conflict';
+ END IF;
+ IF EXISTS (SELECT 1 FROM roleta_audit.prospective_evidence
+            WHERE recommendation_id=p_recommendation_id)
+ THEN RAISE EXCEPTION 'recommendation ID conflict'; END IF;
+ IF v_parent IS NOT NULL THEN
+  SELECT id INTO v_supersedes FROM roleta_audit.prospective_evidence
+   WHERE recommendation_id=v_parent;
+  IF NOT FOUND THEN RAISE EXCEPTION 'unknown predecessor'; END IF;
+ END IF;
+ SELECT record_sha256 INTO v_previous
+ FROM roleta_audit.prospective_evidence ORDER BY id DESC LIMIT 1;
+ v_record:=encode(extensions.digest(
+   convert_to('rlt-chain-v2|'||coalesce(v_previous,'GENESIS')
+     ||'|'||p_request_sha256||'|'||p_actor_subject
+     ||'|'||p_recommendation_id,'UTF8'),'sha256'),'hex');
+
+ INSERT INTO roleta_audit.prospective_evidence(
+  event_id,kind,person_id,recommendation_id,policy,revision_number,
+  supersedes_id,physical_position,generated_at,data_cutoff,frozen_at,
+  idempotency_key,request_sha256,record_sha256,previous_record_sha256,
+  payload,actor_subject
+ ) VALUES(
+  p_event_id,'prediction',p_person_id,p_recommendation_id,p_policy,v_revision,
+  v_supersedes,v_position,v_generated,v_cutoff,v_frozen,
+  p_idempotency_key,p_request_sha256,v_record,v_previous,
+  p_payload,p_actor_subject
+ ) RETURNING id INTO v_inserted;
+ RETURN v_inserted;
+END $fn$;
+REVOKE ALL ON FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
+ text,text,text,text,text,text,text,text,jsonb)
+ FROM PUBLIC, anon, authenticated, service_role, roleta_runtime, roleta_append_owner;
+COMMIT;
+
+ OR (p_payload->>'frozen_at' IS NOT NULL AND
+     p_payload->>'frozen_at' !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}([.][0-9]{1,3})?Z
+  v_position:=(p_payload->>'physical_position')::int;
+  v_generated:=(p_payload->>'generated_at')::timestamptz;
+  v_cutoff:=(p_payload->>'data_cutoff')::timestamptz;
+  v_frozen:=(p_payload->>'frozen_at')::timestamptz;
+ EXCEPTION WHEN others THEN
+  RAISE EXCEPTION 'invalid V2 typed fields'; 
+ END;
+ IF v_revision<1 OR v_position<1 OR v_generated IS NULL OR v_cutoff IS NULL
+    OR v_cutoff>v_generated OR v_generated>clock_timestamp()
+ THEN RAISE EXCEPTION 'invalid V2 temporal or revision fields'; END IF;
+ IF p_policy='WEEKLY_FROZEN' AND
+   (v_revision<>1 OR v_frozen IS NULL OR v_frozen<v_generated)
+ THEN RAISE EXCEPTION 'invalid frozen revision'; END IF;
+ IF p_policy='CURRENT_SHADOW' AND v_revision=1
+    AND p_payload->>'supersedes_recommendation_id' IS NOT NULL
+ THEN RAISE EXCEPTION 'initial shadow has predecessor'; END IF;
+ v_parent:=p_payload->>'supersedes_recommendation_id';
+ IF p_policy='CURRENT_SHADOW' AND v_revision>1 AND
+    (v_parent IS NULL OR v_parent !~ '^[A-Za-z0-9_-]{1,128}$')
+ THEN RAISE EXCEPTION 'missing shadow predecessor'; END IF;
+
+ -- Lock before idempotency and chain lookup. Matches trigger's advisory lock.
+ PERFORM pg_catalog.pg_advisory_xact_lock(1380731973,12);
+ SELECT * INTO v_existing FROM roleta_audit.prospective_evidence
+  WHERE idempotency_key=p_idempotency_key;
+ IF FOUND THEN
+  IF v_existing.request_sha256=p_request_sha256
+   AND v_existing.actor_subject=p_actor_subject
+   AND v_existing.recommendation_id=p_recommendation_id
+  THEN RETURN v_existing.id; END IF;
+  RAISE EXCEPTION 'idempotency conflict';
+ END IF;
+ IF EXISTS (SELECT 1 FROM roleta_audit.prospective_evidence
+            WHERE recommendation_id=p_recommendation_id)
+ THEN RAISE EXCEPTION 'recommendation ID conflict'; END IF;
+ IF v_parent IS NOT NULL THEN
+  SELECT id INTO v_supersedes FROM roleta_audit.prospective_evidence
+   WHERE recommendation_id=v_parent;
+  IF NOT FOUND THEN RAISE EXCEPTION 'unknown predecessor'; END IF;
+ END IF;
+ SELECT record_sha256 INTO v_previous
+ FROM roleta_audit.prospective_evidence ORDER BY id DESC LIMIT 1;
+ v_record:=encode(extensions.digest(
+   convert_to('rlt-chain-v2|'||coalesce(v_previous,'GENESIS')
+     ||'|'||p_request_sha256||'|'||p_actor_subject
+     ||'|'||p_recommendation_id,'UTF8'),'sha256'),'hex');
+
+ INSERT INTO roleta_audit.prospective_evidence(
+  event_id,kind,person_id,recommendation_id,policy,revision_number,
+  supersedes_id,physical_position,generated_at,data_cutoff,frozen_at,
+  idempotency_key,request_sha256,record_sha256,previous_record_sha256,
+  payload,actor_subject
+ ) VALUES(
+  p_event_id,'prediction',p_person_id,p_recommendation_id,p_policy,v_revision,
+  v_supersedes,v_position,v_generated,v_cutoff,v_frozen,
+  p_idempotency_key,p_request_sha256,v_record,v_previous,
+  p_payload,p_actor_subject
+ ) RETURNING id INTO v_inserted;
+ RETURN v_inserted;
+END $fn$;
+REVOKE ALL ON FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
+ text,text,text,text,text,text,text,text,jsonb)
+ FROM PUBLIC, anon, authenticated, service_role, roleta_runtime, roleta_append_owner;
+COMMIT;
+)
+ THEN RAISE EXCEPTION 'invalid V2 number or UTC timestamp'; END IF;
  BEGIN
   v_revision:=(p_payload->>'revision_number')::int;
   v_position:=(p_payload->>'physical_position')::int;
