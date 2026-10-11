@@ -12,9 +12,6 @@ BEGIN
  IF to_regprocedure('roleta_audit.append_authenticated_person_evidence_v2(text,text,text,text,text,text,text,text,jsonb)') IS NULL THEN
    RAISE EXCEPTION 'Gate A.2 must be installed before runtime role';
  END IF;
- IF EXISTS (SELECT 1 FROM roleta_audit.prospective_evidence) THEN
-   RAISE EXCEPTION 'Gate B.0 is credential-less and requires zero preexisting rows';
- END IF;
 END $preflight$;
 -- LOGIN WITHOUT PASSWORD cannot authenticate over Supabase SCRAM.
 CREATE ROLE roleta_v2_writer
