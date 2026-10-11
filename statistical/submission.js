@@ -21,7 +21,7 @@ function prepare(reviewed,physicalByDraw,{source,acknowledged}={}){
  if(!date||!suffix)throw Error('Data ou período do sorteio inválido.');
  if(String(event.empreendimento||'').trim().toUpperCase()!=='CAMINHOS DA LAPA')throw Error('Empreendimento inválido.');
  if(!acknowledged)throw Error('Confirmação humana específica da estatística obrigatória.');
- if(typeof source!=='string'||!source.trim()||source.length>180)throw Error('Informe a origem da folha oficial.');
+ if(typeof source!=='string'||!source.trim()||source.length>180||!/^[-\\p{L}\\p{N} ._()]+$/u.test(source.trim())||/^[=+@]/.test(source.trim()))throw Error('Informe a origem da folha oficial.');
  if(!Array.isArray(physicalByDraw)||physicalByDraw.length!==rows.length)throw Error('Informe a posição física original de cada corretor.');
  const usedDraw=new Set(),usedPhysical=new Set(),mapping=[];
  for(let i=0;i<rows.length;i++){
