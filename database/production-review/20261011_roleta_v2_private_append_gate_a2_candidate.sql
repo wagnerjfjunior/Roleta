@@ -15,10 +15,10 @@ BEGIN
  THEN RAISE EXCEPTION 'V2 append already exists: do not overwrite'; END IF;
 END $preflight$;
 
--- For first roll-out the definer is the controlled database owner. Its EXECUTE
--- is revoked to PUBLIC and API/runtime roles in the creation transaction.
--- Replacing the definer with a narrowly owned append role is an outstanding
--- design gate before exposing the RPC; no runtime membership is granted here.
+-- Narrow function owner is roleta_append_owner: NOLOGIN, NOBYPASSRLS.
+-- Its only table permissions are SELECT/INSERT on this one private table,
+-- with matching table-specific RLS policies. It cannot access shared schemas.
+-- The function is deliberately NOT executable by any runtime/API role.
 CREATE FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
  p_canonical_bytes text,
  p_request_sha256 text,
@@ -32,7 +32,7 @@ CREATE FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
 ) RETURNS bigint
 LANGUAGE plpgsql SECURITY DEFINER
 SET search_path=pg_catalog
-SET row_security=off
+SET row_security=on
 AS $fn$
 DECLARE
  v_envelope jsonb;
@@ -153,7 +153,21 @@ BEGIN
  ) RETURNING id INTO v_inserted;
  RETURN v_inserted;
 END $fn$;
+-- Configuration occurs in this transaction so public EXECUTE is never
+-- committed. Temporary schema CREATE enables function ownership transfer;
+-- revoke it immediately, before COMMIT.
+GRANT USAGE ON SCHEMA roleta_audit TO roleta_append_owner;
+GRANT SELECT, INSERT ON TABLE roleta_audit.prospective_evidence TO roleta_append_owner;
+GRANT USAGE ON SEQUENCE roleta_audit.prospective_evidence_id_seq TO roleta_append_owner;
+CREATE POLICY roleta_append_owner_select ON roleta_audit.prospective_evidence
+ FOR SELECT TO roleta_append_owner USING (true);
+CREATE POLICY roleta_append_owner_insert ON roleta_audit.prospective_evidence
+ FOR INSERT TO roleta_append_owner WITH CHECK (true);
+GRANT CREATE ON SCHEMA roleta_audit TO roleta_append_owner;
+ALTER FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
+ text,text,text,text,text,text,text,text,jsonb) OWNER TO roleta_append_owner;
+REVOKE CREATE ON SCHEMA roleta_audit FROM roleta_append_owner;
 REVOKE ALL ON FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
  text,text,text,text,text,text,text,text,jsonb)
- FROM PUBLIC, anon, authenticated, service_role, roleta_runtime, roleta_append_owner;
+ FROM PUBLIC, anon, authenticated, service_role, roleta_runtime;
 COMMIT;
