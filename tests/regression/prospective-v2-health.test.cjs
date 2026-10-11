@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {createHandler}=require('../../api/prospective-v2-health.js');
+const {createHandler,diagnosticCode}=require('../../api/prospective-v2-health.js');
 function response(){const state={code:0,data:null};return {state,setHeader(){},status(code){state.code=code;return this;},json(data){state.data=data;return this;}};}
 const auth={requireSameOrigin:()=>true,session:()=>({sub:'ci-operator'}),csrfForSub:()=> 'ci-csrf'};
 const req={method:'POST',headers:{'x-roleta-csrf':'ci-csrf'}};
@@ -28,5 +28,21 @@ test('never disclose credentials, database errors or incorrect privileges',async
   const res=response();await createHandler({authenticate:auth,transport})(req,res);
   assert.equal(res.state.code,503);
   assert.doesNotMatch(JSON.stringify(res.state.data),/secret|password|roleta_v2_writer/i);
+ }
+});
+
+test('coarse diagnostic categories cannot reveal raw provider errors',()=>{
+ const cases=[
+  [{code:'28P01',message:'password authentication failed for user private'},'DATABASE_AUTH_REJECTED'],
+  [{code:'ENOTFOUND',message:'getaddrinfo ENOTFOUND private host'},'DATABASE_NETWORK_UNREACHABLE'],
+  [{code:'ETIMEDOUT',message:'connection timeout'},'DATABASE_TIMEOUT'],
+  [{code:'UNABLE_TO_VERIFY_LEAF_SIGNATURE',message:'certificate invalid'},'DATABASE_TLS_REJECTED'],
+  [{message:'F2-12 database credential not configured'},'DATABASE_CONFIGURATION_INVALID'],
+  [{message:'opaque password secret'},'DATABASE_CONNECTION_UNAVAILABLE']
+ ];
+ for(const [error,want] of cases){
+  const got=diagnosticCode(error);
+  assert.equal(got,want);
+  assert.doesNotMatch(got,/private|password|secret|host/i);
  }
 });
