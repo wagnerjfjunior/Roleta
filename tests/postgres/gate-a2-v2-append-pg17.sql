@@ -123,10 +123,38 @@ BEGIN
  WHERE n.nspname='roleta_audit' AND p.proname='append_authenticated_person_evidence_v2';
  IF f IS NULL OR EXISTS (
    SELECT 1 FROM pg_roles r WHERE rolname IN
-   ('anon','authenticated','service_role','roleta_runtime','roleta_append_owner')
+   ('anon','authenticated','service_role','roleta_runtime')
    AND has_function_privilege(r.oid,f,'EXECUTE')
  ) THEN RAISE EXCEPTION 'privileged RPC exposed'; END IF;
 END $perms$;
+
+-- A definer-owner can EXECUTE its own function; it must not have
+-- LOGIN, BYPASSRLS, schema CREATE, or permissions on shared schemas.
+DO $owner$
+DECLARE
+ v_owner text;
+BEGIN
+ SELECT p.proowner::regrole::text INTO v_owner FROM pg_proc p
+ JOIN pg_namespace n ON n.oid=p.pronamespace
+ WHERE n.nspname='roleta_audit' AND p.proname='append_authenticated_person_evidence_v2';
+ IF v_owner <> 'roleta_append_owner' THEN
+  RAISE EXCEPTION 'function has excessive owner: %',v_owner;
+ END IF;
+ IF (SELECT rolcanlogin OR rolbypassrls OR rolsuper FROM pg_roles
+ WHERE rolname='roleta_append_owner') THEN
+  RAISE EXCEPTION 'append owner unexpectedly privileged';
+ END IF;
+ IF NOT has_table_privilege('roleta_append_owner','roleta_audit.prospective_evidence','SELECT')
+ OR NOT has_table_privilege('roleta_append_owner','roleta_audit.prospective_evidence','INSERT')
+ OR has_table_privilege('roleta_append_owner','roleta_audit.prospective_evidence','UPDATE')
+ OR has_table_privilege('roleta_append_owner','roleta_audit.prospective_evidence','DELETE')
+ OR has_schema_privilege('roleta_append_owner','roleta_audit','CREATE')
+ THEN RAISE EXCEPTION 'append owner table/scheme permissions incorrect'; END IF;
+ IF (SELECT count(*) FROM pg_policies WHERE schemaname='roleta_audit'
+ AND tablename='prospective_evidence'
+ AND policyname IN ('roleta_append_owner_select','roleta_append_owner_insert')) <> 2
+ THEN RAISE EXCEPTION 'append owner RLS policies absent'; END IF;
+END $owner$;
 
 -- Reject format ambiguity even if a caller constructs a matching digest.
 DO $strict$
