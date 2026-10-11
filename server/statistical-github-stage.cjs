@@ -77,7 +77,7 @@ function makeGitHub(token,transport=fetch){
     'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json',
     'User-Agent':'Roleta-Stat-Gate-E'},...(body===undefined?{}:{body:JSON.stringify(body)})});
   const data=await r.json().catch(()=>({}));
-  if(!r.ok)throw Object.assign(Error('GitHub operation rejected'),{status:r.status===422||r.status===409?409:502});
+  if(!r.ok)throw Object.assign(Error('GitHub operation rejected'),{status:r.status===404?404:(r.status===422||r.status===409?409:502)});
   return data;
  };
 }
@@ -87,6 +87,33 @@ async function stageStatisticalSubmission(input,{actorSub,token,transport=fetch,
  const e=prepare(input.reviewed,input.physicalByDraw,{source:input.source,acknowledged:input.acknowledged});
  assertOfficial(input.reviewed,e);
  const gh=makeGitHub(token,transport);
+ const existingBranch='stat-intake/'+e.event_id;
+ // A network failure after ref/PR creation must not provoke a duplicate.
+ // Reuse an existing OPEN review only when its server-derived complete
+ // submission digest AND actor match the current request.
+ let branchExists=false;
+ try{await gh('GET','/git/ref/heads/'+existingBranch);branchExists=true;}
+ catch(error){if(error.status!==404)throw error;}
+ if(branchExists){
+  let proof;
+  try{
+   const existing=await gh('GET','/contents/data/intake-proofs/'+e.event_id+
+    '.json?ref='+encodeURIComponent(existingBranch));
+   proof=JSON.parse(Buffer.from(existing.content||'','base64').toString('utf8'));
+  }catch(error){throw Object.assign(Error('unverified existing staged branch'),{status:409});}
+  const digest=crypto.createHash('sha256').update(JSON.stringify(e)).digest('hex');
+  const actor=crypto.createHash('sha256').update(actorSub).digest('hex').slice(0,16);
+  if(proof.schema!=='rlt-statistical-proof-v1'||proof.payload_sha256!==digest||
+     proof.actor_hash!==actor||proof.event_id!==e.event_id)
+   throw Object.assign(Error('staged submission conflict'),{status:409});
+  const prs=await gh('GET','/pulls?state=open&base=main&head='+
+    encodeURIComponent('wagnerjfjunior:'+existingBranch));
+  if(!Array.isArray(prs)||prs.length!==1||typeof prs[0].number!=='number'||
+     !/^https:\/\/github\.com\/wagnerjfjunior\/Roleta\/pull\/\d+$/.test(prs[0].html_url||''))
+   throw Object.assign(Error('staged branch requires manual reconciliation'),{status:409});
+  return {status:'pending_review',event_id:e.event_id,pr_number:prs[0].number,
+   pr_url:prs[0].html_url,replayed:true};
+ }
  const main=await gh('GET','/git/ref/heads/main');
  const mainSha=main.object?.sha;
  if(!/^[a-f0-9]{40}$/.test(mainSha||''))throw Error('invalid main SHA');
