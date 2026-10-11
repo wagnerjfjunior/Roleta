@@ -59,7 +59,7 @@ CREATE TABLE roleta_audit.prospective_evidence (
      AND revision_number>=1 AND physical_position>0
      AND generated_at IS NOT NULL AND data_cutoff IS NOT NULL
      AND data_cutoff<=generated_at
-     AND (frozen_at IS NULL OR frozen_at<=generated_at)
+     AND (frozen_at IS NULL OR frozen_at>=generated_at)
      AND ((policy='WEEKLY_FROZEN' AND revision_number=1
            AND supersedes_id IS NULL AND frozen_at IS NOT NULL)
       OR (policy='CURRENT_SHADOW'
@@ -84,6 +84,66 @@ CREATE UNIQUE INDEX prospective_outcome_event_once
 
 ALTER TABLE roleta_audit.prospective_evidence ENABLE ROW LEVEL SECURITY;
 ALTER TABLE roleta_audit.prospective_evidence FORCE ROW LEVEL SECURITY;
+
+-- Append-only integrity trigger. This is a structural guard, NOT the
+-- authenticated writer. Dedicated server RPC, canonical hash verification
+-- and chain continuity remain a separate security review.
+CREATE FUNCTION roleta_audit.guard_prospective_evidence()
+RETURNS trigger
+LANGUAGE plpgsql SECURITY INVOKER SET search_path=pg_catalog
+AS $fn$
+DECLARE
+ v_previous roleta_audit.prospective_evidence%ROWTYPE;
+ v_last_rev integer;
+BEGIN
+ IF TG_OP<>'INSERT' THEN
+  RAISE EXCEPTION 'prospective evidence is append-only';
+ END IF;
+ -- Serialize integrity checks and lifecycle state for concurrent appends.
+ PERFORM pg_catalog.pg_advisory_xact_lock(1380731973,12);
+ IF NEW.kind='prediction' THEN
+  IF NEW.generated_at>NEW.received_at OR
+     (NEW.frozen_at IS NOT NULL AND NEW.frozen_at>NEW.received_at)
+  THEN RAISE EXCEPTION 'prediction timestamp is in the future'; END IF;
+  IF EXISTS (SELECT 1 FROM roleta_audit.prospective_evidence
+             WHERE event_id=NEW.event_id AND kind='outcome')
+  THEN RAISE EXCEPTION 'event already adjudicated'; END IF;
+  IF NEW.policy='CURRENT_SHADOW' THEN
+   SELECT max(revision_number) INTO v_last_rev
+    FROM roleta_audit.prospective_evidence
+    WHERE event_id=NEW.event_id AND person_id=NEW.person_id
+      AND kind='prediction' AND policy='CURRENT_SHADOW';
+   IF NEW.revision_number<>coalesce(v_last_rev,0)+1
+   THEN RAISE EXCEPTION 'nonsequential current revision'; END IF;
+   IF NEW.revision_number>1 THEN
+    SELECT * INTO v_previous FROM roleta_audit.prospective_evidence
+     WHERE id=NEW.supersedes_id;
+    IF NOT FOUND OR v_previous.event_id<>NEW.event_id
+       OR v_previous.person_id<>NEW.person_id
+       OR v_previous.policy<>'CURRENT_SHADOW'
+       OR v_previous.kind<>'prediction'
+       OR v_previous.revision_number<>NEW.revision_number-1
+       OR v_previous.frozen_at IS NOT NULL
+    THEN RAISE EXCEPTION 'invalid revision predecessor'; END IF;
+   END IF;
+   IF EXISTS (SELECT 1 FROM roleta_audit.prospective_evidence
+       WHERE event_id=NEW.event_id AND person_id=NEW.person_id
+         AND kind='prediction' AND policy='CURRENT_SHADOW'
+         AND frozen_at IS NOT NULL)
+   THEN RAISE EXCEPTION 'current track frozen'; END IF;
+  END IF;
+ ELSE
+  IF NOT EXISTS (SELECT 1 FROM roleta_audit.prospective_evidence
+       WHERE event_id=NEW.event_id AND kind='prediction')
+  THEN RAISE EXCEPTION 'outcome without prediction'; END IF;
+ END IF;
+ RETURN NEW;
+END $fn$;
+
+CREATE TRIGGER prospective_append_only_guard
+ BEFORE INSERT OR UPDATE OR DELETE ON roleta_audit.prospective_evidence
+ FOR EACH ROW EXECUTE FUNCTION roleta_audit.guard_prospective_evidence();
+REVOKE ALL ON FUNCTION roleta_audit.guard_prospective_evidence() FROM PUBLIC,anon,authenticated,service_role;
 
 -- Deliberately NO RLS policies, grants or executable append routines:
 -- even a privileged connector should not be wired until Gate B.
