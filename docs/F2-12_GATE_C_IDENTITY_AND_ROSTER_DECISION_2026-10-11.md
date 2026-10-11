@@ -1,6 +1,9 @@
 # F2-12 — Gate C: decisão de identidade, elegibilidade e fluxo de autorização
 Data: 2026-10-11. Estado: **DECISÃO ARQUITETURAL / EXECUÇÃO BLOQUEADA ATÉ PROVAS CANÔNICAS**.
 
+> **RETIFICAÇÃO OPERACIONAL (11/10/2026):** a hipótese deste documento de que existiria um snapshot de presença/posição física homologado **antes** do sorteio foi revogada após esclarecimento do processo real. A folha permanece aberta até 08:45:59 / 13:45:59, depois fica com quem sorteia e poderá ser fotografada apenas à noite ou em outro dia. Posição física 1 ≠ bolinha sorteada 1; ver `docs/ROLETA_PHYSICAL_LINE_DRAWN_BALL_FINAL_ORDER_CANONICAL.md`. Os itens abaixo descrevem o *gate de segurança implementado*, **não** um fluxo operacional exigível. O gate de F2-12 permanece bloqueante enquanto for redesenhado; Roleta Simples e ingestão histórica não dependem dele.
+
+
 ## Decisões
 
 1. **Operador:** identificar exclusivamente pelo `sub` da sessão Google assinada e verificada no servidor. E-mail é dado de exibição, **não** chave de autorização. Nenhum navegador define `actor_subject` livremente.
