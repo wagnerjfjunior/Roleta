@@ -16,12 +16,12 @@ const isoDate=(v)=>{
 const periodOf=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
 function prepare(reviewed,physicalByDraw,{source,acknowledged}={}){
  const event=reviewed?.evento,rows=reviewed?.salao;
- if(!event||!Array.isArray(rows)||!rows.length||rows.length>200)throw Error('SALÃO validado obrigatório.');
+ if(!event||!Array.isArray(rows)||rows.length<4||rows.length>200)throw Error('SALÃO validado obrigatório.');
  const date=isoDate(event.data),period=periodOf(event.periodo),suffix=SUFFIX[period];
  if(!date||!suffix)throw Error('Data ou período do sorteio inválido.');
  if(String(event.empreendimento||'').trim().toUpperCase()!=='CAMINHOS DA LAPA')throw Error('Empreendimento inválido.');
  if(!acknowledged)throw Error('Confirmação humana específica da estatística obrigatória.');
- if(typeof source!=='string'||!source.trim()||source.length>180||!/^[-\\p{L}\\p{N} ._()]+$/u.test(source.trim())||/^[=+@]/.test(source.trim()))throw Error('Informe a origem da folha oficial.');
+ if(typeof source!=='string'||!source.trim()||source.length>180||!/^[-\p{L}\p{N} ._()]+$/u.test(source.trim())||/^[=+@]/.test(source.trim()))throw Error('Informe a origem da folha oficial.');
  if(!Array.isArray(physicalByDraw)||physicalByDraw.length!==rows.length)throw Error('Informe a posição física original de cada corretor.');
  const usedDraw=new Set(),usedPhysical=new Set(),mapping=[];
  for(let i=0;i<rows.length;i++){
