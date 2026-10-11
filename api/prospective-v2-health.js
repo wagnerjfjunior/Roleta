@@ -6,10 +6,12 @@ const {getPool,databaseUrl}=require('../server/prospective-v2-db-transport.cjs')
 function diagnosticCode(error){
  const code=String(error?.code||'');
  const message=String(error?.message||'');
+ if(/trusted pooler CA PEM missing or invalid/.test(message)) return 'DATABASE_CA_CONFIGURATION_INVALID';
+ if(['42501','42883','42P01','3F000'].includes(code)) return 'DATABASE_SQL_PRIVILEGE_OR_SCHEMA_ERROR';
  if(['28P01','28000'].includes(code)||/password authentication failed|no pg_hba\.conf entry/i.test(message))
   return 'DATABASE_AUTH_REJECTED';
- if(/^CERT_|^ERR_TLS_|^UNABLE_TO_VERIFY|^DEPTH_ZERO_SELF_SIGNED_CERT/.test(code)
-    ||/certificate verify failed|self.signed certificate|certificate has expired|hostname.*certificate/i.test(message))
+ if(/^CERT_|^ERR_TLS_|^UNABLE_TO_VERIFY|^UNABLE_TO_GET_|^DEPTH_ZERO_SELF_SIGNED_CERT|^ERR_SSL_/.test(code)
+    ||/certificate verify failed|self.signed certificate|certificate has expired|hostname.*certificate|unable to get local issuer certificate|unable to verify the first certificate/i.test(message))
   return 'DATABASE_TLS_REJECTED';
  if(['ENOTFOUND','EAI_AGAIN','ECONNREFUSED','ENETUNREACH','EHOSTUNREACH'].includes(code))
   return 'DATABASE_NETWORK_UNREACHABLE';
