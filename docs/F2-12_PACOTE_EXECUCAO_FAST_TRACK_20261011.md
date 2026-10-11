@@ -5,7 +5,7 @@ Objetivo: função auditável funcionando com segurança, sem alterar Discador/M
 
 ## Estado comprovado
 - Gate A: **implantado** em Supabase `uobxxgzshrmbtjfdolxd`, schema `roleta_audit`, RLS FORCE e papéis dedicados.
-- Gate A.2 SQL: **candidate tested only in disposable PostgreSQL 17**; NOT applied to production.
+- Gate A.2: **APPLIED AND POSTCHECKED IN PRODUCTION** as migration `roleta_f2_12_gate_a2_private_append_v2_20261011`; see `docs/F2-12_GATE_A2_PRODUCTION_DEPLOYMENT_20261011.md`. No application EXECUTE grants; live writes OFF.
 - Gate B: **off**. No route/automatic capture.
 - Do NOT rerun Gate A; migration `roleta_f2_12_private_storage_gate_a_20261011` is already applied.
 - Latest pre-package green baseline: `4f76e6c`, 5/5 CI.
@@ -31,9 +31,9 @@ Run `database/production-review/F2_12_GATE_A2_PREFLIGHT_READONLY.sql` through Su
 Confirm `postgres` migration role can transfer function owner to `roleta_append_owner` in shared Supabase; disposable PG superuser success does not prove production transfer.
 Take schema/grant snapshots + validate backup restoration capability before permission changes.
 
-### P3 — Gate A.2 *function-only* migration (REQUIRES P0/P1/P2 PASS)
+### P3 — Gate A.2 *function-only* migration (COMPLETE; DO NOT REAPPLY)
 Source: `database/production-review/20261011_roleta_v2_private_append_gate_a2_candidate.sql`.
-Apply ONCE via Supabase migration API with a unique descriptive name.
+Applied via Supabase migration API and independently checked on 2026-10-11. **Never reapply**; original preflight rejects duplicate. The PostgreSQL 17 SET ROLE transfer was corrected transactionally and its grant restored before COMMIT.
 This migration creates a private function owned by a restricted NOLOGIN NOBYPASSRLS role, RLS policies, and narrow table SELECT/INSERT + identity-sequence rights for that role. It provides **no EXECUTE grants** to app users, `service_role`, `authenticated` or `roleta_runtime`.
 Immediately verify pg_proc.proowner, pg_proc.prosecdef, pg_policies, RLS FORCE, function ACL, schema USAGE denial to client roles, zero rows. If any postcheck fails, stop and disable; do not go to Gate B.
 
@@ -57,4 +57,4 @@ Immediately verify pg_proc.proowner, pg_proc.prosecdef, pg_policies, RLS FORCE, 
 - dashboard/inspector reflects persisted rows and verifiable hashes;
 - Gate B canary authorized and successful, with rollback/disable proven.
 
-The package is **execution-ready as a gated runbook, NOT a claim that all deployment prerequisites have been satisfied**.
+The storage and function migration are deployed, but the Vercel Google-sub→broker ACL and dedicated least-privilege backend SQL credential/endpoint are not configured. The package is **NOT yet a functioning Gate B writer**.
