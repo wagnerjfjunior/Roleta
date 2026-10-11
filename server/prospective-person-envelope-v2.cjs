@@ -25,7 +25,7 @@ function preparePersonEvidenceV2({session,authorizedPersonIds,body}={}){
  const envelope={
   version:VERSION,actor_subject,event_id:checked.body.event_id,
   kind:'prediction',policy:checked.body.policy,
-  person_id:person.person_id,revision_number:person.revision_number,
+  person_id:person.person_id,recommendation_id:person.recommendation_id,revision_number:person.revision_number,
   idempotency_key:checked.body.idempotency_key,payload:checked.body.payload
  };
  const bytes=canonical(envelope);
@@ -33,7 +33,7 @@ function preparePersonEvidenceV2({session,authorizedPersonIds,body}={}){
  return Object.freeze({
   version:VERSION,canonical_bytes:bytes,
   request_sha256:crypto.createHash('sha256').update(bytes,'utf8').digest('hex'),
-  actor_subject,person_id:person.person_id,revision_number:person.revision_number,
+  actor_subject,person_id:person.person_id,recommendation_id:person.recommendation_id,revision_number:person.revision_number,
   event_id:checked.body.event_id,policy:checked.body.policy
  });
 }
