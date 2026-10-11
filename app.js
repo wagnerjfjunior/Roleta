@@ -354,8 +354,10 @@ async function init(){
       if(!r.ok)throw new Error('Falha ao carregar '+s.path);
       return parseCSV(await r.text()).map(eventFromRow).filter(e=>e.N>0);
     }));
-    const byId=new Map();chunks.flat().forEach(e=>byId.set(e.id,e));
-    state.events=[...byId.values()];
+    // Never silently replace an existing canonical roulette on duplicate ID.
+    // Late import retains the original event date; Git manifest is authority.
+    if(!window.RoletaCanonicalDataset)throw Error('Validador canônico indisponível.');
+    state.events=window.RoletaCanonicalDataset.mergeManifestEvents(chunks,manifest);
     render();
     await upgradeWorkspace();
     document.dispatchEvent(new CustomEvent('roleta:workspace-ready',{detail:{events:state.events}}));
