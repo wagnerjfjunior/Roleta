@@ -62,7 +62,7 @@ function assertUniqueEvent(manifest,sourceRows,e){
    const period=String(row['Período']||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
    const date=String(row.Data||'');
    const k=date+'|'+period;
-   if(id===e.event_id||k===(e.event_date.slice(8,10)+'/'+e.event_date.slice(5,7)+'/'+e.event_date.slice(0,4))+'|'+e.period)
+   if(id===e.event_id||(date===(e.event_date.slice(8,10)+'/'+e.event_date.slice(5,7)+'/'+e.event_date.slice(0,4))&&period==='desconhecido')||k===(e.event_date.slice(8,10)+'/'+e.event_date.slice(5,7)+'/'+e.event_date.slice(0,4))+'|'+e.period)
     throw Object.assign(Error('event already registered; correction requires separate review'),{status:409});
    if(seen.has(id)&&seen.get(id)!==JSON.stringify(row))throw Error('historical collision');
    seen.set(id,JSON.stringify(row));
