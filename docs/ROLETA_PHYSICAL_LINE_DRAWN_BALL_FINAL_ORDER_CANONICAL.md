@@ -6,7 +6,7 @@
 
 ## 1. Três conceitos distintos
 
-1. **Posição física pré-sorteio** (`posicao_fisica`): índice da linha **ocupada** pelo corretor na lista física pré-sorteio, numerada de 1 até N participantes elegíveis do SALÃO. Não é resultado nem ordem de atendimento. Linhas vazias/riscadas não recebem bolinha; a numeração das linhas ocupadas deve ser contínua, sem reutilizar índices originais de linhas vazias.
+1. **Posição física pré-sorteio** (`posicao_fisica`): número da linha da folha física pré-sorteio em que o corretor consta. Não é resultado nem ordem de atendimento. Em folhas históricas com linhas vazias/riscadas, a numeração física original pode conter lacunas (por exemplo, linhas ocupadas 1, 2, 4 e 10). Linhas vazias não recebem bolinha; a **ordem efetiva das linhas ocupadas** é outro índice, consecutivo de 1 até N, sem renomear nem perder a numeração física da fonte.
 2. **Número da bolinha sorteada** (`numero_sorteado`): número atribuído ao corretor no sorteio; não se deduz da posição física. A bolinha 1 determina o primeiro atendimento, a bolinha 10 determina o décimo atendimento, e assim por diante, conforme as regras operacionais aplicáveis.
 3. **Ordem final de atendimento** (`ordem_final`): posição ocupada pelo corretor na roleta final publicada após o sorteio. Neste fluxo do SALÃO, segue a ordem das bolinhas: a pessoa que recebe a bolinha 1 ocupa a primeira posição final, a pessoa que recebe a bolinha 10 ocupa a décima. Apesar de coincidirem numericamente quando o sorteio determina diretamente a sequência, número sorteado e posição física **nunca** são sinônimos.
 
@@ -47,7 +47,7 @@ Assim:
 
 ## 4. Invariantes de domínio para futuras implementações e testes
 
-- Para N corretores do SALÃO que efetivamente participam da permutação, `posicao_fisica` deve identificar cada uma das N linhas ocupadas de modo único no evento; a sequência relevante é 1..N.
+- Para N corretores do SALÃO que efetivamente participam da permutação, `posicao_fisica` identifica N linhas físicas distintas, **não necessariamente contíguas**. A ordem efetiva compactada das N linhas ocupadas é 1..N; a bolinha sorteada é uma permutação de 1..N associada às linhas físicas, sem renomeá-las.
 - Para um sorteio plenamente conhecido, a correspondência corretor → bolinha sorteada é uma permutação completa dos números 1..N: nenhum número duplicado ou ausente. A ordem final reflete o resultado, não a ordem de assinatura.
 - **É inválido inferir** `numero_sorteado = posicao_fisica`. A coincidência pode ocorrer por acaso, nunca por regra.
 - **É inválido inferir** que quem estava na posição física 1 deva limpar/imprimir/compartilhar. Essa responsabilidade pertence a quem recebeu a bolinha 1.
@@ -70,5 +70,7 @@ A F2-12, porém, trata de **previsões prospectivas**, não da operação ou bac
 3. Teste da mesma roleta importada em D+1 e novamente no mesmo dia: um único evento histórico e timestamp de importação preservado.
 4. Teste de reimpressão e compartilhamento sem nova inclusão estatística.
 5. Segregação entre registros de previsão pré-sorteio, dados operacionais após sorteio e base histórica validada.
+
+**Verificação de compatibilidade histórica:** `data/events.csv` mantém campos distintos `Nº1 físico` e `Nº1 ordem efetiva` (por exemplo, o registro P02 contém posição física 17 e ordem efetiva 16). O motor `simulation/engine.js` preserva as lacunas da folha e atribui bolinhas 1..N apenas aos ocupantes. A descrição original de linhas físicas necessariamente consecutivas foi corrigida para não apagar essa distinção.
 
 **Referências internas:** `docs/PRINT_TEMPLATE_V2.md`, `docs/F2-12_GATE_C_IDENTITY_AND_ROSTER_DECISION_2026-10-11.md` (premissa pré-sorteio substituída por este registro de domínio).
