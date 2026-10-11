@@ -10,6 +10,9 @@ function assertPreDraw(command,{now=()=>Date.now()}={}){
  const m=ID.exec(eventId||'');
  if(!m||m[2]==='integral')throw Error('unsupported target event cutoff');
  const date=m[1],time=m[2]==='manha'?'08:46':'13:46';
+ // Weekends are one integral draw; this weekday-only gate must fail closed.
+ const weekday=new Date(date+'T12:00:00Z').getUTCDay();
+ if(weekday===0||weekday===6)throw Error('weekend target event cutoff not configured');
  if(!/^2026-/.test(date))throw Error('unconfigured operational calendar');
  const cutoff=Date.parse(date+'T'+time+':00-03:00');
  if(!Number.isFinite(cutoff)||date!==new Date(cutoff-3*3600000).toISOString().slice(0,10))
