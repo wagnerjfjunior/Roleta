@@ -351,7 +351,7 @@
         const rows=[...reviewedPayload.salao].sort((a,b)=>Number(a.ordem_final)-Number(b.ordem_final));
         const physical=[...statRows.querySelectorAll('.rlt-stat-physical')].map(x=>x.value);
         // Blank input stays invalid: do not convert "" to Number(0).
-        if(physical.some(x=>!/^\\d+$/.test(x.trim())))throw Error('Informe cada linha física da folha original.');
+        if(physical.some(x=>!/^\d+$/.test(x.trim())))throw Error('Informe cada linha física da folha original.');
         const checked={...reviewedPayload,salao:rows};
         if(!window.RoletaStatisticalSubmission)throw Error('Validador estatístico indisponível.');
         const prepared=window.RoletaStatisticalSubmission.prepare(checked,physical,{
