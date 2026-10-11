@@ -14,6 +14,8 @@ function createHandler({env=process.env,authenticate=auth,stage=stageStatistical
   if(!authenticate.requireSameOrigin(req))return res.status(403).json({error:'Origem não autorizada.'});
   let session;try{session=authenticate.session(req);}catch{}
   if(!session)return res.status(401).json({error:'Entre com Google para submeter a roleta.'});
+  const allowedSubs=String(env.ROLETA_STAT_ALLOWED_SUBS||'').split(',').map(x=>x.trim()).filter(Boolean);
+  if(!allowedSubs.includes(session.sub))return res.status(403).json({error:'Operador não autorizado a incluir estatísticas.'});
   const provided=req.headers?.['x-roleta-csrf'];
   const expected=Buffer.from(authenticate.csrfForSub(session.sub));
   const supplied=typeof provided==='string'?Buffer.from(provided):Buffer.alloc(0);
@@ -24,6 +26,7 @@ function createHandler({env=process.env,authenticate=auth,stage=stageStatistical
    if(String(req.headers?.['content-type']||'').split(';')[0].trim().toLowerCase()!=='application/json')
     return res.status(415).json({error:'JSON obrigatório.'});
    const input=typeof req.body==='string'?JSON.parse(req.body):req.body;
+   if(Buffer.byteLength(JSON.stringify(input),'utf8')>150000)return res.status(413).json({error:'Arquivo excede limite.'});
    if(!input||Array.isArray(input)||typeof input!=='object'||!input.acknowledged||
       typeof input.source!=='string'||!Array.isArray(input.physicalByDraw))
     return res.status(422).json({error:'Conferência física e fonte oficial obrigatórias.'});
