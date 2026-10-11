@@ -8,7 +8,7 @@ const base={
  event_id:'2026-10-12-manha',kind:'prediction',policy:'WEEKLY_FROZEN',
  idempotency_key:'person-evidence-ci-00001',
  payload:{
-  person_id:'wagner',revision_number:1,supersedes_recommendation_id:null,
+  recommendation_id:'ci-recommendation-wagner-1',person_id:'wagner',revision_number:1,supersedes_recommendation_id:null,
   physical_position:14,generated_at:'2026-10-11T19:00:00Z',
   data_cutoff:'2026-10-11T18:00:00Z',frozen_at:'2026-10-11T19:00:00Z'
  }
@@ -20,10 +20,12 @@ test('V2 envelope cryptographically binds session, person, policy and revision',
  assert.equal(env.version,VERSION);
  assert.equal(env.actor_subject,'google:verified-google-sub');
  assert.equal(env.person_id,'wagner');
+ assert.equal(env.payload.recommendation_id,'ci-recommendation-wagner-1');
  assert.equal(env.revision_number,1);
  assert.equal(result.request_sha256,crypto.createHash('sha256').update(canonical(env)).digest('hex'));
  assert.notEqual(result.request_sha256,prepare(base,{...session,sub:'other-sub'}).request_sha256);
  assert.notEqual(result.request_sha256,prepare({...base,payload:{...base.payload,person_id:'laura'}}).request_sha256);
+ assert.notEqual(result.request_sha256,prepare({...base,payload:{...base.payload,recommendation_id:'ci-recommendation-wagner-2'}}).request_sha256);
 });
 test('V2 preparation denies unauthorized person, forgery and absent authorization',()=>{
  assert.throws(()=>prepare({...base,payload:{...base.payload,person_id:'outsider'}}),/not authorized/);
