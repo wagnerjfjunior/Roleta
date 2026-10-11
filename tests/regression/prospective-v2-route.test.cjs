@@ -44,7 +44,7 @@ test('server cutoff keeps date-bound morning window and rejects late predictions
 test('HTTP path records a verified append and preserves idempotent SQL evidence ID',async()=>{
  let writes=0;const h=createHandler({env,loadAcl:()=>new Set(['brenda']),prepare:async(req,{loadAuthorizedPersonIds})=>{
   assert.equal(loadAuthorizedPersonIds().has('brenda'),true);return cmd;
- },assertEvent:()=>true,append:async()=>{writes++;return '42';}});
+ },assertEvent:()=>true,authorizeRoster:async()=>true,append:async()=>{writes++;return '42';}});
  const res=result();await h({method:'POST'},res);
  assert.equal(res.state.status,201);assert.equal(res.state.body.evidence_id,'42');assert.equal(writes,1);
 });
