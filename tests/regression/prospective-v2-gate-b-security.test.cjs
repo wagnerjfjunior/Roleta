@@ -74,6 +74,7 @@ test('DB transport accepts only canonical function call with nine bound paramete
  const cmd=buildPersonAppendCommand({session,authorizedPersonIds:new Set(['broker_001']),body});
  assert.equal(await appendV2(cmd,{env,getPoolFn:()=>pool}),'31');
  await assert.rejects(appendV2({...cmd,sql:'DELETE FROM roleta_audit.prospective_evidence'},{env,getPoolFn:()=>pool}),/unsupported/);
+ await assert.rejects(appendV2({...cmd,sql:cmd.sql+'; DELETE FROM roleta_audit.prospective_evidence'},{env,getPoolFn:()=>pool}),/unsupported/);
  await assert.rejects(appendV2({...cmd,params:[...cmd.params,'extra']},{env,getPoolFn:()=>pool}),/unsupported/);
  await assert.rejects(appendV2(cmd,{env:{...env,ROLETA_V2_WRITES_ENABLED:'false'},getPoolFn:()=>pool}),/disabled/);
  assert.equal(calls,1);
