@@ -177,7 +177,7 @@ BEGIN
 END $role_gate$;
 GRANT roleta_append_owner TO postgres WITH SET TRUE;
 ALTER FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
- text,text,text,text,text,text,text,jsonb) OWNER TO roleta_append_owner;
+ text,text,text,text,text,text,text,text,jsonb) OWNER TO roleta_append_owner;
 GRANT roleta_append_owner TO postgres WITH SET FALSE;
 REVOKE CREATE ON SCHEMA roleta_audit FROM roleta_append_owner;
 REVOKE ALL ON FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
