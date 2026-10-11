@@ -61,7 +61,7 @@ BEGIN
     OR p_payload IS NULL OR jsonb_typeof(p_payload)<>'object'
     OR octet_length(p_payload::text)>65536
  THEN RAISE EXCEPTION 'invalid V2 append envelope'; END IF;
- IF encode(extensions.digest(convert_to(p_canonical_bytes,'UTF8'),'sha256'),'hex')
+ IF encode(pg_catalog.sha256(convert_to(p_canonical_bytes,'UTF8')),'hex')
        <> p_request_sha256
  THEN RAISE EXCEPTION 'V2 request digest mismatch'; END IF;
  BEGIN
@@ -135,10 +135,10 @@ BEGIN
  END IF;
  SELECT record_sha256 INTO v_previous
  FROM roleta_audit.prospective_evidence ORDER BY id DESC LIMIT 1;
- v_record:=encode(extensions.digest(
+ v_record:=encode(pg_catalog.sha256(
    convert_to('rlt-chain-v2|'||coalesce(v_previous,'GENESIS')
      ||'|'||p_request_sha256||'|'||p_actor_subject
-     ||'|'||p_recommendation_id,'UTF8'),'sha256'),'hex');
+     ||'|'||p_recommendation_id,'UTF8')),'hex');
 
  INSERT INTO roleta_audit.prospective_evidence(
   event_id,kind,person_id,recommendation_id,policy,revision_number,
