@@ -64,10 +64,12 @@ BEGIN
  BEGIN
  INSERT INTO roleta_audit.prospective_evidence
  (event_id,kind,person_id,policy,revision_number,physical_position,generated_at,data_cutoff,
- frozen_at,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
- VALUES('CI-TEAM','prediction','wagner','CURRENT_SHADOW',2,10,'2026-10-10T19:00Z',
- '2026-10-10T18:00Z',NULL,'ci-gate-a-duplicate-current2',
- repeat('5',64),repeat('6',64),'{}','ci');
+ frozen_at,supersedes_id,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
+ SELECT 'CI-TEAM','prediction','wagner','CURRENT_SHADOW',2,10,'2026-10-10T19:00Z',
+ '2026-10-10T18:00Z',NULL,id,'ci-gate-a-duplicate-current2',
+ repeat('5',64),repeat('6',64),'{}','ci'
+ FROM roleta_audit.prospective_evidence
+ WHERE event_id='CI-TEAM' AND person_id='wagner' AND policy='CURRENT_SHADOW' AND revision_number=1;
  RAISE EXCEPTION 'duplicate revision accepted';
  EXCEPTION WHEN unique_violation THEN NULL;
  END;
