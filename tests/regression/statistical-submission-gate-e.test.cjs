@@ -71,7 +71,7 @@ test('enabled Gate E requires trusted Google sub, same origin and CSRF',async()=
   return {state,setHeader(){},status(v){state.status=v;return this;},json(v){state.data=v;return this;}};};
  const request={method:'POST',headers:{'content-type':'application/json','x-roleta-csrf':'secret'},
   body:input};
- const stage=async(args)=>{staged++;assert.equal(args.actorSub,'operator-1');
+ const stage=async(_input,options)=>{staged++;assert.equal(options.actorSub,'operator-1');
   return {status:'pending_review',event_id:'2026-10-11-I',pr_number:999,pr_url:'https://github.com/wagnerjfjunior/Roleta/pull/999'};};
  let r=makeRes();await createHandler({env,authenticate:auth,stage})(request,r);assert.equal(r.state.status,202);
  r=makeRes();await createHandler({env:{...env,ROLETA_STAT_ALLOWED_SUBS:'other'},authenticate:auth,stage})(request,r);assert.equal(r.state.status,403);
