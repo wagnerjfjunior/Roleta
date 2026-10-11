@@ -1,6 +1,7 @@
 'use strict';
 // Dedicated server-only DB client; never use postgres, service_role or anon.
 let pool;
+const ALLOWED_APPEND_SQL='SELECT roleta_audit.append_authenticated_person_evidence_v2($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb) AS evidence_id';
 function databaseUrl(env=process.env){
  const url=env.ROLETA_V2_DATABASE_URL;
  if(typeof url!=='string'||!url)throw Error('F2-12 database credential not configured');
@@ -41,7 +42,7 @@ function getPool({env=process.env,loadPg=()=>require('pg')}={}){
 async function appendV2(command,{env=process.env,getPoolFn=getPool}={}){
  if(env.ROLETA_V2_WRITES_ENABLED!=='true')throw Error('F2-12 writes disabled');
  if(!command||typeof command.sql!=='string'||!Array.isArray(command.params)||command.params.length!==9
-   ||!command.sql.startsWith('SELECT roleta_audit.append_authenticated_person_evidence_v2('))
+   ||command.sql!==ALLOWED_APPEND_SQL)
   throw Error('unsupported F2-12 SQL');
  // Validate credential even if pool is injected; never silently use admin.
  databaseUrl(env);

@@ -203,3 +203,85 @@ BEGIN
     AND m.member='postgres'::regrole AND m.set_option
  ) THEN RAISE EXCEPTION 'temporary SET ROLE option leaked after migration'; END IF;
 END $membership$;
+
+
+-- Gate B negative transaction proofs (CI disposable database only).
+DO $gate_b_negative$
+DECLARE
+ p jsonb;
+ e jsonb;
+ wire text;
+ h text;
+ n_before bigint;
+ n_after bigint;
+BEGIN
+ IF current_database()<>'roleta_gate_a_ci' THEN
+  RAISE EXCEPTION 'Gate B negative tests may only run in disposable CI DB';
+ END IF;
+ SELECT count(*) INTO n_before FROM roleta_audit.prospective_evidence;
+
+ -- Same idempotency key but modified valid envelope MUST fail atomically.
+ SELECT payload INTO p FROM roleta_audit.prospective_evidence
+ WHERE recommendation_id='ci-v2-wagner-weekly';
+ p:=jsonb_set(p,'{recommendation_id}','"ci-v2-wagner-weekly-conflict"');
+ e:=jsonb_build_object(
+  'version','rlt-person-evidence-v2','actor_subject','google:ci-operator',
+  'event_id','CI-V2-TEAM','kind','prediction','policy','WEEKLY_FROZEN',
+  'person_id','wagner','recommendation_id','ci-v2-wagner-weekly-conflict',
+  'revision_number',1,'idempotency_key','ci-v2-wagner-weekly-01','payload',p);
+ wire:=e::text;
+ h:=encode(extensions.digest(convert_to(wire,'UTF8'),'sha256'),'hex');
+ BEGIN
+  PERFORM roleta_audit.append_authenticated_person_evidence_v2(
+   wire,h,'google:ci-operator','CI-V2-TEAM','wagner',
+   'ci-v2-wagner-weekly-conflict','WEEKLY_FROZEN','ci-v2-wagner-weekly-01',p);
+  RAISE EXCEPTION 'Gate B accepted conflicting idempotency key';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM<>'idempotency conflict' THEN RAISE; END IF;
+ END;
+
+ -- A legitimate first shadow revision for a second person.
+ SELECT payload INTO p FROM roleta_audit.prospective_evidence
+ WHERE recommendation_id='ci-v2-wagner-shadow1';
+ p:=jsonb_set(jsonb_set(p,'{person_id}','"laura"'),
+  '{recommendation_id}','"ci-v2-laura-shadow1"');
+ e:=jsonb_build_object(
+  'version','rlt-person-evidence-v2','actor_subject','google:ci-operator',
+  'event_id','CI-V2-TEAM','kind','prediction','policy','CURRENT_SHADOW',
+  'person_id','laura','recommendation_id','ci-v2-laura-shadow1',
+  'revision_number',1,'idempotency_key','ci-v2-laura-shadow-01','payload',p);
+ wire:=e::text;
+ h:=encode(extensions.digest(convert_to(wire,'UTF8'),'sha256'),'hex');
+ PERFORM roleta_audit.append_authenticated_person_evidence_v2(
+  wire,h,'google:ci-operator','CI-V2-TEAM','laura',
+  'ci-v2-laura-shadow1','CURRENT_SHADOW','ci-v2-laura-shadow-01',p);
+
+ -- Revision 2 cannot supersede another person's chain even if the parent exists.
+ p:=jsonb_set(jsonb_set(jsonb_set(p,
+  '{recommendation_id}','"ci-v2-laura-shadow2-invalid"'),
+  '{revision_number}','2'::jsonb),
+  '{supersedes_recommendation_id}','"ci-v2-wagner-shadow1"');
+ e:=jsonb_build_object(
+  'version','rlt-person-evidence-v2','actor_subject','google:ci-operator',
+  'event_id','CI-V2-TEAM','kind','prediction','policy','CURRENT_SHADOW',
+  'person_id','laura','recommendation_id','ci-v2-laura-shadow2-invalid',
+  'revision_number',2,'idempotency_key','ci-v2-laura-shadow-02','payload',p);
+ wire:=e::text;
+ h:=encode(extensions.digest(convert_to(wire,'UTF8'),'sha256'),'hex');
+ BEGIN
+  PERFORM roleta_audit.append_authenticated_person_evidence_v2(
+   wire,h,'google:ci-operator','CI-V2-TEAM','laura',
+   'ci-v2-laura-shadow2-invalid','CURRENT_SHADOW','ci-v2-laura-shadow-02',p);
+  RAISE EXCEPTION 'Gate B accepted cross-person revision predecessor';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM<>'invalid revision predecessor' THEN RAISE; END IF;
+ END;
+ SELECT count(*) INTO n_after FROM roleta_audit.prospective_evidence;
+ IF n_after<>n_before+1 THEN
+  RAISE EXCEPTION 'Gate B atomicity failure or negative test inserted row';
+ END IF;
+ IF EXISTS(SELECT 1 FROM roleta_audit.prospective_evidence
+  WHERE recommendation_id IN (
+   'ci-v2-wagner-weekly-conflict','ci-v2-laura-shadow2-invalid'))
+ THEN RAISE EXCEPTION 'Gate B unexpected prohibited evidence persists'; END IF;
+END $gate_b_negative$;
