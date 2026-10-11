@@ -1,0 +1,54 @@
+name: F2-12 Gate A storage PostgreSQL 17 rehearsal
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  storage-gate-a:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-disposable-only
+          POSTGRES_DB: roleta_gate_a_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d roleta_gate_a_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Initialize isolated Supabase-compatible role and extension fixtures
+        env:
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: ci-disposable-only
+          PGDATABASE: roleta_gate_a_ci
+        run: |
+          test "$PGDATABASE" = roleta_gate_a_ci
+          psql -X -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN"
+          psql -X -v ON_ERROR_STOP=1 -c "CREATE ROLE authenticated NOLOGIN"
+          psql -X -v ON_ERROR_STOP=1 -c "CREATE ROLE service_role NOLOGIN BYPASSRLS"
+          psql -X -v ON_ERROR_STOP=1 -c "CREATE SCHEMA extensions"
+          psql -X -v ON_ERROR_STOP=1 -c "CREATE EXTENSION pgcrypto WITH SCHEMA extensions"
+      - name: Rehearse private storage migration and negative privileges
+        env:
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: ci-disposable-only
+          PGDATABASE: roleta_gate_a_ci
+        run: |
+          test "$PGDATABASE" = roleta_gate_a_ci
+          psql -X -v ON_ERROR_STOP=1 -f database/production-review/20261011_roleta_audit_storage_gate_a_candidate.sql
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/gate-a-storage-pg17-rehearsal.sql
