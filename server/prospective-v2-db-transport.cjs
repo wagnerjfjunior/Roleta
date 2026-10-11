@@ -16,11 +16,23 @@ function databaseUrl(env=process.env){
   throw Error('F2-12 verified TLS is mandatory');
  return url;
 }
+function verifiedTlsConfig(env=process.env){
+ const ca=env.ROLETA_V2_TLS_CA_PEM;
+ if(typeof ca!=='string'||ca.length>16384||!/^-----BEGIN CERTIFICATE-----\\r?\\n[\\s\\S]+\\r?\\n-----END CERTIFICATE-----\\s*$/.test(ca))
+  throw Error('F2-12 trusted pooler CA PEM missing or invalid');
+ return {ca,rejectUnauthorized:true,servername:'aws-1-sa-east-1.pooler.supabase.com'};
+}
 function getPool({env=process.env,loadPg=()=>require('pg')}={}){
  const connectionString=databaseUrl(env);
+ // pg-connection-string replaces explicit ssl options when the URL contains
+ // sslmode. Remove only the validated sslmode, retain strict CA + hostname
+ // verification in the actual Node TLS socket configuration.
+ const uri=new URL(connectionString);
+ uri.searchParams.delete('sslmode');
+ const ssl=verifiedTlsConfig(env);
  if(!pool){
   const {Pool}=loadPg();
-  pool=new Pool({connectionString,ssl:{rejectUnauthorized:true},max:2,
+  pool=new Pool({connectionString:uri.toString(),ssl,max:2,
     connectionTimeoutMillis:5000,idleTimeoutMillis:5000,
     statement_timeout:8000,query_timeout:10000,application_name:'roleta-f2-12-v2'});
  }
@@ -38,4 +50,4 @@ async function appendV2(command,{env=process.env,getPoolFn=getPool}={}){
  if(!/^\d+$/.test(String(id)))throw Error('invalid F2-12 append result');
  return String(id);
 }
-module.exports={databaseUrl,getPool,appendV2};
+module.exports={databaseUrl,verifiedTlsConfig,getPool,appendV2};
