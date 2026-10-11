@@ -48,6 +48,7 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/intent-binding.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/transactional-prototype.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/current-shadow-revisions.sql
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/person-revision-model-disposable.sql
           bash tests/postgres/concurrent-replay.sh
           bash tests/postgres/competing-outcomes.sh
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/definer-runtime-privileges.sql
