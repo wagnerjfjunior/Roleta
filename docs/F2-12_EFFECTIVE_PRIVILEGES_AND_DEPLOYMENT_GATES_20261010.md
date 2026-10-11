@@ -64,3 +64,19 @@ The matrix is a **required post-migration test expectation**, not a verified cur
 4. Gate A / Gate B remain closed.
 
 No DDL, DML or secrets were used to collect the production evidence above.
+
+
+## Backup checkpoint and operator authorization — 2026-10-10
+
+Operator reported completed local exports from shared Supabase PostgreSQL 17.6 using the IPv4 session pooler and PostgreSQL 18 client. Local directory (operator machine only): `~/Backups-Supabase/Discador-MesaCliente/20261010_201200_pre_F2-12/`.
+
+- `database.dump`: custom-format database export, 2.8 MiB reported; archive read with pg_restore and SHA-256 verification reported OK. Export was generated with `--no-owner --no-acl`.
+- `database-globals.sql`: `pg_dumpall --globals-only --no-role-passwords` completed; SHA-256 verification reported OK.
+- `database-schema-acl.dump`: separate schema-only custom archive preserving ownership/ACL declarations; archive read and SHA-256 verification reported OK.
+- Object inventories `backup-objects.txt` and `schema-objects.txt` generated.
+
+This is operator-reported terminal evidence, not independently inspected backup bytes. Archives are stored on the operator's MacBook, not in GitHub. These operations did NOT test a working restore, backup of physical Supabase Storage objects, or a point-in-time-consistent snapshot across the three sequential exports. Existing shared application writes after export would not be covered by a whole-database restore; favor a non-destructive, Roleta-scoped disable/rollback plan.
+
+The operator explicitly authorized necessary production changes during the F2-12 rollout in chat. **This is authorization in principle, not evidence that an executable migration is approved or tested.** Gate A execution remains conditional on a reviewed production-specific SQL migration, tested isolation/negative cases, verified runtime identity and connection mechanism, catalog baseline and targeted rollback. Gate B (prospective capture/write activation) remains distinct and closed until separately reviewed and authorized. No schema, role, function, or production data was modified as part of this checkpoint.
+
+Read-only recheck on 2026-10-10: PostgreSQL 17.6; `roleta_audit`, `roleta_runtime`, and `roleta_append_owner` remain absent. `main` observed at `eb2dd08fd5b5115ae2f3f583da2a4717c7c5b299`.
