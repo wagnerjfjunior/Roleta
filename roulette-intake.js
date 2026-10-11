@@ -469,6 +469,7 @@
     }
 
     async function validateAndPrepareReview(){
+      resetStatisticalReview();
       reviewCard.hidden=true;card.hidden=true;confirm.checked=false;print.disabled=true;savePdf.disabled=true;payload=null;reviewedPayload=null;
       try{
         if(!brokers.length)brokers=await loadBrokerDirectory();
