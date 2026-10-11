@@ -164,8 +164,21 @@ CREATE POLICY roleta_append_owner_select ON roleta_audit.prospective_evidence
 CREATE POLICY roleta_append_owner_insert ON roleta_audit.prospective_evidence
  FOR INSERT TO roleta_append_owner WITH CHECK (true);
 GRANT CREATE ON SCHEMA roleta_audit TO roleta_append_owner;
+-- PostgreSQL 17 owner transfer requires SET ROLE (MEMBER alone is insufficient).
+-- Temporarily enable SET only for the migration role, restore it in THIS xact.
+-- Preflight enforces exactly the inherited non-SET membership used by Supabase.
+DO $role_gate$
+BEGIN
+ IF current_user='postgres' AND EXISTS (
+   SELECT 1 FROM pg_auth_members
+   WHERE roleid='roleta_append_owner'::regrole
+     AND member='postgres'::regrole AND set_option=true)
+ THEN RAISE EXCEPTION 'unexpected postgres SET membership: halt'; END IF;
+END $role_gate$;
+GRANT roleta_append_owner TO postgres WITH SET TRUE;
 ALTER FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
- text,text,text,text,text,text,text,text,jsonb) OWNER TO roleta_append_owner;
+ text,text,text,text,text,text,text,jsonb) OWNER TO roleta_append_owner;
+GRANT roleta_append_owner TO postgres WITH SET FALSE;
 REVOKE CREATE ON SCHEMA roleta_audit FROM roleta_append_owner;
 REVOKE ALL ON FUNCTION roleta_audit.append_authenticated_person_evidence_v2(
  text,text,text,text,text,text,text,text,jsonb)
