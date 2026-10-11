@@ -2,7 +2,7 @@
 // F2-12 deployable boundary contract, intentionally WITHOUT DB transport.
 // This function never executes SQL. A backend route may call it only after
 // validating origin, CSRF, Google session, and persisted actor->person ACL.
-const {prepareAuthenticatedEvidence,MAX_BODY_BYTES,validateStructureBudget}=
+const {prepareAuthenticatedEvidence,MAX_BODY_BYTES}=
  require('./prospective-evidence-boundary.cjs');
 const {buildPersonAppendCommand}=require('./prospective-person-db-command-v2.cjs');
 const MAX_SUBJECT_LEN=128;
@@ -15,7 +15,6 @@ function prepareVerifiedV2Append({session,body,csrfValid,originValid,authorizedP
     ||authorizedPersonIds.size>10000)throw new Error('persisted person ACL required');
  if(!body||typeof body!=='object'||Array.isArray(body))
   throw new Error('request body required');
- validateStructureBudget(body);
  // Reuse the existing transport boundary for origin, CSRF and input budgets.
  // The resulting V1 hash is NOT passed to V2; V2 hashes its own full envelope.
  prepareAuthenticatedEvidence({session,body,csrfValid,originValid});
