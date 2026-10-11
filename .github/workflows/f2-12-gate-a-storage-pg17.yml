@@ -32,6 +32,7 @@ jobs:
           node --test tests/regression/prospective-v2-google-http.test.cjs
           node --test tests/regression/prospective-v2-person-acl-env.test.cjs
           node --test tests/regression/prospective-v2-route.test.cjs
+          node --test tests/regression/prospective-v2-health.test.cjs
       - name: Install client
         run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
       - name: Initialize isolated Supabase-compatible role and extension fixtures
