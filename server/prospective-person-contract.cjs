@@ -28,7 +28,7 @@ function validatePersonPrediction({body,authorizedPersonIds}={}){
  const generated=utc(generated_at,'generated_at'),cutoff=utc(data_cutoff,'data_cutoff');
  if(cutoff>generated)throw new Error('data cutoff after generation');
  if(frozen_at!==null&&frozen_at!==undefined){
-  if(utc(frozen_at,'frozen_at')>generated)throw new Error('freeze after generation');
+  if(utc(frozen_at,'frozen_at')<generated)throw new Error('freeze before generation');
  }
  if(body.policy==='WEEKLY_FROZEN'){
   if(revision_number!==1||supersedes_recommendation_id!==null)throw new Error('weekly revision must be initial');
