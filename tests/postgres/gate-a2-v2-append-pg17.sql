@@ -193,3 +193,13 @@ BEGIN
   IF SQLERRM<>'invalid V2 number or UTC timestamp' THEN RAISE; END IF;
  END;
 END $strict$;
+
+-- No elevated SET ROLE membership may survive owner transfer.
+DO $membership$
+BEGIN
+ IF EXISTS (
+  SELECT 1 FROM pg_auth_members m
+  WHERE m.roleid='roleta_append_owner'::regrole
+    AND m.member='postgres'::regrole AND m.set_option
+ ) THEN RAISE EXCEPTION 'temporary SET ROLE option leaked after migration'; END IF;
+END $membership$;
