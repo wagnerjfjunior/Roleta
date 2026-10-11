@@ -18,6 +18,46 @@ const events=Array.from({length:9},(_,i)=>{
 const simulationConfig={realEvents:events,universes:2,years:1,eventsPerYear:24,seed:'regression-v1',signal:{type:'null',strength:0}};
 const weeklyConfig={realEvents:events,weeks:20,scenario:'null',seed:'regression-v1',signalStrength:0};
 test('simulation engine self-test: permutation and physical gaps',()=>assert.equal(sim.selfTest(events).pass,true));
+
+test('F2-12 physical lines 2 and 13 crossed out: draw balls remain 1..23, not 1..25 minus 2/13',()=>{
+ const physicalLines=Array.from({length:25},(_,i)=>i+1);
+ const crossedOut=[2,13];
+ const occupied=physicalLines.filter(line=>!crossedOut.includes(line));
+ const N=occupied.length;
+ assert.equal(N,23);
+ assert.equal(occupied.at(-1),25,'line 25 must remain a physical position');
+ assert.equal(occupied.includes(2),false);
+ assert.equal(occupied.includes(13),false);
+ const template={N,period:'manha',occupied};
+ const realized=sim.completeTemplates([{id:'crossed-out-fixture',...template}]);
+ assert.deepEqual(realized,[template],'historical template must preserve physical positions and gaps');
+ assert.equal(sim.selfTest([{id:'crossed-out-fixture',...template}]).pass,true);
+ // No synthetic draw ever chooses a crossed-out LINE; the balls 2 and 13
+ // remain available because they are draw numbers, not physical lines.
+ let seenBall2=false,seenBall13=false;
+ let seed=20261011;
+ const rng=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+ for(let i=0;i<250;i++){
+  const e=sim.simulateEvent(template,rng,i+1);
+  assert.deepEqual(e.occupied,occupied);
+  assert.equal(e.permutation.length,23);
+  assert.deepEqual([...e.permutation].sort((a,b)=>a-b),Array.from({length:23},(_,j)=>j+1));
+  assert.equal(e.permutation.includes(24),false);
+  assert.equal(e.permutation.includes(25),false);
+  assert.equal(e.occupied.includes(2),false);
+  assert.equal(e.occupied.includes(13),false);
+  assert.ok([e.first,e.second,e.courtesy,e.last].every(line=>occupied.includes(line)));
+  seenBall2 ||= e.permutation.includes(2);
+  seenBall13 ||= e.permutation.includes(13);
+ }
+ assert.equal(seenBall2,true);
+ assert.equal(seenBall13,true);
+ assert.equal(weekly.selfTest(Array.from({length:12},(_,i)=>({
+  id:'gap-'+i,date:'2026-01-'+String(i+1).padStart(2,'0'),...template,
+  period:['manha','tarde','integral'][i%3],first:occupied[i],last:occupied[(i+7)%23],quality:'A'
+ }))).pass,true);
+});
+
 test('simulation engine: identical inputs and seed produce identical results',()=>{
  const first=sim.run(simulationConfig),second=sim.run(simulationConfig);
  assert.deepEqual(first,second);
