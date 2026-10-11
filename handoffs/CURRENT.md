@@ -1,3 +1,21 @@
+> **SFJM CURRENT CHECKPOINT — 2026-10-11 / GATE E · HANDOFF TO NEXT CONVERSATION**
+>
+> **Fonte atual e escopo:** `main@676d0f9e300404c6d1434b61dbf7c5b61d23cb31` foi observada em produção `READY` na inspeção de 11/10, antes deste checkpoint documental. Re-resolver o HEAD vivo ao retomar. Estado completo, matriz de riscos, fluxos e prompt de continuação em **[`docs/sfjm/HANDOFF_2026-10-11_GATE_E.md`](../docs/sfjm/HANDOFF_2026-10-11_GATE_E.md)**.
+>
+> **Operação canônica:** posição física original ≠ bolinha sorteada ≠ ordem final. A folha permanece aberta até 08:45:59 ou 13:45:59; foto/estatística podem ser D+1; quem recebe a bolinha 1 passa a limpo, imprime e compartilha. Roleta Simples/print não registra automaticamente na base. Leia `docs/ROLETA_PHYSICAL_LINE_DRAWN_BALL_FINAL_ORDER_CANONICAL.md`.
+>
+> **Gate E:** UI e backend de PR GitHub estão publicados, mas **desativados**. Variáveis `ROLETA_STAT_WRITES_ENABLED`, `ROLETA_STAT_GITHUB_TOKEN`, `ROLETA_STAT_ALLOWED_SUBS` ausentes em produção na inspeção; `ROLETA_V2_WRITES_ENABLED=false` para F2-12. A PR criada quando habilitada será `pending_review`, não alteração automática da amostragem.
+>
+> **Dados versionados:** `data/manifest.json` e `docs/sfjm/CURRENT_DATA_STATE.json` registram 86 eventos, 82 A / 4 B. Não inventar novos registros nem confundir a data do upload com a do sorteio.
+>
+> **NEXT SAFE ACTION:** read-only current HEAD/CI + examinar Gate E após `676d0f9`, testar concorrência/replay/branch órfã e revisão versionada em laboratório isolado. Parar no gate de decisão sobre credencial técnica GitHub, operadores Google `sub` e ativação separada. **Nenhuma escrita real, deploy funcional nem alteração Discador/Supabase autorizada por este handoff.**
+>
+> **SFJM obrigatório:** `LOCAL-FIRST / NO PREVIEW`, `remoteIterationAllowed=false`, porta `8082`, `pushRequiresExplicitIntent` e `deployRequiresExplicitIntent`. Este checkpoint foi produzido por edição documental no GitHub, não por execução do launcher SFJM local.
+>
+> **Precedência:** esta seção prevalece sobre os checkpoints antigos abaixo; conservá-los apenas como histórico.
+>
+---
+
 > **SFJM continuity checkpoint — 2026-10-10 (F2-11)**
 >
 > Repository `wagnerjfjunior/Roleta`, canonical branch `main`, LOCAL-FIRST / NO PREVIEW. PRs #73–#76 merged; #76 merge commit `2b949fbdf7282026035e3556ed5f03f8526f9174`. These are historical anchors, **not** a substitute for resolving the live main HEAD.

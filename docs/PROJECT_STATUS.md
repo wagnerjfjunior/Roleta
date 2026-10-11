@@ -1,3 +1,7 @@
+> **CURRENT STATUS — 2026-10-11 / SFJM Gate E:** Consulte o checkpoint atualizado `handoffs/CURRENT.md`, a próxima ação em `docs/NEXT_SAFE_ACTION.md` e o handoff completo `docs/sfjm/HANDOFF_2026-10-11_GATE_E.md`. Main foi observada em `676d0f9e300404c6d1434b61dbf7c5b61d23cb31` (Vercel READY) antes desta atualização documental. Dados: 86 eventos / 82 A / 4 B em `data/manifest.json`; Gate E publicado **sem credenciais/habilitação de escrita**; F2-12 permanece desligado. As afirmações históricas abaixo (incluindo ausência do schema em 10/10) não descrevem necessariamente o estado live atual. Não substituir verificação read-only atual nem homologação.
+
+---
+
 > **Current F2-11 status (2026-10-10):** PRs #73–#76 merged into main. Server-authenticated actor binding, positional SQL arguments, canonical envelope SHA and disposable PostgreSQL isolation tests are implemented; production migration and capture remain disabled. Four workflows passed on PR #76. Supabase read-only audit confirms PostgreSQL 17.6, existing shared Discador schemas, and absence of `roleta_audit` and dedicated Roleta roles. Production Gate A (schema DDL) and Gate B (prospective writes) require distinct explicit approvals. See `handoffs/CURRENT.md`, `docs/NEXT_SAFE_ACTION.md`, and `docs/F2-11_SHARED_SUPABASE_READINESS_20261010.md`. Older state snapshots below are historical and must not be treated as the current HEAD or active branch.
 
 # Roleta — Project Status

@@ -1,3 +1,14 @@
+> **NEXT SAFE ACTION — 2026-10-11 / SFJM GATE E (ATUAL)**
+>
+> 1. Resolver `main` ao vivo e ler `.sfjm/project.json`, `handoffs/CURRENT.md` e `docs/sfjm/HANDOFF_2026-10-11_GATE_E.md`. Conferir local SFJM/LVR e worktree antes de editar.
+> 2. Auditar Gate E já publicado: `server/statistical-github-stage.cjs`, `api/statistical-submit.js`, `statistical/submission.js`, `roulette-intake.js`. Conferir staging por branch e PR, proof JSON de mapeamento completo, SHA fixado, replay seguro e autenticação.
+> 3. Sem nenhuma escrita em Roleta de produção, completar testes de concorrência, reenvio idempotente, duas PRs baseadas em manifesto defasado, branch órfã, conflito por data/período e correção pós-merge versionada em repositório GitHub descartável.
+> 4. STOP — solicitar decisão sobre GitHub App versus credencial técnica temporária, Google `sub` autorizados e revisores de PR; depois autorização expressa **separada** para provisionamento e para `ROLETA_STAT_WRITES_ENABLED=true`. F2-12 mantém `ROLETA_V2_WRITES_ENABLED=false`.
+>
+> **Não reabrir o esclarecimento da linha física:** `docs/ROLETA_PHYSICAL_LINE_DRAWN_BALL_FINAL_ORDER_CANONICAL.md`. **LOCAL-FIRST / NO PREVIEW**; `remoteIterationAllowed=false`; sem mudanças Supabase compartilhado, sem integração automática de PDFs na estatística. Este bloco substitui apenas a orientação atual; os itens abaixo são históricos.
+>
+---
+
 # CURRENT NEXT SAFE ACTION — 2026-10-10 / F2-11
 
 The following supersedes older next-action and branch references below; older sections remain as historical records.
