@@ -3,6 +3,22 @@
 const crypto=require('node:crypto');
 const auth=require('../auth/google');
 const {getPool,databaseUrl}=require('../server/prospective-v2-db-transport.cjs');
+function diagnosticCode(error){
+ const code=String(error?.code||'');
+ const message=String(error?.message||'');
+ if(['28P01','28000'].includes(code)||/password authentication failed|no pg_hba\.conf entry/i.test(message))
+  return 'DATABASE_AUTH_REJECTED';
+ if(/^CERT_|^ERR_TLS_|^UNABLE_TO_VERIFY|^DEPTH_ZERO_SELF_SIGNED_CERT/.test(code)
+    ||/certificate verify failed|self.signed certificate|certificate has expired|hostname.*certificate/i.test(message))
+  return 'DATABASE_TLS_REJECTED';
+ if(['ENOTFOUND','EAI_AGAIN','ECONNREFUSED','ENETUNREACH','EHOSTUNREACH'].includes(code))
+  return 'DATABASE_NETWORK_UNREACHABLE';
+ if(['ETIMEDOUT','ETIMEOUT'].includes(code)||/Connection terminated due to connection timeout/i.test(message))
+  return 'DATABASE_TIMEOUT';
+ if(/F2-12 database credential|F2-12 requires|verified TLS is mandatory/i.test(message))
+  return 'DATABASE_CONFIGURATION_INVALID';
+ return 'DATABASE_CONNECTION_UNAVAILABLE';
+}
 function createHandler({authenticate=auth,transport={getPool,databaseUrl}}={}){
  return async function(req,res){
   res.setHeader('Cache-Control','no-store');
@@ -29,11 +45,14 @@ function createHandler({authenticate=auth,transport={getPool,databaseUrl}}={}){
    if(row?.identity_ok===true&&row.execute_ok===true&&row.direct_insert_denied===true&&row.direct_select_denied===true)
     return res.status(200).json({status:'CONNECTED_RESTRICTED'});
    return res.status(503).json({status:'DATABASE_PERMISSIONS_REJECTED'});
-  }catch{
-   // Never return DSN, password, SQL text, user information or database errors.
-   return res.status(503).json({status:'DATABASE_CONNECTION_UNAVAILABLE'});
+  }catch(error){
+   // Return only coarse allowlisted diagnostics to authenticated operators.
+   // Never return DSN, password, SQL text, user information or raw DB errors.
+   return res.status(503).json({status:diagnosticCode(error)});
   }
  };
 }
 module.exports=createHandler();
 module.exports.createHandler=createHandler;
+
+module.exports.diagnosticCode=diagnosticCode;
