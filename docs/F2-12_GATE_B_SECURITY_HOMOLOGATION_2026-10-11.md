@@ -8,6 +8,7 @@ Data: 2026-10-11. Escopo: `api/prospective-v2-append.js`, fronteira Google/CSRF,
 - Supabase `uobxxgzshrmbtjfdolxd`, tabela `roleta_audit.prospective_evidence`: 19 colunas, 14 constraints; `relrowsecurity=true` e `relforcerowsecurity=true`.
 - Privilégios efetivos de `roleta_v2_writer`: EXECUTE da função `append_authenticated_person_evidence_v2(...)`=true; SELECT/INSERT direto da tabela=false.
 - Production env Vercel: `ROLETA_V2_WRITES_ENABLED=false`; URL do DB e CA permanecem Sensitive. Nunca incluir valores secretos em CI, logs ou evidências.
+- Inspeção read-only do trigger live `roleta_audit.guard_prospective_evidence()`: a validação de predecessor ocorre no gatilho BEFORE INSERT, com exigência do mesmo event_id, person_id, política CURRENT_SHADOW, tipo prediction, revisão anterior, frozen_at nulo e ausência de track congelado. A função de append, isoladamente, só busca por recommendation_id; a análise de segurança **deve considerar função e trigger em conjunto**. Falta prova transacional em banco isolado.
 - A informação acima valida configuração e observações pontuais, não prova isolamento de todas as tabelas nem correção de toda lógica SQL.
 
 ## Matriz Gate B
