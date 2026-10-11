@@ -46,3 +46,15 @@ test('coarse diagnostic categories cannot reveal raw provider errors',()=>{
   assert.doesNotMatch(got,/private|password|secret|host/i);
  }
 });
+
+test('diagnostics distinguish invalid public CA and SQL failures without exposing provider text',()=>{
+ for(const [error,expected] of [
+  [{message:'F2-12 trusted pooler CA PEM missing or invalid'},'DATABASE_CA_CONFIGURATION_INVALID'],
+  [{code:'UNABLE_TO_GET_ISSUER_CERT_LOCALLY',message:'internal certificate details'},'DATABASE_TLS_REJECTED'],
+  [{code:'42501',message:'permission denied for private'},'DATABASE_SQL_PRIVILEGE_OR_SCHEMA_ERROR'],
+  [{code:'42P01',message:'relation missing'},'DATABASE_SQL_PRIVILEGE_OR_SCHEMA_ERROR']
+ ]){
+  assert.equal(diagnosticCode(error),expected);
+  assert.doesNotMatch(diagnosticCode(error),/private|certificate details|permission denied/i);
+ }
+});
