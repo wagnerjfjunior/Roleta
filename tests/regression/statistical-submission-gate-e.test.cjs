@@ -123,3 +123,47 @@ test('GitHub stage checks manifest then prepares a single commit and REVIEW PR',
  assert.ok(seen.some(x=>x.name==='/contents/data/manifest.json?ref='+sha));
  assert.ok(!seen.some(x=>x.name.endsWith('?ref=main')));
 });
+
+
+test('replayed submission with exact proof and actor returns existing PR without writes',async()=>{
+ const crypto=require('node:crypto');
+ const e=good(),digest=crypto.createHash('sha256').update(JSON.stringify(e)).digest('hex');
+ const actorHash=crypto.createHash('sha256').update('operator-1').digest('hex').slice(0,16);
+ const branch='stat-intake/'+e.event_id;
+ const proof={schema:'rlt-statistical-proof-v1',event_id:e.event_id,
+  payload_sha256:digest,actor_hash:actorHash};
+ const seen=[];
+ const transport=async(url,opts)=>{
+  const name=url.replace('https://api.github.com/repos/wagnerjfjunior/Roleta','');
+  seen.push({name,method:opts.method});
+  assert.equal(opts.method,'GET');
+  let data;
+  if(name==='/git/ref/heads/'+branch)data={object:{sha:'a'.repeat(40)}};
+  else if(name==='/contents/data/intake-proofs/'+e.event_id+'.json?ref='+encodeURIComponent(branch))
+   data={content:Buffer.from(JSON.stringify(proof)).toString('base64')};
+  else if(name.startsWith('/pulls?'))data=[{number:555,html_url:'https://github.com/wagnerjfjunior/Roleta/pull/555'}];
+  else throw Error('Unexpected read '+name);
+  return {ok:true,status:200,json:async()=>data};
+ };
+ const result=await stageStatisticalSubmission(input,{actorSub:'operator-1',
+  token:'placeholder-placeholder',transport});
+ assert.equal(result.pr_number,555);
+ assert.equal(result.replayed,true);
+ assert.ok(!seen.some(x=>x.method!=='GET'));
+});
+test('existing branch with mismatched audit proof is a conflict before any mutation',async()=>{
+ const e=good(),branch='stat-intake/'+e.event_id;let calls=0;
+ const transport=async(url,opts)=>{
+  calls++;
+  const name=url.replace('https://api.github.com/repos/wagnerjfjunior/Roleta','');
+  assert.equal(opts.method,'GET');
+  if(name==='/git/ref/heads/'+branch)return {ok:true,status:200,json:async()=>({object:{sha:'a'.repeat(40)}})};
+  if(name.startsWith('/contents/data/intake-proofs/'))return {ok:true,status:200,
+   json:async()=>({content:Buffer.from(JSON.stringify({schema:'rlt-statistical-proof-v1',
+    event_id:e.event_id,actor_hash:'wrong',payload_sha256:'tampered'})).toString('base64')})};
+  throw Error('Unexpected '+name);
+ };
+ await assert.rejects(stageStatisticalSubmission(input,{actorSub:'operator-1',
+  token:'placeholder-placeholder',transport}),err=>err.status===409);
+ assert.equal(calls,2);
+});
