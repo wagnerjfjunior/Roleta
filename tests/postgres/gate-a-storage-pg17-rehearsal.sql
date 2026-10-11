@@ -72,6 +72,50 @@ BEGIN
  WHERE event_id='CI-TEAM' AND person_id='wagner' AND policy='CURRENT_SHADOW' AND revision_number=1;
  RAISE EXCEPTION 'duplicate revision accepted';
  EXCEPTION WHEN unique_violation THEN NULL;
+ WHEN raise_exception THEN
+  IF SQLERRM <> 'nonsequential current revision' THEN RAISE; END IF;
+ END;
+ -- UPDATE and DELETE must be rejected, including by the table owner.
+ BEGIN
+  UPDATE roleta_audit.prospective_evidence SET physical_position=1 WHERE event_id='CI-TEAM';
+  RAISE EXCEPTION 'ledger UPDATE accepted';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM <> 'prospective evidence is append-only' THEN RAISE; END IF;
+ END;
+ BEGIN
+  DELETE FROM roleta_audit.prospective_evidence WHERE event_id='CI-TEAM';
+  RAISE EXCEPTION 'ledger DELETE accepted';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM <> 'prospective evidence is append-only' THEN RAISE; END IF;
+ END;
+ -- Cross-person predecessor is forbidden, even when it references a valid row.
+ BEGIN
+ INSERT INTO roleta_audit.prospective_evidence
+ (event_id,kind,person_id,policy,revision_number,physical_position,generated_at,
+ data_cutoff,frozen_at,supersedes_id,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
+ SELECT 'CI-TEAM','prediction','laura','CURRENT_SHADOW',2,7,
+ '2026-10-10T19:03Z','2026-10-10T18:00Z',NULL,id,
+ 'ci-gate-a-laura-cross-person',repeat('7',64),repeat('8',64),'{}','ci'
+ FROM roleta_audit.prospective_evidence
+ WHERE event_id='CI-TEAM' AND person_id='wagner' AND policy='CURRENT_SHADOW' AND revision_number=1;
+ RAISE EXCEPTION 'cross-person parent accepted';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM NOT IN ('nonsequential current revision','invalid revision predecessor') THEN RAISE; END IF;
+ END;
+ -- Outcome closes the event; later prediction attempts must fail.
+ INSERT INTO roleta_audit.prospective_evidence
+ (event_id,kind,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
+ VALUES ('CI-TEAM','outcome','ci-gate-a-event-outcome',repeat('9',64),repeat('0',64),'{}','ci');
+ BEGIN
+ INSERT INTO roleta_audit.prospective_evidence
+ (event_id,kind,person_id,policy,revision_number,physical_position,generated_at,
+ data_cutoff,frozen_at,idempotency_key,request_sha256,record_sha256,payload,actor_subject)
+ VALUES ('CI-TEAM','prediction','brenda','WEEKLY_FROZEN',1,8,
+ '2026-10-10T19:00Z','2026-10-10T18:00Z','2026-10-10T19:00Z',
+ 'ci-gate-a-post-outcome',repeat('a',64),repeat('c',64),'{}','ci');
+ RAISE EXCEPTION 'post-outcome prediction accepted';
+ EXCEPTION WHEN raise_exception THEN
+  IF SQLERRM <> 'event already adjudicated' THEN RAISE; END IF;
  END;
 END $test$;
 SET ROLE authenticated;
