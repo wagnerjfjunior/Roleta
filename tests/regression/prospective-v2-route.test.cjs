@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const {databaseUrl,appendV2}=require('../../server/prospective-v2-db-transport.cjs');
+const {databaseUrl,verifiedTlsConfig,getPool,appendV2}=require('../../server/prospective-v2-db-transport.cjs');
 const {assertPreDraw}=require('../../server/prospective-v2-event-gate.cjs');
 const {createHandler}=require('../../api/prospective-v2-append.js');
 const body={generated_at:'2026-10-12T11:40:00Z',data_cutoff:'2026-10-11T20:00:00Z',frozen_at:'2026-10-12T11:42:00Z'};
@@ -53,4 +53,21 @@ test('HTTP unauthorized and stale-event requests never reach DB',async()=>{
  const h=createHandler({env,prepare:async()=>cmd,assertEvent:()=>{throw Error('target roulette already closed');},append:async()=>{writes++;return '1';}});
  const res=result();await h({method:'POST'},res);
  assert.equal(res.state.status,422);assert.equal(writes,0);
+});
+
+test('Supabase trusted root CA is required and provided to pg without URL sslmode override',()=>{
+ const pem='-----BEGIN CERTIFICATE-----\nMIIB\n-----END CERTIFICATE-----';
+ assert.throws(()=>verifiedTlsConfig({}),/trusted pooler CA/);
+ assert.throws(()=>verifiedTlsConfig({ROLETA_V2_TLS_CA_PEM:'not-a-cert'}),/trusted pooler CA/);
+ const tls=verifiedTlsConfig({ROLETA_V2_TLS_CA_PEM:pem});
+ assert.equal(tls.rejectUnauthorized,true);
+ assert.equal(tls.servername,'aws-1-sa-east-1.pooler.supabase.com');
+ assert.equal(tls.ca,pem);
+ let config;
+ class Pool {constructor(c){config=c;}}
+ getPool({env:{...env,ROLETA_V2_TLS_CA_PEM:pem},loadPg:()=>({Pool})});
+ assert.ok(config);
+ assert.equal(new URL(config.connectionString).searchParams.has('sslmode'),false);
+ assert.equal(new URL(config.connectionString).hostname,'aws-1-sa-east-1.pooler.supabase.com');
+ assert.deepEqual(config.ssl,tls);
 });
