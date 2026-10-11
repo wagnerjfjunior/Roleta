@@ -26,8 +26,12 @@ CREATE TABLE roleta_audit.prospective_evidence (
  CHECK ((kind='prediction' AND policy IN ('WEEKLY_FROZEN','CURRENT_SHADOW'))
      OR (kind='outcome' AND policy IS NULL))
 );
-CREATE UNIQUE INDEX prospective_prediction_once
- ON roleta_audit.prospective_evidence(event_id,policy) WHERE kind='prediction';
+-- An operational weekly prediction is unique per event. CURRENT_SHADOW
+-- is diagnostic and may append successive revisions before the outcome.
+-- Each revision is separately keyed and preserved by the ledger.
+CREATE UNIQUE INDEX prospective_weekly_frozen_once
+ ON roleta_audit.prospective_evidence(event_id)
+ WHERE kind='prediction' AND policy='WEEKLY_FROZEN';
 CREATE UNIQUE INDEX prospective_outcome_once
  ON roleta_audit.prospective_evidence(event_id) WHERE kind='outcome';
 ALTER TABLE roleta_audit.prospective_evidence ENABLE ROW LEVEL SECURITY;
