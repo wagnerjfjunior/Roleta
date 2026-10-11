@@ -283,6 +283,15 @@
         '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Abrir PDF para imprimir</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar PDF</button><button id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar foto</button></div>'+
         '<p id="rltv2PdfStatus" class="small muted" role="status" aria-live="polite">Confirme a folha final para preparar o PDF de compartilhamento.</p>'+
       '</article>'+
+      '<article id="rltStatCard" class="card" hidden>'+
+        '<div class="section-head"><div><span class="eyebrow">5 · AMOSTRAGEM</span><h2>Salvar na base estatística</h2></div><span class="simulation-separation">VALIDAÇÃO SEPARADA</span></div>'+
+        '<p class="small muted">Este passo não é necessário para imprimir. Quando tiver acesso à folha original, informe a linha física de cada corretor. A bolinha sorteada é a ordem final já conferida. A inclusão só ocorre após uma revisão separada do registro enviado.</p>'+
+        '<label><span>Origem da folha oficial (foto/arquivo)</span><input id="rltStatSource" maxlength="180" placeholder="Ex.: IMG_1700.jpeg"></label>'+
+        '<div id="rltStatRows"></div>'+
+        '<label class="intake-confirm"><input id="rltStatConfirm" type="checkbox"> Conferi na folha original a posição física e o número sorteado de cada corretor. Entendo que o envio fica pendente de aprovação.</label>'+
+        '<div class="intake-actions"><button id="rltStatSubmit" class="simulation-run" type="button">Enviar para revisão estatística</button></div>'+
+        '<p id="rltStatStatus" class="small muted" role="status" aria-live="polite">Aguardando conferência das posições físicas.</p>'+
+      '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
 
     if(window.RoletaGeminiDraftUI)window.RoletaGeminiDraftUI.mount(host);
@@ -314,6 +323,56 @@
     const pdfStatus=host.querySelector('#rltv2PdfStatus');
     let pdfBlob=null,photoBlob=null,pdfVersion=0;
     const printHost=host.querySelector('#rltv2PrintHost');
+    const statCard=host.querySelector('#rltStatCard');
+    const statRows=host.querySelector('#rltStatRows');
+    const statSource=host.querySelector('#rltStatSource');
+    const statConfirm=host.querySelector('#rltStatConfirm');
+    const statSubmit=host.querySelector('#rltStatSubmit');
+    const statStatus=host.querySelector('#rltStatStatus');
+    function resetStatisticalReview(){
+      statCard.hidden=true;statConfirm.checked=false;statRows.replaceChildren();
+      statSource.value='';statStatus.textContent='Aguardando conferência das posições físicas.';
+    }
+    function prepareStatisticalReview(){
+      statConfirm.checked=false;statSource.value='';
+      const rows=[...reviewedPayload.salao].sort((a,b)=>Number(a.ordem_final)-Number(b.ordem_final));
+      statRows.innerHTML='<div class="rltv2-review-wrap"><table class="rltv2-review-table">'+
+        '<thead><tr><th>Bolinha / ordem final</th><th>Corretor</th><th>Linha física da folha</th></tr></thead><tbody>'+
+        rows.map(row=>'<tr><td>'+Number(row.ordem_final)+'</td><td>'+esc(row.nome)+'</td>'+
+          '<td><input class="rlt-stat-physical" type="number" min="1" max="999" step="1" inputmode="numeric" aria-label="Linha física de '+esc(row.nome)+'" placeholder="Sem inferir"></td></tr>').join('')+
+        '</tbody></table></div>';
+      statCard.hidden=false;
+      statStatus.textContent='Nada foi gravado. A posição física não é deduzida da ordem final.';
+    }
+    statSubmit.addEventListener('click',async()=>{
+      if(!reviewedPayload)return;
+      statSubmit.disabled=true;
+      try{
+        const rows=[...reviewedPayload.salao].sort((a,b)=>Number(a.ordem_final)-Number(b.ordem_final));
+        const physical=[...statRows.querySelectorAll('.rlt-stat-physical')].map(x=>x.value);
+        // Blank input stays invalid: do not convert "" to Number(0).
+        if(physical.some(x=>!/^\d+$/.test(x.trim())))throw Error('Informe cada linha física da folha original.');
+        const checked={...reviewedPayload,salao:rows};
+        if(!window.RoletaStatisticalSubmission)throw Error('Validador estatístico indisponível.');
+        const prepared=window.RoletaStatisticalSubmission.prepare(checked,physical,{
+          source:statSource.value,acknowledged:statConfirm.checked
+        });
+        statStatus.textContent='Registro conferido. Enviando para revisão; ainda não está na amostragem.';
+        const auth=await fetch('/api/auth/session',{cache:'no-store'}).then(r=>r.json());
+        if(!auth.authenticated||!auth.csrfToken)throw Error('Entre com Google para enviar para revisão.');
+        const response=await fetch('/api/statistical-submit',{method:'POST',cache:'no-store',headers:{
+          'Content-Type':'application/json','X-Roleta-CSRF':auth.csrfToken
+        },body:JSON.stringify({reviewed:checked,physicalByDraw:physical.map(Number),
+          source:prepared.source,acknowledged:true})});
+        const data=await response.json().catch(()=>({}));
+        if(!response.ok)throw Error(data.error||'Integração indisponível; nenhuma roleta foi salva.');
+        if(data.status!=='pending_review'||!/^https:\/\/github\.com\/wagnerjfjunior\/Roleta\/pull\/\d+$/.test(data.pr_url||''))
+          throw Error('Resposta de revisão não validada.');
+        statStatus.textContent='Enviado para revisão PR #'+data.pr_number+'. Ainda não foi incorporado à amostragem: '+data.pr_url;
+      }catch(err){statStatus.textContent=String(err.message||err)+' Nenhuma inclusão estatística foi confirmada.';}
+      finally{statSubmit.disabled=false;}
+    });
+
 
     loadBrokerDirectory().then(x=>{brokers=x}).catch(err=>{
       gate.className='intake-gate blocked';
@@ -326,6 +385,7 @@
     });
 
     function invalidateFinal(){
+      resetStatisticalReview();
       reviewedPayload=null;pdfBlob=null;photoBlob=null;pdfVersion++;card.hidden=true;confirm.checked=false;print.disabled=true;savePdf.disabled=true;sharePdf.disabled=true;
       reviewGate.className='intake-gate blocked';
       reviewGate.innerHTML='<strong>ALTERAÇÕES PENDENTES</strong><div>Clique em Aplicar correções e validar antes da impressão.</div>';
@@ -409,6 +469,7 @@
     }
 
     async function validateAndPrepareReview(){
+      resetStatisticalReview();
       reviewCard.hidden=true;card.hidden=true;confirm.checked=false;print.disabled=true;savePdf.disabled=true;payload=null;reviewedPayload=null;
       try{
         if(!brokers.length)brokers=await loadBrokerDirectory();
@@ -474,9 +535,10 @@
       if(result.errors.length){
         reviewGate.className='intake-gate blocked';
         reviewGate.innerHTML='<strong>CONFERÊNCIA BLOQUEADA</strong>'+result.errors.map(x=>'<div>• '+esc(x)+'</div>').join('');
-        reviewedPayload=null;card.hidden=true;return;
+        resetStatisticalReview();reviewedPayload=null;card.hidden=true;return;
       }
       reviewedPayload=result.payload;
+      prepareStatisticalReview();
       pdfBlob=null;photoBlob=null;pdfVersion++;print.disabled=true;sharePdf.disabled=true;pdfStatus.textContent='Confirme a folha final para preparar o PDF.';
       reviewGate.className='intake-gate clear';
       reviewGate.innerHTML='<strong>CONFERÊNCIA HUMANA VALIDADA</strong>'+
