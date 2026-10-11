@@ -87,15 +87,22 @@ test('GitHub stage checks manifest then prepares a single commit and REVIEW PR',
   const body=opts.body?JSON.parse(opts.body):null;seen.push({name,method:opts.method,body});
   let data={};
   if(name==='/git/ref/heads/main')data={object:{sha}};
-  else if(name==='/contents/data/manifest.json?ref=main')data={content:Buffer.from(JSON.stringify(manifest)).toString('base64')};
+  else if(name==='/contents/data/manifest.json?ref='+sha)data={content:Buffer.from(JSON.stringify(manifest)).toString('base64')};
   else if(name.startsWith('/contents/data/')){
-   const p=name.slice('/contents/'.length).replace('?ref=main','');
+   const p=name.slice('/contents/'.length).replace('?ref='+sha,'');
    data={content:fs.readFileSync(path.join(base,p)).toString('base64')};
   }else if(name==='/git/commits/'+sha)data={tree:{sha:'b'.repeat(40)}};
   else if(name==='/git/trees'){
-   assert.equal(body.tree.length,2);
+   assert.equal(body.tree.length,3);
    assert.equal(body.tree[0].path,'data/incoming/2026-10-11-I.csv');
    assert.equal(body.tree[1].path,'data/manifest.json');
+   assert.equal(body.tree[2].path,'data/intake-proofs/2026-10-11-I.json');
+   const proof=JSON.parse(body.tree[2].content);
+   assert.equal(proof.drawn_mapping.length,10);
+   assert.equal(proof.drawn_mapping[0].physical_position,10);
+   assert.equal(proof.drawn_mapping[9].physical_position,1);
+   assert.equal(proof.event_date,'2026-10-11');
+   assert.equal(proof.payload_sha256.length,64);
    assert.equal(JSON.parse(body.tree[1].content).canonical_event_count,manifest.canonical_event_count+1);
    data={sha:'c'.repeat(40)};
   }else if(name==='/git/commits'&&opts.method==='POST')data={sha:'d'.repeat(40)};
@@ -113,4 +120,6 @@ test('GitHub stage checks manifest then prepares a single commit and REVIEW PR',
  assert.equal(seen.filter(x=>x.name==='/pulls').length,1);
  assert.equal(seen.filter(x=>x.name==='/git/refs'&&x.method==='POST').length,1);
  assert.equal(seen.filter(x=>x.name.endsWith('/main')&&x.method==='PATCH').length,0);
+ assert.ok(seen.some(x=>x.name==='/contents/data/manifest.json?ref='+sha));
+ assert.ok(!seen.some(x=>x.name.endsWith('?ref=main')));
 });
