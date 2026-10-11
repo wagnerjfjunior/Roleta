@@ -86,6 +86,7 @@ test('GitHub stage checks manifest then prepares a single commit and REVIEW PR',
   const name=url.replace('https://api.github.com/repos/wagnerjfjunior/Roleta','');
   const body=opts.body?JSON.parse(opts.body):null;seen.push({name,method:opts.method,body});
   let data={};
+  if(name.startsWith('/git/ref/heads/stat-intake/'))return {ok:false,status:404,json:async()=>({message:'Not Found'})};
   if(name==='/git/ref/heads/main')data={object:{sha}};
   else if(name==='/contents/data/manifest.json?ref='+sha)data={content:Buffer.from(JSON.stringify(manifest)).toString('base64')};
   else if(name.startsWith('/contents/data/')){
