@@ -33,6 +33,8 @@ jobs:
           test "$GATE_E_HEAD_REPO" = "$GATE_E_BASE_REPO"
           git fetch --no-tags origin "$GATE_E_BASE_SHA" "$GATE_E_HEAD_SHA"
           git checkout --detach "$GATE_E_HEAD_SHA"
+          BASE_SHA="$GATE_E_BASE_SHA"
+          HEAD_SHA="$GATE_E_HEAD_SHA"
           # Trust boundary: run validators sourced from protected BASE, not PR HEAD.
           # Bootstrap is permitted only when the PR does not modify data/.
           if git cat-file -e "${BASE_SHA}:scripts/gate-e/ci-policy.cjs" 2>/dev/null; then
