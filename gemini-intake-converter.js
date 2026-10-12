@@ -24,14 +24,25 @@ const linhas=src.linhas.map(l=>{
 const pos=num(l?.posicao_impressa),sorteado=num(l?.numero_sorteado),nome_lido=String(l?.nome_lido||'').trim(),key=norm(nome_lido);
 if(pos===null||pos<1||seenPos.has(pos))add('POSICAO_FISICA','Posição ausente/duplicada.',pos);
 if(pos!==null)seenPos.add(pos);
-const matches=index.get(key)||[],b=matches.length===1?matches[0]:null;
+let matches=index.get(key)||[],resolucao='NOME_EXATO';
+// Restore a truncated OCR name using registry identity first; manager is only
+// a tie-breaker among matching names. Human comparison with the source remains mandatory.
+if(!matches.length&&key.length>=3){
+ matches=brokers.filter(b=>norm(b.nome).startsWith(key));resolucao='PREFIXO_UNICO';
+ const manager=norm(l?.gerente_lido??l?.gerente);
+ if(matches.length>1&&manager.length>=3){
+  matches=matches.filter(b=>norm(b.gerente).startsWith(manager));resolucao='PREFIXO_GERENTE_UNICO';
+ }
+}
+const b=matches.length===1?matches[0]:null;
+const canonicalKey=b?norm(b.nome):key;
 if(!b)add('NOME_NAO_RESOLVIDO','Nome não confirmado no cadastro: '+nome_lido,pos);
-if(b&&seenNames.has(key))add('NOME_DUPLICADO','Corretor duplicado.',pos);
-if(b)seenNames.add(key);
+if(b&&seenNames.has(canonicalKey))add('NOME_DUPLICADO','Corretor duplicado.',pos);
+if(b)seenNames.add(canonicalKey);
 if(sorteado===null||sorteado<1)add('SORTEIO_AUSENTE','Número sorteado ausente.',pos);
 if(sorteado!==null&&seenNum.has(sorteado))add('SORTEIO_DUPLICADO','Número sorteado duplicado.',pos);
 if(sorteado!==null)seenNum.add(sorteado);
-return {posicao_impressa:pos,numero_sorteado:sorteado,nome_lido,nome:b?.nome||'',creci:b?.creci||'',gerente:b?.gerente||'',diretor:b?.diretor||'',status_creci:b?.status_creci||'',cadastro_confirmado:!!b,confianca_visual:l?.confianca||null};
+return {posicao_impressa:pos,numero_sorteado:sorteado,nome_lido,nome:b?.nome||'',creci:b?.creci||'',gerente:b?.gerente||'',diretor:b?.diretor||'',status_creci:b?.status_creci||'',cadastro_confirmado:!!b,cadastro_resolucao:b?resolucao:null,gerente_lido:String(l?.gerente_lido??l?.gerente??''),confianca_visual:l?.confianca||null};
 });
 // Only records carrying a unique, positive drawn number are SALÃO candidates.
 // Rows without a drawn number stay in a separate pending bucket; class must be confirmed by a human.

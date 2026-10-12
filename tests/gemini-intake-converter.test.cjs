@@ -39,3 +39,21 @@ require('./print-layout-blank-pages.test.cjs');
 require('./gemini-row-checks.test.cjs');
 
 require('./google-sso-session.test.cjs');
+
+const prefixDto={brokers:[{nome:'Wagner',creci:'297.586-F',gerente:'Wislane',diretor:'Renan',status_creci:'Definitivo'}]};
+const prefixSrc={empreendimento:'CAMINHOS DA LAPA',data:'12/10/2026',periodo:'MANHÃ',quantidade_corretores:1,linhas:[{posicao_impressa:10,numero_sorteado:1,nome_lido:'Wag',gerente:'WIS'}]};
+const restored=convertGeminiDraft(prefixSrc,prefixDto);
+assert.equal(restored.payload.salao[0].nome,'Wagner');
+assert.equal(restored.payload.salao[0].gerente,'Wislane');
+assert.equal(restored.payload.salao[0].creci,'297.586-F');
+assert.equal(restored.sorteados[0].posicao_impressa,10);
+assert.equal(restored.sorteados[0].cadastro_resolucao,'PREFIXO_UNICO');
+assert.equal(restored.impressao_liberada,false);
+assert.equal(restored.salvamento_liberado,false);
+const ambiguousDto={brokers:[...prefixDto.brokers,{...prefixDto.brokers[0],nome:'Wagner Junior',gerente:'Cazarim'}]};
+assert.equal(convertGeminiDraft({...prefixSrc,linhas:[{...prefixSrc.linhas[0],gerente:''}]},ambiguousDto).payload.salao[0].nome,'');
+assert.equal(convertGeminiDraft(prefixSrc,ambiguousDto).payload.salao[0].nome,'Wagner');
+assert.equal(convertGeminiDraft({...prefixSrc,linhas:[{...prefixSrc.linhas[0],nome_lido:'XYZ'}]},prefixDto).payload.salao[0].nome,'');
+const aliasDuplicate=convertGeminiDraft({...prefixSrc,linhas:[prefixSrc.linhas[0],{...prefixSrc.linhas[0],posicao_impressa:1,numero_sorteado:2,nome_lido:'Wagner'}]},prefixDto);
+assert.ok(aliasDuplicate.pendencias.some(x=>x.code==='NOME_DUPLICADO'));
+console.log('PASS: OCR Wag/WIS restoration, ambiguity, canonical duplicate and mandatory operator validation');

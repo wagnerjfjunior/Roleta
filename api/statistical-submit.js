@@ -9,6 +9,10 @@ function createHandler({env=process.env,authenticate=auth,stage=stageStatistical
   res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Content-Type-Options','nosniff');
   if(req.method!=='POST')return res.status(405).json({error:'Método não permitido.'});
+  // GitHub staging is retained only as an explicitly selected legacy path.
+  // The operational destination is Supabase; a write flag must not silently create a PR.
+  if(env.ROLETA_STAT_STORAGE_BACKEND!=='github_legacy')
+   return res.status(503).json({error:'Registro no Supabase indisponível: aguardando integração autorizada.'});
   if(env.ROLETA_STAT_WRITES_ENABLED!=='true'||!env.ROLETA_STAT_GITHUB_TOKEN)
    return res.status(503).json({error:'Inclusão estatística indisponível: aguardando habilitação auditada.'});
   if(!authenticate.requireSameOrigin(req))return res.status(403).json({error:'Origem não autorizada.'});

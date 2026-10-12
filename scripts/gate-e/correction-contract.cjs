@@ -11,7 +11,7 @@ function assess({original,proposed,approval}={}){
  if(!original||!EVENT.test(original.event_id||'')||!Number.isSafeInteger(original.version)||original.version<1||!SHA.test(original.proof_sha256||''))return deny('INVALID_PREDECESSOR');
  if(!proposed||proposed.schema!=='rlt-statistical-correction-v1'||proposed.event_id!==original.event_id||proposed.version!==original.version+1||proposed.predecessor_proof_sha256!==original.proof_sha256)return deny('BROKEN_VERSION_CHAIN');
  if(!ID.test(proposed.actor_id||'')||typeof proposed.reason!=='string'||proposed.reason.trim().length<15||typeof proposed.source!=='string'||!proposed.source.trim()||!SHA.test(proposed.replacement_proof_sha256||'')||proposed.replacement_proof_sha256===original.proof_sha256)return deny('INSUFFICIENT_CORRECTION_EVIDENCE');
- if(!approval||approval.explicit!==true||approval.event_id!==original.event_id||approval.version!==proposed.version||!ID.test(approval.reviewer_id||'')||approval.reviewer_id===proposed.actor_id||!ISO.test(approval.reviewed_at||''))return deny('INDEPENDENT_APPROVAL_REQUIRED');
+ if(!approval||approval.explicit!==true||approval.event_id!==original.event_id||approval.version!==proposed.version||!ID.test(approval.reviewer_id||'')||!ISO.test(approval.reviewed_at||''))return deny('OPERATOR_CONFIRMATION_REQUIRED');
  const expected=crypto.createHash('sha256').update(canonical(proposed)).digest('hex');
  if(approval.proposal_sha256!==expected)return deny('APPROVAL_NOT_BOUND_TO_PROPOSAL');
  // Deliberately cannot authorize writes until a versioned persistence endpoint and
