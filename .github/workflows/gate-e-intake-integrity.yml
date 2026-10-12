@@ -33,7 +33,20 @@ jobs:
           test "$GATE_E_HEAD_REPO" = "$GATE_E_BASE_REPO"
           git fetch --no-tags origin "$GATE_E_BASE_SHA" "$GATE_E_HEAD_SHA"
           git checkout --detach "$GATE_E_HEAD_SHA"
-          node scripts/gate-e/ci-policy.cjs
+          # Trust boundary: run validators sourced from protected BASE, not PR HEAD.
+          # Bootstrap is permitted only when the PR does not modify data/.
+          if git cat-file -e "${BASE_SHA}:scripts/gate-e/ci-policy.cjs" 2>/dev/null; then
+            TRUST_ROOT="$(mktemp -d)"
+            git archive "$BASE_SHA" | tar -x -C "$TRUST_ROOT"
+            node "$TRUST_ROOT/scripts/gate-e/ci-policy.cjs"
+          else
+            echo "Gate E bootstrap: base does not yet contain a trusted guard"
+            if git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- data/ | grep -q .; then
+              echo "BLOCKED: protected data changed before trusted gate is installed"
+              exit 1
+            fi
+            echo "Bootstrap allowed only without data/ modifications"
+          fi
       - name: Validate merge queue candidate
         if: ${{ github.event_name == 'merge_group' }}
         shell: bash
