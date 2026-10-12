@@ -1,14 +1,14 @@
 'use strict';
 const auth=require('../auth/google');
-const MAX_BYTES=4*1024*1024;
+const {MAX_BYTES}=require('../photo-prepare');
 const ALLOWED=new Set(['image/jpeg','image/png','image/webp']);
 async function readStream(req){
- if(Buffer.isBuffer(req.body)){if(req.body.length>MAX_BYTES){const e=new Error('Imagem excede 4 MB.');e.status=413;throw e;}return req.body;}
+ if(Buffer.isBuffer(req.body)){if(req.body.length>MAX_BYTES){const e=new Error('Imagem excede 900 KB. Selecione a foto novamente para prepará-la.');e.status=413;throw e;}return req.body;}
  const chunks=[];let total=0;
  for await(const part of req){
    const chunk=Buffer.isBuffer(part)?part:Buffer.from(part);
    total+=chunk.length;
-   if(total>MAX_BYTES){const err=new Error('Imagem excede 4 MB.');err.status=413;throw err;}
+   if(total>MAX_BYTES){const err=new Error('Imagem excede 900 KB. Selecione a foto novamente para prepará-la.');err.status=413;throw err;}
    chunks.push(chunk);
  }
  return Buffer.concat(chunks);
@@ -36,7 +36,7 @@ module.exports=async function handler(req,res){
  const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
  if(!ALLOWED.has(mime))return res.status(415).json({error:'Formato de imagem não permitido.'});
  const length=Number(req.headers['content-length']||0);
- if(length>MAX_BYTES)return res.status(413).json({error:'Imagem excede 4 MB.'});
+ if(length>MAX_BYTES)return res.status(413).json({error:'Imagem excede 900 KB. Selecione a foto novamente para prepará-la.'});
  const originalName=String(req.headers['x-roleta-filename']||'captura').replace(/[^a-zA-Z0-9._-]/g,'_').slice(0,70)||'captura';
  const suffix=mime==='image/png'?'.png':mime==='image/webp'?'.webp':'.jpg';
  // Filename is not used as an authorization or routing mechanism.
