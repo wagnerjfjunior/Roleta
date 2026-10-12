@@ -62,3 +62,13 @@ Rollback: manter escrita bloqueada; restaurar deployment funcional anterior se o
 Definir quais pessoas podem submeter estatísticas e qual conta GitHub fará revisão independente. Provisionar credencial técnica limitada a Contents write e Pull requests write no Roleta, sem administração, workflows ou bypass da main; não enviar token pelo chat. O conector GitHub disponível não oferece mutação de rulesets nem criação de GitHub App/segredos; não contornar proteção por push direto.
 
 Depois das identidades e do acesso administrativo: fechar correção versionada, homologar recuperação no LAB com cadeia oficial, instalar proteção obrigatória, testar negativas e E2E autenticado; só então habilitar escrita. Esta é a próxima ação segura, sem recomeçar o projeto.
+
+## Adendo — produção confirmada
+
+- PR [#92](https://github.com/wagnerjfjunior/Roleta/pull/92) mergeada com SHA `1d836b6c61c523dae3e98f6126cab78a115b3f34`; HEAD revisado `74c029b28846589d0d80e8ebb80038e72b303b50`.
+- Cinco workflows no HEAD revisado: todos completed/success. Runs: audit 38277069119, guardrails 38277069160, Gemini 38277069115, F2-11 38277069158, F2-12 38277069104. Gate E target precisa de base instalada; sua verificação ocorre na PR documental posterior, sem contar sua ausência na PR de instalação como PASS.
+- Vercel production READY: `dpl_FMJi473JZg1oXzPTT6rmWM7x8YS4`, exatamente o SHA do merge.
+- Domínio confirmado pertencente ao projeto: [roleta-tgv.vercel.app](https://roleta-tgv.vercel.app).
+- Smoke HTTP: raiz 200; /data/manifest.json 200, 86 eventos / 82 A / 4 B; /api/auth/session 200 com authenticated:false. POST vazio em /api/statistical-submit foi usado somente para conferir bloqueio, não para registrar evento.
+- Estado final: **DEPLOY REALIZADO com escrita estatística bloqueada**. **Não** significa GRAVAÇÃO ATIVADA nem conclusão das etapas 2–4.
+- A autorização de merge/deploy foi executada, não precisa ser repetida. Próxima decisão: identidades de operadores e revisor independente; escolher/provisionar credencial restrita e acesso administrativo às regras. Após isso ainda executar os bloqueadores técnicos registrados acima.
