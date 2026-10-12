@@ -1,3 +1,5 @@
+> **RELEASE ATIVO — FOLHA FINAL SUPABASE — 12/10/2026:** PR #95 mergeada, main funcional `54031ad`, migration `20261012200806` aplicada, deployment `dpl_5MPQWnouiJwqH7WKVPqvVbTZmmp5` READY e flags finais ativas. Vínculo automático do sub real na primeira sessão Google de uma das duas contas autorizadas, sem cópia manual de IDs. Próxima ação: observar primeiro envio real conferido e painel, sem criar roleta fictícia. Detalhes e limites de evidência em `FINAL_ROULETTE_PRODUCTION_RELEASE_2026-10-12.md`. Os estados anteriores abaixo são históricos.
+
 # Roleta — fluxo operacional corrigido pelo responsável — 12/10/2026
 
 ## Autoridade e correção de escopo
