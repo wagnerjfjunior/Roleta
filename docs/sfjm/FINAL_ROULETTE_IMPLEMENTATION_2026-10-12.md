@@ -26,7 +26,7 @@ O SQL é candidato de revisão, não migration aplicada. A CLI Supabase não est
 - Suíte de UI/OCR/PDF existente: 10/10 arquivos aprovados.
 - Sintaxe app/intake verificada; `git diff --check` aprovado.
 - PostgreSQL indisponível localmente; tentativa de instalação não concluiu por restrições de ambiente/rede. Não substituir teste real por mocks.
-- Ensaio PostgreSQL 17 e script concorrente incluídos no workflow descartável existente. Até resultado observado, idempotência transacional/DDL/concorrência permanecem PENDENTES.
+- Ensaio PostgreSQL 17 e script concorrente incluídos no workflow descartável existente. Ensaio confirmado PASS no run 38300941084, job 114983434806, step 8; SHA 2d6c890a30ccb34858bedf1531ce94edbcce1aff.
 
 ## Limites e proteção de histórico
 
@@ -37,3 +37,13 @@ Leitura atual retorna versões vigentes com limite de 5000 eventos; antes de vol
 ## Próxima ação
 
 Observar CI PostgreSQL 17 no SHA promovido para homologação, corrigir localmente qualquer falha e repetir apenas checks afetados. Depois auditar configuração de runtime e aplicar migração adicional, sob autorização existente do responsável, somente com provas verdes. Verificar grants e fluxo real antes de afirmar ativação. A conferência é pelo próprio operador, sem segundo revisor.
+
+## Homologação e configuração observadas
+
+PR de homologação: https://github.com/wagnerjfjunior/Roleta/pull/95 (DRAFT; sem merge). Os cinco workflows retornaram success no SHA 2d6c890a30ccb34858bedf1531ce94edbcce1aff, incluindo PostgreSQL 17 e concurrent replay. URL: https://github.com/wagnerjfjunior/Roleta/actions/runs/38300941084
+
+Projeto Vercel confirmado por inventário: roleta / prj_Fc4IcpnaqmYj3XSvhV8g0avwbv4o, equipe team_WIH0gs3BUjcZdk59oPViSjEm. Inventário sem descriptografar valores confirmou DSN e CA Sensitive/Production. ROLETA_STAT_ALLOWED_SUBS, ROLETA_FINAL_READS_ENABLED e ROLETA_FINAL_WRITES_ENABLED ausentes. Sem ACL de sujeitos verificados, ativação permanece bloqueada por desenho. Não criar sub a partir de e-mail. Nenhuma variável foi alterada.
+
+A função final inclui explicitamente data/** no bundle Vercel para validar o histórico carregado por caminhos dinâmicos. Configuração ainda requer build/deploy real para smoke. Não foi aplicada migração nem feito merge/deploy nesta etapa.
+
+A confirmação estatística é invalidada ao editar linhas físicas, fonte ou motivo. A bateria concorrente foi ampliada para duas correções divergentes sobre o mesmo predecessor: apenas uma deve vencer, preservando duas versões. Verificar CI do SHA final antes de promoção.

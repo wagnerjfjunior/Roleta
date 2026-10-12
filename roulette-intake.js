@@ -336,6 +336,7 @@
     const statConfirm=host.querySelector('#rltStatConfirm');
     const statSubmit=host.querySelector('#rltStatSubmit');
     const statStatus=host.querySelector('#rltStatStatus');
+    for(const control of [statRows,statSource,statReason])control.addEventListener('input',()=>{statConfirm.checked=false});
     function resetStatisticalReview(){
       statCard.hidden=true;statConfirm.checked=false;statRows.replaceChildren();
       statSource.value='';statStatus.textContent='Aguardando conferência das posições físicas.';
