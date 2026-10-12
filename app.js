@@ -1,4 +1,4 @@
-const state={events:[],weekendPolicy:null,presence:null,modelLab:null};
+const state={events:[],weekendPolicy:null,presence:null,modelLab:null,finalNominal:[],finalWarning:null};
 const OBJ='n1last';
 const domain=window.RoletaDomainCore;
 if(!domain)throw new Error('RoletaDomainCore unavailable.');
@@ -358,7 +358,18 @@ async function init(){
     // Late import retains the original event date; Git manifest is authority.
     if(!window.RoletaCanonicalDataset)throw Error('Validador canônico indisponível.');
     state.events=window.RoletaCanonicalDataset.mergeManifestEvents(chunks,manifest);
+    try{
+      const response=await fetch('/api/final-roulette',{cache:'no-store'});
+      if(response.ok){
+        const ledger=await response.json();
+        if(ledger.schema!=='rlt-final-ledger-v1')throw Error('Ledger final inválido.');
+        const merged=window.RoletaFinalLedger.mergeFinal(state.events,ledger.records);
+        state.events=merged.events;state.finalNominal=merged.nominal;
+      }else if(response.status!==503){state.finalWarning='Entre com uma conta autorizada para carregar os registros Supabase.';}
+      else state.finalWarning='Registros Supabase indisponíveis; exibindo somente o histórico versionado.';
+    }catch(err){state.finalWarning='Falha ao carregar registros Supabase; exibindo somente o histórico versionado.';}
     render();
+    if(state.finalWarning){const note=document.createElement('p');note.className='small muted';note.setAttribute('role','status');note.textContent=state.finalWarning;document.querySelector('#datasetStamp').parentNode.appendChild(note);}
     await upgradeWorkspace();
     document.dispatchEvent(new CustomEvent('roleta:workspace-ready',{detail:{events:state.events}}));
   }catch(err){
@@ -382,6 +393,9 @@ async function upgradeWorkspace(){
     if(officialResponse.ok)officialBrokers=parseCSV(await officialResponse.text());
     if(aliasesResponse.ok)nameAliases=(await aliasesResponse.json()).aliases||{};
   }catch(_){}
+
+  brokerStats=window.RoletaFinalLedger.updateBrokerStats(brokerStats,nominalRows,state.finalNominal);
+  nominalRows=[...nominalRows,...state.finalNominal];
 
   const shell=document.querySelector('.shell');
   if(!shell)return;
