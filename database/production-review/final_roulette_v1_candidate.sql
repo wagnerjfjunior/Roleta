@@ -14,6 +14,32 @@ BEGIN
  IF EXISTS(SELECT 1 FROM pg_auth_members WHERE roleid='roleta_append_owner'::regrole AND member='postgres'::regrole AND set_option)
  THEN RAISE EXCEPTION 'unexpected SET membership'; END IF;
 END $preflight$;
+CREATE TABLE roleta_audit.final_operator_identities(
+ email text PRIMARY KEY CHECK(email IN ('wagnerjfjunior@gmail.com','brendatatianelima@gmail.com')),
+ google_subject text UNIQUE CHECK(google_subject ~ '^[A-Za-z0-9_-]{1,128}$'),
+ enabled boolean NOT NULL DEFAULT true,
+ bound_at timestamptz
+);
+INSERT INTO roleta_audit.final_operator_identities(email) VALUES('wagnerjfjunior@gmail.com'),('brendatatianelima@gmail.com');
+ALTER TABLE roleta_audit.final_operator_identities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE roleta_audit.final_operator_identities FORCE ROW LEVEL SECURITY;
+REVOKE ALL ON roleta_audit.final_operator_identities FROM PUBLIC,anon,authenticated,service_role,roleta_runtime,roleta_v2_writer;
+GRANT SELECT,UPDATE ON roleta_audit.final_operator_identities TO roleta_append_owner;
+CREATE POLICY final_operator_owner_select ON roleta_audit.final_operator_identities FOR SELECT TO roleta_append_owner USING(true);
+CREATE POLICY final_operator_owner_update ON roleta_audit.final_operator_identities FOR UPDATE TO roleta_append_owner USING(true) WITH CHECK(true);
+CREATE FUNCTION roleta_audit.bind_final_operator_v1(p_email text,p_subject text) RETURNS boolean
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog SET row_security=on AS $fn$
+DECLARE identity roleta_audit.final_operator_identities%ROWTYPE;
+BEGIN
+ IF p_subject IS NULL OR p_subject !~ '^[A-Za-z0-9_-]{1,128}$' THEN RAISE EXCEPTION 'invalid operator' USING ERRCODE='42501'; END IF;
+ SELECT * INTO identity FROM roleta_audit.final_operator_identities WHERE email=p_email FOR UPDATE;
+ IF NOT FOUND OR NOT identity.enabled OR (identity.google_subject IS NOT NULL AND identity.google_subject<>p_subject)
+ THEN RAISE EXCEPTION 'operator rejected' USING ERRCODE='42501'; END IF;
+ IF identity.google_subject IS NULL THEN
+  UPDATE roleta_audit.final_operator_identities SET google_subject=p_subject,bound_at=clock_timestamp() WHERE email=p_email;
+ END IF;
+ RETURN true;
+END $fn$;
 CREATE TABLE roleta_audit.final_roulette_versions(
  event_id text NOT NULL CHECK(event_id ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}-[MTI]$'),
  version integer NOT NULL CHECK(version>0),
@@ -72,6 +98,7 @@ BEGIN
  IF p_event IS NULL OR p_text IS NULL OR p_actor IS NULL OR p_sha IS NULL OR p_expected IS NULL OR p_expected<0
  OR p_event !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}-[MTI]$' OR p_actor !~ '^[A-Za-z0-9_-]{1,128}$' OR octet_length(p_text)>150000
  THEN RAISE EXCEPTION 'invalid final command'; END IF;
+ IF NOT EXISTS(SELECT 1 FROM roleta_audit.final_operator_identities WHERE google_subject=p_actor AND enabled) THEN RAISE EXCEPTION 'operator rejected' USING ERRCODE='42501'; END IF;
  content:=p_text::jsonb;
  PERFORM pg_advisory_xact_lock(hashtextextended('roleta-final:'||p_event,0));
  SELECT * INTO latest FROM roleta_audit.final_roulette_versions WHERE event_id=p_event ORDER BY version DESC LIMIT 1;
@@ -102,10 +129,13 @@ $fn$;
 -- Private definer owner has SELECT/INSERT only, and is neither login nor bypassrls.
 GRANT CREATE ON SCHEMA roleta_audit TO roleta_append_owner;
 GRANT roleta_append_owner TO postgres WITH SET TRUE;
+ALTER FUNCTION roleta_audit.bind_final_operator_v1(text,text) OWNER TO roleta_append_owner;
 ALTER FUNCTION roleta_audit.save_final_roulette_v1(text,text,text,text,integer,text) OWNER TO roleta_append_owner;
 ALTER FUNCTION roleta_audit.read_final_roulettes_v1() OWNER TO roleta_append_owner;
 GRANT roleta_append_owner TO postgres WITH SET FALSE;
 REVOKE CREATE ON SCHEMA roleta_audit FROM roleta_append_owner;
+REVOKE ALL ON FUNCTION roleta_audit.bind_final_operator_v1(text,text) FROM PUBLIC,anon,authenticated,service_role,roleta_runtime;
+GRANT EXECUTE ON FUNCTION roleta_audit.bind_final_operator_v1(text,text) TO roleta_v2_writer;
 REVOKE ALL ON FUNCTION roleta_audit.save_final_roulette_v1(text,text,text,text,integer,text),roleta_audit.read_final_roulettes_v1() FROM PUBLIC,anon,authenticated,service_role,roleta_runtime;
 GRANT EXECUTE ON FUNCTION roleta_audit.save_final_roulette_v1(text,text,text,text,integer,text),roleta_audit.read_final_roulettes_v1() TO roleta_v2_writer;
 COMMIT;

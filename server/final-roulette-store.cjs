@@ -2,6 +2,11 @@
 const {databaseUrl,getPool}=require('./prospective-v2-db-transport.cjs');
 const WRITE='SELECT roleta_audit.save_final_roulette_v1($1,$2,$3,$4,$5,$6) AS result';
 const READ='SELECT roleta_audit.read_final_roulettes_v1() AS result';
+async function authorizeFinalOperator(session,{env=process.env,poolFn=getPool}={}){
+ databaseUrl(env);
+ const r=await poolFn({env}).query('SELECT roleta_audit.bind_final_operator_v1($1,$2) AS allowed',[session.email,session.sub]);
+ if(r.rows?.[0]?.allowed!==true)throw Object.assign(Error('Operador não autorizado.'),{status:403});
+}
 async function saveFinal(command,{env=process.env,poolFn=getPool}={}){
  if(env.ROLETA_FINAL_WRITES_ENABLED!=='true')throw Object.assign(Error('Gravação desativada.'),{status:503});
  databaseUrl(env);
@@ -18,4 +23,4 @@ async function readFinal({env=process.env,poolFn=getPool}={}){
  if(!Array.isArray(result)||result.length>5000)throw Error('Invalid final ledger');
  return result;
 }
-module.exports={saveFinal,readFinal,WRITE,READ};
+module.exports={saveFinal,readFinal,authorizeFinalOperator,WRITE,READ};

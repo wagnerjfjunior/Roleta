@@ -55,3 +55,11 @@ SHA executável homologado: 82c87462a84c8f041de7c17b06140e0211025126. PostgreSQL
 Última verificação local após as alterações: 212/212 regressões e 10/10 arquivos UI/OCR/PDF aprovados; árvore de data/ idêntica à base. Código entregue na PR #95; main e banco de produção não modificados nesta etapa.
 
 Pendência concreta: configurar sujeitos Google realmente verificados dos operadores. Em produção, a ACL ROLETA_STAT_ALLOWED_SUBS e as duas flags finais estão ausentes. Não habilitar escrita com ACL vazia nem inventar IDs a partir de e-mails. Antes do go-live, aplicar migração adicional homologada e realizar build/deploy e smoke com sessão real. Sem recomeçar conexão, OCR ou impressão.
+
+## Encerramento solicitado pelo responsável — 12/10/2026
+
+Autorização expressa para finalizar publicação e ativação. A exigência manual de copiar Google sub foi substituída por vínculo automático seguro: o callback existente consulta userinfo Google por HTTPS com access token, exige email_verified=true e assina sessão contendo o sub real. O endpoint final aceita somente as duas contas aprovadas por env server-only e o banco vincula o sub real na primeira utilização autenticada. Depois de vinculado, outro sub para o mesmo e-mail é rejeitado; desativação no cadastro privado também bloqueia. Não há ID inferido do e-mail, segundo revisor ou token no navegador.
+
+Novo cadastro privado final_operator_identities (RLS/FORCE RLS), com as duas contas autorizadas. Writer executa somente função de vínculo, sem ler/alterar a tabela diretamente. Owner privado possui SELECT/UPDATE apenas nesse cadastro e SELECT/INSERT no ledger. ROLETA_FINAL_OPERATOR_EMAILS controla o gate server-side, separado de ROLETA_GOOGLE_ALLOWED_EMAILS e da escrita prospectiva. A ACL manual ROLETA_STAT_ALLOWED_SUBS não é mais requisito deste fluxo final.
+
+Re-homologar alteração de identidade em PostgreSQL 17 antes de aplicar a migração. Depois instalar a migração adicional, configurar flags/contas finais, merge da PR #95 e verificar deployment READY no domínio real. Não fabricar roleta real para canário.

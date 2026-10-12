@@ -15,6 +15,19 @@ BEGIN
  THEN RAISE EXCEPTION 'browser/privileged API execute'; END IF;
 END $permissions$;
 SET ROLE roleta_v2_writer;
+SELECT roleta_audit.bind_final_operator_v1('wagnerjfjunior@gmail.com','operator_test');
+SELECT roleta_audit.bind_final_operator_v1('brendatatianelima@gmail.com','synthetic_actor');
+DO $identity_checks$
+BEGIN
+ BEGIN
+  PERFORM roleta_audit.bind_final_operator_v1('wagnerjfjunior@gmail.com','other_subject');
+  RAISE EXCEPTION 'subject replacement accepted';
+ EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+ BEGIN
+  PERFORM roleta_audit.bind_final_operator_v1('unknown@example.com','unknown_subject');
+  RAISE EXCEPTION 'unapproved account accepted';
+ EXCEPTION WHEN insufficient_privilege THEN NULL; END;
+END $identity_checks$;
 DO $cases$
 DECLARE t text; t2 text; d text; d2 text; r jsonb; count_now integer;
 BEGIN
