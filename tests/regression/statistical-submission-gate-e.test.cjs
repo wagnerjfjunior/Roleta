@@ -132,7 +132,7 @@ test('replayed submission with exact proof and actor returns existing PR without
  const actorHash=crypto.createHash('sha256').update('operator-1').digest('hex').slice(0,16);
  const branch='stat-intake/'+e.event_id;
  const proof={schema:'rlt-statistical-proof-v1',event_id:e.event_id,
-  payload_sha256:digest,actor_hash:actorHash};
+  payload_sha256:digest,actor_hash:actorHash,human_review_confirmed:true};
  const seen=[];
  const transport=async(url,opts)=>{
   const name=url.replace('https://api.github.com/repos/wagnerjfjunior/Roleta','');
@@ -140,9 +140,9 @@ test('replayed submission with exact proof and actor returns existing PR without
   assert.equal(opts.method,'GET');
   let data;
   if(name==='/git/ref/heads/'+branch)data={object:{sha:'a'.repeat(40)}};
-  else if(name==='/contents/data/intake-proofs/'+e.event_id+'.json?ref='+encodeURIComponent(branch))
+  else if(name==='/contents/data/intake-proofs/'+e.event_id+'.json?ref='+'a'.repeat(40))
    data={content:Buffer.from(JSON.stringify(proof)).toString('base64')};
-  else if(name.startsWith('/pulls?'))data=[{number:555,html_url:'https://github.com/wagnerjfjunior/Roleta/pull/555'}];
+  else if(name.startsWith('/pulls?'))data=[{number:555,html_url:'https://github.com/wagnerjfjunior/Roleta/pull/555',state:'open',head:{ref:branch,sha:'a'.repeat(40),repo:{full_name:'wagnerjfjunior/Roleta'}},base:{ref:'main'}}];
   else throw Error('Unexpected read '+name);
   return {ok:true,status:200,json:async()=>data};
  };

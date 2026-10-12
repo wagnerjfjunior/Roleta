@@ -24,7 +24,7 @@ const makeInput=(date='11/10/2026')=>({reviewed:reviewed(date),physicalByDraw:[1
 const ok=data=>({ok:true,status:200,json:async()=>data});
 const fail=(status=404)=>({ok:false,status,json:async()=>({message:'isolated mock rejection'})});
 function mockGitHub({failure=null}={}){
- const state={requests:[],branches:new Map(),prs:new Map(),snapshots:[],manifestCommits:[]};
+ const state={failure,requests:[],branches:new Map(),prs:new Map(),snapshots:[],manifestCommits:[]};
  const transport=async(url,opts)=>{
   assert.ok(url.startsWith(ROOT));const route=url.slice(ROOT.length),method=opts.method;
   const body=opts.body?JSON.parse(opts.body):null;
@@ -39,10 +39,14 @@ function mockGitHub({failure=null}={}){
    return proof?ok({content:Buffer.from(JSON.stringify(proof)).toString('base64')}):fail();
   }
   if(method==='GET'&&route.startsWith('/pulls?')){
-   const head=decodeURIComponent(route.split('head=')[1]||'').replace('wagnerjfjunior:','');
-   return ok([...state.prs.values()].filter(p=>p.head===head&&p.open).map(p=>({number:p.number,html_url:p.url})));
+   const head=decodeURIComponent((route.split('head=')[1]||'').split('&')[0]).replace('wagnerjfjunior:','');
+   return ok([...state.prs.values()].filter(p=>p.head===head).map(p=>({number:p.number,html_url:p.url,state:p.open?'open':'closed',head:{ref:p.head,sha:COMMIT,repo:{full_name:'wagnerjfjunior/Roleta'}},base:{ref:'main'}})));
   }
   if(route==='/git/ref/heads/main')return ok({object:{sha:MAIN}});
+  if(route==='/contents/data/manifest.json?ref='+COMMIT)return ok({content:Buffer.from(JSON.stringify(state.snapshots.at(-1).manifest)).toString('base64')});
+  if(route.startsWith('/contents/data/incoming/')&&route.endsWith('?ref='+COMMIT))return ok({content:Buffer.from(state.snapshots.at(-1).csv).toString('base64')});
+  if(route==='/git/commits/'+COMMIT)return ok({sha:COMMIT,parents:[{sha:MAIN}]});
+  if(route==='/compare/'+MAIN+'...'+COMMIT)return ok({status:'ahead',ahead_by:1,behind_by:0,merge_base_commit:{sha:MAIN},files:state.snapshots.at(-1).paths.map(filename=>({filename,status:filename==='data/manifest.json'?'modified':'added'}))});
   if(route==='/contents/data/manifest.json?ref='+MAIN)return ok({content:Buffer.from(JSON.stringify(manifest)).toString('base64')});
   if(route.startsWith('/contents/data/')){
    const file=route.slice('/contents/'.length).replace('?ref='+MAIN,'');
@@ -52,18 +56,19 @@ function mockGitHub({failure=null}={}){
   if(method==='POST'&&route==='/git/trees'){
    const proof=JSON.parse(body.tree.find(x=>x.path.startsWith('data/intake-proofs/')).content);
    const newManifest=JSON.parse(body.tree.find(x=>x.path==='data/manifest.json').content);
-   state.snapshots.push({proof,manifest:newManifest});return ok({sha:TREE});
+   state.snapshots.push({proof,manifest:newManifest,csv:body.tree.find(x=>x.path.startsWith('data/incoming/')).content,paths:body.tree.map(x=>x.path)});return ok({sha:TREE});
   }
   if(method==='POST'&&route==='/git/commits')return ok({sha:COMMIT});
   if(method==='POST'&&route==='/git/refs'){
    const name=body.ref.replace('refs/heads/','');
    if(state.branches.has(name))return fail(422);
    state.branches.set(name,body.sha);
-   if(failure==='after_branch')return fail(502);
+   if(state.failure==='after_branch')return fail(502);
    return ok({ref:body.ref});
   }
   if(method==='POST'&&route==='/pulls'){
-   if(failure==='after_branch'||failure==='pr_rejected')return fail(502);
+   if([...state.prs.values()].some(p=>p.head===body.head))return fail(422);
+   if(state.failure==='after_branch'||state.failure==='pr_rejected')return fail(502);
    const number=800+state.prs.size;
    const p={number,head:body.head,open:true,url:`https://github.com/wagnerjfjunior/Roleta/pull/${number}`};
    state.prs.set(number,p);return ok({number,html_url:p.url});
@@ -81,17 +86,19 @@ test('two distinct events generate stale manifest snapshots (must block second m
  assert.notEqual(mock.state.snapshots[0].proof.event_id,mock.state.snapshots[1].proof.event_id);
  // This is a TEST OF THE RISK, not a passing implementation of rebase/reconciliation.
 });
-test('same-event concurrent requests do not overwrite branch',async()=>{
+test('same-event concurrent requests converge without overwriting branch',async()=>{
  const mock=mockGitHub();const results=await Promise.allSettled([stage(makeInput(),mock.transport),stage(makeInput(),mock.transport)]);
- assert.equal(results.filter(x=>x.status==='fulfilled').length,1);
- assert.equal(results.filter(x=>x.status==='rejected'&&x.reason.status===409).length,1);
+ assert.equal(results.filter(x=>x.status==='fulfilled').length,2);
  assert.equal(mock.state.branches.size,1);assert.equal(mock.state.prs.size,1);
 });
-test('branch created then PR rejected fails closed on retry',async()=>{
+test('branch created then PR rejected recovers only original validated commit',async()=>{
  const mock=mockGitHub({failure:'pr_rejected'});
  await assert.rejects(stage(makeInput(),mock.transport),e=>e.status===502);
  assert.equal(mock.state.branches.size,1);assert.equal(mock.state.prs.size,0);
- await assert.rejects(stage(makeInput(),mock.transport),e=>e.status===409);
+ mock.state.failure=null;
+ const recovered=await stage(makeInput(),mock.transport);
+ assert.equal(recovered.recovered,true);
+ assert.equal(mock.state.prs.size,1);
  assert.equal(mock.state.branches.size,1);
 });
 test('identical replay returns PR and zero additional write requests',async()=>{
@@ -118,4 +125,39 @@ test('proof stores every physical↔ball mapping with original event date',async
  assert.equal(proof.drawn_mapping[0].physical_position,10);
  assert.equal(proof.drawn_mapping[9].physical_position,1);
  assert.equal(proof.payload_sha256,crypto.createHash('sha256').update(JSON.stringify(prepare(makeInput().reviewed,makeInput().physicalByDraw,{source:'IMG_1700.jpeg',acknowledged:true}))).digest('hex'));
+});
+
+test('orphan proof mutation blocks recovery without creating a PR',async()=>{
+ const m=mockGitHub({failure:'pr_rejected'});await assert.rejects(stage(makeInput(),m.transport));
+ m.state.failure=null;m.state.snapshots[0].proof.drawn_mapping[0].physical_position=11;
+ await assert.rejects(stage(makeInput(),m.transport),/occupied lines inconsistent|special physical|digest/);
+ assert.equal(m.state.prs.size,0);
+});
+test('orphan manifest mutation blocks recovery without creating a PR',async()=>{
+ const m=mockGitHub({failure:'pr_rejected'});await assert.rejects(stage(makeInput(),m.transport));
+ m.state.failure=null;m.state.snapshots[0].manifest.canonical_event_count++;
+ await assert.rejects(stage(makeInput(),m.transport),/manifest totals/);assert.equal(m.state.prs.size,0);
+});
+test('orphan on an advanced main fails closed',async()=>{
+ const m=mockGitHub({failure:'pr_rejected'});await assert.rejects(stage(makeInput(),m.transport));
+ m.state.failure=null;
+ const transport=(url,opts)=>url.endsWith('/git/ref/heads/main')?ok({object:{sha:'d'.repeat(40)}}):m.transport(url,opts);
+ await assert.rejects(stage(makeInput(),transport),e=>e.status===409&&/STALE_BASE/.test(e.message));assert.equal(m.state.prs.size,0);
+});
+test('replay with moved PR head fails closed without mutation',async()=>{
+ const m=mockGitHub();await stage(makeInput(),m.transport);
+ const transport=async(url,opts)=>{const r=await m.transport(url,opts);if(url.includes('/pulls?')){const data=await r.json();data[0].head.sha='e'.repeat(40);return ok(data);}return r;};
+ const before=m.state.requests.filter(x=>x.method!=='GET').length;
+ await assert.rejects(stage(makeInput(),transport),e=>e.status===409);
+ assert.equal(m.state.requests.filter(x=>x.method!=='GET').length,before);
+});
+test('another event can be staged after a suffixed source has been published',async()=>{
+ const m=mockGitHub();await stage(makeInput(),m.transport);const snapshot=m.state.snapshots[0];
+ const transport=(url,opts)=>{
+  if(url.endsWith('/contents/data/manifest.json?ref='+MAIN))return Promise.resolve(ok({content:Buffer.from(JSON.stringify(snapshot.manifest)).toString('base64')}));
+  if(url.endsWith('/contents/data/incoming/2026-10-11-I.csv?ref='+MAIN))return Promise.resolve(ok({content:Buffer.from(snapshot.csv).toString('base64')}));
+  return m.transport(url,opts);
+ };
+ const r=await stage(makeInput('12/10/2026'),transport);assert.equal(r.status,'pending_review');
+ assert.equal(m.state.snapshots.at(-1).manifest.canonical_event_count,manifest.canonical_event_count+2);
 });

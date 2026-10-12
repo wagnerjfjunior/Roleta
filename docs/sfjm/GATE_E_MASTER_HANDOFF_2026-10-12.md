@@ -1,3 +1,5 @@
+> **Atualização 12/10/2026 — autorização atual e promoção:** ler primeiro `GATE_E_RELEASE_PROGRESS_2026-10-12.md`. O responsável autorizou execução/merge/produção. LAB concorrente: PR #1 mergeada; PR #2 rejeitada com STALE_BASE em Actions. Recuperação implementada e testes locais aprovados. Publicação de código com escrita bloqueada não encerra correção versionada, proteção ou E2E. Próxima decisão: operadores, revisor independente e credencial técnica. Conteúdo abaixo preservado como histórico.
+
 # SFJM — Roleta Intelligence V3 — Dossiê de transição Gate E
 
 **Data de corte:** 12/10/2026 (America/Sao_Paulo)  

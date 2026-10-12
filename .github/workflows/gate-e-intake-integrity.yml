@@ -1,7 +1,8 @@
 name: Gate E intake integrity
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
 permissions:
   contents: read
@@ -10,53 +11,34 @@ jobs:
     name: Gate E intake manifest and proof
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout candidate
-        uses: actions/checkout@v4
+      - name: Checkout protected base only
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Validate pull request (branch + exact SHA)
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: Validate pull request using protected code
+        if: ${{ github.event_name == 'pull_request_target' }}
         env:
           GATE_E_PR_BRANCH: ${{ github.event.pull_request.head.ref }}
           GATE_E_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           GATE_E_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           GATE_E_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           GATE_E_BASE_REPO: ${{ github.event.pull_request.base.repo.full_name }}
+          GATE_E_TRUSTED_CHECKOUT: base
         shell: bash
         run: |
           set -euo pipefail
           test "$GATE_E_HEAD_REPO" = "$GATE_E_BASE_REPO"
-          git fetch --no-tags origin "$GATE_E_BASE_SHA" "$GATE_E_HEAD_SHA"
-          git checkout --detach "$GATE_E_HEAD_SHA"
           BASE_SHA="$GATE_E_BASE_SHA"
           HEAD_SHA="$GATE_E_HEAD_SHA"
-          # Trust boundary: run validators sourced from protected BASE, not PR HEAD.
-          # Bootstrap is permitted only when the PR does not modify data/.
-          if git cat-file -e "${BASE_SHA}:scripts/gate-e/ci-policy.cjs" 2>/dev/null; then
-            TRUST_ROOT="$(mktemp -d)"
-            git archive "$BASE_SHA" | tar -x -C "$TRUST_ROOT"
-            node "$TRUST_ROOT/scripts/gate-e/ci-policy.cjs"
-          else
-            echo "Gate E bootstrap: base does not yet contain a trusted guard"
-            if git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- data/ | grep -q .; then
-              echo "BLOCKED: protected data changed before trusted gate is installed"
-              exit 1
-            fi
-            echo "Bootstrap allowed only without data/ modifications"
-          fi
-      - name: Validate merge queue candidate
+          test "$(git rev-parse HEAD)" = "$BASE_SHA"
+          git cat-file -e "$HEAD_SHA^{commit}"
+          test "$(git rev-parse origin/main)" = "$BASE_SHA"
+          # Candidate bytes are read through git show; never checkout or execute HEAD.
+          node scripts/gate-e/ci-policy.cjs
+      - name: Reject unsupported merge queue
         if: ${{ github.event_name == 'merge_group' }}
-        shell: bash
         run: |
-          set -euo pipefail
-          echo "Merge queue requires a separate full gate against its generated merge-group base."
-          echo "Fail closed until the queue-specific validator is implemented."
+          echo "Merge queue requires a separate full gate."
           exit 1
-      - name: Regression suite
-        if: ${{ github.event_name == 'pull_request' }}
-        run: node --test tests/regression/*.test.cjs

@@ -6,7 +6,7 @@
 const {execFileSync}=require('node:child_process');
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 const EVENT=/^stat-intake\/(\d{4}-\d{2}-\d{2}-[MTI])$/;
-const STAT=/^data\/(?:manifest\.json|incoming\/|intake-proofs\/)/;
+const STAT=/^data\/(?:events\.csv|full_draws_reconstructed\.csv|manifest\.json|incoming\/|intake-proofs\/|corrections\/)/;
 function inspect({branch,paths}){
  if(typeof branch!=='string'||!Array.isArray(paths)||
     paths.some(p=>typeof p!=='string'||p.includes('\n'))) throw Error('invalid CI inputs');
@@ -31,7 +31,8 @@ if(require.main===module){
   const base=process.env.GATE_E_BASE_SHA;
   const head=process.env.GATE_E_HEAD_SHA;
   if(!/^[a-f0-9]{40}$/.test(base||'')||!/^[a-f0-9]{40}$/.test(head||''))throw Error('invalid pinned SHAs');
-  if(git('rev-parse','HEAD')!==head)throw Error('checkout not at PR SHA');
+  const expectedCheckout=process.env.GATE_E_TRUSTED_CHECKOUT==='base'?base:head;
+  if(git('rev-parse','HEAD')!==expectedCheckout)throw Error('checkout not at trusted SHA');
   const paths=git('diff','--name-only','--diff-filter=ACDMRTUXB',base,head).split('\n').filter(Boolean);
   const result=inspect({branch,paths});
   console.log(JSON.stringify(result,null,2));

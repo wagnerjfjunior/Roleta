@@ -12,3 +12,5 @@ test('intake PR changing application code is blocked',()=>assert.equal(inspect({
 test('intake PR altering a historical source is blocked',()=>assert.equal(inspect({branch:'stat-intake/'+id,paths:[...three,'data/events.csv']}).ok,false));
 test('wrong event ID is blocked',()=>assert.equal(inspect({branch:'stat-intake/'+id,paths:['data/manifest.json','data/incoming/2026-10-13-M.csv','data/intake-proofs/2026-10-13-M.json']}).ok,false));
 test('malformed intake branch is blocked',()=>assert.equal(inspect({branch:'stat-intake/garbage',paths:three}).reason,'INVALID_EVENT_BRANCH'));
+
+test('ordinary PR cannot mutate canonical historical CSV',()=>assert.equal(inspect({branch:'fix/bypass',paths:['data/events.csv']}).ok,false));
