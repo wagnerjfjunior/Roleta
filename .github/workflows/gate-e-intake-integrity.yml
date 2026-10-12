@@ -1,0 +1,54 @@
+name: Gate E intake integrity
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'data/manifest.json'
+      - 'data/incoming/**'
+      - 'data/intake-proofs/**'
+      - 'scripts/gate-e/**'
+      - '.github/workflows/gate-e-intake-integrity.yml'
+permissions:
+  contents: read
+jobs:
+  intake-guard:
+    name: Gate E intake manifest and proof
+    runs-on: ubuntu-latest
+    # This workflow is for event-intake branches ONLY. Other PRs need not satisfy
+    # this check; protect main with the existing regression workflow as well.
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'stat-intake/') }}
+    steps:
+      - name: Reject fork or unexpected destination
+        shell: bash
+        env:
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          BASE_REPO: ${{ github.event.pull_request.base.repo.full_name }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          test "$HEAD_REPO" = "$BASE_REPO"
+          test "$BASE_REF" = "main"
+      - name: Checkout exact PR head (not synthetic merge ref)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate against main captured at workflow start
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EVENT_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          git cat-file -e "${BASE_SHA}^{commit}"
+          test "$(git rev-parse HEAD)" = "$HEAD_SHA"
+          # Do not reuse origin/main from the build machine.
+          node scripts/gate-e/check-stale-base.cjs "$BASE_SHA" "$HEAD_SHA"
+          node scripts/gate-e/validate-intake-pr.cjs "$BASE_SHA" "$HEAD_SHA"
+          test "$EVENT_BRANCH" = "stat-intake/$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" | sed -nE 's@^data/incoming/([0-9]{4}-[0-9]{2}-[0-9]{2}-[MTI])\.csv$@\1@p')"
+          node --test tests/regression/*.test.cjs
