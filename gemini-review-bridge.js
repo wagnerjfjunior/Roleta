@@ -30,7 +30,7 @@ const matches=registry.get(norm(r.nome))||[];if(matches.length!==1){fail('Corret
 const broker=matches[0],key=norm(broker.nome);
 if(seenBroker.has(key))fail('Corretor duplicado: '+broker.nome+'.');seenBroker.add(key);
 const record={nome:broker.nome,creci:broker.creci,gerente:broker.gerente,diretor:broker.diretor,status_creci:broker.status_creci};
-if(classification==='salao'){if(n===null||n<1)fail('Número sorteado obrigatório no SALÃO: '+broker.nome+'.');active.push({record,n});}
+if(classification==='salao'){if(n===null||n<1)fail('Número sorteado obrigatório no SALÃO: '+broker.nome+'.');record.physical_position=pos;active.push({record,n});}
 else if(classification==='standby'){if(n!==null)fail('STAND BY com número sorteado: '+broker.nome+'.');standby.push(record);}
 else if(classification==='online'){if(n!==null)fail('ON-LINE com número sorteado: '+broker.nome+'.');online.push(record);}
 }

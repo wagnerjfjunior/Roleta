@@ -29,7 +29,7 @@ function createHandler({env=process.env,authenticate=auth,save=saveFinal,read=re
   }catch(e){
    const conflict=e.status===409||e.code==='23505'||e.code==='40001';
    const code=conflict?409:e.code==='42501'?403:[403,413,422,503].includes(e.status)?e.status:e instanceof SyntaxError||e.code==='22023'?422:503;
-   return res.status(code).json({error:conflict?'Evento existente ou versão desatualizada. Carregue o registro antes de corrigir.':code===422?'Confira a folha, o cadastro, a data e o motivo da correção.':'Não foi possível concluir. Nenhuma gravação foi confirmada.'});
+   return res.status(code).json({error:conflict?'Evento existente ou versão desatualizada. Carregue o registro antes de corrigir.':code===422?'Confira a folha, o cadastro e a data.':'Não foi possível concluir. Nenhuma gravação foi confirmada.'});
   }
  };
 }

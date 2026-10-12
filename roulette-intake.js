@@ -185,7 +185,7 @@
   function clonePayload(p){return JSON.parse(JSON.stringify(p))}
   function reviewRowHtml(r,group,index,total){
     const pos=group==='salao'?Number(r.ordem_final||index+1):index+1;
-    return '<tr data-group="'+group+'" data-original-position="'+esc(pos)+'" data-original-name="'+esc(r.nome||'')+'">'+
+    return '<tr data-group="'+group+'" data-original-position="'+esc(pos)+'" data-original-name="'+esc(r.nome||'')+'" data-physical-position="'+esc(r.physical_position??'')+'">'+
       '<td><input class="rltv2-review-position" inputmode="numeric" type="number" min="1" max="'+Math.max(total,1)+'" value="'+esc(pos)+'"></td>'+
       '<td><input class="rltv2-review-name" list="rltv2BrokerNames" value="'+esc(r.nome||'')+'" autocomplete="off"></td>'+
       '<td class="rltv2-review-creci">'+esc(r.creci||'')+'</td>'+
@@ -234,7 +234,7 @@
         }
         if(!broker)return null;
         const out={nome:broker.nome,creci:broker.creci,status_creci:broker.status_creci,gerente:broker.gerente,diretor:broker.diretor};
-        if(group==='salao')out.ordem_final=pos;
+        if(group==='salao'){out.ordem_final=pos;const physical=Number(tr.dataset.physicalPosition);if(Number.isSafeInteger(physical)&&physical>0)out.physical_position=physical;}
         else out.__review_position=pos;
         return out;
       }).filter(Boolean);
@@ -280,18 +280,9 @@
         '<div class="section-head"><div><span class="eyebrow">3 · PRÉVIA FINAL</span><h2>RLT-PRINT-V2</h2></div><span id="rltv2Counts" class="intake-counts"></span></div>'+
         '<div id="rltv2Preview" class="rltv2-screen-preview"></div>'+
         '<label class="intake-confirm"><input id="rltv2Confirm" type="checkbox"> Conferi a folha final após as correções humanas.</label>'+
-        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Abrir PDF para imprimir</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar PDF</button><button id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar foto</button></div>'+
+        '<div class="intake-actions"><button id="rltv2Print" class="simulation-run" disabled>4 · Abrir PDF para imprimir</button><button id="rltv2SavePdf" class="simulation-run" disabled>Salvar PDF</button><button id="rltv2SharePdf" class="simulation-run" disabled>Compartilhar foto</button><button id="rltStatSubmit" class="simulation-run" type="button" disabled>Salvar no Supabase</button></div>'+
         '<p id="rltv2PdfStatus" class="small muted" role="status" aria-live="polite">Confirme a folha final para preparar o PDF de compartilhamento.</p>'+
-      '</article>'+
-      '<article id="rltStatCard" class="card" hidden>'+
-        '<div class="section-head"><div><span class="eyebrow">5 · AMOSTRAGEM</span><h2>Salvar na base estatística</h2></div><span class="simulation-separation">VALIDAÇÃO SEPARADA</span></div>'+
-        '<p class="small muted">Este passo não é necessário para imprimir. Quando tiver acesso à folha original, informe a linha física de cada corretor. A bolinha sorteada é a ordem final já conferida. O próprio operador confirma e salva no Supabase, em ação separada da impressão.</p>'+
-        '<label><span>Origem da folha oficial (foto/arquivo)</span><input id="rltStatSource" maxlength="180" placeholder="Ex.: IMG_1700.jpeg"></label>'+
-        '<label><span>Motivo da correção (se já salvo)</span><input id="rltStatReason" maxlength="1000" placeholder="Explique o que foi corrigido"></label>'+
-        '<div id="rltStatRows"></div>'+
-        '<label class="intake-confirm"><input id="rltStatConfirm" type="checkbox"> Conferi na folha original a posição física e o número sorteado de cada corretor. Confirmo o envio desta folha ao Supabase.</label>'+
-        '<div class="intake-actions"><button id="rltStatSubmit" class="simulation-run" type="button">Salvar no Supabase</button></div>'+
-        '<p id="rltStatStatus" class="small muted" role="status" aria-live="polite">Aguardando conferência das posições físicas.</p>'+
+        '<p id="rltStatStatus" class="small muted" role="status" aria-live="polite">A folha validada pode ser salva no Supabase por este botão.</p>'+
       '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
 
@@ -328,65 +319,48 @@
     const pdfStatus=host.querySelector('#rltv2PdfStatus');
     let pdfBlob=null,photoBlob=null,pdfVersion=0;
     const printHost=host.querySelector('#rltv2PrintHost');
-    const statCard=host.querySelector('#rltStatCard');
-    const statRows=host.querySelector('#rltStatRows');
-    const statSource=host.querySelector('#rltStatSource');
-    const statReason=host.querySelector('#rltStatReason');
-    let savedRecord=null;
-    const statConfirm=host.querySelector('#rltStatConfirm');
+    let savedRecord=null,statBusy=false;
     const statSubmit=host.querySelector('#rltStatSubmit');
     const statStatus=host.querySelector('#rltStatStatus');
-    for(const control of [statRows,statSource,statReason])control.addEventListener('input',()=>{statConfirm.checked=false});
     function resetStatisticalReview(){
-      statCard.hidden=true;statConfirm.checked=false;statRows.replaceChildren();
-      statSource.value='';statStatus.textContent='Aguardando conferência das posições físicas.';
+      statSubmit.disabled=true;
+      statStatus.textContent='Aplique as correções para liberar a folha final.';
     }
     function prepareStatisticalReview(){
-      statConfirm.checked=false;statSource.value='';
-      const rows=[...reviewedPayload.salao].sort((a,b)=>Number(a.ordem_final)-Number(b.ordem_final));
-      statRows.innerHTML='<div class="rltv2-review-wrap"><table class="rltv2-review-table">'+
-        '<thead><tr><th>Bolinha / ordem final</th><th>Corretor</th><th>Linha física da folha</th></tr></thead><tbody>'+
-        rows.map(row=>'<tr><td>'+Number(row.ordem_final)+'</td><td>'+esc(row.nome)+'</td>'+
-          '<td><input class="rlt-stat-physical" type="number" min="1" max="999" step="1" inputmode="numeric" aria-label="Linha física de '+esc(row.nome)+'" placeholder="Sem inferir"></td></tr>').join('')+
-        '</tbody></table></div>';
-      if(savedRecord&&savedRecord.payload.reviewed.evento.data===reviewedPayload.evento.data&&savedRecord.payload.reviewed.evento.periodo===reviewedPayload.evento.periodo){
-        const mapping=new Map(savedRecord.payload.event.drawn_mapping.map(m=>[m.drawn_number,m.physical_position]));
-        [...statRows.querySelectorAll('.rlt-stat-physical')].forEach((x,i)=>{x.value=mapping.get(Number(rows[i].ordem_final))||''});
-        statSource.value=savedRecord.payload.event.source;
-      }
-      statCard.hidden=false;
-      statStatus.textContent='Nada foi gravado. A posição física não é deduzida da ordem final.';
+      statSubmit.disabled=true;
+      statStatus.textContent='A folha validada pode ser salva no Supabase por este botão.';
     }
     statSubmit.addEventListener('click',async()=>{
-      if(!reviewedPayload)return;
-      statSubmit.disabled=true;
+      if(!reviewedPayload||!confirm.checked||statBusy)return;
+      statBusy=true;statSubmit.disabled=true;
       try{
-        const rows=[...reviewedPayload.salao].sort((a,b)=>Number(a.ordem_final)-Number(b.ordem_final));
-        const physical=[...statRows.querySelectorAll('.rlt-stat-physical')].map(x=>x.value);
-        // Blank input stays invalid: do not convert "" to Number(0).
-        if(physical.some(x=>!/^\d+$/.test(x.trim())))throw Error('Informe cada linha física da folha original.');
-        const checked={...reviewedPayload,salao:rows};
+        const checked=clonePayload(reviewedPayload);
+        checked.salao.sort((a,b)=>Number(a.ordem_final)-Number(b.ordem_final));
+        const sameEvent=savedRecord&&savedRecord.payload.reviewed.evento.data===checked.evento.data&&savedRecord.payload.reviewed.evento.periodo===checked.evento.periodo;
+        if(sameEvent){
+          const known=new Map(savedRecord.payload.event.drawn_mapping.map(m=>[normalizeName(m.broker_name),m.physical_position]));
+          for(const row of checked.salao)if(row.physical_position==null&&known.get(normalizeName(row.nome))!=null)row.physical_position=known.get(normalizeName(row.nome));
+        }
         if(!window.RoletaStatisticalSubmission)throw Error('Validador estatístico indisponível.');
-        const prepared=window.RoletaStatisticalSubmission.prepare(checked,physical,{
-          source:statSource.value,acknowledged:statConfirm.checked
+        const prepared=window.RoletaStatisticalSubmission.prepareFinalSheet(checked,{
+          source:sameEvent?savedRecord.payload.event.source:undefined,acknowledged:true
         });
         statStatus.textContent='Salvando a folha conferida no Supabase.';
         const auth=await fetch('/api/auth/session',{cache:'no-store'}).then(r=>r.json());
         if(!auth.authenticated||!auth.csrfToken)throw Error('Entre com Google para salvar no Supabase.');
         const response=await fetch('/api/final-roulette',{method:'POST',cache:'no-store',headers:{
           'Content-Type':'application/json','X-Roleta-CSRF':auth.csrfToken
-        },body:JSON.stringify({reviewed:checked,physicalByDraw:physical.map(Number),
-          source:prepared.source,acknowledged:true,expectedVersion:savedRecord?.event_id===prepared.event_id?savedRecord.version:0,reason:statReason.value})});
+        },body:JSON.stringify({reviewed:checked,source:prepared.source,acknowledged:true,
+          expectedVersion:sameEvent?savedRecord.version:0})});
         const data=await response.json().catch(()=>({}));
         if(!response.ok)throw Error(data.error||'Integração indisponível; nenhuma roleta foi salva.');
         if(!['saved','replayed'].includes(data.status)||data.event_id!==prepared.event_id||!Number.isSafeInteger(data.version)||data.version<1)
           throw Error('Resposta de gravação não validada.');
         if(data.current_version!==data.version)throw Error('Reenvio reconhecido, mas existe uma correção mais recente. Carregue a versão atual.');
         savedRecord={event_id:data.event_id,version:data.version,payload:{event:prepared,reviewed:checked}};
-        statReason.value='';
         statStatus.textContent=(data.status==='replayed'?'Registro já salvo, sem duplicação. ':'Salvo no Supabase. ')+data.event_id+' · versão '+data.version+'. Atualize o painel para carregar a base.';
       }catch(err){statStatus.textContent=String(err.message||err)+' Nenhuma inclusão estatística foi confirmada.';}
-      finally{statSubmit.disabled=false;}
+      finally{statBusy=false;statSubmit.disabled=!reviewedPayload||!confirm.checked;}
     });
 
 
@@ -628,6 +602,7 @@
       }
     }
     confirm.addEventListener('change',()=>{
+      statSubmit.disabled=statBusy||!reviewedPayload||!confirm.checked;
       pdfVersion++;
       pdfBlob=null;photoBlob=null;
       print.disabled=true;
