@@ -64,3 +64,15 @@ jobs:
           psql -X -v ON_ERROR_STOP=1 -f database/production-review/20261011_roleta_v2_runtime_role_gate_b_candidate.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/gate-b0-runtime-pg17.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/gate-a2-v2-append-pg17.sql
+      - name: Rehearse final roulette additive ledger and concurrent replay
+        env:
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: ci-disposable-only
+          PGDATABASE: roleta_gate_a_ci
+        run: |
+          node --test tests/regression/final-roulette.test.cjs
+          psql -X -v ON_ERROR_STOP=1 -f database/production-review/final_roulette_v1_candidate.sql
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/final-roulette-pg17.sql
+          bash tests/postgres/final-roulette-concurrency.sh

@@ -285,17 +285,22 @@
       '</article>'+
       '<article id="rltStatCard" class="card" hidden>'+
         '<div class="section-head"><div><span class="eyebrow">5 · AMOSTRAGEM</span><h2>Salvar na base estatística</h2></div><span class="simulation-separation">VALIDAÇÃO SEPARADA</span></div>'+
-        '<p class="small muted">Este passo não é necessário para imprimir. Quando tiver acesso à folha original, informe a linha física de cada corretor. A bolinha sorteada é a ordem final já conferida. A inclusão só ocorre após uma revisão separada do registro enviado.</p>'+
+        '<p class="small muted">Este passo não é necessário para imprimir. Quando tiver acesso à folha original, informe a linha física de cada corretor. A bolinha sorteada é a ordem final já conferida. O próprio operador confirma e salva no Supabase, em ação separada da impressão.</p>'+
         '<label><span>Origem da folha oficial (foto/arquivo)</span><input id="rltStatSource" maxlength="180" placeholder="Ex.: IMG_1700.jpeg"></label>'+
+        '<label><span>Motivo da correção (se já salvo)</span><input id="rltStatReason" maxlength="1000" placeholder="Explique o que foi corrigido"></label>'+
         '<div id="rltStatRows"></div>'+
-        '<label class="intake-confirm"><input id="rltStatConfirm" type="checkbox"> Conferi na folha original a posição física e o número sorteado de cada corretor. Entendo que o envio fica pendente de aprovação.</label>'+
-        '<div class="intake-actions"><button id="rltStatSubmit" class="simulation-run" type="button">Enviar para revisão estatística</button></div>'+
+        '<label class="intake-confirm"><input id="rltStatConfirm" type="checkbox"> Conferi na folha original a posição física e o número sorteado de cada corretor. Confirmo o envio desta folha ao Supabase.</label>'+
+        '<div class="intake-actions"><button id="rltStatSubmit" class="simulation-run" type="button">Salvar no Supabase</button></div>'+
         '<p id="rltStatStatus" class="small muted" role="status" aria-live="polite">Aguardando conferência das posições físicas.</p>'+
       '</article>'+
       '<section id="rltv2PrintHost" class="roulette-print-sheet" hidden></section>';
 
     if(window.RoletaGeminiDraftUI)window.RoletaGeminiDraftUI.mount(host);
 
+    const loadWrap=document.createElement('div');loadWrap.className='intake-actions';
+    const loadId=document.createElement('input');loadId.placeholder='Evento salvo: 2026-10-07-M';loadId.setAttribute('aria-label','Identificador da roleta salva');
+    const loadButton=document.createElement('button');loadButton.type='button';loadButton.textContent='Carregar roleta salva';
+    loadWrap.append(loadId,loadButton);host.querySelector('#rltv2Json').parentNode.appendChild(loadWrap);
     const ta=host.querySelector('#rltv2Json');
     const file=host.querySelector('#rltv2File');
     const paste=host.querySelector('#rltv2Paste');
@@ -326,9 +331,12 @@
     const statCard=host.querySelector('#rltStatCard');
     const statRows=host.querySelector('#rltStatRows');
     const statSource=host.querySelector('#rltStatSource');
+    const statReason=host.querySelector('#rltStatReason');
+    let savedRecord=null;
     const statConfirm=host.querySelector('#rltStatConfirm');
     const statSubmit=host.querySelector('#rltStatSubmit');
     const statStatus=host.querySelector('#rltStatStatus');
+    for(const control of [statRows,statSource,statReason])control.addEventListener('input',()=>{statConfirm.checked=false});
     function resetStatisticalReview(){
       statCard.hidden=true;statConfirm.checked=false;statRows.replaceChildren();
       statSource.value='';statStatus.textContent='Aguardando conferência das posições físicas.';
@@ -341,6 +349,11 @@
         rows.map(row=>'<tr><td>'+Number(row.ordem_final)+'</td><td>'+esc(row.nome)+'</td>'+
           '<td><input class="rlt-stat-physical" type="number" min="1" max="999" step="1" inputmode="numeric" aria-label="Linha física de '+esc(row.nome)+'" placeholder="Sem inferir"></td></tr>').join('')+
         '</tbody></table></div>';
+      if(savedRecord&&savedRecord.payload.reviewed.evento.data===reviewedPayload.evento.data&&savedRecord.payload.reviewed.evento.periodo===reviewedPayload.evento.periodo){
+        const mapping=new Map(savedRecord.payload.event.drawn_mapping.map(m=>[m.drawn_number,m.physical_position]));
+        [...statRows.querySelectorAll('.rlt-stat-physical')].forEach((x,i)=>{x.value=mapping.get(Number(rows[i].ordem_final))||''});
+        statSource.value=savedRecord.payload.event.source;
+      }
       statCard.hidden=false;
       statStatus.textContent='Nada foi gravado. A posição física não é deduzida da ordem final.';
     }
@@ -357,18 +370,21 @@
         const prepared=window.RoletaStatisticalSubmission.prepare(checked,physical,{
           source:statSource.value,acknowledged:statConfirm.checked
         });
-        statStatus.textContent='Registro conferido. Enviando para revisão; ainda não está na amostragem.';
+        statStatus.textContent='Salvando a folha conferida no Supabase.';
         const auth=await fetch('/api/auth/session',{cache:'no-store'}).then(r=>r.json());
-        if(!auth.authenticated||!auth.csrfToken)throw Error('Entre com Google para enviar para revisão.');
-        const response=await fetch('/api/statistical-submit',{method:'POST',cache:'no-store',headers:{
+        if(!auth.authenticated||!auth.csrfToken)throw Error('Entre com Google para salvar no Supabase.');
+        const response=await fetch('/api/final-roulette',{method:'POST',cache:'no-store',headers:{
           'Content-Type':'application/json','X-Roleta-CSRF':auth.csrfToken
         },body:JSON.stringify({reviewed:checked,physicalByDraw:physical.map(Number),
-          source:prepared.source,acknowledged:true})});
+          source:prepared.source,acknowledged:true,expectedVersion:savedRecord?.event_id===prepared.event_id?savedRecord.version:0,reason:statReason.value})});
         const data=await response.json().catch(()=>({}));
         if(!response.ok)throw Error(data.error||'Integração indisponível; nenhuma roleta foi salva.');
-        if(data.status!=='pending_review'||!/^https:\/\/github\.com\/wagnerjfjunior\/Roleta\/pull\/\d+$/.test(data.pr_url||''))
-          throw Error('Resposta de revisão não validada.');
-        statStatus.textContent='Enviado para revisão PR #'+data.pr_number+'. Ainda não foi incorporado à amostragem: '+data.pr_url;
+        if(!['saved','replayed'].includes(data.status)||data.event_id!==prepared.event_id||!Number.isSafeInteger(data.version)||data.version<1)
+          throw Error('Resposta de gravação não validada.');
+        if(data.current_version!==data.version)throw Error('Reenvio reconhecido, mas existe uma correção mais recente. Carregue a versão atual.');
+        savedRecord={event_id:data.event_id,version:data.version,payload:{event:prepared,reviewed:checked}};
+        statReason.value='';
+        statStatus.textContent=(data.status==='replayed'?'Registro já salvo, sem duplicação. ':'Salvo no Supabase. ')+data.event_id+' · versão '+data.version+'. Atualize o painel para carregar a base.';
       }catch(err){statStatus.textContent=String(err.message||err)+' Nenhuma inclusão estatística foi confirmada.';}
       finally{statSubmit.disabled=false;}
     });
@@ -527,6 +543,17 @@
       }
     });
 
+    loadButton.addEventListener('click',async()=>{
+      loadButton.disabled=true;
+      try{
+        const id=loadId.value.trim();if(!/^\d{4}-\d{2}-\d{2}-[MTI]$/.test(id))throw Error('Informe o identificador do evento.');
+        const response=await fetch('/api/final-roulette',{cache:'no-store'});const data=await response.json();
+        if(!response.ok)throw Error(data.error||'Não foi possível carregar.');
+        const record=data.records?.find(r=>r.event_id===id);if(!record)throw Error('Evento não encontrado.');
+        savedRecord=record;ta.value=JSON.stringify(record.payload.reviewed,null,2);await validateAndPrepareReview();
+      }catch(err){gate.textContent=err.message||'Falha ao carregar.';}
+      finally{loadButton.disabled=false;}
+    });
     btn.addEventListener('click',validateAndPrepareReview);
 
     reviewBtn.addEventListener('click',()=>{
