@@ -37,6 +37,7 @@ jobs:
       - run: node --check gemini-intake-converter.js
       - run: node tests/gemini-intake-converter.test.cjs
       - run: node tests/roleta-ocr-relay.test.cjs
+      - run: node tests/roleta-ocr-timeout.test.cjs
       - run: node tests/photo-prepare.test.cjs
       - run: node tests/ios-print-gesture.test.cjs
       - run: node tests/backfill-mobile-review-ui.test.cjs

@@ -24,6 +24,9 @@
     }
   ],
   "functions": {
+    "api/roleta-ocr.js": {
+      "maxDuration": 200
+    },
     "api/final-roulette.js": {
       "includeFiles": "data/**"
     }

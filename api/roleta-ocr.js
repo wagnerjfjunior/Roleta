@@ -57,18 +57,20 @@ module.exports=async function handler(req,res){
  const form=new FormData();
  form.append('file',new Blob([bytes],{type:mime}),fileName);
  const controller=new AbortController();
- const timeout=setTimeout(()=>controller.abort(),55000);
+ // Make waits up to 180 seconds for Webhook Response. Leave a margin and
+ // allow the slow Gemini run observed in production (~143 seconds) to return.
+ const timeout=setTimeout(()=>controller.abort(),175000);
  let upstream;
  try{upstream=await fetch(url.toString(),{method:'POST',body:form,signal:controller.signal,redirect:'error'});}
- catch(e){clearTimeout(timeout);return res.status(502).json({error:e.name==='AbortError'?'O processamento demorou demais. Tente novamente.':'Falha na comunicação com o Make.'});}
- clearTimeout(timeout);
- if(!upstream.ok)return res.status(502).json({error:'Make retornou erro HTTP '+upstream.status+'.'});
+ catch(e){clearTimeout(timeout);return res.status(e.name==='AbortError'?504:502).json({error:e.name==='AbortError'?'A leitura excedeu 2 minutos e 55 segundos. O Make pode continuar processando; não houve retorno ao app.':'Falha na comunicação com o Make.'});}
+ if(!upstream.ok){clearTimeout(timeout);return res.status(502).json({error:'Make retornou erro HTTP '+upstream.status+'.'});}
  let result;
  try{
   const raw=await upstream.text();
   if(raw.length>1000000)throw Error('resposta grande');
   result=JSON.parse(raw);
- }catch{return res.status(502).json({error:'Make não retornou JSON válido. Verifique o módulo Webhook Response.'});}
+ }catch(e){return res.status(e.name==='AbortError'?504:502).json({error:e.name==='AbortError'?'A leitura excedeu o prazo de retorno ao app.':'Make não retornou JSON válido. Verifique o módulo Webhook Response.'});}
+ finally{clearTimeout(timeout);}
  const data=validResponse(result)?result:validResponse(result?.body)?result.body:validResponse(result?.result)?result.result:null;
  if(!data)return res.status(502).json({error:'Resposta do Make não contém linhas do Gemini.'});
  return res.status(200).json({status:'PENDENTE_REVISAO',source:'make-gemini',result:data});

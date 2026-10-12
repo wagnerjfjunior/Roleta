@@ -1,3 +1,5 @@
+> **RETORNO OCR — 12/10/2026:** execução Make das 19h58 levou 143,8 s até responder, mas relay abortava em 55 s. Prazo ajustado para 175 s, duração Vercel 200 s e cliente 210 s. Ler `sfjm/OCR_RETURN_TIMEOUT_2026-10-12.md`. Próxima validação: retorno no telefone da Sabrina, mantendo a página aberta; depois primeiro salvamento real.
+
 > **FLUXO SIMPLIFICADO — 12/10/2026:** passo 5 removido; gravação Supabase no passo 3 usa a folha já conferida no passo 2, sem nova tabela, nome de arquivo ou motivo manual. Posições originais do OCR preservadas internamente; folha final sem posições originais também pode ser salva, sem inventar posições para modelos físicos. Ler `sfjm/FINAL_SHEET_SINGLE_REVIEW_2026-10-12.md`.
 
 > **TROUBLESHOOTING OCR — 12/10/2026:** compressão local de câmera/galeria implementada com cópia JPEG de até 900.000 bytes e prévia do arquivo enviado; relay impõe o mesmo limite. Ler `sfjm/OCR_PHOTO_PREPARATION_2026-10-12.md`. Próxima validação operacional: foto real no iPhone e retorno Make; depois retomar primeiro salvamento real da folha final Supabase.

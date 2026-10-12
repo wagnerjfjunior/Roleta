@@ -26,7 +26,7 @@ async function mount(host){
  const status=article.querySelector('[data-gemini-status]'),details=article.querySelector('[data-gemini-detail]');
  const progressBox=article.querySelector('[data-upload-progress]'),progressLabel=article.querySelector('[data-upload-label]'),progressMeter=article.querySelector('[data-upload-meter]');
  function progress(label,n){progressBox.hidden=false;progressLabel.textContent=label;if(n===null)progressMeter.removeAttribute('value');else progressMeter.value=n;}
- function upload(file,csrf){return new Promise((resolve,reject)=>{const x=new XMLHttpRequest();x.open('POST','/api/roleta-ocr');x.setRequestHeader('Content-Type',file.type);x.setRequestHeader('X-Roleta-Filename',file.name);x.setRequestHeader('X-Roleta-CSRF',csrf);x.upload.onprogress=e=>{if(e.lengthComputable){const n=Math.round(100*e.loaded/e.total);progress('Enviando imagem: '+n+'%',n);}};x.upload.onload=()=>progress('Foto enviada. Make/Gemini processando…',null);x.onerror=()=>reject(Error('Falha de conexão.'));x.onabort=()=>reject(Error('Envio cancelado.'));x.onload=()=>{let json;try{json=JSON.parse(x.responseText);}catch{return reject(Error('Resposta inválida do servidor.'));}if(x.status<200||x.status>=300)return reject(Error(json.error||'Falha na leitura.'));resolve(json);};x.send(file);});}
+ function upload(file,csrf){return new Promise((resolve,reject)=>{const x=new XMLHttpRequest();x.open('POST','/api/roleta-ocr');x.timeout=210000;x.ontimeout=()=>reject(Error('O telefone ou a conexão encerrou a espera pela leitura. O Make pode continuar processando.'));x.setRequestHeader('Content-Type',file.type);x.setRequestHeader('X-Roleta-Filename',file.name);x.setRequestHeader('X-Roleta-CSRF',csrf);x.upload.onprogress=e=>{if(e.lengthComputable){const n=Math.round(100*e.loaded/e.total);progress('Enviando imagem: '+n+'%',n);}};x.upload.onload=()=>progress('Foto enviada. Make/Gemini processando…',null);x.onerror=()=>reject(Error('Falha de conexão.'));x.onabort=()=>reject(Error('Envio cancelado.'));x.onload=()=>{let json;try{json=JSON.parse(x.responseText);}catch{return reject(Error('Resposta inválida do servidor.'));}if(x.status<200||x.status>=300)return reject(Error(json.error||'Falha na leitura.'));resolve(json);};x.send(file);});}
  article.querySelector('[data-json-copy]').addEventListener('click',async()=>{if(!textarea.value)return;try{await navigator.clipboard.writeText(textarea.value);}catch{textarea.focus();textarea.select();}});
  article.querySelector('[data-json-download]').addEventListener('click',()=>{if(!textarea.value)return;const url=URL.createObjectURL(new Blob([textarea.value],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='roleta-gemini-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
  file.addEventListener('change',async()=>{const f=file.files?.[0];if(f)textarea.value=await f.text();});
@@ -110,7 +110,7 @@ async function mount(host){
    if(!canSend())return;
    busy=true;refreshSend();
    photoStatus.className='intake-gate blocked';
-   photoStatus.innerHTML='<strong>PROCESSANDO FOTOGRAFIA</strong><div>Aguardando resposta do Make e do Gemini…</div>';
+   photoStatus.innerHTML='<strong>PROCESSANDO FOTOGRAFIA</strong><div>Aguardando resposta do Make e do Gemini. A leitura pode levar até 3 minutos; mantenha esta página aberta.</div>';
    progress('Iniciando envio: 0%',0);
    try{
      const json=await upload(selected,googleSession.csrfToken);
