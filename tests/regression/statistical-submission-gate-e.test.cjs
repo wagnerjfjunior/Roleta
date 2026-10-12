@@ -65,7 +65,7 @@ test('enabled Gate E requires trusted Google sub, same origin and CSRF',async()=
  let staged=0;
  const auth={requireSameOrigin:()=>true,session:()=>({sub:'operator-1'}),
   csrfForSub:()=> 'secret'};
- const env={ROLETA_STAT_WRITES_ENABLED:'true',ROLETA_STAT_GITHUB_TOKEN:'placeholder-placeholder',
+ const env={ROLETA_STAT_STORAGE_BACKEND:'github_legacy',ROLETA_STAT_WRITES_ENABLED:'true',ROLETA_STAT_GITHUB_TOKEN:'placeholder-placeholder',
   ROLETA_STAT_ALLOWED_SUBS:'operator-1'};
  const makeRes=()=>{const state={status:null,data:null};
   return {state,setHeader(){},status(v){state.status=v;return this;},json(v){state.data=v;return this;}};};
@@ -167,4 +167,11 @@ test('existing branch with mismatched audit proof is a conflict before any mutat
  await assert.rejects(stageStatisticalSubmission(input,{actorSub:'operator-1',
   token:'placeholder-placeholder',transport}),err=>err.status===409);
  assert.equal(calls,2);
+});
+
+test('write flag alone cannot route the operational Supabase flow into GitHub PRs',async()=>{
+ let calls=0;const state={code:null};
+ const res={setHeader(){},status(v){state.code=v;return this;},json(){return this;}};
+ await createHandler({env:{ROLETA_STAT_WRITES_ENABLED:'true',ROLETA_STAT_GITHUB_TOKEN:'placeholder-placeholder'},stage:async()=>{calls++;}})({method:'POST'},res);
+ assert.equal(state.code,503);assert.equal(calls,0);
 });

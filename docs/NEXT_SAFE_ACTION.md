@@ -1,3 +1,5 @@
+> **CORREÇÃO CANÔNICA DO RESPONSÁVEL — 12/10/2026:** ler primeiro [OPERATOR_VALIDATED_OCR_SUPABASE_FLOW_2026-10-12.md](sfjm/OPERATOR_VALIDATED_OCR_SUPABASE_FLOW_2026-10-12.md). Conferência pelo próprio corretor; nenhuma segunda pessoa, aprovação independente ou conta GitHub adicional. Destino operacional: Supabase, mediante permissão, separado da impressão. Google: wagnerjfjunior@gmail.com e brendatatianelima@gmail.com. Exigências anteriores de revisor independente estão revogadas; abaixo fica o histórico técnico.
+
 > **Atualização 12/10/2026 — autorização atual e promoção:** ler primeiro `sfjm/GATE_E_RELEASE_PROGRESS_2026-10-12.md`. O responsável autorizou execução/merge/produção. LAB concorrente: PR #1 mergeada; PR #2 rejeitada com STALE_BASE em Actions. Recuperação implementada e testes locais aprovados. Publicação de código com escrita bloqueada não encerra correção versionada, proteção ou E2E. Próxima decisão: operadores, revisor independente e credencial técnica. Conteúdo abaixo preservado como histórico.
 
 > **NEXT SAFE ACTION — 2026-10-11 / SFJM GATE E (ATUAL)**

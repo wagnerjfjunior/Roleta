@@ -15,7 +15,7 @@ test('conflicting two PRs block',()=>{const x=orphan();x.openPrs=[{},{}];assert.
 test('unverified original proof blocks recovery',()=>{const x=orphan();x.proof.payload_sha256='bad';assert.equal(plan(x).reason,'UNVERIFIED_PROOF');});
 test('approved correction contract still never allows writes',()=>{const r=assess(correction());assert.equal(r.ok,true);assert.equal(r.writesPermitted,false);});
 test('correction requires predecessor proof hash',()=>{const x=correction();x.proposed.predecessor_proof_sha256='e'.repeat(64);assert.equal(assess(x).reason,'BROKEN_VERSION_CHAIN');});
-test('author and reviewer must be different',()=>{const x=correction();x.approval.reviewer_id='author';assert.equal(assess(x).reason,'INDEPENDENT_APPROVAL_REQUIRED');});
+test('same operator may confirm their own correction; no second reviewer required',()=>{const x=correction();x.approval.reviewer_id='author';assert.equal(assess(x).ok,true);assert.equal(assess(x).writesPermitted,false);});
 test('reviewer approval must bind proposal digest',()=>{const x=correction();x.proposed.reason+=' changed';assert.equal(assess(x).reason,'APPROVAL_NOT_BOUND_TO_PROPOSAL');});
 test('no silent correction without reason and source',()=>{const x=correction();x.proposed.reason='wrong';assert.equal(assess(x).reason,'INSUFFICIENT_CORRECTION_EVIDENCE');});
 test('new correction needs new version',()=>{const x=correction();x.proposed.version=1;assert.equal(assess(x).reason,'BROKEN_VERSION_CHAIN');});

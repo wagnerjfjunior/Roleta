@@ -93,7 +93,7 @@ async function stageStatisticalSubmission(input,{actorSub,token,transport=fetch,
  const evidencePath='data/intake-proofs/'+e.event_id+'.json';
  const createPr=async()=>{
   const pr=await gh('POST','/pulls',{title:'Data: validar roleta '+e.event_id,head:existingBranch,base:'main',
-   body:'Gate E: revisão humana independente obrigatória. Fonte e posições físicas em '+evidencePath+'. Revalidar contra main antes do merge.'});
+   body:'Gate E legado GitHub: conferência pelo próprio operador antes do envio. Fonte e posições físicas em '+evidencePath+'. Revalidar contra main antes do merge.'});
   return {status:'pending_review',event_id:e.event_id,pr_number:pr.number,pr_url:pr.html_url};
  };
  let branch;

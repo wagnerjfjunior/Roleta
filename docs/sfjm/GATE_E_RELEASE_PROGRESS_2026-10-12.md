@@ -1,3 +1,5 @@
+> **CORREÇÃO CANÔNICA DO RESPONSÁVEL — 12/10/2026:** ler primeiro [OPERATOR_VALIDATED_OCR_SUPABASE_FLOW_2026-10-12.md](OPERATOR_VALIDATED_OCR_SUPABASE_FLOW_2026-10-12.md). Conferência pelo próprio corretor; nenhuma segunda pessoa, aprovação independente ou conta GitHub adicional. Destino operacional: Supabase, mediante permissão, separado da impressão. Google: wagnerjfjunior@gmail.com e brendatatianelima@gmail.com. Exigências anteriores de revisor independente estão revogadas; abaixo fica o histórico técnico.
+
 # SFJM — Gate E: promoção e ponto de decisão — 12/10/2026
 
 ## Autoridade atual
