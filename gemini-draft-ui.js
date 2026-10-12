@@ -41,8 +41,7 @@ async function mount(host){
  const send=article.querySelector('[data-photo-send]');
  const remove=article.querySelector('[data-photo-remove]');
  const photoStatus=article.querySelector('[data-photo-status]');
- let selected=null,objectURL=null;
- const maxBytes=4*1024*1024;
+ let selected=null,objectURL=null,photoGeneration=0,preparing=false;
  const authIndicator=article.querySelector('[data-google-auth]');
  const loginLink=article.querySelector('[data-google-login]');
  const logoutButton=article.querySelector('[data-google-logout]');
@@ -67,28 +66,39 @@ async function mount(host){
  });
 
  let busy=false;
- function canSend(){return !!selected&&confirmation.checked&&!!googleSession&&!busy;}
- function refreshSend(){send.disabled=!canSend();}
+ function canSend(){return !!selected&&confirmation.checked&&!!googleSession&&!busy&&!preparing;}
+ function refreshSend(){
+   send.disabled=!canSend();
+   remove.disabled=busy;
+   article.querySelector('[data-photo-camera]').disabled=busy;
+   article.querySelector('[data-photo-gallery]').disabled=busy;
+ }
  function resetPhoto(){
+   photoGeneration++;preparing=false;
    if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
    selected=null;camera.value='';gallery.value='';review.hidden=true;
    preview.removeAttribute('src');confirmation.checked=false;send.disabled=true;
  }
- function setPhoto(file){
+ async function setPhoto(file){
+   if(busy)return;
    resetPhoto();
    if(!file)return;
-   const accepted=['image/jpeg','image/png','image/webp'];
-   if(!accepted.includes(file.type)||file.size===0||file.size>maxBytes){
-     photoStatus.className='intake-gate blocked';
-     photoStatus.innerHTML='<strong>FOTOGRAFIA NÃO ACEITA</strong><div>Selecione JPEG, PNG ou WebP de até 4 MB.</div>';
-     return;
-   }
-   selected=file;objectURL=URL.createObjectURL(file);preview.src=objectURL;
-   meta.textContent=file.name+' · '+(file.size/1024/1024).toFixed(2)+' MB';
-   review.hidden=false;
+   const generation=photoGeneration;
+   preparing=true;refreshSend();progressBox.hidden=true;
    photoStatus.className='intake-gate blocked';
-   photoStatus.innerHTML='<strong>FOTOGRAFIA SELECIONADA</strong><div>Confira a imagem e confirme o enquadramento.</div>';
-   refreshSend();
+   photoStatus.innerHTML='<strong>PREPARANDO FOTOGRAFIA</strong><div>Reduzindo o arquivo para leitura automática…</div>';
+   try{
+     if(!window.RoletaPhotoPrepare)throw Error('Recarregue a página para preparar a fotografia.');
+     const prepared=await window.RoletaPhotoPrepare.prepare(file);
+     if(generation!==photoGeneration)return;
+     selected=prepared.file;objectURL=URL.createObjectURL(selected);preview.src=objectURL;
+     meta.textContent=file.name+' · original: '+(file.size/1024/1024).toFixed(2)+' MB · envio: '+Math.ceil(selected.size/1000)+' KB · '+prepared.width+' × '+prepared.height+' px';
+     review.hidden=false;
+     photoStatus.innerHTML='<strong>FOTOGRAFIA PRONTA</strong><div>Esta é a imagem que será enviada. Confira orientação, nomes e números antes de confirmar.</div>';
+   }catch(e){
+     if(generation!==photoGeneration)return;
+     photoStatus.innerHTML='<strong>FOTOGRAFIA NÃO ACEITA</strong><div>'+escapeHtml(e.message||e)+'</div>';
+   }finally{if(generation===photoGeneration){preparing=false;refreshSend();}}
  }
  article.querySelector('[data-photo-camera]').addEventListener('click',()=>camera.click());
  article.querySelector('[data-photo-gallery]').addEventListener('click',()=>gallery.click());
@@ -119,6 +129,7 @@ async function mount(host){
    }finally{busy=false;refreshSend();}
  });
  remove.addEventListener('click',()=>{
+   if(busy)return;
    resetPhoto();
    photoStatus.innerHTML='<strong>FOTOGRAFIA REMOVIDA</strong><div>Selecione outra imagem.</div>';
  });

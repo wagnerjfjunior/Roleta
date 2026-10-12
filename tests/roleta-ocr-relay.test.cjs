@@ -20,6 +20,14 @@ const img=Buffer.from([0xff,0xd8,0xff,0xe0,0,0]);
  r=res();await handler(req(img,{'content-type':'text/plain'}),r);assert.equal(r.statusCode,415);
  r=res();await handler(req(Buffer.alloc(0)),r);assert.equal(r.statusCode,400);
  const originalFetch=global.fetch;
+ // Oversized bodies must never reach Make, including forged/absent Content-Length.
+ const {MAX_BYTES}=require('../photo-prepare');
+ global.fetch=async()=>{throw Error('Oversized image reached Make');};
+ for(const headers of [{},{'content-length':'0'}]){
+   r=res();await handler(req(Buffer.alloc(MAX_BYTES+1),headers),r);assert.equal(r.statusCode,413);
+ }
+ const buffered=req(img);buffered.body=Buffer.alloc(MAX_BYTES+1);
+ r=res();await handler(buffered,r);assert.equal(r.statusCode,413);
  global.fetch=async(_url,options)=>{assert.equal(options.method,'POST');return {ok:true,text:async()=>JSON.stringify({linhas:[{posicao_impressa:16,nome_lido:'Paola',numero_sorteado:'01'}]})};};
  try{r=res();await handler(req(img),r);assert.equal(r.statusCode,200);assert.equal(r.body.status,'PENDENTE_REVISAO');assert.equal(r.body.result.linhas.length,1);}
   finally{global.fetch=originalFetch;}
