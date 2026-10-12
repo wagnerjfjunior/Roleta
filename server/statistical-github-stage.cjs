@@ -88,32 +88,19 @@ async function stageStatisticalSubmission(input,{actorSub,token,transport=fetch,
  assertOfficial(input.reviewed,e);
  const gh=makeGitHub(token,transport);
  const existingBranch='stat-intake/'+e.event_id;
- // A network failure after ref/PR creation must not provoke a duplicate.
- // Reuse an existing OPEN review only when its server-derived complete
- // submission digest AND actor match the current request.
- let branchExists=false;
- try{await gh('GET','/git/ref/heads/'+existingBranch);branchExists=true;}
+ const actorHash=crypto.createHash('sha256').update(actorSub).digest('hex').slice(0,16);
+ const digest=crypto.createHash('sha256').update(JSON.stringify(e)).digest('hex');
+ const evidencePath='data/intake-proofs/'+e.event_id+'.json';
+ const createPr=async()=>{
+  const pr=await gh('POST','/pulls',{title:'Data: validar roleta '+e.event_id,head:existingBranch,base:'main',
+   body:'Gate E: revisão humana independente obrigatória. Fonte e posições físicas em '+evidencePath+'. Revalidar contra main antes do merge.'});
+  return {status:'pending_review',event_id:e.event_id,pr_number:pr.number,pr_url:pr.html_url};
+ };
+ let branch;
+ try{branch=await gh('GET','/git/ref/heads/'+existingBranch);}
  catch(error){if(error.status!==404)throw error;}
- if(branchExists){
-  let proof;
-  try{
-   const existing=await gh('GET','/contents/data/intake-proofs/'+e.event_id+
-    '.json?ref='+encodeURIComponent(existingBranch));
-   proof=JSON.parse(Buffer.from(existing.content||'','base64').toString('utf8'));
-  }catch(error){throw Object.assign(Error('unverified existing staged branch'),{status:409});}
-  const digest=crypto.createHash('sha256').update(JSON.stringify(e)).digest('hex');
-  const actor=crypto.createHash('sha256').update(actorSub).digest('hex').slice(0,16);
-  if(proof.schema!=='rlt-statistical-proof-v1'||proof.payload_sha256!==digest||
-     proof.actor_hash!==actor||proof.event_id!==e.event_id)
-   throw Object.assign(Error('staged submission conflict'),{status:409});
-  const prs=await gh('GET','/pulls?state=open&base=main&head='+
-    encodeURIComponent('wagnerjfjunior:'+existingBranch));
-  if(!Array.isArray(prs)||prs.length!==1||typeof prs[0].number!=='number'||
-     !/^https:\/\/github\.com\/wagnerjfjunior\/Roleta\/pull\/\d+$/.test(prs[0].html_url||''))
-   throw Object.assign(Error('staged branch requires manual reconciliation'),{status:409});
-  return {status:'pending_review',event_id:e.event_id,pr_number:prs[0].number,
-   pr_url:prs[0].html_url,replayed:true};
- }
+ if(branch)return require('./statistical-recovery.cjs').recover({gh,branch:existingBranch,
+  headSha:branch.object?.sha,event:e,actorHash,digest,createPr});
  const main=await gh('GET','/git/ref/heads/main');
  const mainSha=main.object?.sha;
  if(!/^[a-f0-9]{40}$/.test(mainSha||''))throw Error('invalid main SHA');
@@ -121,20 +108,18 @@ async function stageStatisticalSubmission(input,{actorSub,token,transport=fetch,
  const manifest=JSON.parse(Buffer.from(rawManifest.content||'','base64').toString('utf8'));
  const sources=[];
  for(const item of manifest.sources){
-  if(!/^\/data\/(?:events\.csv|incoming\/[0-9-]+\.csv)$/.test(item.path))throw Error('untrusted manifest source path');
+  if(!/^\/data\/(?:events\.csv|incoming\/\d{4}-\d{2}-\d{2}(?:-[MTI])?\.csv)$/.test(item.path))throw Error('untrusted manifest source path');
   const result=await gh('GET','/contents'+item.path+'?ref='+mainSha);
   sources.push(csvRows(Buffer.from(result.content||'','base64').toString('utf8')));
  }
  assertUniqueEvent(manifest,sources,e);
  const path='data/incoming/'+e.event_id+'.csv';
- const evidencePath='data/intake-proofs/'+e.event_id+'.json';
  const updated={...manifest,
   logical_dataset_version:'gate-e-'+e.event_id,
   canonical_event_count:manifest.canonical_event_count+1,
   quality_A:manifest.quality_A+1,
   sources:[...manifest.sources,{path:'/'+path,role:'append_only_ledger',events:1}]};
  const commit=await gh('GET','/git/commits/'+mainSha);
- const actorHash=crypto.createHash('sha256').update(actorSub).digest('hex').slice(0,16);
  const submittedAt=clock();
  // Audit the ENTIRE row↔draw association, not just the four special numbers
  // retained for the compact CSV statistical index. The proof is immutable
@@ -154,13 +139,15 @@ async function stageStatisticalSubmission(input,{actorSub,token,transport=fetch,
    {path:evidencePath,mode:'100644',type:'blob',content:JSON.stringify(evidence,null,2)+'\n'}]
  });
  const prepared=await gh('POST','/git/commits',{message:'data(statistics): stage '+e.event_id+' for audit',tree:tree.sha,parents:[mainSha]});
- const branch='stat-intake/'+e.event_id;
- // If another request already created this branch, never replace it.
- // Different proposals must be reconciled by a human, not rewritten.
- await gh('POST','/git/refs',{ref:'refs/heads/'+branch,sha:prepared.sha});
- const pr=await gh('POST','/pulls',{title:'Data: validar roleta '+e.event_id,head:branch,base:'main',
-  body:'Gate E · revisão humana obrigatória antes do merge. Evento: '+e.event_id+'; data original: '+e.event_date+
-  '; responsável hash: '+actorHash+'. Confira a fonte, data, todas as correspondências linha↔bolinha em '+evidencePath+', N, qualidade e manifest.\n\nATENÇÃO: revalidar contra a main atual antes do merge. Não faça merge sem auditoria.'});
- return {status:'pending_review',event_id:e.event_id,pr_number:pr.number,pr_url:pr.html_url};
+ // A racing request may have created the ref; never replace its commit.
+ try{await gh('POST','/git/refs',{ref:'refs/heads/'+existingBranch,sha:prepared.sha});}
+ catch(error){
+  if(error.status!==409&&error.status!==502)throw error;
+  let existing;
+  try{existing=await gh('GET','/git/ref/heads/'+existingBranch);}catch{throw error;}
+  return require('./statistical-recovery.cjs').recover({gh,branch:existingBranch,
+   headSha:existing.object?.sha,event:e,actorHash,digest,createPr});
+ }
+ return createPr();
 }
 module.exports={csvRows,assertUniqueEvent,buildCsv,stageStatisticalSubmission};

@@ -1,3 +1,5 @@
+> **Atualização 12/10/2026 — autorização atual e promoção:** ler primeiro `../docs/sfjm/GATE_E_RELEASE_PROGRESS_2026-10-12.md`. O responsável autorizou execução/merge/produção. LAB concorrente: PR #1 mergeada; PR #2 rejeitada com STALE_BASE em Actions. Recuperação implementada e testes locais aprovados. Publicação de código com escrita bloqueada não encerra correção versionada, proteção ou E2E. Próxima decisão: operadores, revisor independente e credencial técnica. Conteúdo abaixo preservado como histórico.
+
 > **SFJM CURRENT CHECKPOINT — 2026-10-11 / GATE E · HANDOFF TO NEXT CONVERSATION**
 >
 > **Fonte atual e escopo:** `main@676d0f9e300404c6d1434b61dbf7c5b61d23cb31` foi observada em produção `READY` na inspeção de 11/10, antes deste checkpoint documental. Re-resolver o HEAD vivo ao retomar. Estado completo, matriz de riscos, fluxos e prompt de continuação em **[`docs/sfjm/HANDOFF_2026-10-11_GATE_E.md`](../docs/sfjm/HANDOFF_2026-10-11_GATE_E.md)**.

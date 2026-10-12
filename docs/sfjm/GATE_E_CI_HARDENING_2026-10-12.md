@@ -1,0 +1,12 @@
+# Gate E — CI hardening candidate; not activated
+- Unconditional `pull_request` check (no path filters, no skipped intake job).
+- Changes to `data/manifest.json`, `data/incoming/`, `data/intake-proofs/` by non-intake PRs rejected.
+- Strict allowlist of 3 files for `stat-intake/YYYY-MM-DD-X` branches.
+- Explicitly pinned base and head SHA; read-only Git history/content validation.
+- Regression suite executes in the same check.
+- GitHub-side branch protection and freshness **still mandatory**. Enforce required checks and require up-to-date branches before merge.
+- `merge_group` currently FAILS CLOSED because a correct queue-specific validator is not implemented; do not enable merge queue with this workflow.
+- In a separate future design, corrections will use an audited, versioned process; current append CI MUST refuse corrections.
+- Review and test real CI on a disposable GitHub repository before enabling any merge rights.
+- Security note: PR head controls workflow scripts in checkout. Branch protections, required review, CODEOWNERS, and proper trust boundaries are required before treating CI as authoritative.
+- Feature flags for statistical writes remain OFF. This patch does not commit, push or deploy.
