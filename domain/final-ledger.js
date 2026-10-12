@@ -2,24 +2,26 @@
  'use strict';
  function mergeFinal(baseline,records){
   if(!Array.isArray(records))throw Error('Ledger final inválido.');
-  const events=[...baseline],ids=new Set(events.map(e=>e.id)),keys=new Set(events.map(e=>e.date+'|'+e.period)),nominal=[];
+  const events=[...baseline],ids=new Set(events.map(e=>e.id)),keys=new Set(events.map(e=>e.date+'|'+e.period)),nominal=[],unmapped=[];
   for(const r of records){
    const e=r?.payload?.event,review=r?.payload?.reviewed;
-   if(!e||r.event_id!==e.event_id||!Number.isSafeInteger(r.version)||r.version<1||!Number.isSafeInteger(e.N)||e.N<4||e.N>200||!/^\d{4}-\d{2}-\d{2}$/.test(e.event_date)||!['manha','tarde','integral'].includes(e.period)||!Array.isArray(e.drawn_mapping)||e.drawn_mapping.length!==e.N||!Array.isArray(e.occupied)||e.occupied.length!==e.N||!Array.isArray(review?.salao)||review.salao.length!==e.N)throw Error('Registro final inválido.');
+   if(!e||r.event_id!==e.event_id||!Number.isSafeInteger(r.version)||r.version<1||!Number.isSafeInteger(e.N)||e.N<4||e.N>200||!/^\d{4}-\d{2}-\d{2}$/.test(e.event_date)||!['manha','tarde','integral'].includes(e.period)||!Array.isArray(e.drawn_mapping)||e.drawn_mapping.length!==e.N||!Array.isArray(e.occupied)||!Array.isArray(review?.salao)||review.salao.length!==e.N)throw Error('Registro final inválido.');
    const draws=new Set(),physical=new Set();
    for(const m of e.drawn_mapping){
-    if(!Number.isSafeInteger(m.drawn_number)||m.drawn_number<1||m.drawn_number>e.N||!Number.isSafeInteger(m.physical_position)||m.physical_position<1||m.physical_position>999||draws.has(m.drawn_number)||physical.has(m.physical_position))throw Error('Permutação final inválida.');
-    draws.add(m.drawn_number);physical.add(m.physical_position);
+    const unknown=m.physical_position===null&&e.physical_mapping_complete===false;
+    if(!Number.isSafeInteger(m.drawn_number)||m.drawn_number<1||m.drawn_number>e.N||(!unknown&&(!Number.isSafeInteger(m.physical_position)||m.physical_position<1||m.physical_position>999||physical.has(m.physical_position)))||draws.has(m.drawn_number))throw Error('Permutação final inválida.');
+    draws.add(m.drawn_number);if(!unknown)physical.add(m.physical_position);
    }
    const mapping=new Map(e.drawn_mapping.map(m=>[m.drawn_number,m.physical_position]));
    if(e.first!==mapping.get(1)||e.second!==mapping.get(2)||e.courtesy!==mapping.get(e.N-1)||e.last!==mapping.get(e.N)||JSON.stringify([...physical].sort((a,b)=>a-b))!==JSON.stringify(e.occupied))throw Error('Índice final divergente.');
    const date=e.event_date.slice(8)+'/'+e.event_date.slice(5,7)+'/'+e.event_date.slice(0,4),key=date+'|'+e.period;
    if(ids.has(e.event_id)||keys.has(key)||baseline.some(b=>b.date===date&&b.period==='desconhecido'))throw Error('Conflito entre ledger final e histórico.');
    ids.add(e.event_id);keys.add(key);
-   events.push({id:e.event_id,date,period:e.period,N:e.N,occupied:e.occupied,first:e.first,second:e.second,courtesy:e.courtesy,last:e.last,quality:'A',source:e.source,notes:'Supabase · versão '+r.version,storage_origin:'supabase',version:r.version});
+   if(physical.size===e.N)events.push({id:e.event_id,date,period:e.period,N:e.N,occupied:e.occupied,first:e.first,second:e.second,courtesy:e.courtesy,last:e.last,quality:'A',source:e.source,notes:'Supabase · versão '+r.version,storage_origin:'supabase',version:r.version});
+   else unmapped.push(e.event_id);
    for(const m of e.drawn_mapping)nominal.push({event_id:e.event_id,date,period:e.period,N:e.N,physical_position:m.physical_position,drawn_number:m.drawn_number,broker_name_normalized:m.broker_name,broker_name_raw:m.broker_name,row_status:'VERIFIED_NUMBER',event_status:'VERIFIED_FULL'});
   }
-  return {events,nominal};
+  return {events,nominal,unmapped};
  }
  function updateBrokerStats(stats,baselineNominal,added){
   if(!stats||!added.length)return stats;

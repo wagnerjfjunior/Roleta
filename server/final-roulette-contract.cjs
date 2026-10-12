@@ -1,6 +1,6 @@
 'use strict';
 const crypto=require('node:crypto'),fs=require('node:fs'),path=require('node:path');
-const {prepare}=require('../statistical/submission.js');
+const {prepareFinalSheet}=require('../statistical/submission.js');
 const official=require('../data/print-brokers.json');
 const {csvRows}=require('./statistical-github-stage.cjs');
 const clean=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
@@ -16,7 +16,7 @@ function prepareFinal(input,{actorSub,now=new Date(),checkBaseline=true}={}){
  if(input?.acknowledged!==true||input?.reviewed?.status!=='VALIDADO')fail('Conferência obrigatória.');
  const p=input.reviewed;
  if(p.pendencias?.length)fail('Existem pendências.');
- const e=prepare(p,input.physicalByDraw,{source:input.source,acknowledged:true});
+ const e=prepareFinalSheet(p,{physicalByDraw:input.physicalByDraw,source:input.source,acknowledged:true});
  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(now);
  if(e.event_date>today)fail('Resultado futuro não permitido.');
  const directory=new Map();
@@ -59,7 +59,7 @@ function prepareFinal(input,{actorSub,now=new Date(),checkBaseline=true}={}){
  const text=stable(payload),digest=sha(text);
  const expected=input.expectedVersion??0;
  if(!Number.isSafeInteger(expected)||expected<0)fail('Versão inválida.');
- const reason=String(input.reason||'').trim();
+ const reason=String(input.reason||(expected>0?'Atualização da folha final corrigida e validada pelo operador.':'')).trim();
  if(reason.length>1000||(reason.length>0&&reason.length<15))fail('Explique a correção com pelo menos 15 caracteres.');
  return {eventId:e.event_id,text,digest,actorSub,expectedVersion:expected,reason};
 }

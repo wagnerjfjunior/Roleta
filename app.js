@@ -190,7 +190,7 @@ function nominalBrokerForDraw(nominalRows,eventId,drawnNumber,officialBrokers,na
     name:official?.['Nome Comercial']||canonical||'—',
     manager:official?.['Equipe']||null,
     director:official?.['Diretor']||null,
-    position:Number(row.physical_position),
+    position:row.physical_position==null?null:Number(row.physical_position),
     transcribed
   };
 }
@@ -216,7 +216,7 @@ function buildLastTwoSpecialCard(nominalRows,officialBrokers,nameAliases){
               return '<div class="recent-special-item">'+
                 '<span>'+label+'</span>'+
                 '<strong>'+(broker?.name||'—')+'</strong>'+
-                '<small>'+(broker?'posição física '+broker.position:'nome não disponível na transcrição nominal')+'</small>'+
+                '<small>'+(broker?(broker.position===null?'posição física não registrada':'posição física '+broker.position):'nome não disponível na transcrição nominal')+'</small>'+
               '</div>';
             }).join('')+'</div>'+
           '</section>';
@@ -365,6 +365,7 @@ async function init(){
         if(ledger.schema!=='rlt-final-ledger-v1')throw Error('Ledger final inválido.');
         const merged=window.RoletaFinalLedger.mergeFinal(state.events,ledger.records);
         state.events=merged.events;state.finalNominal=merged.nominal;
+        if(merged.unmapped.length)state.finalWarning=merged.unmapped.length+' roleta(s) salva(s) com ordem final, incluídas nas estatísticas de corretores. Sem posição física original completa, não entram no modelo de posições físicas.';
       }else if(response.status!==503){state.finalWarning='Entre com uma conta autorizada para carregar os registros Supabase.';}
       else state.finalWarning='Registros Supabase indisponíveis; exibindo somente o histórico versionado.';
     }catch(err){state.finalWarning='Falha ao carregar registros Supabase; exibindo somente o histórico versionado.';}

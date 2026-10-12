@@ -11,7 +11,7 @@ test('stable digest ignores client property order and excludes forged actor',()=
 test('requires exact operator confirmation',()=>{const x=input();x.acknowledged='true';assert.throws(()=>prepare(x));});
 test('rejects duplicated broker across classes',()=>{const x=input();x.online=[x.reviewed.salao[0]];x.reviewed.online=x.online;assert.throws(()=>prepare(x));});
 test('rejects tampered official metadata',()=>{const x=input();x.reviewed.standby[0]={...x.reviewed.standby[0],gerente:'Fake'};assert.throws(()=>prepare(x));});
-test('validates supplied correction reason and integer predecessor; DB enforces reason on changes',()=>{const x=input();x.expectedVersion=1;assert.equal(prepare(x).reason,'');x.reason='curto';assert.throws(()=>prepare(x));x.reason='Correção da linha física conferida';assert.equal(prepare(x).expectedVersion,1);x.expectedVersion='1';assert.throws(()=>prepare(x));});
+test('validates supplied correction reason and integer predecessor; DB enforces reason on changes',()=>{const x=input();x.expectedVersion=1;assert.match(prepare(x).reason,/validada pelo operador/);x.reason='curto';assert.throws(()=>prepare(x));x.reason='Correção da linha física conferida';assert.equal(prepare(x).expectedVersion,1);x.expectedVersion='1';assert.throws(()=>prepare(x));});
 test('rejects future outcomes and baseline events',()=>{const x=input();x.reviewed.evento.data='13/10/2026';assert.throws(()=>prepare(x));x.reviewed.evento.data='05/10/2026';x.reviewed.evento.periodo='MANHÃ';assert.throws(()=>prepare(x),e=>e.status===409);});
 test('invalid company draw blocked',()=>{const x=input();x.reviewed.evento.company_draw.helbor_positions=[2];assert.throws(()=>prepare(x));});
 const authenticate={session:()=>({sub:'real-google-sub',email:'wagnerjfjunior@gmail.com'}),csrfForSub:()=> 'csrf',requireSameOrigin:()=>true};
@@ -26,3 +26,43 @@ test('database conflict sanitized; secrets never reflected',async()=>{const r=re
 test('read requires operator and no write or CSRF; no cookie means denied',async()=>{const r=res();await createHandler({env,authenticate,authorize:async()=>{},read:async()=>[]})({method:'GET'},r);assert.equal(r.code,200);const denied=res();await createHandler({env,authenticate:{session:()=>null}})({method:'GET'},denied);assert.equal(denied.code,401);});
 test('dashboard includes one current version and complete nominal records',()=>{const c=prepare(input()),record={event_id:c.eventId,version:2,payload:JSON.parse(c.text)};const result=mergeFinal([], [record]);assert.equal(result.events.length,1);assert.equal(result.nominal.length,4);assert.equal(result.events[0].first,10);assert.equal(result.events[0].version,2);assert.throws(()=>mergeFinal(result.events,[record]));});
 test('dashboard rejects corrupt mapping instead of silently changing statistics',()=>{const c=prepare(input()),record={event_id:c.eventId,version:1,payload:JSON.parse(c.text)};record.payload.event.first=1;assert.throws(()=>mergeFinal([],[record]));});
+test('final sheet alone saves without filename or invented physical positions',()=>{
+ const x=input();delete x.source;delete x.physicalByDraw;
+ const c=prepare(x),payload=JSON.parse(c.text);
+ assert.equal(payload.event.physical_mapping_complete,false);
+ assert.deepEqual(payload.event.occupied,[]);assert.equal(payload.event.first,null);
+ assert.ok(payload.event.drawn_mapping.every(m=>m.physical_position===null));
+ const result=mergeFinal([],[{event_id:c.eventId,version:1,payload}]);
+ assert.equal(result.events.length,0);assert.equal(result.nominal.length,4);assert.deepEqual(result.unmapped,[c.eventId]);
+});
+test('physical positions already reviewed in OCR remain paired with the broker and final draw',()=>{
+ const x=input();delete x.physicalByDraw;delete x.source;
+ x.reviewed.salao.forEach((r,i)=>r.physical_position=[10,3,5,8][i]);
+ const e=JSON.parse(prepare(x).text).event;assert.equal(e.first,10);assert.equal(e.last,8);
+ assert.equal(e.physical_mapping_complete,undefined);
+ x.reviewed.salao[1].physical_position=10;assert.throws(()=>prepare(x));
+});
+test('partial physical data does not become a complete positional event',()=>{
+ const x=input();delete x.physicalByDraw;x.reviewed.salao[0].physical_position=10;
+ const c=prepare(x),payload=JSON.parse(c.text);
+ assert.deepEqual(payload.event.occupied,[10]);assert.equal(payload.event.first,10);assert.equal(payload.event.last,null);
+ assert.equal(mergeFinal([],[{event_id:c.eventId,version:1,payload}]).events.length,0);
+ delete payload.event.physical_mapping_complete;assert.throws(()=>mergeFinal([],[{event_id:c.eventId,version:1,payload}]));
+});
+test('canonical human correction keeps original physical positions when final order changes',()=>{
+ const vm=require('node:vm'),fs=require('node:fs'),context={window:{}};
+ vm.runInNewContext(fs.readFileSync('roulette-intake.js','utf8'),context);
+ const x=input(),positions=[10,3,5,8];
+ const elements=x.reviewed.salao.map((r,i)=>({
+  dataset:{originalPosition:String(i+1),originalName:r.nome,physicalPosition:String(positions[i])},
+  querySelector(selector){return {value:selector==='.rltv2-review-name'?r.nome:String(i===0?2:i===1?1:i+1)};}
+ }));
+ const host={querySelectorAll:selector=>selector.includes('"salao"')?elements:[]};
+ const result=context.window.RouletteIntake.applyHumanReview({...x.reviewed,standby:[]},host,brokers);
+ assert.equal(result.errors.length,0);
+ assert.equal(result.payload.salao[0].nome,x.reviewed.salao[1].nome);
+ assert.equal(result.payload.salao[0].physical_position,3);
+ const text=fs.readFileSync('roulette-intake.js','utf8');
+ assert.doesNotMatch(text,/5 · AMOSTRAGEM|rltStatSource|rltStatConfirm|rlt-stat-physical|rltStatReason/);
+ assert.ok(text.indexOf('id="rltStatSubmit"')>text.indexOf('3 · PRÉVIA FINAL'));
+});

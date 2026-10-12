@@ -75,4 +75,6 @@ jobs:
           node --test tests/regression/final-roulette.test.cjs
           psql -X -v ON_ERROR_STOP=1 -f database/production-review/final_roulette_v1_candidate.sql
           psql -X -v ON_ERROR_STOP=1 -f tests/postgres/final-roulette-pg17.sql
+          psql -X -v ON_ERROR_STOP=1 -f database/production-review/final_roulette_optional_physical_v1.sql
+          psql -X -v ON_ERROR_STOP=1 -f tests/postgres/final-roulette-optional-physical.sql
           bash tests/postgres/final-roulette-concurrency.sh

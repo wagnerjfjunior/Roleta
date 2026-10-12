@@ -7,7 +7,7 @@ trap 'rm -rf "$task_dir"' EXIT
 node - "$task_dir" <<'NODE'
 const fs=require('fs');
 const dir=process.argv[2];
-const e={event_id:'2026-10-10-M',event_date:'2026-10-10',period:'manha',N:4,human_review_confirmed:true,drawn_mapping:[1,2,3,4].map(n=>({drawn_number:n,physical_position:n,broker_name:'synthetic-'+n}))};
+const e={event_id:'2026-10-10-M',event_date:'2026-10-10',period:'manha',N:4,occupied:[1,2,3,4],first:1,second:2,courtesy:3,last:4,human_review_confirmed:true,drawn_mapping:[1,2,3,4].map(n=>({drawn_number:n,physical_position:n,broker_name:'synthetic-'+n}))};
 const payload=JSON.stringify({schema:'rlt-final-roulette-v1',event:e,reviewed:{status:'VALIDADO',salao:[1,2,3,4]}});
 const hash=require('crypto').createHash('sha256').update(payload).digest('hex');
 fs.writeFileSync(dir+'/command.sql',"SET ROLE roleta_v2_writer; SELECT roleta_audit.save_final_roulette_v1('2026-10-10-M',$payload$"+payload+"$payload$,'"+hash+"','synthetic_actor',0,'');\n");
