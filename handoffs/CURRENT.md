@@ -1,3 +1,11 @@
+## Correção da leitura OCR.space — 13/10/2026
+
+A execução real `2b9a48b0f2fa41f0a1d38ec342f595f6` acionou OCR.space, mas a revisão ficou inutilizável. O cabeçalho Corretor começava sobre a coluna dos índices; o parser comparava o centro do índice com a borda esquerda do cabeçalho e descartava todas as âncoras. O fallback de texto livre criou linhas para gerentes e diretor.
+
+A correção usa coordenadas para separar colunas, mantém a ordem física na revisão e permite linha com bolinha lida e posição ilegível sem completar a sequência. Texto sem estrutura abre uma linha vazia para preenchimento humano, preservando a foto e o texto bruto. Cores claras e rótulos explícitos substituem os estados escuros na tela Simples. Nenhuma linha é aprovada automaticamente.
+
+Validação: geometria real reduzida e anonimizada como regressão, resposta sintética anterior e todas as verificações Node do workflow Gemini. Isso não comprova a exatidão da caligrafia nem substitui uma nova conferência da folha pelo operador. Make não foi alterado nesta correção.
+
 ## Estado atual 13/10/2026 — OCR.space terceira opção ativa
 
 PR #110 mergeada; main funcional `83004c8`; Vercel `dpl_DwmFiumd1R4yQAqtDqTCYR6TeJJD` READY. Make 6549955 ativo com fallback 3.8 → 3.6 → OCR.space e retornos Resume restaurados. 247 testes/checks verdes; LAB isolado com folha fictícia aprovado e desativado. Sem escrita estatística fictícia. Próxima ação: envio real e revisão pelo operador. Fonte: `docs/sfjm/OCR_SPACE_THIRD_OPTION_2026-10-13.md`. Registros abaixo são históricos.

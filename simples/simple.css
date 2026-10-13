@@ -179,3 +179,11 @@
 .roleta-simple .simple-login-card>.simple-back{color:#355744;background:#f4f8f2;border-color:#d7e3d5;font-size:12px;margin-top:12px;width:100%}
 .roleta-simple .simple-login-bottom{border-top:1px solid #e5ebe2;color:#7a887d;font-size:11px;line-height:1.6;margin-top:28px;padding-top:18px}
 @media(max-width:700px){.roleta-simple.simple-screen-entry .simple-shell{padding:24px 18px}.roleta-simple .simple-login-card{padding:32px 25px 24px;border-radius:14px}.roleta-simple .simple-entry .simple-login-card h1{font-size:24px}}
+
+/* Review states must remain legible inside the light workspace. */
+.roleta-simple .rlt-five-column-table th{background:#edf3ef!important;color:#294638!important;padding:10px 5px;font-size:11px}
+.roleta-simple .rlt-five-column-table td{background:#fff!important;border-bottom:1px solid #dce5df;padding:8px 5px}
+.roleta-simple .rlt-five-column-table tr.rlt-line-attention td{background:#fff8e9!important}
+.roleta-simple .rlt-five-column-table tr.rlt-line-verified td{background:#eef8ef!important}
+.roleta-simple .rlt-line-attention [data-line-state]{color:#755013!important}
+.roleta-simple .rlt-five-column-table input:not([type=checkbox]),.roleta-simple .rlt-five-column-table select{min-height:40px;font-size:14px!important;border-radius:7px!important}

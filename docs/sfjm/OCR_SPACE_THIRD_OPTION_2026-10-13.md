@@ -1,3 +1,11 @@
+## Correção da leitura OCR.space — 13/10/2026
+
+A execução real `2b9a48b0f2fa41f0a1d38ec342f595f6` acionou OCR.space, mas a revisão ficou inutilizável. O cabeçalho Corretor começava sobre a coluna dos índices; o parser comparava o centro do índice com a borda esquerda do cabeçalho e descartava todas as âncoras. O fallback de texto livre criou linhas para gerentes e diretor.
+
+A correção usa coordenadas para separar colunas, mantém a ordem física na revisão e permite linha com bolinha lida e posição ilegível sem completar a sequência. Texto sem estrutura abre uma linha vazia para preenchimento humano, preservando a foto e o texto bruto. Cores claras e rótulos explícitos substituem os estados escuros na tela Simples. Nenhuma linha é aprovada automaticamente.
+
+Validação: geometria real reduzida e anonimizada como regressão, resposta sintética anterior e todas as verificações Node do workflow Gemini. Isso não comprova a exatidão da caligrafia nem substitui uma nova conferência da folha pelo operador. Make não foi alterado nesta correção.
+
 # OCR.space como terceira opção — 13/10/2026
 
 **Estado atual: backend publicado e terceiro fallback ativo.** PR #110, main funcional `83004c8729968f86002a48d5dbcb0e3eedee004a`, deployment `dpl_DwmFiumd1R4yQAqtDqTCYR6TeJJD` READY. Make 6549955 ativo, lastEdit `2026-10-13T15:47:52.174Z`. A seção de implantação abaixo registra a ordem utilizada; não é uma pendência de ativação.
