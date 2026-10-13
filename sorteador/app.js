@@ -117,6 +117,7 @@ function showSession(record){
  $('sequenceDescription').textContent=isRange(record)?'Cada retirada entra na sequência abaixo, com seu horário.':'1ª bolinha para a posição física 1, 2ª para a posição física 2, e assim por diante.';
  $('sessionTime').textContent='Iniciado em '+formatDate(record.createdAt);
  renderSession(true);
+ if(!$('drawButton').disabled)$('drawButton').focus({preventScroll:true});
 }
 function drawPool(){
  const pool=remainingFor(current);
@@ -163,6 +164,9 @@ function renderSession(resetWinner){
  list.replaceChildren(fragment);
  $('emptySequence').hidden=drawn>0;
  $('finishBanner').hidden=drawn!==total;
+ $('drawMotionLabel').textContent=drawn===total?'Sorteio concluído':'Bolinhas em movimento';
+ $('session').classList.toggle('session-complete',drawn===total);
+ $('sessionEyebrow').textContent=drawn===total?'SORTEIO CONCLUÍDO':'SORTEIO EM ANDAMENTO';
  drawPool();
  const button=$('drawButton');
  button.disabled=busy||drawn===total;
@@ -198,7 +202,7 @@ function draw(){
  $('winnerCaption').textContent=isRange(current)?'Sorteando bolinha':'Sorteando para a posição '+position;
  $('winnerNumber').textContent='●';
  $('winnerPosition').textContent='Aguarde a revelação';
- $('drawHint').textContent='Bolinha selecionada com aleatoriedade criptográfica.';
+ $('drawHint').textContent='Preparando a próxima bolinha…';
  $('arena').classList.add('speed-up');
  if(visualBalls)visualBalls.setFast(true);
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;

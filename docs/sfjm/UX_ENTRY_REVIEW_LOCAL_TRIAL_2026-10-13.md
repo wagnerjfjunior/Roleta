@@ -41,3 +41,11 @@ Not verified in this iteration: rendered desktop/mobile layout, camera/rotation 
 ## Operator feedback — 13/10/2026
 
 Removed duplicate Google login in digitalization. The entry owns authentication; session expiration sends the operator back there. Local test mode remains clearly identified and cannot authorize backend operations. Replaced four button-shaped step labels with a non-interactive native progress indicator and the current step text. Removed the JSON shortcut from the simplified flow; retained existing technical/manual paths in Intelligence.
+
+## Architectural background and Sorteador UX — 13/10/2026
+
+The operator reported that the background image was missing and Sorteador retained its previous visual treatment. Added `assets/real-estate-background.webp` (1672 × 940, approximately 247 KiB), generated using the built-in image tool and optimized for the application. Prompt: a photorealistic generic contemporary residential architectural scene in São Paulo, pale stone/glass balconies, gardens, morning sunlight, navy and restrained green tones, wide composition with calm left-side space; no text, logos, currency, people or depiction of a named development. This is fictional architectural atmosphere, not a factual image of Caminhos da Lapa.
+
+Both interfaces now share the image, navy/green palette and readable surfaces. Sorteador has a prominent setup introduction and form; desktop draws and results appear in adjacent columns, with the result sequence in a bounded panel. Mobile stacks those sections, uses large controls and a sticky action within the draw card. Completed draws offer an action to digitalize the sheet. Added session-state labels and focus on the primary draw action. Cryptographic engine and local-history contracts remain unchanged.
+
+12 focused tests passed (draw engine, safe OAuth return, signed sessions and protected OCR relay); HTML tags balanced and IDs unique in both pages. Rendered desktop/mobile, iPhone capture and real operational acceptance still need validation in Live Sync. No production deployment.

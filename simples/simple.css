@@ -145,3 +145,18 @@
 .roleta-simple .simple-progress progress::-webkit-progress-bar{background:#dce5df;border-radius:5px}
 .roleta-simple .simple-progress progress::-webkit-progress-value{background:#39775f;border-radius:5px}
 .roleta-simple .simple-progress progress::-moz-progress-bar{background:#39775f;border-radius:5px}
+
+/* Shared architectural image: fictional atmosphere, no project representation. */
+.roleta-simple{background:linear-gradient(90deg,rgba(8,28,42,.91),rgba(8,28,42,.42)),url('/assets/real-estate-background.webp') center/cover fixed!important;min-height:100vh}
+.roleta-simple .simple-header .simple-kicker,.roleta-simple .simple-header .simple-brand,.roleta-simple .simple-header .simple-brand-name{color:#fff}
+.roleta-simple .simple-header .simple-back{color:#fff;border-color:#ffffff55;background:#ffffff0c}
+.roleta-simple .simple-brand-dot{color:#93d5b6}
+.roleta-simple .simple-entry-copy>.simple-kicker,.roleta-simple .simple-home>.simple-kicker,.roleta-simple .simple-workflow-heading>.simple-kicker{color:#b3dbc5}
+.roleta-simple .simple-entry h1,.roleta-simple .simple-home h1,.roleta-simple .simple-workflow-heading h1{color:#fff}
+.roleta-simple .simple-entry-copy>p,.roleta-simple .simple-home-subtitle,.roleta-simple .simple-home-note,.roleta-simple .simple-footer{color:#e1e9e9}
+.roleta-simple .simple-entry-copy>.simple-back{color:white;border-color:#ffffff66;background:#173b51b3}
+.roleta-simple .simple-entry-guide{background:#f4f6f0f5;border-color:#ffffffa0;box-shadow:0 24px 60px #06162633}
+.roleta-simple .simple-primary{background:#fff;color:#15384f}
+.roleta-simple .simple-progress p{color:#d5e7db}
+.roleta-simple .simple-progress progress{background:#ffffff30}
+@media(max-width:700px){.roleta-simple{background-attachment:scroll!important;background-position:62% center!important}.roleta-simple .simple-entry{gap:34px}.roleta-simple .simple-entry-copy{padding:14px 0 18px}}
