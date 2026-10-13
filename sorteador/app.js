@@ -4,7 +4,36 @@ const engine=window.RoletaSorteadorEngine;
 const $=id=>document.getElementById(id);
 const STORAGE='roleta-sorteador-historico-v1';
 const MAX_RECORDS=100;
-let records=[],current=null,busy=false,revealTimer=null;
+let records=[],current=null,busy=false,revealTimer=null,visualBalls=null;
+const SOUND_KEY='roleta-sorteador-voz-v1';
+let soundOn=false;
+const speechAvailable=typeof window.speechSynthesis!=='undefined'&&typeof window.SpeechSynthesisUtterance!=='undefined';
+function speak(message){
+ if(!soundOn||!speechAvailable)return;
+ try{
+  window.speechSynthesis.cancel();
+  const utterance=new SpeechSynthesisUtterance(message);
+  utterance.lang='pt-BR';utterance.rate=.83;utterance.pitch=1.04;utterance.volume=1;
+  const voices=window.speechSynthesis.getVoices();
+  const voice=voices.find(v=>v.lang.toLowerCase()==='pt-br')||voices.find(v=>v.lang.toLowerCase().startsWith('pt'));
+  if(voice)utterance.voice=voice;
+  window.speechSynthesis.speak(utterance);
+ }catch(e){$('drawHint').textContent='A voz não está disponível neste dispositivo.';}
+}
+function updateSoundButton(){
+ const button=$('soundToggle');if(!button)return;
+ button.disabled=!speechAvailable;
+ button.setAttribute('aria-pressed',String(soundOn));
+ button.textContent=!speechAvailable?'🔇 Voz indisponível':soundOn?'🔊 Som ligado':'🔇 Som desligado';
+ button.title=soundOn?'Desativar anúncio de voz dos números':'Ativar anúncio de voz dos números';
+}
+function setSound(enabled){
+ soundOn=!!enabled&&speechAvailable;
+ try{localStorage.setItem(SOUND_KEY,soundOn?'1':'0');}catch{}
+ if(!soundOn&&speechAvailable)window.speechSynthesis.cancel();
+ updateSoundButton();
+ if(soundOn)speak('Som ativado. Próxima bolinha.');
+}
 const fmt=new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'medium'});
 function formatDate(value){try{return fmt.format(new Date(value));}catch{return 'Data indisponível';}}
 function showError(message){$('drawHint').textContent=message;$('drawHint').classList.add('error');}
@@ -48,6 +77,9 @@ function canRun(){
 function countText(n){return n===1?'1 bolinha':n+' bolinhas';}
 function showSession(record){
  if(revealTimer){clearTimeout(revealTimer);revealTimer=null;}
+ if(visualBalls){visualBalls.destroy();visualBalls=null;}
+ $('arena').classList.remove('speed-up');
+ if(speechAvailable)window.speechSynthesis.cancel();
  busy=false;current=record;
  $('setup').hidden=true;$('session').hidden=false;
  $('sessionLabel').textContent=record.total+' corretores · '+(record.draws.length===record.total?'Concluído':'Em andamento');
@@ -57,23 +89,25 @@ function showSession(record){
 function drawPool(){
  const pool=engine.remaining(current.total,current.draws);
  const arena=$('arena');
- const fragment=document.createDocumentFragment();
- for(const n of pool){
-  const b=document.createElement('span');
-  b.className='ball';
-  b.textContent=String(n);
-  b.setAttribute('aria-hidden','true');
-  const i=n-1,ring=Math.sqrt((i+.5)/current.total);
-  const angle=i*2.399963229728653;
-  // Distribuição visual fixa e reproduzível; não interfere no sorteio.
-  const x=50+ring*45*Math.cos(angle);
-  const y=50+ring*38*Math.sin(angle);
-  b.style.setProperty('--x',x.toFixed(3)+'%');
-  b.style.setProperty('--y',y.toFixed(3)+'%');
-  b.style.setProperty('--i',String(i%7));
-  fragment.appendChild(b);
+ if(window.RoletaBingoBalls){
+  if(!visualBalls)visualBalls=window.RoletaBingoBalls.create(arena);
  }
- arena.replaceChildren(fragment);
+ if(visualBalls){
+  visualBalls.update(pool);
+ }else{
+  // Fallback estatico/animado caso Canvas nao esteja disponivel.
+  const fragment=document.createDocumentFragment();
+  for(const n of pool){
+   const b=document.createElement('span');
+   b.className='ball';b.textContent=String(n);
+   b.setAttribute('aria-hidden','true');
+   const i=n-1,ring=Math.sqrt((i+.5)/current.total),angle=i*2.399963229728653;
+   b.style.setProperty('--x',(50+ring*45*Math.cos(angle)).toFixed(3)+'%');
+   b.style.setProperty('--y',(50+ring*38*Math.sin(angle)).toFixed(3)+'%');
+   b.style.setProperty('--i',String(i%7));fragment.appendChild(b);
+  }
+  arena.replaceChildren(fragment);
+ }
  $('poolLabel').textContent=countText(pool.length)+' na urna';
 }
 function renderSession(resetWinner){
@@ -131,16 +165,19 @@ function draw(){
  $('winnerPosition').textContent='Aguarde a revelação';
  $('drawHint').textContent='Bolinha selecionada com aleatoriedade criptográfica.';
  $('arena').classList.add('speed-up');
+ if(visualBalls)visualBalls.setFast(true);
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  revealTimer=setTimeout(()=>{
   revealTimer=null;
   $('arena').classList.remove('speed-up');
+  if(visualBalls)visualBalls.setFast(false);
   busy=false;
   renderSession(false);
   $('winner').classList.add('revealing');
   $('winnerCaption').textContent='Bolinha sorteada';
   $('winnerNumber').textContent=number;
   $('winnerPosition').textContent=position+'ª posição física';
+  speak('Posição '+position+'. Número '+number+'.');
   $('drawHint').textContent=current.draws.length===current.total?'Sorteio finalizado. Todos os números estão registrados abaixo.':'Clique novamente para a próxima posição.';
   clearError();
  },reduced?0:1100);
@@ -169,6 +206,9 @@ function renderHistory(){
  }
 }
 function openHistory(){renderHistory();$('historyDialog').showModal();}
+$('soundToggle').addEventListener('click',()=>setSound(!soundOn));
+try{soundOn=localStorage.getItem(SOUND_KEY)==='1'&&speechAvailable;}catch{}
+updateSoundButton();
 $('startForm').addEventListener('submit',event=>{
  event.preventDefault();
  if(!canRun())return;
@@ -181,6 +221,8 @@ $('drawButton').addEventListener('click',()=>{
 $('newButton').addEventListener('click',()=>{
  if(busy)return;
  if(current&&current.draws.length<current.total&&!confirm('Deseja sair deste sorteio parcial? Ele ficará no histórico local.'))return;
+ if(visualBalls){visualBalls.destroy();visualBalls=null;}
+ if(speechAvailable)window.speechSynthesis.cancel();
  current=null;$('session').hidden=true;$('setup').hidden=false;
  $('total').focus();
 });
@@ -191,6 +233,8 @@ $('clearHistory').addEventListener('click',()=>{
  if(records.length===0)return;
  if(!confirm('Apagar todos os sorteios armazenados neste navegador? Esta ação não pode ser desfeita.'))return;
  if(!persist([]))return;
+ if(visualBalls){visualBalls.destroy();visualBalls=null;}
+ if(speechAvailable)window.speechSynthesis.cancel();
  current=null;$('session').hidden=true;$('setup').hidden=false;renderHistory();
 });
 records=readRecords();
