@@ -30,6 +30,7 @@ Este repositório aplica SFJM, mas não redefine o protocolo.
 13. ler `docs/RLT_PRINT_V2_CHANGELOG_2026-10-07.md` quando houver regressão ou dúvida sobre decisões de implementação do fluxo de impressão.
 14. ler `docs/ARCHITECTURE.md` quando a tarefa alterar fronteiras de domínio, dados, simulação, prospectivo ou infraestrutura.
 15. ler `docs/F2-11_SHARED_SUPABASE_READINESS_20261010.md` antes de qualquer trabalho envolvendo Supabase, papéis, permissões ou evidências prospectivas; respeitar os gates A e B.
+16. ler `docs/sfjm/HANDOFF_SIMPLES_SORTEADOR_NEON_2026-10-13.md` sempre que a tarefa envolver Roleta Simples, Sorteador local, finalização visual/sonora, Neon, Sorteador Seguro, login Google compartilhado ou PR #107. O documento distingue produção de implementação suspensa e bloqueios de segurança.
 
 ## 3. Regra de autoridade
 
