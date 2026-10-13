@@ -35,16 +35,11 @@ function create(arena){
    g.addColorStop(0,'#f7fdff');g.addColorStop(.35,'#a3e8fe');g.addColorStop(.74,'#45abd7');g.addColorStop(1,'#126b9d');
    ctx.beginPath();ctx.arc(b.x,b.y,radius,0,TAU);
    ctx.fillStyle=g;ctx.fill();ctx.lineWidth=.8;ctx.strokeStyle='#ffffff66';ctx.stroke();
-   // Rodar o numero com a trajetoria, dificultando leitura sem ocultar a bola.
-   const angle=Math.atan2(b.vy,b.vx)+Math.PI/2;
-   ctx.save();ctx.translate(b.x,b.y);ctx.rotate(angle);
-   ctx.font='800 '+Math.max(8,Math.round(radius*.85))+'px system-ui';
-   ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#133d56';
-   ctx.fillText(String(b.n),0,.5);ctx.restore();
+   // As bolinhas permanecem sem numeros na urna; somente a revelacao mostra o resultado.
   }
  }
  function step(dt){
-  const boost=fast?2.1:1;
+  const boost=fast?2.625:1; // 25% acima da aceleracao anterior (2.1).
   // Integracao de pequeno passo previne atravessar paredes com velocidades altas.
   const steps=Math.min(4,Math.max(1,Math.ceil(dt/.012)));
   const h=dt/steps;
