@@ -1,6 +1,6 @@
 # Roleta — UX local trial — 13/10/2026
 
-Status: implemented locally; not pushed, merged or deployed. Visual acceptance pending in the operator's Live Sync.
+Status: test branch published with operator authorization. No main merge or deployment. Visual acceptance pending in the operator's Live Sync.
 
 ## Baseline and scope
 
@@ -17,7 +17,7 @@ The operator approved testing the proposed restrained real-estate visual directi
 - Photo wording is simplified; technical file measurements stay out of the main flow.
 - Rotation updates the actual upload image, recompresses through the existing preparation service and resets photograph confirmation.
 - Line review gets a photo reference, zoom, hide/show controls and next-pending-line action. Desktop uses columns; mobile uses a bounded sticky reference.
-- Existing manual JSON paths are accessible through a secondary action.
+- Manual JSON remains in the existing Intelligence interface; no JSON action is exposed in the simplified broker flow.
 - Save-to-history controls are restored; document output actions remain separate from persistence.
 - Sorteador's main-menu link returns to `/simples/`. Its random selection, history, completion and sound mechanisms are not rebuilt.
 
@@ -37,3 +37,7 @@ Not verified in this iteration: rendered desktop/mobile layout, camera/rotation 
 2. Validate entry/menu, four steps, photo reference/zoom, manual JSON, rotation upload orientation and final output controls at desktop and mobile widths.
 3. Fix observed issues locally. Preserve existing human-review and storage invariants.
 4. Main merge and production promotion require explicit operator intent. No Preview deployment.
+
+## Operator feedback — 13/10/2026
+
+Removed duplicate Google login in digitalization. The entry owns authentication; session expiration sends the operator back there. Local test mode remains clearly identified and cannot authorize backend operations. Replaced four button-shaped step labels with a non-interactive native progress indicator and the current step text. Removed the JSON shortcut from the simplified flow; retained existing technical/manual paths in Intelligence.

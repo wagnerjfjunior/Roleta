@@ -63,19 +63,18 @@ const gallery=photo.querySelector('[data-photo-gallery]');
 if(camera)camera.textContent='Tirar foto';
 if(gallery)gallery.textContent='Escolher da galeria';
 const login=photo.querySelector('[data-google-login]');
-if(login){login.textContent='Entrar com Google';login.href='/api/auth/google/start?returnTo=%2Fsimples%2F';}
+if(login)login.parentElement.classList.add('simple-auth-controls');
 const send=photo.querySelector('[data-photo-send]');
 if(send)send.textContent='Processar foto';
 const transfer=()=>photo.querySelector('[data-review-transfer]');
-const stepNodes=[...document.querySelectorAll('[data-step]')];
+const stepLabel=document.getElementById('simpleStepLabel');
+const stepProgress=document.getElementById('simpleStepProgress');
 const photoPreview=photo.querySelector('[data-photo-preview]');
 const confirmation=photo.querySelector('[data-photo-confirm]');
 if(confirmation){confirmation.parentElement.lastChild.textContent=' A folha está na posição correta e os nomes e números estão legíveis.';}
 const remove=photo.querySelector('[data-photo-remove]');if(remove)remove.textContent='Trocar foto';
 const rotate=document.createElement('button');rotate.type='button';rotate.dataset.photoRotate='';rotate.textContent='Girar foto';
 if(send)send.parentElement.insertBefore(rotate,send);
-const manualToggle=document.createElement('button');manualToggle.type='button';manualToggle.className='simple-back';manualToggle.textContent='Usar JSON já preparado';manualToggle.setAttribute('aria-expanded','false');
-photo.append(manualToggle);manualToggle.addEventListener('click',()=>{const open=manualToggle.getAttribute('aria-expanded')!=='true';manualToggle.setAttribute('aria-expanded',String(open));host.classList.toggle('simple-show-manual',open);});
 const tools=document.createElement('div');tools.className='simple-review-tools';tools.hidden=true;
 const referenceButton=document.createElement('button');referenceButton.type='button';referenceButton.className='simple-back';referenceButton.textContent='Ver foto da folha';
 const nextPending=document.createElement('button');nextPending.type='button';nextPending.className='simple-back';nextPending.textContent='Próxima linha pendente';
@@ -116,13 +115,9 @@ function update(){
  if(next!==phase){
    phase=next;
    host.dataset.simplePhase=String(phase);
-   stepNodes.forEach(el=>{
-     const n=Number(el.dataset.step);
-     el.classList.toggle('active',n===phase);
-     el.classList.toggle('complete',n<phase);
-     if(n===phase)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');
-   });
-   if(next===1)notice.textContent='Tire uma foto ou escolha uma imagem. Confira a posição da folha antes de processar.';
+   stepLabel.textContent='Etapa '+phase+' de 4 · '+['Foto da folha','Conferir participantes','Revisar folha','Roleta pronta'][phase-1];
+   stepProgress.value=phase;
+   if(next===1)notice.textContent='Comece pela foto da folha.';
    else if(next===2)notice.textContent='Confira os nomes e as bolinhas na fotografia. Marque cada linha revisada.';
    else if(next===3)notice.textContent='Confira SALÃO, STAND-BY, ON-LINE e o sorteio de empresa.';
    else notice.textContent='Confirme a folha final para liberar impressão, JPEG e compartilhamento.';
@@ -139,6 +134,16 @@ function update(){
    if(section&&!section.classList.contains('simple-human-review'))section.classList.add('simple-human-review');
    const title=section?.querySelector('h3');if(title&&title.textContent!=='Confira os participantes')title.textContent='Confira os participantes';
  }
+ const authIndicator=photo.querySelector('[data-google-auth]');
+ if(authenticated&&!isLocal&&authIndicator?.textContent==='Entre com Google para enviar fotografias.'){
+   authenticated=false;access.textContent='Sua sessão terminou. Entre com Google para continuar.';loginEntry.hidden=false;route();
+ }
+ const initialPhotoStatus=photo.querySelector('[data-photo-status]');
+ const initialPhotoText=initialPhotoStatus?.querySelector('div');
+ if(initialPhotoText?.textContent==='Faça login com Google, selecione uma foto e confirme o enquadramento.')initialPhotoText.textContent='Selecione a foto e confirme que os nomes e números estão legíveis.';
+ const readingStatus=photo.querySelector('[data-gemini-status]');
+ const waiting=readingStatus?.textContent==='AGUARDANDO JSON DO GEMINI'||readingStatus?.textContent==='Aguardando a foto da folha';
+ if(readingStatus&&readingStatus.hidden!==waiting)readingStatus.hidden=waiting;
  const translations=new Map([
   ['AGUARDANDO JSON DO GEMINI','Aguardando a foto da folha'],
   ['CONFERÊNCIA PENDENTE','Confira a foto antes de continuar'],
