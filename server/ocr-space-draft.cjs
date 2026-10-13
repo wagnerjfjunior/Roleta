@@ -61,6 +61,25 @@ function fromDelimited(raw){
  }
  return rows;
 }
+function fromColumnText(raw){
+ // Engine 3 sometimes overlays only headings, while returning the table as
+ // successive columns. Only the explicitly numbered broker column is safe.
+ const lines=raw.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+ const start=lines.findIndex(s=>normalized(s)==='CORRETOR'||normalized(s)==='CORRETORES');
+ const end=lines.findIndex((s,i)=>i>start&&/^(?:N[º°o]?|NÚMERO)$/i.test(s.replace(/\*/g,'').trim()));
+ const manager=lines.findIndex((s,i)=>i>end&&normalized(s)==='GERENTE');
+ if(start<0||end<=start||manager<=end)return [];
+ const rows=[];let previous=0;
+ for(const line of lines.slice(start+1,end)){
+  const match=/^(\d{1,3})(?:\s+(.+))?$/.exec(line);
+  const position=match?integer(match[1]):null;
+  if(position===null||position<=previous)return [];
+  const name=match[2]||null;
+  if(name&&!/[A-Za-zÀ-ÿ]/.test(name))return [];
+  rows.push(row(position,name,null));previous=position;
+ }
+ return rows.filter(l=>l.nome_lido).length>=3?rows:[];
+}
 function convertOcrSpace(value){
  const payload=value?.ocr??value;
  if(!payload||typeof payload!=='object'||Array.isArray(payload)||payload.IsErroredOnProcessing===true)throw Error('OCR.space não conseguiu ler a fotografia.');
@@ -72,11 +91,12 @@ function convertOcrSpace(value){
  if(!raw.trim())throw Error('OCR.space não encontrou texto legível na fotografia.');
  let rows=fromOverlay(page),method='overlay';
  if(!rows.length){rows=fromDelimited(raw);method='delimited';}
+ if(!rows.length){rows=fromColumnText(raw);method='column-text';}
  // Raw fragments have no reliable participant/manager distinction. A blank review
  // preserves the photo and literal OCR text without creating fictitious people.
  if(!rows.length){rows=[row(null,null,null)];method='manual';}
  if(!rows.length)throw Error('Não foi possível separar participantes. Escolha uma fotografia mais nítida.');
  if(rows.length>MAX_ROWS)throw Error('Leitura OCR excedeu 100 linhas.');
- return {empreendimento:null,data:null,periodo:null,sorteio_empresa:null,quantidade_corretores:null,helbor_qtd_lida:null,linhas:rows,source:'ocr-space',parser_version:'ocr-space-draft-v2',metodo_leitura:method,texto_original:raw,inconsistencias:[method==='manual'?'Não foi possível separar a tabela. Preencha os participantes consultando a fotografia.':'Leitura de emergência: confira todas as linhas e acrescente participantes que não foram reconhecidos.','Posições e bolinhas ilegíveis permanecem vazias; não foram completadas por sequência.'],observacoes:['Os dois modelos Gemini falharam. O OCR.space é um rascunho e exige conferência humana completa.']};
+ return {empreendimento:null,data:null,periodo:null,sorteio_empresa:null,quantidade_corretores:null,helbor_qtd_lida:null,linhas:rows,source:'ocr-space',parser_version:'ocr-space-draft-v3',metodo_leitura:method,texto_original:raw,inconsistencias:[method==='manual'?'Não foi possível separar a tabela. Preencha os participantes consultando a fotografia.':method==='column-text'?'Nomes e posições recuperados da coluna de corretores. Preencha as bolinhas pela foto: o OCR não informou sua associação às linhas.':'Leitura de emergência: confira todas as linhas e acrescente participantes que não foram reconhecidos.','Posições e bolinhas ilegíveis permanecem vazias; não foram completadas por sequência.'],observacoes:['Os dois modelos Gemini falharam. O OCR.space é um rascunho e exige conferência humana completa.']};
 }
 module.exports={convertOcrSpace};

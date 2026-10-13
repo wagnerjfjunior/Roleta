@@ -1,3 +1,7 @@
+## Complemento — OCR com coordenadas só nos cabeçalhos
+
+Na execução `b156fbb40e0143d0a97c0708d80c33d9` (13:16 de São Paulo), o OCR.space retornou apenas oito entradas de overlay, todas no cabeçalho. O texto continha a coluna Corretor com posições explícitas 1–31, seguida pela coluna de bolinhas incompleta e pelas colunas Gerente/Diretor. O parser v3 recupera exclusivamente a coluna de corretores delimitada pelos cabeçalhos, exigindo posições explícitas, únicas e crescentes. Mantém linhas impressas sem nome para revisão e todas as bolinhas vazias; não associa números por sequência. A interface explica a recuperação parcial. Regressão com estrutura real anonimizada adicionada; os testes de geometria anteriores continuam obrigatórios.
+
 ## Correção da leitura OCR.space — 13/10/2026
 
 A execução real `2b9a48b0f2fa41f0a1d38ec342f595f6` acionou OCR.space, mas a revisão ficou inutilizável. O cabeçalho Corretor começava sobre a coluna dos índices; o parser comparava o centro do índice com a borda esquerda do cabeçalho e descartava todas as âncoras. O fallback de texto livre criou linhas para gerentes e diretor.
