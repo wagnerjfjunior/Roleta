@@ -19,7 +19,7 @@
 <label class="mode-option"><input type="radio" name="drawMode" value="range"><span><strong>Do número até o número</strong><small>Você define o primeiro e o último número</small></span></label></fieldset>
 <div id="countFields" class="mode-fields"><label for="total">Quantidade de corretores</label><input id="total" type="number" min="1" max="200" step="1" value="25"></div>
 <div id="rangeFields" class="range-pair" hidden><div><label for="firstNumber">Do número</label><input id="firstNumber" type="number" min="1" max="999999" step="1" value="1"></div><div><label for="lastNumber">Até o número</label><input id="lastNumber" type="number" min="1" max="999999" step="1" value="50"></div></div>
-<button type="button" id="start" class="primary full">Iniciar sorteio oficial</button>
+<button type="button" id="start" class="primary full">Iniciar sorteio oficial</button><button type="button" id="showHistory" class="quiet full">Consultar sorteios registrados</button><div id="serverHistory" class="server-history" hidden></div>
 </div></section>
 <section id="session" hidden class="card official-card">
 <span class="eyebrow">RESULTADO REGISTRADO NO SERVIDOR</span>
