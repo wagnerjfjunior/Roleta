@@ -10,6 +10,7 @@ let authenticated=false,localTest=false;
 function route(){
  const permitted=authenticated||(isLocal&&localTest);
  const digital=permitted&&location.hash==='#digitalizar';
+ document.body.classList.toggle('simple-screen-entry',!permitted);
  entry.hidden=permitted;home.hidden=!permitted||digital;workflow.hidden=!digital;
  menu.hidden=!digital;
  if(digital)update();
