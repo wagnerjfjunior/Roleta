@@ -17,11 +17,24 @@
 </header>
 <main>
 <section class="setup card" id="setup">
- <div class="setup-copy"><span class="eyebrow">COMEÇAR</span><h2>Quantos corretores vão participar?</h2><p>Uma bolinha para cada corretor. Cada clique revela um número, na ordem das posições físicas da folha.</p></div>
+ <div class="setup-copy"><span class="eyebrow">COMEÇAR</span><h2>Como deseja sortear?</h2><p>Escolha uma opção, informe os números e comece. Cada bolinha sai apenas uma vez.</p></div>
  <form id="startForm" class="setup-actions">
-  <label for="total">Quantidade de corretores</label>
-  <div class="start-row"><input id="total" name="total" type="number" inputmode="numeric" min="1" max="200" step="1" value="25" required><button type="submit" class="primary">Preparar bolinhas <span aria-hidden="true">→</span></button></div>
-  <small>De 1 a 200 corretores. Sem cadastro e sem envio de dados.</small>
+  <fieldset class="mode-choices"><legend>Tipo de sorteio</legend>
+   <label class="mode-option"><input type="radio" name="drawMode" value="count" checked><span><strong>Quantidade de corretores</strong><small>Exemplo: 25 corretores, bolinhas de 1 a 25</small></span></label>
+   <label class="mode-option"><input type="radio" name="drawMode" value="range"><span><strong>Escolher do número até o número</strong><small>Exemplo: de 50 até 80</small></span></label>
+  </fieldset>
+  <div id="countFields" class="mode-fields">
+   <label for="total">Quantos corretores?</label>
+   <input id="total" name="total" type="number" inputmode="numeric" min="1" max="200" step="1" value="25" required>
+  </div>
+  <div id="rangeFields" class="mode-fields" hidden>
+   <div class="range-pair"><div><label for="firstNumber">Do número</label><input id="firstNumber" name="firstNumber" type="number" inputmode="numeric" min="1" max="999999" step="1" value="1" disabled></div>
+   <div><label for="lastNumber">Até o número</label><input id="lastNumber" name="lastNumber" type="number" inputmode="numeric" min="1" max="999999" step="1" value="50" disabled></div></div>
+   <small>Inclui o primeiro e o último número. Até 200 bolinhas.</small>
+  </div>
+  <p id="setupSummary" class="setup-summary" aria-live="polite">25 bolinhas, numeradas de 1 a 25.</p>
+  <button type="submit" class="primary start-submit">Preparar bolinhas <span aria-hidden="true">→</span></button>
+  <small>Sem cadastro e sem envio de dados.</small>
  </form>
 </section>
 <section id="session" hidden>
@@ -39,7 +52,7 @@
  </section>
  <section class="results card" aria-labelledby="resultsHeading">
   <div class="results-head"><div><span class="eyebrow">CONFERÊNCIA</span><h2 id="resultsHeading">Sequência sorteada</h2></div><span id="resultCount">0 números</span></div>
-  <p>1ª bolinha para a posição física 1, 2ª para a posição física 2, e assim por diante.</p>
+  <p id="sequenceDescription">1ª bolinha para a posição física 1, 2ª para a posição física 2, e assim por diante.</p>
   <ol id="sequence" class="sequence" aria-label="Sequência cronológica"></ol>
   <p id="emptySequence" class="empty">Os números aparecerão aqui após cada sorteio.</p>
  </section>
