@@ -45,7 +45,7 @@ function readRecords(){
   return raw.filter(r=>{
    try{
     if(typeof r.id!=='string'||typeof r.createdAt!=='string')return false;
-    engine.remaining(r.total,r.draws);
+    remainingFor(r);
     return r.draws.every((d,i)=>d.position===i+1&&Number.isFinite(Date.parse(d.at)));
    }catch{return false;}
   }).slice(0,MAX_RECORDS);
@@ -63,7 +63,7 @@ function persist(nextRecords){
 function canRun(){
  if(!engine||typeof crypto==='undefined'||typeof crypto.getRandomValues!=='function'){
   $('startForm').querySelector('button[type=submit]').disabled=true;
-  $('total').disabled=true;
+  $('total').disabled=true;$('firstNumber').disabled=true;$('lastNumber').disabled=true;
   $('setup').querySelector('small').textContent='Este navegador não oferece aleatoriedade criptográfica segura. Utilize um navegador atualizado em localhost ou HTTPS.';
   return false;
  }
@@ -75,6 +75,10 @@ function canRun(){
  }
 }
 function countText(n){return n===1?'1 bolinha':n+' bolinhas';}
+function isRange(r){return r.mode==='range';}
+function remainingFor(r){return isRange(r)?engine.remainingRange(r.first,r.last,r.draws):engine.remaining(r.total,r.draws);}
+function nextFor(r){return isRange(r)?engine.nextRange(r.first,r.last,r.draws,crypto):engine.next(r.total,r.draws,crypto);}
+function description(r){return isRange(r)?'Do número '+r.first+' até '+r.last:r.total+' corretores';}
 function showSession(record){
  if(revealTimer){clearTimeout(revealTimer);revealTimer=null;}
  if(visualBalls){visualBalls.destroy();visualBalls=null;}
@@ -82,12 +86,13 @@ function showSession(record){
  if(speechAvailable)window.speechSynthesis.cancel();
  busy=false;current=record;
  $('setup').hidden=true;$('session').hidden=false;
- $('sessionLabel').textContent=record.total+' corretores · '+(record.draws.length===record.total?'Concluído':'Em andamento');
+ $('sessionLabel').textContent=description(record)+' · '+(record.draws.length===record.total?'Concluído':'Em andamento');
+ $('sequenceDescription').textContent=isRange(record)?'Cada retirada entra na sequência abaixo, com seu horário.':'1ª bolinha para a posição física 1, 2ª para a posição física 2, e assim por diante.';
  $('sessionTime').textContent='Iniciado em '+formatDate(record.createdAt);
  renderSession(true);
 }
 function drawPool(){
- const pool=engine.remaining(current.total,current.draws);
+ const pool=remainingFor(current);
  const arena=$('arena');
  if(window.RoletaBingoBalls){
   if(!visualBalls)visualBalls=window.RoletaBingoBalls.create(arena);
@@ -113,7 +118,7 @@ function drawPool(){
 function renderSession(resetWinner){
  if(!current)return;
  const drawn=current.draws.length,total=current.total;
- $('sessionLabel').textContent=total+' corretores · '+(drawn===total?'Concluído':'Em andamento');
+ $('sessionLabel').textContent=description(current)+' · '+(drawn===total?'Concluído':'Em andamento');
  $('progressText').textContent=drawn+' de '+total+' sorteadas';
  $('remainingText').textContent=countText(total-drawn)+' restantes';
  $('progressFill').style.width=(100*drawn/total)+'%';
@@ -125,6 +130,7 @@ function renderSession(resetWinner){
   const position=document.createElement('span');position.className='position';position.textContent=entry.position+'ª posição';
   const number=document.createElement('strong');number.className='sequence-number';number.textContent=entry.number;
   const time=document.createElement('time');time.dateTime=entry.at;time.textContent=new Date(entry.at).toLocaleTimeString('pt-BR');
+  if(isRange(current))position.textContent=entry.position+'ª retirada';
   li.append(position,number,time);fragment.appendChild(li);
  });
  list.replaceChildren(fragment);
@@ -139,11 +145,11 @@ function renderSession(resetWinner){
    const last=current.draws[drawn-1];
    $('winnerCaption').textContent=drawn===total?'Última bolinha sorteada':'Bolinha sorteada';
    $('winnerNumber').textContent=last.number;
-   $('winnerPosition').textContent=last.position+'ª posição física';
+   $('winnerPosition').textContent=last.position+(isRange(current)?'ª retirada':'ª posição física');
   }else{
    $('winnerCaption').textContent='Pronto para sortear';
    $('winnerNumber').textContent='?';
-   $('winnerPosition').textContent='Aguardando a primeira posição';
+   $('winnerPosition').textContent=isRange(current)?'Aguardando a primeira bolinha':'Aguardando a primeira posição';
   }
   clearError();
   $('drawHint').textContent=drawn===total?'Sequência completa. O histórico foi salvo neste navegador.':'Cada clique revela uma bolinha ainda não sorteada.';
@@ -151,7 +157,7 @@ function renderSession(resetWinner){
 }
 function draw(){
  if(!current||busy||current.draws.length>=current.total)return;
- const number=engine.next(current.total,current.draws,crypto);
+ const number=nextFor(current);
  const position=current.draws.length+1;
  const entry={position,number,at:new Date().toISOString()};
  const updated={...current,draws:[...current.draws,entry]};
@@ -160,7 +166,7 @@ function draw(){
  current=updated;busy=true;
  $('drawButton').disabled=true;
  $('winner').classList.remove('revealing');
- $('winnerCaption').textContent='Sorteando para a posição '+position;
+ $('winnerCaption').textContent=isRange(current)?'Sorteando bolinha':'Sorteando para a posição '+position;
  $('winnerNumber').textContent='●';
  $('winnerPosition').textContent='Aguarde a revelação';
  $('drawHint').textContent='Bolinha selecionada com aleatoriedade criptográfica.';
@@ -176,17 +182,17 @@ function draw(){
   $('winner').classList.add('revealing');
   $('winnerCaption').textContent='Bolinha sorteada';
   $('winnerNumber').textContent=number;
-  $('winnerPosition').textContent=position+'ª posição física';
+  $('winnerPosition').textContent=position+(isRange(current)?'ª retirada':'ª posição física');
   speak(String(number));
   $('drawHint').textContent=current.draws.length===current.total?'Sorteio finalizado. Todos os números estão registrados abaixo.':'Clique novamente para a próxima posição.';
   clearError();
  },reduced?0:1100);
 }
-function start(total){
+function start(config){
  if(current&&current.draws.length<current.total){
   if(!confirm('O sorteio atual ainda não terminou. Deseja iniciar outro? O parcial continuará no histórico local.'))return;
  }
- const record={id:crypto.randomUUID?crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint32Array(4))).join('-'),createdAt:new Date().toISOString(),total,draws:[]};
+ const record={id:crypto.randomUUID?crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint32Array(4))).join('-'),createdAt:new Date().toISOString(),...config,draws:[]};
  if(!persist([record,...records].slice(0,MAX_RECORDS)))return;
  showSession(record);
 }
@@ -196,7 +202,7 @@ function renderHistory(){
  for(const r of records){
   const row=document.createElement('article');row.className='history-row';
   const heading=document.createElement('div');heading.className='history-row-heading';
-  const label=document.createElement('strong');label.textContent=r.total+' corretores · '+r.draws.length+'/'+r.total+(r.draws.length===r.total?' concluído':' parcial');
+  const label=document.createElement('strong');label.textContent=description(r)+' · '+r.draws.length+'/'+r.total+(r.draws.length===r.total?' concluído':' parcial');
   const date=document.createElement('small');date.textContent=formatDate(r.createdAt);
   heading.append(label,date);
   const seq=document.createElement('p');seq.textContent=r.draws.length?r.draws.map(d=>d.position+'ª: '+d.number).join(' · '):'Nenhuma bolinha sorteada';
@@ -209,10 +215,38 @@ function openHistory(){renderHistory();$('historyDialog').showModal();}
 $('soundToggle').addEventListener('click',()=>setSound(!soundOn));
 try{soundOn=localStorage.getItem(SOUND_KEY)==='1'&&speechAvailable;}catch{}
 updateSoundButton();
+const modeInputs=[...document.querySelectorAll('input[name="drawMode"]')];
+function activeMode(){return modeInputs.find(r=>r.checked)?.value||'count';}
+function updateMode(){
+ const range=activeMode()==='range';
+ $('countFields').hidden=range;$('rangeFields').hidden=!range;
+ $('total').disabled=range;$('firstNumber').disabled=!range;$('lastNumber').disabled=!range;
+ updateSetupSummary();
+}
+function updateSetupSummary(){
+ try{
+  if(activeMode()==='range'){
+   const v=engine.assertRange(Number($('firstNumber').value),Number($('lastNumber').value));
+   $('setupSummary').textContent=v.total+' bolinhas, numeradas de '+v.first+' até '+v.last+'.';
+  }else{
+   const total=engine.assertTotal(Number($('total').value));
+   $('setupSummary').textContent=total+' bolinhas, numeradas de 1 a '+total+'.';
+  }
+  $('setupSummary').classList.remove('error');
+ }catch(e){$('setupSummary').textContent=e.message;$('setupSummary').classList.add('error');}
+}
+modeInputs.forEach(r=>r.addEventListener('change',updateMode));
+['total','firstNumber','lastNumber'].forEach(id=>$(id).addEventListener('input',updateSetupSummary));
+updateMode();
 $('startForm').addEventListener('submit',event=>{
  event.preventDefault();
  if(!canRun())return;
- try{start(engine.assertTotal(Number($('total').value)));}
+ try{
+  if(activeMode()==='range'){
+   const {first,last,total}=engine.assertRange(Number($('firstNumber').value),Number($('lastNumber').value));
+   start({mode:'range',first,last,total});
+  }else start({mode:'count',total:engine.assertTotal(Number($('total').value))});
+ }
  catch(e){alert(e.message);}
 });
 $('drawButton').addEventListener('click',()=>{
