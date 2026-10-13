@@ -43,6 +43,7 @@ jobs:
       - run: node tests/intake-normalization.test.cjs
       - run: node tests/roleta-ocr-relay.test.cjs
       - run: node --test tests/ocr-space-draft.test.cjs
+      - run: node --test tests/ocr-review-render.test.cjs
       - run: node tests/roleta-ocr-timeout.test.cjs
       - run: node tests/photo-prepare.test.cjs
       - run: node tests/ios-print-gesture.test.cjs

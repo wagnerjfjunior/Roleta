@@ -118,7 +118,7 @@ async function mount(host){
      if(!data||!Array.isArray(data.linhas))throw Error('O Make retornou resposta incompleta.');
      textarea.value=JSON.stringify(data,null,2);
      progress('Leitura recebida. Preparando conferência…',null);
-     article.querySelector('[data-gemini-check]').click();
+     await renderDraft();
      photoStatus.className='intake-gate blocked';
      photoStatus.innerHTML=json.source==='make-ocr-space'?'<strong>LEITURA ALTERNATIVA RECEBIDA</strong><div>Confira a foto com atenção. Acrescente participantes ausentes e complete os campos que ficaram vazios.</div>':'<strong>LEITURA RECEBIDA</strong><div>Confira nomes e números na tabela; a conferência humana continua obrigatória.</div>';
      progress('Leitura concluída · pronto para revisão',100);
@@ -158,7 +158,7 @@ async function mount(host){
  });
  window.addEventListener('pagehide',()=>{if(objectURL)URL.revokeObjectURL(objectURL);},{once:true});
 
- article.querySelector('[data-gemini-check]').addEventListener('click',async()=>{
+ async function renderDraft(){
   status.className='intake-gate blocked';status.textContent='Validando leitura e cadastro…';details.replaceChildren();
   try{
    const [response,aliasResponse]=await Promise.all([fetch('/data/print-brokers.json',{cache:'no-store'}),fetch('/data/broker-name-aliases.json',{cache:'no-store'}).catch(()=>null)]);
@@ -189,6 +189,7 @@ async function mount(host){
 
    // Isolated human correction surface. Does not modify the GPT intake until the
    // operator explicitly transfers a complete, validated draft.
+   if(!window.RoletaHumanBridge)throw Error('O módulo de conferência não carregou. Atualize a página.');
    if(window.RoletaHumanBridge){
      const human=document.createElement('section');
      human.className='rltv2-review-card';
@@ -357,11 +358,14 @@ async function mount(host){
        errors.innerHTML='<strong>ENVIADO À CONFERÊNCIA CANÔNICA</strong><div>Ainda é obrigatório revisar SALÃO, STAND BY, ON-LINE e confirmar a prévia para imprimir.</div>';
      });
    }
+   if(!details.querySelector('[data-correction-row]'))throw Error('A leitura não criou linhas para conferência.');
   }catch(e){
    status.className='intake-gate blocked';
    status.innerHTML='<strong>LEITURA BLOQUEADA</strong><div>'+escapeHtml(e.message||e)+'</div>';
+   throw e;
   }
- });
+ }
+ article.querySelector('[data-gemini-check]').addEventListener('click',()=>{renderDraft().catch(()=>{});});
 }
 window.RoletaGeminiDraftUI={mount};
 })();

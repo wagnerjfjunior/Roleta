@@ -1,3 +1,9 @@
+## Revisão sem tabela — confirmação de conclusão corrigida
+
+Os anexos dos módulos 31/32 correspondem à execução de 13:16 e contêm o JSON OCR; `output: null` no Resume 32 não comprova perda do retorno. O módulo Webhook Response 13 recebeu o mesmo envelope e respondeu HTTP 200. Até esta auditoria não apareceu execução posterior no Make. O código atual converte esse envelope em 31 linhas, 28 nomes lidos; o teste isolado da tela Simples também monta essas linhas. O desaparecimento relatado em produção ainda não foi reproduzido no dispositivo do operador.
+
+Falha confirmada na interface: o envio disparava um clique assíncrono para montar a revisão e anunciava conclusão sem aguardar o cadastro e a tabela. Agora aguarda a revisão, exige módulo humano e pelo menos uma linha, e propaga falhas para o aviso de envio. Testes DOM isolados cobrem resposta recebida com cadastro atrasado, sucesso com 31 linhas, cadastro indisponível e módulo humano ausente. Autenticação, Make e parser permanecem sob as regras anteriores. Próxima ação: observar a mensagem concreta da tela do operador se continuar sem tabela; não afirmar que a causa no dispositivo foi resolvida apenas por testes isolados.
+
 ## Complemento — OCR com coordenadas só nos cabeçalhos
 
 Na execução `b156fbb40e0143d0a97c0708d80c33d9` (13:16 de São Paulo), o OCR.space retornou apenas oito entradas de overlay, todas no cabeçalho. O texto continha a coluna Corretor com posições explícitas 1–31, seguida pela coluna de bolinhas incompleta e pelas colunas Gerente/Diretor. O parser v3 recupera exclusivamente a coluna de corretores delimitada pelos cabeçalhos, exigindo posições explícitas, únicas e crescentes. Mantém linhas impressas sem nome para revisão e todas as bolinhas vazias; não associa números por sequência. A interface explica a recuperação parcial. Regressão com estrutura real anonimizada adicionada; os testes de geometria anteriores continuam obrigatórios.
