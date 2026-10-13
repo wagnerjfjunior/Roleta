@@ -4,21 +4,48 @@ const engine=window.RoletaSorteadorEngine;
 const $=id=>document.getElementById(id);
 const STORAGE='roleta-sorteador-historico-v1';
 const MAX_RECORDS=100;
-let records=[],current=null,busy=false,revealTimer=null,visualBalls=null;
+let records=[],current=null,busy=false,revealTimer=null,visualBalls=null,completionAudio=null;
 const SOUND_KEY='roleta-sorteador-voz-v1';
 let soundOn=false;
 const speechAvailable=typeof window.speechSynthesis!=='undefined'&&typeof window.SpeechSynthesisUtterance!=='undefined';
-function speak(message){
- if(!soundOn||!speechAvailable)return;
+function speak(message,onEnd){
+ if(!soundOn||!speechAvailable){if(onEnd)onEnd();return;}
  try{
   window.speechSynthesis.cancel();
   const utterance=new SpeechSynthesisUtterance(message);
+  if(onEnd){let invoked=false;const finish=()=>{if(!invoked){invoked=true;onEnd();}};utterance.onend=finish;utterance.onerror=finish;}
   utterance.lang='pt-BR';utterance.rate=.83;utterance.pitch=1.04;utterance.volume=1;
   const voices=window.speechSynthesis.getVoices();
   const voice=voices.find(v=>v.lang.toLowerCase()==='pt-br')||voices.find(v=>v.lang.toLowerCase().startsWith('pt'));
   if(voice)utterance.voice=voice;
   window.speechSynthesis.speak(utterance);
- }catch(e){$('drawHint').textContent='A voz não está disponível neste dispositivo.';}
+ }catch(e){$('drawHint').textContent='A voz não está disponível neste dispositivo.';if(onEnd)onEnd();}
+}
+function prepareFinishAudio(){
+ if(!soundOn||completionAudio)return;
+ const AudioCtor=window.AudioContext||window.webkitAudioContext;
+ if(!AudioCtor)return;
+ try{
+  completionAudio=new AudioCtor();
+  if(completionAudio.state==='suspended')completionAudio.resume().catch(()=>{});
+ }catch{completionAudio=null;}
+}
+function playFinishChime(){
+ if(!soundOn||!completionAudio||completionAudio.state!=='running')return;
+ try{
+  const ctx=completionAudio,now=ctx.currentTime;
+  // Curta sequencia musical de encerramento, sem audio externo.
+  [523.25,659.25,783.99,1046.5].forEach((freq,i)=>{
+   const start=now+i*.17,end=start+.29;
+   const osc=ctx.createOscillator(),gain=ctx.createGain();
+   osc.type='sine';osc.frequency.setValueAtTime(freq,start);
+   gain.gain.setValueAtTime(.0001,start);
+   gain.gain.exponentialRampToValueAtTime(.12,start+.024);
+   gain.gain.exponentialRampToValueAtTime(.0001,end);
+   osc.connect(gain);gain.connect(ctx.destination);
+   osc.start(start);osc.stop(end+.02);
+  });
+ }catch{/* Ausencia de audio nao altera o resultado. */}
 }
 function updateSoundButton(){
  const button=$('soundToggle');if(!button)return;
@@ -32,7 +59,7 @@ function setSound(enabled){
  try{localStorage.setItem(SOUND_KEY,soundOn?'1':'0');}catch{}
  if(!soundOn&&speechAvailable)window.speechSynthesis.cancel();
  updateSoundButton();
- if(soundOn)speak('Som ativado. Próxima bolinha.');
+ if(soundOn){prepareFinishAudio();speak('Som ativado. Próxima bolinha.');}
 }
 const fmt=new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'medium'});
 function formatDate(value){try{return fmt.format(new Date(value));}catch{return 'Data indisponível';}}
@@ -135,6 +162,7 @@ function renderSession(resetWinner){
  });
  list.replaceChildren(fragment);
  $('emptySequence').hidden=drawn>0;
+ $('finishBanner').hidden=drawn!==total;
  drawPool();
  const button=$('drawButton');
  button.disabled=busy||drawn===total;
@@ -157,6 +185,7 @@ function renderSession(resetWinner){
 }
 function draw(){
  if(!current||busy||current.draws.length>=current.total)return;
+ prepareFinishAudio();
  const number=nextFor(current);
  const position=current.draws.length+1;
  const entry={position,number,at:new Date().toISOString()};
@@ -183,7 +212,8 @@ function draw(){
   $('winnerCaption').textContent='Bolinha sorteada';
   $('winnerNumber').textContent=number;
   $('winnerPosition').textContent=position+(isRange(current)?'ª retirada':'ª posição física');
-  speak(String(number));
+  if(current.draws.length===current.total)speak(String(number),playFinishChime);
+  else speak(String(number));
   $('drawHint').textContent=current.draws.length===current.total?'Sorteio finalizado. Todos os números estão registrados abaixo.':'Clique novamente para a próxima posição.';
   clearError();
  },reduced?0:1100);

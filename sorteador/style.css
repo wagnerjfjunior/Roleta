@@ -49,3 +49,25 @@ button:disabled{opacity:.45;cursor:not-allowed}.shell{max-width:1080px;margin:au
 .setup-summary.error{color:#ffb1ba!important;border-color:#a34d5b}
 .start-submit{width:100%;min-height:55px}
 @media(max-width:650px){.mode-option{padding:12px}.range-pair{gap:9px}.mode-fields input{font-size:21px}}
+
+/* Entradas claras para o menu principal e encerramento visivel para todos. */
+.header-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;flex-wrap:wrap}
+.header-actions .menu-return,.finish-home{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap}
+.header-actions .menu-return:hover{color:#fff;background:#21445e}
+.finish-banner{margin:22px auto 4px;padding:25px 18px;text-align:center;border:2px solid #54dbaa;border-radius:18px;background:linear-gradient(145deg,#174c45,#0e302d);box-shadow:0 12px 33px rgba(28,178,132,.14);color:#f1fff8}
+.finish-banner[hidden]{display:none!important}
+.finish-icon{width:55px;height:55px;margin:0 auto 10px;display:grid;place-items:center;border-radius:50%;background:#65dfae;color:#09362a;font-size:34px;font-weight:900}
+.finish-banner>strong{display:block;font-size:clamp(24px,4vw,36px);font-weight:950;letter-spacing:.015em;line-height:1.15}
+.finish-banner p{margin:9px auto 0;font-size:17px;color:#e1ffee;font-weight:700}
+.finish-banner .finish-note{font-size:13px;color:#b4ead4;font-weight:500;line-height:1.5}
+.finish-home{width:min(335px,100%);min-height:49px;margin:19px auto 0;border:1px solid #9cedc4;border-radius:12px;background:#d9ffed;color:#08412e;font-size:15px;font-weight:850;padding:10px 16px}
+.finish-home:hover{background:#fff;color:#08412e}
+@media(max-width:650px){
+ .header{align-items:flex-start;flex-wrap:wrap}
+ .header-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+ .header-actions>*{text-align:center;font-size:12px;min-height:44px}
+ .finish-banner{padding:22px 12px}
+ .finish-banner>strong{font-size:26px}
+ .finish-banner p{font-size:15px}
+}
+@media(prefers-reduced-motion:no-preference){.finish-banner:not([hidden]){animation:finish-appear .48s ease-out both}@keyframes finish-appear{from{transform:translateY(9px);opacity:.3}to{transform:translateY(0);opacity:1}}}
