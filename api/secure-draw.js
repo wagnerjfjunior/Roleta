@@ -60,11 +60,11 @@ async function draw(client,body,operator,privateKey){
   const row=q.rows[0];
   if(row.operator_id!==operator)throw Object.assign(Error('Acesso negado.'),{status:403});
   const used=await client.query('select position,number,receipt from public.secure_draw_events where session_id=$1 order by position',[sessionId]);
-  const duplicate=used.rows.find(e=>e.receipt?.payload?.requestId===requestId);
-  if(duplicate){await client.query('commit');return await load(client,sessionId);}
-  if(row.finished_at||used.rowCount>=row.total)throw Object.assign(Error('Sorteio concluído. Crie uma nova sessão para começar novamente.'),{status:409});
   const before=await load(client,sessionId);
   if(!core.verifyLedger(before,core.publicKey(privateKey)))throw Object.assign(Error('Falha na integridade dos registros. Sorteio bloqueado.'),{status:409});
+  const duplicate=used.rows.find(e=>e.receipt?.payload?.requestId===requestId);
+  if(duplicate){await client.query('commit');return before;}
+  if(row.finished_at||used.rowCount>=row.total)throw Object.assign(Error('Sorteio concluído. Crie uma nova sessão para começar novamente.'),{status:409});
   const picked=used.rows.map(e=>e.number);
   const number=core.pick(row.first_number,row.last_number,picked);
   const position=picked.length+1,at=new Date().toISOString();
@@ -100,6 +100,10 @@ module.exports=async function handler(req,res){
   const client=await database().connect();
   try{
    if(req.method==='GET'){
+    if(req.query?.list==='1'){
+     const items=await client.query('select id,mode,first_number,last_number,total,created_at,finished_at from public.secure_draw_sessions where operator_id=$1 order by created_at desc limit 100',[operator]);
+     return respond(res,200,{sessions:items.rows});
+    }
     if(!core.isUuid(req.query?.sessionId))return respond(res,400,{error:'Informe um identificador válido.'});
     const state=await load(client,req.query.sessionId);
     if(!state||state.operatorId!==operator)return respond(res,404,{error:'Sorteio não encontrado.'});
