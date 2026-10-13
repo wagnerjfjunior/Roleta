@@ -67,3 +67,7 @@
 .roleta-simple .rlt-five-column-table input,.roleta-simple .rlt-five-column-table select{width:100%!important}
 .roleta-simple .rltv2-review-table:not(.rlt-five-column-table){font-size:13px}
 }
+
+.roleta-simple .simple-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.roleta-simple .simple-sort-link{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;min-height:42px;border-radius:11px;text-decoration:none;background:#155da3;color:white;font-size:13px;font-weight:850}
+@media(max-width:640px){.roleta-simple .simple-links{width:100%}.roleta-simple .simple-links a{flex:1;text-align:center}}
