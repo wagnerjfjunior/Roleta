@@ -51,7 +51,7 @@ function authorized(auth,secret){
 }
 function receipt(payload,key){return {payload,signature:sign(payload,key),algorithm:'Ed25519',version:1};}
 function identifyOperator(auth,json){
- const match=/^Bearer ([^\\s]+)$/.exec(auth||'');
+ const match=/^Bearer ([^\s]+)$/.exec(auth||'');
  if(!match||!json)return null;
  let operators;try{operators=JSON.parse(json);}catch{return null;}
  if(!operators||typeof operators!=='object'||Array.isArray(operators))return null;
@@ -82,6 +82,6 @@ function verifyLedger(session,pubKey){
   if(sha256(canonical(unsigned))!==eventHash)return false;
   hash=eventHash;seen.add(p.number);
  }
- return session.draws.length<=session.total;
+ return session.draws.length<=session.total&&hash===session.lastHash;
 }
 module.exports={identifyOperator,verifyLedger,MAX,bounds,canonical,sha256,sign,verify,publicKey,pick,requestId,isUuid,authorized,receipt};
