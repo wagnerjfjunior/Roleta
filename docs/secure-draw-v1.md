@@ -13,7 +13,7 @@ Implementado apenas na branch de desenvolvimento. Não fazer merge ou promover a
 ## Provisionamento necessário, sem Supabase
 1. Criar um projeto Neon separado **exclusivamente** para os sorteios. Confirmar cotas do plano gratuito e condições de uso.
 2. Aplicar `db/secure-draw-neon.sql` com administrador do banco.
-3. Criar uma role da API com permissões mínimas; evitar conexão com usuário proprietário das tabelas. Conceder SELECT/INSERT em tabelas, USAGE/SELECT na sequência de eventos, e UPDATE apenas de `last_hash,finished_at` nas sessões. Configurar a URL de conexão dessa role em `SORTEADOR_DATABASE_URL`.
+3. Criar uma role da API com permissões mínimas; evitar conexão com usuário proprietário das tabelas. Conceder SELECT/INSERT em tabelas, USAGE/SELECT na sequência de eventos, e UPDATE apenas de `last_hash,finished_at` nas sessões. Configurar a URL de conexão dessa role em `SORTEADOR_DATABASE_DATABASE_URL`.
 4. Gerar par Ed25519 fora do repositório. Guardar **somente** a chave privada PKCS#8 PEM em `SORTEADOR_ED25519_PRIVATE_KEY`, como variável secreta da Vercel; pode conter quebras de linha reais ou literais `\\n`. A chave pública é derivada no servidor.
 5. Gerar uma chave aleatória diferente, com 32+ bytes criptográficos, por operador; guardar no ambiente como JSON em `SORTEADOR_OPERATOR_KEYS_JSON`. Formato ilustrativo `{"operador1":"<token_de_64_hex>","operador2":"<outro_token>"}`. **Não inserir valores reais no GitHub, no chat ou em páginas públicas.**
 6. Não ativar rota, divulgar chaves ou habilitar operadores antes de validar permissões, autoria, isolamento e comportamento de erro na Vercel.
