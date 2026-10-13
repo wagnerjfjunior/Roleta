@@ -683,6 +683,29 @@
     print.addEventListener('click',openPrintDialog);
     savePdf.addEventListener('click',saveReadyPdf);
     sharePdf.addEventListener('click',shareReadyPhoto);
+    // Roleta Simples: download JPEG da mesma imagem validada para compartilhamento.
+    // A ação é opt-in na rota simples e não altera o Intelligence V3.
+    if(document.body.classList.contains('roleta-simple')){
+      const saveJpeg=document.createElement('button');
+      saveJpeg.id='rltv2SimpleJpeg';
+      saveJpeg.type='button';
+      saveJpeg.className='simulation-run';
+      saveJpeg.textContent='Salvar JPEG';
+      saveJpeg.disabled=true;
+      sharePdf.insertAdjacentElement('beforebegin',saveJpeg);
+      const sync=()=>{saveJpeg.disabled=sharePdf.disabled||!photoBlob||!confirm.checked;};
+      new MutationObserver(sync).observe(sharePdf,{attributes:true,attributeFilter:['disabled']});
+      confirm.addEventListener('change',sync);
+      saveJpeg.addEventListener('click',()=>{
+        if(saveJpeg.disabled||!photoBlob||!confirm.checked)return;
+        const url=URL.createObjectURL(photoBlob);
+        const link=document.createElement('a');
+        link.href=url;link.download=jpegFilename();document.body.appendChild(link);
+        link.click();link.remove();
+        setTimeout(()=>URL.revokeObjectURL(url),30000);
+      });
+      sync();
+    }
   }
 
   window.RouletteIntake={mount,normalizePayload,validatePayload,renderCanonical,applyHumanReview,deriveCompanyDraw};
