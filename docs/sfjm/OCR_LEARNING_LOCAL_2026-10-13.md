@@ -1,3 +1,17 @@
+## Publicação confirmada — 13/10/2026
+
+PR #115 mergeada após os cinco workflows do GitHub concluírem com sucesso.
+Commit funcional: `b2885001679a44f0251d7d8949245c626f19b5ec`.
+Deployment de produção: `dpl_EwyjVC7m6u1f7zrz6r8zmPGUPQbr`, READY,
+projeto `roleta` (`prj_Fc4IcpnaqmYj3XSvhV8g0avwbv4o`), alias
+`https://roleta-tgv.vercel.app` atribuído à main.
+Verificação HTTP pós-publicação: os sete arquivos de frontend alterados
+responderam 200 e coincidem byte a byte com a árvore aprovada.
+Não foi feita gravação de roleta fictícia nem login operacional do usuário.
+Próxima ação: observar uma confirmação real e as sugestões em folhas distintas
+no mesmo navegador/conta. Aprendizado local não é sincronizado no Supabase.
+Os registros de candidato e autorização abaixo são históricos.
+
 # Aprendizado assistido do pós-OCR — candidato local
 
 Autorização: em 13/10/2026 o responsável pediu implementar a camada de melhorias,
