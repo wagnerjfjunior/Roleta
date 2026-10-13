@@ -412,7 +412,9 @@ async function upgradeWorkspace(){
     '<button class="workspace-menu-toggle" type="button" aria-controls="workspaceNavigation" aria-expanded="false" aria-label="Abrir menu de navegação">☰ <span>Menu</span></button>'+
     '<nav id="workspaceNavigation" class="workspace-nav" aria-label="Navegação principal">'+
       '<button class="active" data-workspace-page="overview">Visão geral</button>'+
-      '<button data-workspace-page="intake">Nova Roleta</button>'+
+      '<button data-workspace-page="intake">Nova Roleta</button>'+ 
+      '<a class="workspace-nav-link" href="/simples/">Roleta Simples</a>'+
+      '<a class="workspace-nav-link" href="/sorteador/">Sorteador</a>'+
       '<button data-workspace-page="family">Minha família</button>'+
       '<button data-workspace-page="ranking">Ranking</button>'+
       '<button data-workspace-page="weekend">Fim de semana</button>'+
