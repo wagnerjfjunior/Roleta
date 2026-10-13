@@ -46,6 +46,19 @@ async function mount(host){
  const loginLink=article.querySelector('[data-google-login]');
  const logoutButton=article.querySelector('[data-google-logout]');
  let googleSession=null;
+ let learningCandidate=null;
+ host.addEventListener('roleta-final-confirmed',event=>{
+   const learning=window.RoletaOcrLearning,candidate=learningCandidate;
+   if(!learning||!candidate||!googleSession?.authenticated||googleSession.email!==candidate.account)return;
+   if(learning.key(event.detail)!==candidate.eventKey)return;
+   try{
+     const state=learning.load(localStorage,candidate.account);
+     const next=learning.record(state,candidate.source,event.detail,candidate.directory);
+     const saved=learning.save(localStorage,candidate.account,next);
+     const note=details.querySelector('[data-learning-status]');
+     if(note)note.textContent=saved?'Correções registradas neste navegador. Sugestões de nomes exigem duas folhas distintas sem conflito; a conferência continua obrigatória.':'Não foi possível guardar as correções neste navegador. A folha final continua válida.';
+   }catch{/* Learning failure never blocks review, output or saving. */}
+ });
  async function checkGoogleSession(){
    try{
      const result=await fetch('/api/auth/session',{cache:'no-store'});
@@ -159,6 +172,7 @@ async function mount(host){
  window.addEventListener('pagehide',()=>{if(objectURL)URL.revokeObjectURL(objectURL);},{once:true});
 
  async function renderDraft(){
+  learningCandidate=null;
   status.className='intake-gate blocked';status.textContent='Validando leitura e cadastro…';details.replaceChildren();
   try{
    const [response,aliasResponse]=await Promise.all([fetch('/data/print-brokers.json',{cache:'no-store'}),fetch('/data/broker-name-aliases.json',{cache:'no-store'}).catch(()=>null)]);
@@ -167,7 +181,10 @@ async function mount(host){
    const aliases=aliasResponse?.ok?(await aliasResponse.json().catch(()=>({}))).aliases||{}:{};
    const original=JSON.parse(textarea.value);
    const value=original?.result?.linhas?original.result:original?.body?.linhas?original.body:original;
-   const draft=window.RoletaGeminiConverter.convertGeminiDraft(value,dto,{aliases});
+   const learning=window.RoletaOcrLearning;
+   let learnedAliases={};
+   try{if(learning&&googleSession?.authenticated&&value.source==='ocr-space')learnedAliases=learning.suggestions(learning.load(localStorage,googleSession.email),dto);}catch{}
+   const draft=window.RoletaGeminiConverter.convertGeminiDraft(value,dto,{aliases,learnedAliases});
    const lines=draft.sorteados;
    const extras=draft.sem_sorteio;
    status.className='intake-gate blocked';
@@ -201,9 +218,9 @@ async function mount(host){
        return (a.numero_sorteado===null?Infinity:x)-(b.numero_sorteado===null?Infinity:y);
      });
      const opts=dto.brokers.map(b=>'<option value="'+escapeHtml(b.nome)+'"></option>').join('');
-     const body=sorted.map(l=>'<tr data-correction-row data-pos="'+escapeHtml(l.posicao_impressa)+'">'+
+     const body=sorted.map((l,i)=>'<tr data-correction-row data-source-index="'+i+'" data-pos="'+escapeHtml(l.posicao_impressa)+'">'+
        '<td><input data-correct-position aria-label="Posição impressa na folha" type="number" inputmode="numeric" min="1" max="100" value="'+escapeHtml(l.posicao_impressa??'')+'"></td>'+
-       '<td><input data-correct-number aria-label="Número sorteado na posição '+escapeHtml(l.posicao_impressa)+'" type="number" inputmode="numeric" min="1" value="'+escapeHtml(l.numero_sorteado??'')+'"></td>'+
+       '<td><input data-correct-number aria-label="Número sorteado na posição '+escapeHtml(l.posicao_impressa)+'" type="number" inputmode="numeric" min="1" value="'+escapeHtml(l.numero_sorteado??'')+'">'+(l.bolinha_ambigua?'<small>OCR: '+escapeHtml(l.numero_lido_original)+' · preencher pela foto</small>':'')+'</td>'+
        '<td><input data-correct-name aria-label="Nome na posição '+escapeHtml(l.posicao_impressa)+'" list="geminiReviewBrokerNames" value="'+escapeHtml(l.nome||l.nome_lido)+'">'+(l.nome&&l.cadastro_resolucao!=='NOME_EXATO'?'<small>OCR: '+escapeHtml(l.nome_lido)+' → '+escapeHtml(l.nome)+' · conferir</small>':'')+'</td>'+
        '<td><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
        '<option value="'+(l.numero_sorteado===null?'':'salao')+'">'+(l.numero_sorteado===null?'Confirmar classe':'SALÃO')+'</option>'+
@@ -226,6 +243,12 @@ async function mount(host){
        '<div class="intake-actions"><button type="button" data-review-transfer class="simulation-run">Transferir para conferência canônica</button></div>'+
        '<div data-review-errors class="intake-gate blocked"><strong>TRANSFERÊNCIA NÃO AUTORIZADA</strong><div>Corrija as linhas, escolha as classes e confirme o cabeçalho antes de continuar.</div></div>';
      details.insertBefore(human,technicalTables);
+     if(value.source==='ocr-space'&&learning){
+       const note=document.createElement('p');note.dataset.learningStatus='';note.className='small muted';note.textContent='Sugestões de nomes usam correções confirmadas em duas folhas distintas. Histórico local separado por conta Google; números não são aprendidos.';
+       const clear=document.createElement('button');clear.type='button';clear.textContent='Limpar aprendizado deste navegador';
+       clear.addEventListener('click',()=>{try{const ok=googleSession?.authenticated&&learning.save(localStorage,googleSession.email,learning.empty());learningCandidate=null;note.textContent=ok?'Aprendizado removido. As sugestões já exibidas continuam exigindo conferência; a próxima leitura usará o histórico vazio.':'Não foi possível limpar o histórico.';}catch{note.textContent='Não foi possível limpar o histórico.';}});
+       human.append(note,clear);
+     }
      if(value.source==='ocr-space'){
        const period=human.querySelector('[data-review-period]');period.insertAdjacentHTML('afterbegin','<option value="">Confirmar período</option>');
        const note=document.createElement('p');note.className='intake-gate blocked';note.textContent=value.metodo_leitura==='column-text'?'Nomes e posições recuperados. Preencha as bolinhas consultando a foto: o OCR devolveu a coluna de números sem associação segura às linhas.':value.metodo_leitura==='manual'?'Não foi possível separar a tabela. Preencha os participantes consultando a foto e use “Adicionar participante que falta” para incluir as demais linhas.':'Leitura alternativa: confira as linhas na mesma ordem da foto. Complete campos vazios e acrescente os participantes que faltarem.';human.prepend(note);
@@ -243,7 +266,7 @@ async function mount(host){
          const n=tr.querySelector('[data-correct-number]').value;
          const p=numericPosition(tr.querySelector('[data-correct-position]').value);
          if(tr.querySelector('[data-correct-class]').value==='excluir')return;
-         if(n)tallies.set(n,(tallies.get(n)||0)+1);
+         if(n)tallies.set(Number(n),(tallies.get(Number(n))||0)+1);
          if(p!==null)positions.set(p,(positions.get(p)||0)+1);
        });
        let confirmed=0;
@@ -256,7 +279,7 @@ async function mount(host){
          const parsedPhysical=numericPosition(physical);
          const invalidPhysical=parsedPhysical===null||(positions.get(parsedPhysical)>1);
          // Exclusion requires explicit human confirmation, not a broker/position match.
-         const warning=category==='excluir'?false:(invalidPhysical||!name||!category||(category==='salao'&&!n)||(n&&tallies.get(n)>1));
+         const warning=category==='excluir'?false:(invalidPhysical||!name||!category||(category==='salao'&&(!n||!/^\d+$/.test(n)||Number(n)<1||/^0\d{2,}$/.test(n)))||(n&&tallies.get(Number(n))>1));
          if(warning&&check.checked)check.checked=false;
          tr.classList.toggle('rlt-line-verified',check.checked);
          tr.classList.toggle('rlt-line-attention',!check.checked&&!!warning);
@@ -280,6 +303,7 @@ async function mount(host){
      human.querySelector('[data-review-add-line]').addEventListener('click',()=>{
        if(correctionRows.length>=100)return;
        const tr=correctionRows[0].cloneNode(true);
+       delete tr.dataset.sourceIndex;
        tr.removeAttribute('data-pos');tr.classList.remove('rlt-line-verified','rlt-line-attention');
        tr.querySelectorAll('input').forEach(field=>{field.value='';field.checked=false;});
        tr.querySelectorAll('small').forEach(el=>el.remove());
@@ -352,6 +376,20 @@ async function mount(host){
        const canonicalInput=host.querySelector('#rltv2Json');
        const canonicalButton=host.querySelector('#rltv2Validate');
        if(!canonicalInput||!canonicalButton){errors.textContent='Importador canônico indisponível.';return;}
+       learningCandidate=null;
+       if(learning&&value.source==='ocr-space'&&googleSession?.authenticated){
+         // Pair only unchanged, known physical positions from the same source
+         // row; changing a physical position invalidates its learning evidence.
+         const sourcePositions=new Map();
+         for(const row of sorted)if(row.posicao_impressa!=null){const p=Number(row.posicao_impressa);sourcePositions.set(p,(sourcePositions.get(p)||0)+1);}
+         const safeLines=[...human.querySelectorAll('[data-correction-row]')].flatMap(tr=>{
+           const i=tr.dataset.sourceIndex;
+           if(i===undefined)return [];
+           const original=sorted[Number(i)];
+           return original?.posicao_impressa!=null&&sourcePositions.get(Number(original.posicao_impressa))===1&&Number(tr.querySelector('[data-correct-position]').value)===Number(original.posicao_impressa)?[original]:[];
+         });
+         learningCandidate={account:googleSession.email,eventKey:learning.key(checked.payload),source:{...value,linhas:safeLines},directory:dto};
+       }
        canonicalInput.value=JSON.stringify(checked.payload,null,2);
        canonicalButton.click();
        errors.className='intake-gate clear';

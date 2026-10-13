@@ -1,3 +1,5 @@
+> **APRENDIZADO OCR — candidato local 13/10/2026:** camada de sugestões após confirmação final, duas folhas distintas sem conflito, replay idempotente e bolinhas ambíguas para preenchimento manual. Histórico por conta no navegador, sem sincronização Supabase. Ler `docs/sfjm/OCR_LEARNING_LOCAL_2026-10-13.md` (a partir da raiz). Branch `feature/ocr-learning-20261013`; envio ao GitHub autorizado para teste Live Sync; produção ainda não autorizada nesta etapa. Próximo passo: teste local da branch.
+
 ## Revisão sem tabela — confirmação de conclusão corrigida
 
 Os anexos dos módulos 31/32 correspondem à execução de 13:16 e contêm o JSON OCR; `output: null` no Resume 32 não comprova perda do retorno. O módulo Webhook Response 13 recebeu o mesmo envelope e respondeu HTTP 200. Até esta auditoria não apareceu execução posterior no Make. O código atual converte esse envelope em 31 linhas, 28 nomes lidos; o teste isolado da tela Simples também monta essas linhas. O desaparecimento relatado em produção ainda não foi reproduzido no dispositivo do operador.

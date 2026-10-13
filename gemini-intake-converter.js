@@ -6,7 +6,7 @@ if(root)root.RoletaGeminiConverter=api;
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
 const num=v=>v!==null&&v!==undefined&&/^\d+$/.test(String(v).trim())?Number(v):null;
 function iso(v){return normalization.dateInfo(v)?.iso??null;}
-function convertGeminiDraft(input,dto,{aliases={}}={}){
+function convertGeminiDraft(input,dto,{aliases={},learnedAliases={}}={}){
 const src=typeof input==='string'?JSON.parse(input):input;
 if(!src||!Array.isArray(src.linhas))throw Error('Gemini: linhas ausentes.');
 const brokers=Array.isArray(dto)?dto:dto?.brokers;
@@ -18,10 +18,13 @@ if(!data)add('DATA','Data inválida.');
 if(!['MANHA','MANHÃ','TARDE','INTEGRAL'].includes(periodo))add('PERIODO','Período inválido.');
 const seenPos=new Set(),seenNum=new Set(),seenNames=new Set();
 const linhas=src.linhas.map(l=>{
-const pos=num(l?.posicao_impressa),sorteado=num(l?.numero_sorteado),nome_lido=String(l?.nome_lido||'').trim(),key=norm(nome_lido);
+const rawNumber=String(l?.numero_lido_original??l?.numero_sorteado??'').trim();
+const ambiguousNumber=/^0\d{2,}$/.test(rawNumber);
+const pos=num(l?.posicao_impressa),sorteado=ambiguousNumber?null:num(l?.numero_sorteado),nome_lido=String(l?.nome_lido||'').trim(),key=norm(nome_lido);
+if(ambiguousNumber)add('BOLINHA_AMBIGUA','Leitura numérica ambígua ('+rawNumber+'): preencher pela foto.',pos);
 if(pos===null||pos<1||seenPos.has(pos))add('POSICAO_FISICA','Posição ausente/duplicada.',pos);
 if(pos!==null)seenPos.add(pos);
-const resolved=normalization.resolveDraftName(nome_lido,brokers,{aliases,manager:l?.gerente_lido??l?.gerente});
+const resolved=normalization.resolveDraftName(nome_lido,brokers,{aliases,learnedAliases,manager:l?.gerente_lido??l?.gerente});
 const b=resolved.broker,resolucao=resolved.method;
 const canonicalKey=b?norm(b.nome):key;
 if(!b)add('NOME_NAO_RESOLVIDO','Nome não confirmado no cadastro: '+nome_lido,pos);
@@ -30,7 +33,7 @@ if(b)seenNames.add(canonicalKey);
 if(sorteado===null||sorteado<1)add('SORTEIO_AUSENTE','Número sorteado ausente.',pos);
 if(sorteado!==null&&seenNum.has(sorteado))add('SORTEIO_DUPLICADO','Número sorteado duplicado.',pos);
 if(sorteado!==null)seenNum.add(sorteado);
-return {posicao_impressa:pos,numero_sorteado:sorteado,nome_lido,nome:b?.nome||'',creci:b?.creci||'',gerente:b?.gerente||'',diretor:b?.diretor||'',status_creci:b?.status_creci||'',cadastro_confirmado:!!b,cadastro_resolucao:b?resolucao:null,gerente_lido:String(l?.gerente_lido??l?.gerente??''),confianca_visual:l?.confianca||null};
+return {posicao_impressa:pos,numero_sorteado:sorteado,numero_lido_original:rawNumber,bolinha_ambigua:ambiguousNumber,nome_lido,nome:b?.nome||'',creci:b?.creci||'',gerente:b?.gerente||'',diretor:b?.diretor||'',status_creci:b?.status_creci||'',cadastro_confirmado:!!b,cadastro_resolucao:b?resolucao:null,gerente_lido:String(l?.gerente_lido??l?.gerente??''),confianca_visual:l?.confianca||null};
 });
 // Only records carrying a unique, positive drawn number are SALÃO candidates.
 // Rows without a drawn number stay in a separate pending bucket; class must be confirmed by a human.

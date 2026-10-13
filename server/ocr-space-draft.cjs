@@ -46,7 +46,7 @@ function fromOverlay(page){
   const digits=near.filter(w=>w.x>=leftBoundary&&w.x<=rightBoundary);
   if(!names.length&&!digits.length)continue;
   const n=digits.length===1?integer(digits[0].t):null;
-  rows.push(row(indices.length===1?integer(indices[0].t):null,names.map(w=>w.t).join(' '),n));
+  rows.push({...row(indices.length===1?integer(indices[0].t):null,names.map(w=>w.t).join(' '),n),numero_lido_original:digits.map(w=>w.t).join(' ')});
  }
  return rows;
 }
@@ -57,7 +57,7 @@ function fromDelimited(raw){
   const cells=line.split(line.includes('|')?'|':'\t').map(s=>s.trim());
   if(line.includes('|')){if(cells[0]==='')cells.shift();if(cells[cells.length-1]==='')cells.pop();}
   if(cells.length<3||integer(cells[0])===null||!/[A-Za-zÀ-ÿ]/.test(cells[1]))continue;
-  rows.push(row(integer(cells[0]),cells[1],integer(cells[2])));
+  rows.push({...row(integer(cells[0]),cells[1],integer(cells[2])),numero_lido_original:cells[2]});
  }
  return rows;
 }

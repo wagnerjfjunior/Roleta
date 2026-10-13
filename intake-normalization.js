@@ -17,13 +17,15 @@ function dateInfo(value){
  const dd=String(day).padStart(2,'0'),mm=String(month).padStart(2,'0');
  return {data:dd+'/'+mm+'/'+year,iso:year+'-'+mm+'-'+dd,dia_semana:['DOMINGO','SEGUNDA-FEIRA','TERÇA-FEIRA','QUARTA-FEIRA','QUINTA-FEIRA','SEXTA-FEIRA','SÁBADO'][date.getUTCDay()]};
 }
-function resolveDraftName(observed,brokers,{aliases={},manager=''}={}){
+function resolveDraftName(observed,brokers,{aliases={},learnedAliases={},manager=''}={}){
  const key=norm(observed),result=(candidates,method)=>({broker:candidates.length===1?candidates[0]:null,method:candidates.length===1?method:null});
  if(!key)return result([],null);
  let candidates=brokers.filter(b=>norm(b.nome)===key);
  if(candidates.length)return result(candidates,'NOME_EXATO');
  const targets=Object.entries(aliases).filter(([alias])=>norm(alias)===key).map(([,target])=>norm(target));
  if(targets.length){if(new Set(targets).size!==1)return result([],null);return result(brokers.filter(b=>norm(b.nome)===targets[0]),'ALIAS_CONFIRMADO');}
+ const learned=Object.entries(learnedAliases).filter(([alias])=>norm(alias)===key).map(([,target])=>norm(target));
+ if(learned.length){if(new Set(learned).size!==1)return result([],null);return result(brokers.filter(b=>norm(b.nome)===learned[0]),'SUGESTAO_APRENDIDA');}
  if(key.length>=3){
    candidates=brokers.filter(b=>norm(b.nome).startsWith(key));
    if(candidates.length===1)return result(candidates,'PREFIXO_UNICO');
