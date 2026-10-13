@@ -1,3 +1,5 @@
+> **SFJM ATUAL — 13/10/2026, fechamento OCR/dicionário:** ler `docs/sfjm/HANDOFF_2026-10-13_OCR_DICTIONARY.md` a partir da raiz. Aprendizado local publicado nas PRs #115/#116; próxima ação é refinar a agregação de grafias entre leituras distintas da mesma folha, sem duplicar suporte nem manter associações comprovadamente erradas. Refinamento e sincronização Supabase ainda não implementados. Conferência humana obrigatória. Os blocos anteriores abaixo são históricos.
+
 # Roleta — Bootstrap Canônico
 
 ## 1. Identidade

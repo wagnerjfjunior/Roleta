@@ -1,3 +1,5 @@
+> **SFJM ATUAL — 13/10/2026, fechamento OCR/dicionário:** ler `docs/sfjm/HANDOFF_2026-10-13_OCR_DICTIONARY.md` a partir da raiz. Aprendizado local publicado nas PRs #115/#116; próxima ação é refinar a agregação de grafias entre leituras distintas da mesma folha, sem duplicar suporte nem manter associações comprovadamente erradas. Refinamento e sincronização Supabase ainda não implementados. Conferência humana obrigatória. Os blocos anteriores abaixo são históricos.
+
 > **CURRENT STATUS — 2026-10-11 / SFJM Gate E:** Consulte o checkpoint atualizado `handoffs/CURRENT.md`, a próxima ação em `docs/NEXT_SAFE_ACTION.md` e o handoff completo `docs/sfjm/HANDOFF_2026-10-11_GATE_E.md`. Main foi observada em `676d0f9e300404c6d1434b61dbf7c5b61d23cb31` (Vercel READY) antes desta atualização documental. Dados: 86 eventos / 82 A / 4 B em `data/manifest.json`; Gate E publicado **sem credenciais/habilitação de escrita**; F2-12 permanece desligado. As afirmações históricas abaixo (incluindo ausência do schema em 10/10) não descrevem necessariamente o estado live atual. Não substituir verificação read-only atual nem homologação.
 
 ---

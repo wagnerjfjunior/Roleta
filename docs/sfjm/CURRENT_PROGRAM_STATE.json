@@ -1,19 +1,20 @@
 {
   "project_id": "roleta",
-  "as_of": "2026-10-04",
+  "as_of": "2026-10-13",
   "primary_objective_status": "ACTIVE",
-  "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
-  "next_safe_action": "Reconcile disputed weekly presence from original evidence, fix mobile responsiveness locally, preserve frozen Sunday picks, then adjudicate Sunday without hindsight.",
+  "current_gate": "OCR dictionary: additive confirmed variants across readings of the same sheet",
+  "next_safe_action": "Refine aggregation locally; retain valid variants, deduplicate same readings, revoke corrected wrong associations; manual review remains mandatory.",
   "data": {
-    "logical_events": 81,
-    "full_permutation_events": 80,
-    "quality_A": 77,
-    "quality_B": 4
+    "logical_events": 86,
+    "quality_A": 82,
+    "quality_B": 4,
+    "scope": "versioned_manifest_only_not_live_supabase",
+    "source": "data/manifest.json"
   },
   "dashboard": {
     "version": "V3_WORKSPACE",
     "status": "RELEASED_PRODUCTION",
-    "known_issue": "MOBILE_RESPONSIVENESS"
+    "known_issue": "Previous mobile issue is historical; comprehensive device validation not reassessed in this documentation update."
   },
   "model_lab": {
     "status": "ACTIVE",
@@ -27,14 +28,16 @@
       "Brenda": 5,
       "Laura": 25,
       "Helena": 23
-    }
+    },
+    "snapshot_as_of": "2026-10-04"
   },
   "presence": {
     "status": "RECONCILIATION_REQUIRED",
     "disputed": [
       "Sabrina/Brenda",
       "Laura"
-    ]
+    ],
+    "snapshot_as_of": "2026-10-04"
   },
   "delivery_policy": {
     "mode": "LOCAL_FIRST",
@@ -42,5 +45,51 @@
     "remote_iteration": false,
     "push_requires_explicit_intent": true,
     "deploy_requires_explicit_intent": true
-  }
+  },
+  "historical_snapshot_2026_10_04": {
+    "as_of": "2026-10-04",
+    "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
+    "next_safe_action": "Reconcile disputed weekly presence from original evidence, fix mobile responsiveness locally, preserve frozen Sunday picks, then adjudicate Sunday without hindsight.",
+    "data": {
+      "logical_events": 81,
+      "full_permutation_events": 80,
+      "quality_A": 77,
+      "quality_B": 4
+    },
+    "dashboard": {
+      "version": "V3_WORKSPACE",
+      "status": "RELEASED_PRODUCTION",
+      "known_issue": "MOBILE_RESPONSIVENESS"
+    },
+    "weekend_cycle": {
+      "saturday": "OBSERVED_COMPLETE",
+      "sunday": "FROZEN_AFTER_SATURDAY_RESULT",
+      "sunday_assignments": {
+        "Wagner": 9,
+        "Brenda": 5,
+        "Laura": 25,
+        "Helena": 23
+      }
+    },
+    "presence": {
+      "status": "RECONCILIATION_REQUIRED",
+      "disputed": [
+        "Sabrina/Brenda",
+        "Laura"
+      ]
+    }
+  },
+  "ocr_learning": {
+    "implementation_pr": 115,
+    "release_documentation_pr": 116,
+    "functional_commit": "b2885001679a44f0251d7d8949245c626f19b5ec",
+    "observed_documentation_main": "96fde2927667ddc7a94744b53e603e56bca3bc96",
+    "deployment_id": "dpl_EwyjVC7m6u1f7zrz6r8zmPGUPQbr",
+    "deployment_state": "READY",
+    "local_tests_passed": 260,
+    "learning_storage": "browser_local_per_google_account",
+    "same_sheet_variant_aggregation": "PENDING_REFINEMENT",
+    "shared_supabase_learning": "NOT_IMPLEMENTED"
+  },
+  "handoff": "docs/sfjm/HANDOFF_2026-10-13_OCR_DICTIONARY.md"
 }

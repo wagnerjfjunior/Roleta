@@ -9,18 +9,17 @@
   "next_safe_action": "docs/NEXT_SAFE_ACTION.md",
   "blocked_actions": "docs/BLOCKED_ACTIONS.md",
   "state": {
-    "usable_events": 81,
-    "full_permutation_events": 80,
-    "quality_A": 77,
+    "usable_events": 86,
+    "quality_A": 82,
     "quality_B": 4,
+    "count_scope": "versioned_manifest_only_not_live_supabase",
     "dashboard_version": "V3_WORKSPACE",
     "dashboard_status": "RELEASED_PRODUCTION",
-    "viability": "EVIDENCIA_INSUFICIENTE",
-    "presence_status": "RECONCILIATION_REQUIRED"
+    "statistical_inference": "NOT_REASSESSED_IN_THIS_SESSION"
   },
-  "active_workstream": "RLT-M3 Prospective Statistical Monitoring",
-  "parallel_workstream": "RLT-M2 Broker Identity Layer",
-  "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
+  "active_workstream": "OCR post-processing and confirmed-name dictionary",
+  "parallel_workstream": "Historical statistical workstreams preserved; no new adjudication",
+  "current_gate": "Additive aggregation across different readings of the same sheet",
   "frozen_context": {
     "sunday": {
       "Wagner": 9,
@@ -35,5 +34,43 @@
     "remote_iteration": false,
     "push_requires_explicit_intent": true,
     "deploy_requires_explicit_intent": true
-  }
+  },
+  "historical_snapshot_2026_10_04": {
+    "state": {
+      "usable_events": 81,
+      "full_permutation_events": 80,
+      "quality_A": 77,
+      "quality_B": 4,
+      "dashboard_version": "V3_WORKSPACE",
+      "dashboard_status": "RELEASED_PRODUCTION",
+      "viability": "EVIDENCIA_INSUFICIENTE",
+      "presence_status": "RECONCILIATION_REQUIRED"
+    },
+    "active_workstream": "RLT-M3 Prospective Statistical Monitoring",
+    "parallel_workstream": "RLT-M2 Broker Identity Layer",
+    "current_gate": "RLT-M3-04 presence reconciliation + Workspace V3 mobile stabilization",
+    "frozen_context": {
+      "sunday": {
+        "Wagner": 9,
+        "Brenda": 5,
+        "Laura": 25,
+        "Helena": 23
+      }
+    }
+  },
+  "as_of": "2026-10-13",
+  "frozen_context_snapshot_as_of": "2026-10-04",
+  "ocr_learning": {
+    "implementation_pr": 115,
+    "release_documentation_pr": 116,
+    "functional_commit": "b2885001679a44f0251d7d8949245c626f19b5ec",
+    "observed_documentation_main": "96fde2927667ddc7a94744b53e603e56bca3bc96",
+    "deployment_id": "dpl_EwyjVC7m6u1f7zrz6r8zmPGUPQbr",
+    "deployment_state": "READY",
+    "local_tests_passed": 260,
+    "learning_storage": "browser_local_per_google_account",
+    "same_sheet_variant_aggregation": "PENDING_REFINEMENT",
+    "shared_supabase_learning": "NOT_IMPLEMENTED"
+  },
+  "handoff": "docs/sfjm/HANDOFF_2026-10-13_OCR_DICTIONARY.md"
 }
