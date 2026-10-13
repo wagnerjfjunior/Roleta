@@ -12,7 +12,7 @@ function key(){const value=process.env.SORTEADOR_ED25519_PRIVATE_KEY; if(!value)
 function respond(res,code,obj){res.status(code).setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');return res.end(JSON.stringify(obj));}
 function publicSession(row,events){
  return {id:row.id,mode:row.mode,first:row.first_number,last:row.last_number,total:row.total,
- createdAt:row.created_at,finishedAt:row.finished_at,operatorId:row.operator_id,startReceipt:row.start_receipt,
+ createdAt:row.created_at,finishedAt:row.finished_at,operatorId:row.operator_id,startReceipt:row.start_receipt,lastHash:row.last_hash,
  draws:events.map(e=>({position:e.position,number:e.number,at:e.occurred_at,receipt:e.receipt}))};
 }
 async function load(client,id,lock=false){
@@ -63,6 +63,8 @@ async function draw(client,body,operator,privateKey){
   const duplicate=used.rows.find(e=>e.receipt?.payload?.requestId===requestId);
   if(duplicate){await client.query('commit');return await load(client,sessionId);}
   if(row.finished_at||used.rowCount>=row.total)throw Object.assign(Error('Sorteio concluído. Crie uma nova sessão para começar novamente.'),{status:409});
+  const before=await load(client,sessionId);
+  if(!core.verifyLedger(before,core.publicKey(privateKey)))throw Object.assign(Error('Falha na integridade dos registros. Sorteio bloqueado.'),{status:409});
   const picked=used.rows.map(e=>e.number);
   const number=core.pick(row.first_number,row.last_number,picked);
   const position=picked.length+1,at=new Date().toISOString();
@@ -92,15 +94,17 @@ module.exports=async function handler(req,res){
    if(!receipt||typeof receipt!=='object'||!receipt.payload||typeof receipt.payload!=='object')return respond(res,400,{error:'Comprovante inválido.'});
    return respond(res,200,{valid:core.verify(receipt.payload,receipt.signature,core.publicKey(key())),algorithm:'Ed25519'});
   }
-  if(!process.env.SORTEADOR_DATABASE_URL||!process.env.SORTEADOR_ED25519_PRIVATE_KEY||!process.env.SORTEADOR_OPERATOR_TOKEN||!process.env.SORTEADOR_OPERATOR_ID)return respond(res,503,{error:'Sorteador Oficial ainda não ativado. Falta configuração segura no servidor.'});
-  if(!core.authorized(req.headers.authorization,process.env.SORTEADOR_OPERATOR_TOKEN))return respond(res,401,{error:'Acesso negado.'});
-  const operator=process.env.SORTEADOR_OPERATOR_ID;
+  if(!process.env.SORTEADOR_DATABASE_URL||!process.env.SORTEADOR_ED25519_PRIVATE_KEY||!process.env.SORTEADOR_OPERATOR_KEYS_JSON)return respond(res,503,{error:'Sorteador Oficial ainda não ativado. Falta configuração segura no servidor.'});
+  const operator=core.identifyOperator(req.headers.authorization,process.env.SORTEADOR_OPERATOR_KEYS_JSON);
+  if(!operator)return respond(res,401,{error:'Acesso negado.'});
   const client=await database().connect();
   try{
    if(req.method==='GET'){
     if(!core.isUuid(req.query?.sessionId))return respond(res,400,{error:'Informe um identificador válido.'});
     const state=await load(client,req.query.sessionId);
-    return state&&state.operatorId===operator?respond(res,200,{session:state}):respond(res,404,{error:'Sorteio não encontrado.'});
+    if(!state||state.operatorId!==operator)return respond(res,404,{error:'Sorteio não encontrado.'});
+    if(!core.verifyLedger(state,core.publicKey(key())))return respond(res,409,{error:'Falha na verificação de integridade. Operação bloqueada.'});
+    return respond(res,200,{session:state});
    }
    if(body.action==='start')return respond(res,200,{session:await start(client,body,operator,key())});
    if(body.action==='draw')return respond(res,200,{session:await draw(client,body,operator,key())});
