@@ -1,3 +1,5 @@
+> **DATA/NOME OCR — 12/10/2026:** normalização de ano 26 agora compartilhada por OCR e importação canônica; recomposição de grafia próxima no rascunho com candidato único e margem conservadora, preservando texto original e revisão humana. Ler `../docs/sfjm/INTAKE_DATE_NAME_NORMALIZATION_2026-10-12.md`. Retorno OCR no telefone da Sabrina confirmado pelo operador; próximo teste: ano abreviado e sobrina, depois gravação real Supabase.
+
 > **RETORNO OCR — 12/10/2026:** execução Make das 19h58 levou 143,8 s até responder, mas relay abortava em 55 s. Prazo ajustado para 175 s, duração Vercel 200 s e cliente 210 s. Ler `../docs/sfjm/OCR_RETURN_TIMEOUT_2026-10-12.md`. Próxima validação: retorno no telefone da Sabrina, mantendo a página aberta; depois primeiro salvamento real.
 
 > **FLUXO SIMPLIFICADO — 12/10/2026:** passo 5 removido; gravação Supabase no passo 3 usa a folha já conferida no passo 2, sem nova tabela, nome de arquivo ou motivo manual. Posições originais do OCR preservadas internamente; folha final sem posições originais também pode ser salva, sem inventar posições para modelos físicos. Ler `../docs/sfjm/FINAL_SHEET_SINGLE_REVIEW_2026-10-12.md`.

@@ -1,19 +1,9 @@
 (function(){
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  function toBRDate(value){
-    const v=String(value||'').trim();
-    if(/^\d{2}\/\d{2}\/\d{4}$/.test(v))return v;
-    const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
-    return m?m[3]+'/'+m[2]+'/'+m[1]:v;
-  }
-
-  function weekdayPT(value){
-    const br=toBRDate(value),m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(br);
-    if(!m)return '';
-    const d=new Date(Date.UTC(Number(m[3]),Number(m[2])-1,Number(m[1]),12));
-    return ['DOMINGO','SEGUNDA-FEIRA','TERÇA-FEIRA','QUARTA-FEIRA','QUINTA-FEIRA','SEXTA-FEIRA','SÁBADO'][d.getUTCDay()];
-  }
+  const normalization=window.RoletaIntakeNormalization;
+  function toBRDate(value){return normalization.dateInfo(value)?.data??String(value||'').trim();}
+  function weekdayPT(value){return normalization.dateInfo(value)?.dia_semana||'';}
 
   function normalizePayload(input){
     const raw=typeof input==='string'?JSON.parse(input):input;
@@ -42,6 +32,7 @@
         }
       };
     }
+    if(p.evento){p.evento={...p.evento,data:toBRDate(p.evento.data)};p.evento.dia_semana=weekdayPT(p.evento.data)||p.evento.dia_semana;}
     return p;
   }
 
@@ -92,7 +83,7 @@
     if(p.status!=='VALIDADO')errors.push('status precisa ser VALIDADO.');
     const e=p.evento||{};
     if(String(e.empreendimento||'').trim().toUpperCase()!=='CAMINHOS DA LAPA')errors.push('empreendimento deve ser CAMINHOS DA LAPA.');
-    if(!/^\d{2}\/\d{2}\/\d{4}$/.test(String(e.data||'')))errors.push('data deve estar em DD/MM/AAAA.');
+    if(!normalization.dateInfo(e.data)||!/^\d{2}\/\d{2}\/\d{4}$/.test(String(e.data||'')))errors.push('data deve estar em DD/MM/AAAA.');
     if(!String(e.dia_semana||'').trim())errors.push('dia_semana ausente.');
     if(!['MANHA','MANHÃ','TARDE','INTEGRAL'].includes(String(e.periodo||'').trim().toUpperCase()))errors.push('periodo deve ser MANHÃ, TARDE ou INTEGRAL.');
     if(!Number.isInteger(Number(e.helbor_qtd))||Number(e.helbor_qtd)<0)errors.push('helbor_qtd deve ser informado.');
