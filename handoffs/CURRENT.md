@@ -1,3 +1,5 @@
+> **APRENDIZADO OCR PUBLICADO — 13/10/2026:** PR #115, commit funcional `b2885001`, deployment `dpl_EwyjVC7m6u1f7zrz6r8zmPGUPQbr` READY e sete arquivos de frontend verificados HTTP 200/idênticos. Ler `docs/sfjm/OCR_LEARNING_LOCAL_2026-10-13.md` a partir da raiz. Próxima ação: observar confirmação real e sugestões em duas folhas distintas na mesma conta/navegador. Histórico é local, sem sincronização Supabase; conferência humana obrigatória. O candidato abaixo é histórico.
+
 > **APRENDIZADO OCR — candidato local 13/10/2026:** camada de sugestões após confirmação final, duas folhas distintas sem conflito, replay idempotente e bolinhas ambíguas para preenchimento manual. Histórico por conta no navegador, sem sincronização Supabase. Ler `docs/sfjm/OCR_LEARNING_LOCAL_2026-10-13.md` (a partir da raiz). Branch `feature/ocr-learning-20261013`; envio ao GitHub autorizado para teste Live Sync; merge para main autorizado às 16h41 na PR #115. Próximo passo: concluir checks/merge e verificar produção.
 
 ## Revisão sem tabela — confirmação de conclusão corrigida
