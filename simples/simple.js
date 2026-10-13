@@ -67,7 +67,7 @@ function update(){
    else notice.textContent='Confirme a folha final para liberar impressão, JPEG e compartilhamento.';
  }
  const button=transfer();
- if(button)button.textContent='Continuar para a folha final';
+ if(button&&button.textContent!=='Continuar para a folha final')button.textContent='Continuar para a folha final';
  if(isHuman){
    const section=human.querySelector('.rltv2-review-card');
    if(section)section.classList.add('simple-human-review');
