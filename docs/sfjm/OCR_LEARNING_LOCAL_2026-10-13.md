@@ -1,3 +1,5 @@
+> **Regra canônica esclarecida em 13/10/2026:** agregar variantes confirmadas por nome oficial; uma nova grafia não apaga outra válida. O código publicado ainda substitui o conjunto da mesma folha na reconfirmação; preservar leituras distintas da mesma folha é refinamento pendente. Ler [HANDOFF_2026-10-13_OCR_DICTIONARY.md](HANDOFF_2026-10-13_OCR_DICTIONARY.md) para evidência, decisões, limites e próxima ação.
+
 ## Publicação confirmada — 13/10/2026
 
 PR #115 mergeada após os cinco workflows do GitHub concluírem com sucesso.

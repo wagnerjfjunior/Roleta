@@ -1,16 +1,18 @@
 {
   "project_id": "roleta",
-  "graph_version": 3,
+  "graph_version": 4,
   "nodes": [
     {
       "id": "RLT-M0",
       "type": "milestone",
-      "status": "COMPLETE"
+      "status": "COMPLETE",
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M1",
       "type": "milestone",
-      "status": "COMPLETE_WITH_QUARANTINE"
+      "status": "COMPLETE_WITH_QUARANTINE",
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M2",
@@ -19,19 +21,22 @@
       "children": [
         "RLT-M2-01",
         "RLT-M2-02"
-      ]
+      ],
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M2-01",
       "type": "task",
       "status": "ACTIVE",
-      "title": "Normalize broker identities and rank outcomes"
+      "title": "Normalize broker identities and rank outcomes",
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M2-02",
       "type": "task",
       "status": "NEXT_SAFE_ACTION",
-      "title": "Reconcile weekly presence from original evidence"
+      "title": "Reconcile weekly presence from original evidence",
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M3",
@@ -42,36 +47,69 @@
         "RLT-M3-02",
         "RLT-M3-03",
         "RLT-M3-04"
-      ]
+      ],
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M3-01",
       "type": "task",
       "status": "COMPLETE",
-      "title": "Release Workspace V3 dashboard"
+      "title": "Release Workspace V3 dashboard",
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M3-02",
       "type": "task",
       "status": "ACTIVE",
-      "title": "Prospective Champion vs Challengers validation"
+      "title": "Prospective Champion vs Challengers validation",
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M3-03",
       "type": "task",
       "status": "ACTIVE_SUNDAY_FROZEN",
-      "title": "Weekend forecast cycle"
+      "title": "Weekend forecast cycle",
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M3-04",
       "type": "task",
       "status": "NEXT_SAFE_ACTION",
-      "title": "Presence reconciliation + Workspace V3 mobile stabilization"
+      "title": "Presence reconciliation + Workspace V3 mobile stabilization",
+      "snapshot_as_of": "2026-10-04"
     },
     {
       "id": "RLT-M4",
       "type": "milestone",
-      "status": "PLANNED"
+      "status": "PLANNED",
+      "snapshot_as_of": "2026-10-04"
+    },
+    {
+      "id": "RLT-OCR-LOCAL",
+      "type": "task",
+      "status": "RELEASED_PRODUCTION",
+      "title": "Local learning from confirmed final sheets",
+      "evidence": "PR #115; 260 local tests; READY deployment",
+      "as_of": "2026-10-13"
+    },
+    {
+      "id": "RLT-OCR-AGGREGATION",
+      "type": "task",
+      "status": "NEXT_SAFE_ACTION",
+      "title": "Aggregate validated spelling variants across distinct readings of the same sheet",
+      "implementation_status": "NOT_IMPLEMENTED",
+      "handoff": "docs/sfjm/HANDOFF_2026-10-13_OCR_DICTIONARY.md",
+      "as_of": "2026-10-13"
+    },
+    {
+      "id": "RLT-OCR-SHARED",
+      "type": "task",
+      "status": "PROPOSED_NOT_IMPLEMENTED",
+      "title": "Private shared learning storage in Supabase",
+      "as_of": "2026-10-13"
     }
-  ]
+  ],
+  "historical_snapshot_version": 3,
+  "as_of": "2026-10-13",
+  "current_gate": "RLT-OCR-AGGREGATION"
 }

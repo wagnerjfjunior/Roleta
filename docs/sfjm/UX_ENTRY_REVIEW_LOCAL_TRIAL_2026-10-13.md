@@ -1,3 +1,5 @@
+> **Publicação posterior — 13/10/2026:** UX mergeada na PR #109, commit funcional `34cde4e`, Vercel READY e 239 testes registrados na publicação. Estados locais/sem produção abaixo são históricos. Consolidação em [HANDOFF_2026-10-13_OCR_DICTIONARY.md](HANDOFF_2026-10-13_OCR_DICTIONARY.md). Não reconstruir as interfaces existentes.
+
 # Roleta — UX local trial — 13/10/2026
 
 Status: test branch published with operator authorization. No main merge or deployment. Visual acceptance pending in the operator's Live Sync.
