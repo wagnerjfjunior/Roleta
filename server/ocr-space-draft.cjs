@@ -26,19 +26,27 @@ function fromOverlay(page){
  const band=Math.max(number.height*1.8,width*.025);
  const leftBoundary=number.x-band,rightBoundary=number.x+band;
  // Printed indices must actually be read at the left of the name column.
- const anchors=words.filter(w=>w.y>name.y+name.height*.8&&w.x<name.left&&integer(w.t)!==null).sort((a,b)=>a.y-b.y);
+ // The heading starts over the printed index: its left edge is not the column boundary.
+ const anchors=words.filter(w=>w.y>name.y+name.height*.8&&w.left+w.width<name.x&&integer(w.t)!==null).sort((a,b)=>a.y-b.y);
  if(!anchors.length)return [];
+ const indexRight=Math.max(...anchors.map(w=>w.left+w.width));
+ // A drawn-number cell can identify a row even when its printed index is illegible.
+ // Keep that position empty; never complete it from a sequence.
+ const seeds=[...anchors,...words.filter(w=>w.y>name.y+name.height*.8&&w.x>=leftBoundary&&w.x<=rightBoundary)].sort((a,b)=>a.y-b.y);
+ const groups=[];
+ for(const seed of seeds){const last=groups[groups.length-1];if(last&&Math.abs(last.y-seed.y)<Math.min(last.height,seed.height)*.35){last.words.push(seed);}else groups.push({y:seed.y,height:seed.height,words:[seed]});}
  const rows=[];
- for(let i=0;i<anchors.length;i++){
-  const a=anchors[i],prev=anchors[i-1],next=anchors[i+1];
-  const low=prev?(prev.y+a.y)/2:a.y-a.height;
-  const high=next?(next.y+a.y)/2:a.y+a.height;
-  const near=words.filter(w=>w!==a&&w.y>=low&&w.y<high);
-  const names=near.filter(w=>w.x>a.x+a.width/2&&w.x<leftBoundary).sort((a,b)=>a.x-b.x);
+ for(let i=0;i<groups.length;i++){
+  const a=groups[i],prev=groups[i-1],next=groups[i+1];
+  const low=prev?Math.max((prev.y+a.y)/2,a.y-a.height*.48):a.y-a.height*.48;
+  const high=next?Math.min((next.y+a.y)/2,a.y+a.height*.48):a.y+a.height*.48;
+  const near=words.filter(w=>w.y>=low&&w.y<high);
+  const indices=near.filter(w=>anchors.includes(w));
+  const names=near.filter(w=>!anchors.includes(w)&&w.left+w.width>indexRight+10&&w.x<leftBoundary).sort((a,b)=>a.x-b.x);
   const digits=near.filter(w=>w.x>=leftBoundary&&w.x<=rightBoundary);
   if(!names.length&&!digits.length)continue;
   const n=digits.length===1?integer(digits[0].t):null;
-  rows.push(row(integer(a.t),names.map(w=>w.t).join(' '),n));
+  rows.push(row(indices.length===1?integer(indices[0].t):null,names.map(w=>w.t).join(' '),n));
  }
  return rows;
 }
@@ -53,11 +61,6 @@ function fromDelimited(raw){
  }
  return rows;
 }
-function fromText(raw){
- // No coordinates means no safe column mapping. Preserve uncertain fragments for correction.
- const ignored=/EMPREENDIMENTO|PER[IÍ]ODO|CORRETORES?\s+HELBOR|SORTEIO|DIRETOR|GERENTE|ELO\s+DUO|NOVA\s+VIVERE|GARDEN|^DATA\b|^TEGRA\b|^HELBOR\b/i;
- return raw.split(/\r?\n/).map(s=>s.trim()).filter(s=>/[A-Za-zÀ-ÿ]/.test(s)&&!ignored.test(s)&&!/^\*?\*?\*?CORRETOR/i.test(s)).map(s=>row(null,s,null));
-}
 function convertOcrSpace(value){
  const payload=value?.ocr??value;
  if(!payload||typeof payload!=='object'||Array.isArray(payload)||payload.IsErroredOnProcessing===true)throw Error('OCR.space não conseguiu ler a fotografia.');
@@ -69,9 +72,11 @@ function convertOcrSpace(value){
  if(!raw.trim())throw Error('OCR.space não encontrou texto legível na fotografia.');
  let rows=fromOverlay(page),method='overlay';
  if(!rows.length){rows=fromDelimited(raw);method='delimited';}
- if(!rows.length){rows=fromText(raw);method='unstructured';}
+ // Raw fragments have no reliable participant/manager distinction. A blank review
+ // preserves the photo and literal OCR text without creating fictitious people.
+ if(!rows.length){rows=[row(null,null,null)];method='manual';}
  if(!rows.length)throw Error('Não foi possível separar participantes. Escolha uma fotografia mais nítida.');
  if(rows.length>MAX_ROWS)throw Error('Leitura OCR excedeu 100 linhas.');
- return {empreendimento:null,data:null,periodo:null,sorteio_empresa:null,quantidade_corretores:null,helbor_qtd_lida:null,linhas:rows,source:'ocr-space',parser_version:'ocr-space-draft-v1',metodo_leitura:method,texto_original:raw,inconsistencias:['Leitura de emergência: confira todas as linhas e acrescente participantes que não foram reconhecidos.','Posições e bolinhas ilegíveis permanecem vazias; não foram completadas por sequência.'],observacoes:['Os dois modelos Gemini falharam. O OCR.space é um rascunho e exige conferência humana completa.']};
+ return {empreendimento:null,data:null,periodo:null,sorteio_empresa:null,quantidade_corretores:null,helbor_qtd_lida:null,linhas:rows,source:'ocr-space',parser_version:'ocr-space-draft-v2',metodo_leitura:method,texto_original:raw,inconsistencias:[method==='manual'?'Não foi possível separar a tabela. Preencha os participantes consultando a fotografia.':'Leitura de emergência: confira todas as linhas e acrescente participantes que não foram reconhecidos.','Posições e bolinhas ilegíveis permanecem vazias; não foram completadas por sequência.'],observacoes:['Os dois modelos Gemini falharam. O OCR.space é um rascunho e exige conferência humana completa.']};
 }
 module.exports={convertOcrSpace};

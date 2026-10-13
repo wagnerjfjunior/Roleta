@@ -1,0 +1,210 @@
+{
+  "ParsedResults": [
+    {
+      "FileParseExitCode": 1,
+      "ParsedText": "Diretor A\n***Corretor***\nN°\n***Gerente***\n1\nCorretor A\n04\nGerente A\n2\nCorretor B\n3\nGerente B\nCorretor C\n06\n4\nCorretor D\n24\nGerente C",
+      "TextOverlay": {
+        "Lines": [
+          {
+            "Words": [
+              {
+                "WordText": "Diretor A",
+                "Left": 1260,
+                "Top": 672,
+                "Height": 66,
+                "Width": 283
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "***Corretor***",
+                "Left": 97,
+                "Top": 675,
+                "Height": 63,
+                "Width": 366
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "N°",
+                "Left": 611,
+                "Top": 678,
+                "Height": 60,
+                "Width": 64
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "***Gerente***",
+                "Left": 852,
+                "Top": 678,
+                "Height": 63,
+                "Width": 205
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "1",
+                "Left": 87,
+                "Top": 738,
+                "Height": 60,
+                "Width": 33
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "Corretor A",
+                "Left": 303,
+                "Top": 738,
+                "Height": 60,
+                "Width": 160
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "04",
+                "Left": 607,
+                "Top": 738,
+                "Height": 60,
+                "Width": 67
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "Gerente A",
+                "Left": 746,
+                "Top": 738,
+                "Height": 60,
+                "Width": 275
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "2",
+                "Left": 87,
+                "Top": 795,
+                "Height": 63,
+                "Width": 33
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "Corretor B",
+                "Left": 202,
+                "Top": 795,
+                "Height": 63,
+                "Width": 422
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "3",
+                "Left": 607,
+                "Top": 795,
+                "Height": 63,
+                "Width": 64
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "Gerente B",
+                "Left": 762,
+                "Top": 795,
+                "Height": 63,
+                "Width": 253
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "Corretor C",
+                "Left": 87,
+                "Top": 851,
+                "Height": 63,
+                "Width": 227
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "06",
+                "Left": 607,
+                "Top": 851,
+                "Height": 63,
+                "Width": 64
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "4",
+                "Left": 87,
+                "Top": 909,
+                "Height": 63,
+                "Width": 33
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "Corretor D",
+                "Left": 168,
+                "Top": 909,
+                "Height": 63,
+                "Width": 185
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "24",
+                "Left": 607,
+                "Top": 909,
+                "Height": 63,
+                "Width": 64
+              }
+            ]
+          },
+          {
+            "Words": [
+              {
+                "WordText": "Gerente C",
+                "Left": 754,
+                "Top": 909,
+                "Height": 63,
+                "Width": 266
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -3,9 +3,15 @@ const assert=require('node:assert/strict'),test=require('node:test');
 const {convertOcrSpace}=require('../server/ocr-space-draft.cjs');
 const payload=(raw,lines)=>({IsErroredOnProcessing:false,ParsedResults:[{FileParseExitCode:1,ParsedText:raw,TextOverlay:{Lines:lines||[]}}]});
 const word=(t,left,top,width=40,height=20)=>({WordText:t,Left:left,Top:top,Width:width,Height:height});
+test('production geometry: overlapping heading keeps rows and excludes management; missing index is not guessed',()=>{
+ const d=convertOcrSpace(require('./fixtures/ocr-space-overlapping-header.json'));
+ assert.equal(d.metodo_leitura,'overlay');
+ assert.deepEqual(d.linhas.map(l=>[l.posicao_impressa,l.nome_lido,l.numero_sorteado]),[[1,'Corretor A','04'],[2,'Corretor B','03'],[null,'Corretor C','06'],[4,'Corretor D','24']]);
+ assert.ok(d.linhas.every(l=>!/(Gerente|Diretor)/.test(l.nome_lido)));
+});
 test('unstructured OCR does not invent physical rows, drawn numbers or header',()=>{
  const draft=convertOcrSpace(payload('EMPREENDIMENTO\nDATA 13-10-26\nCORRETORES HELBOR 11\n1\nARNON\n04\nPAOLA\n01'));
- assert.equal(draft.linhas.length,2);assert.ok(draft.linhas.every(l=>l.posicao_impressa===null&&l.numero_sorteado===null&&l.confianca==='baixa'));assert.equal(draft.data,null);assert.equal(draft.quantidade_corretores,null);assert.equal(draft.source,'ocr-space');
+ assert.equal(draft.metodo_leitura,'manual');assert.equal(draft.linhas.length,1);assert.equal(draft.linhas[0].nome_lido,null);assert.ok(draft.linhas.every(l=>l.posicao_impressa===null&&l.numero_sorteado===null&&l.confianca==='baixa'));assert.equal(draft.data,null);assert.equal(draft.quantidade_corretores,null);assert.equal(draft.source,'ocr-space');
 });
 test('explicit table cells keep physical row and ball distinct; duplicates never repaired',()=>{
  const draft=convertOcrSpace(payload('1 | Arnon | 10 | Team\n16 | Paola | 01 | Team\n9 | Wagner | 01 | Team'));
@@ -31,7 +37,7 @@ test('provider errors, partial output, empty text, multiple pages and oversized 
  const p=payload('Arnon');p.ParsedResults[0].FileParseExitCode=2;assert.throws(()=>convertOcrSpace(p));
 });
 test('raw text survives literally; returned row has no approval or canonical authority',()=>{
- const raw='<script>alert(1)</script>';const d=convertOcrSpace(payload(raw));assert.equal(d.texto_original,raw);assert.equal(d.linhas[0].nome_lido,raw);assert.equal(d.aprovado,undefined);assert.equal(d.linhas[0].gerente,null);
+ const raw='<script>alert(1)</script>';const d=convertOcrSpace(payload(raw));assert.equal(d.texto_original,raw);assert.equal(d.linhas[0].nome_lido,null);assert.equal(d.aprovado,undefined);assert.equal(d.linhas[0].gerente,null);
 });
 
 test('real OCR.space synthetic response maps three participants and remains pending',()=>{

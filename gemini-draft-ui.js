@@ -193,13 +193,15 @@ async function mount(host){
      const human=document.createElement('section');
      human.className='rltv2-review-card';
      human.style.marginTop='20px';
-     const sorted=[...draft.leitura_original.linhas].sort((a,b)=>{
+     const sorted=[...draft.leitura_original.linhas];
+     // Emergency OCR is reviewed alongside the photograph, in physical row order.
+     if(value.source!=='ocr-space')sorted.sort((a,b)=>{
        const x=Number(a.numero_sorteado),y=Number(b.numero_sorteado);
        return (a.numero_sorteado===null?Infinity:x)-(b.numero_sorteado===null?Infinity:y);
      });
      const opts=dto.brokers.map(b=>'<option value="'+escapeHtml(b.nome)+'"></option>').join('');
      const body=sorted.map(l=>'<tr data-correction-row data-pos="'+escapeHtml(l.posicao_impressa)+'">'+
-       '<td><input data-correct-position aria-label="Nº Escolhido (posição impressa)" type="number" inputmode="numeric" min="1" max="100" value="'+escapeHtml(l.posicao_impressa??'')+'"></td>'+
+       '<td><input data-correct-position aria-label="Posição impressa na folha" type="number" inputmode="numeric" min="1" max="100" value="'+escapeHtml(l.posicao_impressa??'')+'"></td>'+
        '<td><input data-correct-number aria-label="Número sorteado na posição '+escapeHtml(l.posicao_impressa)+'" type="number" inputmode="numeric" min="1" value="'+escapeHtml(l.numero_sorteado??'')+'"></td>'+
        '<td><input data-correct-name aria-label="Nome na posição '+escapeHtml(l.posicao_impressa)+'" list="geminiReviewBrokerNames" value="'+escapeHtml(l.nome||l.nome_lido)+'">'+(l.nome&&l.cadastro_resolucao!=='NOME_EXATO'?'<small>OCR: '+escapeHtml(l.nome_lido)+' → '+escapeHtml(l.nome)+' · conferir</small>':'')+'</td>'+
        '<td><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
@@ -208,7 +210,7 @@ async function mount(host){
        '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></td><td><label class="rlt-line-check"><input data-correct-confirm type="checkbox"><span data-line-state>Revisar</span></label></td></tr>').join('');
      human.innerHTML='<h3>Correção humana assistida</h3><p class="small muted">Confira os números com a fotografia. Corrija 01/10 e qualquer duplicidade. Os números são usados apenas nesta etapa e não aparecem na impressão.</p>'+
        '<datalist id="geminiReviewBrokerNames">'+opts+'</datalist>'+
-       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rltv2-review-wrap rlt-five-column-review" role="region" aria-label="Conferência de corretores"><table class="rltv2-review-table rlt-five-column-table"><thead><tr><th>Nº Escolhido</th><th>Nº Sorteado</th><th>Corretor</th><th>Classe</th><th>Check</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
+       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rltv2-review-wrap rlt-five-column-review" role="region" aria-label="Conferência de corretores"><table class="rltv2-review-table rlt-five-column-table"><thead><tr><th>Posição na folha</th><th>Bolinha sorteada</th><th>Corretor</th><th>Participação</th><th>Conferido</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
        '<div class="intake-actions"><button type="button" data-review-add-line class="simulation-run">Adicionar participante que falta</button></div>'+
        '<h3>Conferir cabeçalho operacional</h3>'+
        '<div class="rltv2-company-review">'+
@@ -225,7 +227,7 @@ async function mount(host){
      details.insertBefore(human,technicalTables);
      if(value.source==='ocr-space'){
        const period=human.querySelector('[data-review-period]');period.insertAdjacentHTML('afterbegin','<option value="">Confirmar período</option>');
-       const note=document.createElement('p');note.className='intake-gate blocked';note.textContent='Leitura alternativa: confira todas as linhas na foto. Complete campos vazios e acrescente os participantes que faltarem.';human.prepend(note);
+       const note=document.createElement('p');note.className='intake-gate blocked';note.textContent=value.metodo_leitura==='manual'?'Não foi possível separar a tabela. Preencha os participantes consultando a foto e use “Adicionar participante que falta” para incluir as demais linhas.':'Leitura alternativa: confira as linhas na mesma ordem da foto. Complete campos vazios e acrescente os participantes que faltarem.';human.prepend(note);
        const original=document.createElement('details');const label=document.createElement('summary');label.textContent='Ver texto reconhecido na folha';const content=document.createElement('pre');content.style.whiteSpace='pre-wrap';content.textContent=value.texto_original||'';original.append(label,content);human.append(original);
      }
      human.querySelector('[data-review-period]').value=['MANHÃ','TARDE','INTEGRAL'].includes(String(value.periodo).toUpperCase())?String(value.periodo).toUpperCase():(value.source==='ocr-space'?'':'TARDE');
