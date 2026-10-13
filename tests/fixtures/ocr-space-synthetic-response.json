@@ -1,0 +1,304 @@
+{
+  "source": "ocr-space",
+  "ocr": {
+    "ParsedResults": [
+      {
+        "TextOverlay": {
+          "Lines": [
+            {
+              "LineText": "FOLHA FICTICIA DE TESTE",
+              "Words": [
+                {
+                  "WordText": "FOLHA FICTICIA DE TESTE",
+                  "Left": 45,
+                  "Top": 41,
+                  "Height": 16,
+                  "Width": 362
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 41
+            },
+            {
+              "LineText": "CORRETOR",
+              "Words": [
+                {
+                  "WordText": "CORRETOR",
+                  "Left": 197,
+                  "Top": 153,
+                  "Height": 16,
+                  "Width": 133
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 153
+            },
+            {
+              "LineText": "N°",
+              "Words": [
+                {
+                  "WordText": "N°",
+                  "Left": 507,
+                  "Top": 153,
+                  "Height": 16,
+                  "Width": 33
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 153
+            },
+            {
+              "LineText": "GERENTE",
+              "Words": [
+                {
+                  "WordText": "GERENTE",
+                  "Left": 637,
+                  "Top": 153,
+                  "Height": 16,
+                  "Width": 93
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 153
+            },
+            {
+              "LineText": "DIRETOR",
+              "Words": [
+                {
+                  "WordText": "DIRETOR",
+                  "Left": 820,
+                  "Top": 153,
+                  "Height": 16,
+                  "Width": 93
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 153
+            },
+            {
+              "LineText": "1",
+              "Words": [
+                {
+                  "WordText": "1",
+                  "Left": 55,
+                  "Top": 214,
+                  "Height": 16,
+                  "Width": 15
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 214
+            },
+            {
+              "LineText": "Arnon",
+              "Words": [
+                {
+                  "WordText": "Arnon",
+                  "Left": 197,
+                  "Top": 214,
+                  "Height": 16,
+                  "Width": 63
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 214
+            },
+            {
+              "LineText": "03",
+              "Words": [
+                {
+                  "WordText": "03",
+                  "Left": 507,
+                  "Top": 214,
+                  "Height": 16,
+                  "Width": 28
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 214
+            },
+            {
+              "LineText": "Teste",
+              "Words": [
+                {
+                  "WordText": "Teste",
+                  "Left": 637,
+                  "Top": 214,
+                  "Height": 16,
+                  "Width": 53
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 214
+            },
+            {
+              "LineText": "Teste",
+              "Words": [
+                {
+                  "WordText": "Teste",
+                  "Left": 820,
+                  "Top": 214,
+                  "Height": 16,
+                  "Width": 53
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 214
+            },
+            {
+              "LineText": "2",
+              "Words": [
+                {
+                  "WordText": "2",
+                  "Left": 55,
+                  "Top": 287,
+                  "Height": 16,
+                  "Width": 15
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 287
+            },
+            {
+              "LineText": "Paola",
+              "Words": [
+                {
+                  "WordText": "Paola",
+                  "Left": 197,
+                  "Top": 287,
+                  "Height": 16,
+                  "Width": 53
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 287
+            },
+            {
+              "LineText": "01",
+              "Words": [
+                {
+                  "WordText": "01",
+                  "Left": 507,
+                  "Top": 287,
+                  "Height": 16,
+                  "Width": 28
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 287
+            },
+            {
+              "LineText": "Teste",
+              "Words": [
+                {
+                  "WordText": "Teste",
+                  "Left": 637,
+                  "Top": 287,
+                  "Height": 16,
+                  "Width": 53
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 287
+            },
+            {
+              "LineText": "Teste",
+              "Words": [
+                {
+                  "WordText": "Teste",
+                  "Left": 820,
+                  "Top": 287,
+                  "Height": 16,
+                  "Width": 53
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 287
+            },
+            {
+              "LineText": "3",
+              "Words": [
+                {
+                  "WordText": "3",
+                  "Left": 55,
+                  "Top": 348,
+                  "Height": 16,
+                  "Width": 15
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 348
+            },
+            {
+              "LineText": "Wagner",
+              "Words": [
+                {
+                  "WordText": "Wagner",
+                  "Left": 197,
+                  "Top": 348,
+                  "Height": 16,
+                  "Width": 73
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 348
+            },
+            {
+              "LineText": "02",
+              "Words": [
+                {
+                  "WordText": "02",
+                  "Left": 507,
+                  "Top": 348,
+                  "Height": 16,
+                  "Width": 28
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 348
+            },
+            {
+              "LineText": "Teste",
+              "Words": [
+                {
+                  "WordText": "Teste",
+                  "Left": 637,
+                  "Top": 348,
+                  "Height": 16,
+                  "Width": 53
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 348
+            },
+            {
+              "LineText": "Teste",
+              "Words": [
+                {
+                  "WordText": "Teste",
+                  "Left": 820,
+                  "Top": 348,
+                  "Height": 16,
+                  "Width": 53
+                }
+              ],
+              "MaxHeight": 16,
+              "MinTop": 348
+            }
+          ],
+          "HasOverlay": true,
+          "Message": "Total lines: 20"
+        },
+        "TextOrientation": "0",
+        "FileParseExitCode": 1,
+        "ParsedText": "FOLHA FICTICIA DE TESTE\n\n|   | CORRETOR | N° | GERENTE | DIRETOR |\n|---|---|---|---|---|\n| 1 | Arnon | 03 | Teste | Teste |\n| 2 | Paola | 01 | Teste | Teste |\n| 3 | Wagner | 02 | Teste | Teste |",
+        "ErrorMessage": "",
+        "ErrorDetails": ""
+      }
+    ],
+    "OCRExitCode": 1,
+    "IsErroredOnProcessing": false,
+    "ProcessingTimeInMilliseconds": "3606",
+    "SearchablePDFURL": ""
+  }
+}

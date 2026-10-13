@@ -120,7 +120,7 @@ async function mount(host){
      progress('Leitura recebida. Preparando conferência…',null);
      article.querySelector('[data-gemini-check]').click();
      photoStatus.className='intake-gate blocked';
-     photoStatus.innerHTML='<strong>LEITURA RECEBIDA</strong><div>Confira nomes e números na tabela; a conferência humana continua obrigatória.</div>';
+     photoStatus.innerHTML=json.source==='make-ocr-space'?'<strong>LEITURA ALTERNATIVA RECEBIDA</strong><div>Confira a foto com atenção. Acrescente participantes ausentes e complete os campos que ficaram vazios.</div>':'<strong>LEITURA RECEBIDA</strong><div>Confira nomes e números na tabela; a conferência humana continua obrigatória.</div>';
      progress('Leitura concluída · pronto para revisão',100);
    }catch(e){
      photoStatus.className='intake-gate blocked';
@@ -209,6 +209,7 @@ async function mount(host){
      human.innerHTML='<h3>Correção humana assistida</h3><p class="small muted">Confira os números com a fotografia. Corrija 01/10 e qualquer duplicidade. Os números são usados apenas nesta etapa e não aparecem na impressão.</p>'+
        '<datalist id="geminiReviewBrokerNames">'+opts+'</datalist>'+
        '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rltv2-review-wrap rlt-five-column-review" role="region" aria-label="Conferência de corretores"><table class="rltv2-review-table rlt-five-column-table"><thead><tr><th>Nº Escolhido</th><th>Nº Sorteado</th><th>Corretor</th><th>Classe</th><th>Check</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
+       '<div class="intake-actions"><button type="button" data-review-add-line class="simulation-run">Adicionar participante que falta</button></div>'+
        '<h3>Conferir cabeçalho operacional</h3>'+
        '<div class="rltv2-company-review">'+
        '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(window.RoletaIntakeNormalization.dateInfo(value.data)?.data||value.data||'')+'"></label>'+
@@ -222,7 +223,12 @@ async function mount(host){
        '<div class="intake-actions"><button type="button" data-review-transfer class="simulation-run">Transferir para conferência canônica</button></div>'+
        '<div data-review-errors class="intake-gate blocked"><strong>TRANSFERÊNCIA NÃO AUTORIZADA</strong><div>Corrija as linhas, escolha as classes e confirme o cabeçalho antes de continuar.</div></div>';
      details.insertBefore(human,technicalTables);
-     human.querySelector('[data-review-period]').value=['MANHÃ','TARDE','INTEGRAL'].includes(String(value.periodo).toUpperCase())?String(value.periodo).toUpperCase():'TARDE';
+     if(value.source==='ocr-space'){
+       const period=human.querySelector('[data-review-period]');period.insertAdjacentHTML('afterbegin','<option value="">Confirmar período</option>');
+       const note=document.createElement('p');note.className='intake-gate blocked';note.textContent='Leitura alternativa: confira todas as linhas na foto. Complete campos vazios e acrescente os participantes que faltarem.';human.prepend(note);
+       const original=document.createElement('details');const label=document.createElement('summary');label.textContent='Ver texto reconhecido na folha';const content=document.createElement('pre');content.style.whiteSpace='pre-wrap';content.textContent=value.texto_original||'';original.append(label,content);human.append(original);
+     }
+     human.querySelector('[data-review-period]').value=['MANHÃ','TARDE','INTEGRAL'].includes(String(value.periodo).toUpperCase())?String(value.periodo).toUpperCase():(value.source==='ocr-space'?'':'TARDE');
 
      const correctionRows=[...human.querySelectorAll('[data-correction-row]')];
      const lineProgress=human.querySelector('[data-line-progress]');
@@ -258,7 +264,7 @@ async function mount(host){
        lineProgress.className='intake-gate '+(confirmed===correctionRows.length?'clear':'blocked');
        transferButton.disabled=confirmed!==correctionRows.length;
      }
-     correctionRows.forEach(tr=>{
+     function bindCorrectionRow(tr){
        tr.querySelector('[data-correct-confirm]').addEventListener('change',refreshChecks);
        ['[data-correct-position]','[data-correct-number]','[data-correct-name]','[data-correct-class]'].forEach(sel=>{
          const field=tr.querySelector(sel);
@@ -266,6 +272,21 @@ async function mount(host){
          field.addEventListener('input',invalidate);
          field.addEventListener('change',invalidate);
        });
+     }
+     correctionRows.forEach(bindCorrectionRow);
+     human.querySelector('[data-review-add-line]').addEventListener('click',()=>{
+       if(correctionRows.length>=100)return;
+       const tr=correctionRows[0].cloneNode(true);
+       tr.removeAttribute('data-pos');tr.classList.remove('rlt-line-verified','rlt-line-attention');
+       tr.querySelectorAll('input').forEach(field=>{field.value='';field.checked=false;});
+       tr.querySelectorAll('small').forEach(el=>el.remove());
+       tr.querySelector('[data-correct-class]').innerHTML='<option value="">Confirmar participação</option><option value="salao">SALÃO</option><option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option>';
+       const index=correctionRows.length+1;
+       tr.querySelector('[data-correct-position]').setAttribute('aria-label','Posição na folha do participante acrescentado '+index);
+       tr.querySelector('[data-correct-number]').setAttribute('aria-label','Número sorteado do participante acrescentado '+index);
+       tr.querySelector('[data-correct-name]').setAttribute('aria-label','Nome do participante acrescentado '+index);
+       correctionRows.push(tr);human.querySelector('tbody').append(tr);bindCorrectionRow(tr);refreshChecks();
+       tr.querySelector('[data-correct-position]').focus();
      });
      refreshChecks();
 
