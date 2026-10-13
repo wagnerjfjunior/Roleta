@@ -1,5 +1,6 @@
 'use strict';
 const auth=require('../auth/google');
+const {convertOcrSpace}=require('../server/ocr-space-draft.cjs');
 const {MAX_BYTES}=require('../photo-prepare');
 const ALLOWED=new Set(['image/jpeg','image/png','image/webp']);
 async function readStream(req){
@@ -71,7 +72,12 @@ module.exports=async function handler(req,res){
   result=JSON.parse(raw);
  }catch(e){return res.status(e.name==='AbortError'?504:502).json({error:e.name==='AbortError'?'A leitura excedeu o prazo de retorno ao app.':'Make não retornou JSON válido. Verifique o módulo Webhook Response.'});}
  finally{clearTimeout(timeout);}
+ let source='make-gemini';
+ if(result?.source==='ocr-space'){
+  try{result=convertOcrSpace(result);source='make-ocr-space';}
+  catch{return res.status(502).json({error:'A leitura alternativa não conseguiu separar a folha. Tente uma foto mais nítida.'});}
+ }
  const data=validResponse(result)?result:validResponse(result?.body)?result.body:validResponse(result?.result)?result.result:null;
- if(!data)return res.status(502).json({error:'Resposta do Make não contém linhas do Gemini.'});
- return res.status(200).json({status:'PENDENTE_REVISAO',source:'make-gemini',result:data});
+ if(!data)return res.status(502).json({error:'Resposta do Make não contém participantes para conferência.'});
+ return res.status(200).json({status:'PENDENTE_REVISAO',source,result:data});
 };

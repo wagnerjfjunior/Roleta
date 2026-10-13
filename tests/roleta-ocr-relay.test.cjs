@@ -42,5 +42,11 @@ const img=Buffer.from([0xff,0xd8,0xff,0xe0,0,0]);
  global.fetch=async()=>({ok:true,text:async()=>JSON.stringify({linhas:[{posicao_impressa:0,nome_lido:'Arnon',numero_sorteado:'01'}]})});
  try{r=res();await handler(req(img),r);assert.equal(r.statusCode,502);}
  finally{global.fetch=originalFetch;}
+ global.fetch=async()=>({ok:true,text:async()=>JSON.stringify(require('./fixtures/ocr-space-synthetic-response.json'))});
+ try{r=res();await handler(req(img),r);assert.equal(r.statusCode,200);assert.equal(r.body.source,'make-ocr-space');assert.equal(r.body.status,'PENDENTE_REVISAO');assert.deepEqual(r.body.result.linhas.map(l=>l.numero_sorteado),['03','01','02']);assert.ok(r.body.result.linhas.every(l=>l.confianca==='baixa'));}
+ finally{global.fetch=originalFetch;}
+ global.fetch=async()=>({ok:true,text:async()=>JSON.stringify({source:'ocr-space',ocr:{IsErroredOnProcessing:true,ParsedResults:[]}})});
+ try{r=res();await handler(req(img),r);assert.equal(r.statusCode,502);assert.equal(r.body.result,undefined);}
+ finally{global.fetch=originalFetch;}
  console.log('PASS: Google-only relay auth, CSRF, origin, upload constraints and JSON response');
 })().catch(e=>{console.error(e);process.exitCode=1;});
