@@ -1,0 +1,34 @@
+/* Interface separada: reutiliza intencionalmente CSS e fluxo RLT-PRINT-V2. */
+.roleta-simple{background:#eef3f9;color:#112a46;color-scheme:light}
+.roleta-simple .simple-shell{max-width:960px;margin:auto;padding:18px 14px 55px}
+.roleta-simple .simple-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0 20px}
+.roleta-simple .simple-header h1{color:#102b48;font-size:clamp(30px,6vw,45px);letter-spacing:-.035em;margin:3px 0 5px}
+.roleta-simple .simple-header p{color:#51677f;margin:0}
+.roleta-simple .simple-kicker{font-size:12px;font-weight:800;color:#1160a7;letter-spacing:.1em}
+.roleta-simple .simple-back{color:#144f7e;font-size:13px;text-decoration:none;white-space:nowrap}
+.roleta-simple .simple-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:10px 0 14px}
+.roleta-simple .simple-steps span{text-align:center;border-radius:10px;background:#dbe6f0;padding:12px 3px;color:#456079;font-size:12px;font-weight:800}
+.roleta-simple .simple-steps .active{background:#145ca2;color:#fff}
+.roleta-simple .simple-notice{background:#fff;border:1px solid #ccdae8;border-radius:12px;padding:12px 15px;color:#183c61;margin-bottom:14px;font-size:14px}
+.roleta-simple #simpleIntake>.workspace-page-head{display:none}
+.roleta-simple #simpleIntake>.rltv2-import-card{display:none!important}
+.roleta-simple .rlt-technical-backup{display:none!important}
+.roleta-simple #rltStatSubmit,.roleta-simple #rltStatStatus{display:none!important}
+.roleta-simple [hidden]{display:none!important}
+.roleta-simple .card{background:#fff;color:#122e4c;box-shadow:0 10px 28px #24496a14;border:1px solid #d5e1eb;border-radius:18px;margin:0 0 15px;padding:18px}
+.roleta-simple .card h2,.roleta-simple .card h3{color:#112a46}
+.roleta-simple .muted,.roleta-simple .small{color:#50667c}
+.roleta-simple .eyebrow{color:#145ca2}
+.roleta-simple input,.roleta-simple select,.roleta-simple textarea{background:#fff;color:#102b48;border-color:#bdcede;min-height:44px}
+.roleta-simple button,.roleta-simple .simulation-run{min-height:48px;border-radius:11px;font-size:15px;cursor:pointer}
+.roleta-simple button:disabled{opacity:.48;cursor:not-allowed}
+.roleta-simple [data-photo-camera],.roleta-simple [data-photo-gallery],.roleta-simple [data-photo-send],.roleta-simple [data-review-transfer],.roleta-simple #rltv2ApplyReview{background:#155ea4!important;color:#fff!important;border-color:#155ea4!important;font-weight:750}
+.roleta-simple .intake-gate.clear{background:#ecf8f1;color:#145238;border-color:#b5dec6}
+.roleta-simple .intake-gate.blocked{background:#fff8eb;color:#614716;border-color:#ecd5a3}
+.roleta-simple .rltv2-review-wrap{overflow-x:auto}
+.roleta-simple .rltv2-review-table{min-width:560px}
+.roleta-simple .rltv2-review-card{border-radius:14px}
+.roleta-simple #rltv2PreviewCard .intake-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.roleta-simple #rltv2Print,.roleta-simple #rltv2SimpleJpeg,.roleta-simple #rltv2SharePdf{font-weight:800}
+.roleta-simple .simple-footer{font-size:12px;color:#5d7289;margin-top:24px;text-align:center}
+@media(max-width:600px){.roleta-simple .simple-header{align-items:flex-start;flex-direction:column}.roleta-simple .card{padding:14px}.roleta-simple .intake-actions{display:flex;flex-direction:column;gap:9px}.roleta-simple .intake-actions button{width:100%}.roleta-simple #rltv2PreviewCard .intake-actions{grid-template-columns:1fr}.roleta-simple .rltv2-company-review{grid-template-columns:1fr}.roleta-simple .simple-shell{padding:12px 10px 35px}}
