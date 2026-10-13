@@ -3,6 +3,20 @@ const assert=require('node:assert/strict'),test=require('node:test');
 const {convertOcrSpace}=require('../server/ocr-space-draft.cjs');
 const payload=(raw,lines)=>({IsErroredOnProcessing:false,ParsedResults:[{FileParseExitCode:1,ParsedText:raw,TextOverlay:{Lines:lines||[]}}]});
 const word=(t,left,top,width=40,height=20)=>({WordText:t,Left:left,Top:top,Width:width,Height:height});
+test('production header-only overlay recovers explicit broker positions without assigning an incomplete ball column',()=>{
+ const d=convertOcrSpace(require('./fixtures/ocr-space-header-only-overlay.json'));
+ assert.equal(d.metodo_leitura,'column-text');assert.equal(d.linhas.length,31);
+ assert.deepEqual(d.linhas[0],[{posicao_impressa:1,nome_lido:'Corretor 1',numero_sorteado:null,gerente:null,diretor:null,confianca:'baixa'}][0]);
+ assert.equal(d.linhas[26].posicao_impressa,27);assert.equal(d.linhas[26].nome_lido,null);
+ assert.equal(d.linhas[28].nome_lido,'Corretor 29');
+ assert.ok(d.linhas.every(l=>l.numero_sorteado===null&&!/(Gerente|Diretor)/.test(l.nome_lido||'')));
+});
+test('column text rejects mixed or duplicate rows rather than creating people from fragments',()=>{
+ for(const column of ['1 A\n1 B\n3 C','1 A\ntexto solto\n3 C','1 A\n3 B\n2 C']){
+  const d=convertOcrSpace(payload('***Corretor***\n'+column+'\nN°\n01\n***Gerente***\nRENAN'));
+  assert.equal(d.metodo_leitura,'manual');assert.equal(d.linhas[0].nome_lido,null);
+ }
+});
 test('production geometry: overlapping heading keeps rows and excludes management; missing index is not guessed',()=>{
  const d=convertOcrSpace(require('./fixtures/ocr-space-overlapping-header.json'));
  assert.equal(d.metodo_leitura,'overlay');

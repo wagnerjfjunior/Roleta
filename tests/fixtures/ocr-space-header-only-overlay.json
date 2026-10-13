@@ -1,0 +1,126 @@
+{
+  "ParsedResults": [
+    {
+      "FileParseExitCode": 1,
+      "ParsedText": "***Corretor***\n1 Corretor 1\n2 Corretor 2\n3 Corretor 3\n4 Corretor 4\n5 Corretor 5\n6 Corretor 6\n7 Corretor 7\n8 Corretor 8\n9 Corretor 9\n10 Corretor 10\n11 Corretor 11\n12 Corretor 12\n13 Corretor 13\n14 Corretor 14\n15 Corretor 15\n16 Corretor 16\n17 Corretor 17\n18 Corretor 18\n19 Corretor 19\n20 Corretor 20\n21 Corretor 21\n22 Corretor 22\n23 Corretor 23\n24 Corretor 24\n25 Corretor 25\n26 Corretor 26\n27\n28\n29 Corretor 29\n30 Corretor 30\n31\nN°\n04\n06\n24\n***Gerente***\nGerente A\nGerente B\n***Diretor***\nDiretor A",
+      "TextOverlay": {
+        "Lines": [
+          {
+            "LineText": "EMPREENDIMENTO",
+            "Words": [
+              {
+                "WordText": "EMPREENDIMENTO",
+                "Left": 114,
+                "Top": 95,
+                "Height": 16,
+                "Width": 165
+              }
+            ],
+            "MaxHeight": 16,
+            "MinTop": 95
+          },
+          {
+            "LineText": "ELO DUO/GARDEN/NOVA VIVERE",
+            "Words": [
+              {
+                "WordText": "ELO DUO/GARDEN/NOVA VIVERE",
+                "Left": 53,
+                "Top": 140,
+                "Height": 13,
+                "Width": 253
+              }
+            ],
+            "MaxHeight": 13,
+            "MinTop": 140
+          },
+          {
+            "LineText": "***Corretor***",
+            "Words": [
+              {
+                "WordText": "***Corretor***",
+                "Left": 71,
+                "Top": 166,
+                "Height": 13,
+                "Width": 87
+              }
+            ],
+            "MaxHeight": 13,
+            "MinTop": 166
+          },
+          {
+            "LineText": "N°",
+            "Words": [
+              {
+                "WordText": "N°",
+                "Left": 328,
+                "Top": 166,
+                "Height": 13,
+                "Width": 18
+              }
+            ],
+            "MaxHeight": 13,
+            "MinTop": 166
+          },
+          {
+            "LineText": "***Gerente***",
+            "Words": [
+              {
+                "WordText": "***Gerente***",
+                "Left": 423,
+                "Top": 166,
+                "Height": 13,
+                "Width": 87
+              }
+            ],
+            "MaxHeight": 13,
+            "MinTop": 166
+          },
+          {
+            "LineText": "CORRETORES HELBOR:",
+            "Words": [
+              {
+                "WordText": "CORRETORES HELBOR:",
+                "Left": 637,
+                "Top": 56,
+                "Height": 14,
+                "Width": 153
+              }
+            ],
+            "MaxHeight": 14,
+            "MinTop": 56
+          },
+          {
+            "LineText": "17",
+            "Words": [
+              {
+                "WordText": "17",
+                "Left": 811,
+                "Top": 56,
+                "Height": 15,
+                "Width": 27
+              }
+            ],
+            "MaxHeight": 15,
+            "MinTop": 56
+          },
+          {
+            "LineText": "DATA-06/20/2026",
+            "Words": [
+              {
+                "WordText": "DATA-06/20/2026",
+                "Left": 378,
+                "Top": 95,
+                "Height": 17,
+                "Width": 189
+              }
+            ],
+            "MaxHeight": 17,
+            "MinTop": 95
+          }
+        ],
+        "HasOverlay": true,
+        "Message": "Total lines: 8"
+      }
+    }
+  ]
+}
