@@ -3,7 +3,8 @@
 Autorização: em 13/10/2026 o responsável pediu implementar a camada de melhorias,
 mantendo dúvidas para conferência manual. Branch `feature/ocr-learning-20261013`.
 Em 13/10/2026 o responsável autorizou enviar a branch ao GitHub para teste Live Sync.
-A produção não está autorizada nesta etapa. Não altera o Make ou o banco.
+Às 16h41 o responsável autorizou o merge para main. PR #115 aberta;
+publicação pendente de checks/merge/verificação. Não altera o Make ou o banco.
 
 ## Comportamento
 
@@ -58,5 +59,5 @@ registrar → repetir sem duplicar → alterar posição sem treinar → sugest�
 na próxima leitura → limpar histórico. Regressões de OCR e conferência executadas.
 
 Próximo passo: testar a branch no Live Sync conforme autorização de envio registrada,
-sem promover a main nesta etapa. A publicação requer autorização expressa e checks.
+com merge autorizado na PR #115. Conferir checks, merge e deployment de produção.
 Não usar o histórico de produção como massa de teste nem reabrir WEEKLY_FROZEN.

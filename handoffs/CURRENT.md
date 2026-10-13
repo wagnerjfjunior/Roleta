@@ -1,4 +1,4 @@
-> **APRENDIZADO OCR — candidato local 13/10/2026:** camada de sugestões após confirmação final, duas folhas distintas sem conflito, replay idempotente e bolinhas ambíguas para preenchimento manual. Histórico por conta no navegador, sem sincronização Supabase. Ler `docs/sfjm/OCR_LEARNING_LOCAL_2026-10-13.md` (a partir da raiz). Branch `feature/ocr-learning-20261013`; envio ao GitHub autorizado para teste Live Sync; produção ainda não autorizada nesta etapa. Próximo passo: teste local da branch.
+> **APRENDIZADO OCR — candidato local 13/10/2026:** camada de sugestões após confirmação final, duas folhas distintas sem conflito, replay idempotente e bolinhas ambíguas para preenchimento manual. Histórico por conta no navegador, sem sincronização Supabase. Ler `docs/sfjm/OCR_LEARNING_LOCAL_2026-10-13.md` (a partir da raiz). Branch `feature/ocr-learning-20261013`; envio ao GitHub autorizado para teste Live Sync; merge para main autorizado às 16h41 na PR #115. Próximo passo: concluir checks/merge e verificar produção.
 
 ## Revisão sem tabela — confirmação de conclusão corrigida
 
