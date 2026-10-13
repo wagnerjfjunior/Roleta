@@ -6,10 +6,10 @@
 .roleta-simple .simple-header h1{font-size:clamp(30px,5vw,42px);letter-spacing:-.045em;line-height:1.1;margin:0 0 7px;color:#112c49}
 .roleta-simple .simple-header p{color:#5c7084;font-size:14px;margin:0}
 .roleta-simple .simple-back{padding:9px 11px;border:1px solid #d6e2ed;border-radius:9px;background:#fff;color:#345b7b;text-decoration:none;white-space:nowrap;font-size:12px;font-weight:700}
-.roleta-simple .simple-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 15px}
-.roleta-simple .simple-steps span{padding:12px 4px;background:#e5ebf2;border-radius:11px;text-align:center;color:#677a8d;font-size:12px;font-weight:800}
-.roleta-simple .simple-steps .active{background:#1859a0;color:#fff}
-.roleta-simple .simple-steps .complete{background:#d7f0e4;color:#196146}
+
+
+
+
 .roleta-simple .simple-notice{padding:15px 16px;background:#e7f1fc;color:#234b70;border:1px solid #cbdff2;border-radius:12px;font-size:14px;line-height:1.5;margin-bottom:18px}
 .roleta-simple .workspace-page-head,.roleta-simple .simple-manual-import,.roleta-simple .rlt-technical-backup,.roleta-simple #rltStatSubmit,.roleta-simple #rltStatStatus{display:none!important}
 .roleta-simple [hidden]{display:none!important}
@@ -71,3 +71,111 @@
 .roleta-simple .simple-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .roleta-simple .simple-sort-link{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;min-height:42px;border-radius:11px;text-decoration:none;background:#155da3;color:white;font-size:13px;font-weight:850}
 @media(max-width:640px){.roleta-simple .simple-links{width:100%}.roleta-simple .simple-links a{flex:1;text-align:center}}
+
+/* UX trial: scoped to /simples/, existing operational modules remain authoritative. */
+.roleta-simple{--simple-blue:#163d56;--simple-ink:#163348;background:#f5f6f3!important}
+.roleta-simple .simple-shell{max-width:1240px;padding:32px 40px 60px}
+.roleta-simple .simple-header{align-items:center;margin-bottom:54px}
+.roleta-simple .simple-brand{text-decoration:none;color:#163348}
+.roleta-simple .simple-brand-name{display:block;font-size:32px;letter-spacing:-.06em;font-weight:850;line-height:1}
+.roleta-simple .simple-brand-dot{color:#268064}
+.roleta-simple .simple-kicker{color:#517064;font-size:11px;letter-spacing:.12em}
+.roleta-simple .simple-back{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 15px;border-radius:10px;background:transparent;color:#314f61}
+.roleta-simple .simple-entry{display:grid;grid-template-columns:1.15fr 1fr;gap:64px;align-items:center;padding:28px 0 50px}
+.roleta-simple .simple-entry h1{font-size:clamp(38px,5vw,64px);font-weight:750;line-height:1.08;letter-spacing:-.055em;color:#15384f;margin:20px 0 24px}
+.roleta-simple .simple-entry-copy>p{font-size:18px;line-height:1.65;color:#5b6c71;max-width:470px;margin:0 0 30px}
+.roleta-simple .simple-primary{display:inline-flex;align-items:center;justify-content:center;padding:18px 28px;min-height:56px;border-radius:12px;background:#183f56;color:#fff;text-decoration:none;font-size:16px;font-weight:750;box-shadow:0 8px 18px #15384f15}
+.roleta-simple .simple-entry-copy .simple-access-note{font-size:13px;margin:15px 0;line-height:1.5}
+.roleta-simple .simple-entry-guide{background:#e8eeea;border:1px solid #dae4dc;border-radius:24px;padding:38px}
+.roleta-simple .simple-entry-guide h2{font-size:29px;line-height:1.22;letter-spacing:-.035em;margin:18px 0 30px;color:#15384f}
+.roleta-simple .simple-entry-guide ol{padding:0;margin:0;list-style:none;display:grid;gap:25px}
+.roleta-simple .simple-entry-guide li{display:flex;gap:20px;align-items:flex-start}
+.roleta-simple .simple-entry-guide li>span{color:#39775f;font-weight:750;font-size:13px;line-height:24px}
+.roleta-simple .simple-entry-guide strong{font-size:16px;color:#25473c}
+.roleta-simple .simple-entry-guide li p{margin:5px 0 0;font-size:14px;line-height:1.5;color:#61746a}
+.roleta-simple .simple-guide-note{font-size:12px;color:#61746a;border-top:1px solid #cedbd2;padding-top:20px;margin:30px 0 0}
+.roleta-simple .simple-home h1,.roleta-simple .simple-workflow-heading h1{font-size:clamp(30px,4vw,44px);letter-spacing:-.045em;line-height:1.15;color:#173b51;margin:14px 0}
+.roleta-simple .simple-home-subtitle{color:#697c85;font-size:14px;overflow-wrap:anywhere}
+.roleta-simple .simple-activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:34px}
+.roleta-simple .simple-activity{padding:34px;background:#fff;border:1px solid #dce5e2;border-radius:20px;text-decoration:none;color:#15384f;transition:border-color .15s,box-shadow .15s}
+.roleta-simple .simple-activity:hover{border-color:#8eb39f;box-shadow:0 8px 24px #15384f0d}
+.roleta-simple .simple-activity-label{font-size:11px;color:#437c65;font-weight:800;letter-spacing:.09em}
+.roleta-simple .simple-activity h2{font-size:28px;letter-spacing:-.04em;margin:23px 0 12px;color:#15384f}
+.roleta-simple .simple-activity p{line-height:1.6;color:#60747e;max-width:350px}
+.roleta-simple .simple-activity-action{display:block;font-size:14px;font-weight:750;color:#216549;margin-top:32px}
+.roleta-simple .simple-home-note{color:#677b74;font-size:13px;margin:22px 0 55px}
+.roleta-simple .simple-workflow-heading{margin-bottom:24px}
+
+
+.roleta-simple .simple-photo-card>.section-head:first-child .eyebrow,.roleta-simple [data-photo-meta],.roleta-simple .simple-photo-card>[data-photo-status]{display:none}
+.roleta-simple .simple-photo-card [data-photo-camera]::before,.roleta-simple .simple-photo-card [data-photo-gallery]::before{content:none}
+
+.roleta-simple #rltStatSubmit,.roleta-simple #rltStatStatus{display:revert!important}
+.roleta-simple #rltStatSubmit[hidden],.roleta-simple #rltStatStatus[hidden]{display:none!important}
+.roleta-simple .simple-photo-card>[data-photo-status].blocked{display:block}
+.roleta-simple .simple-review-tools{display:flex;justify-content:space-between;gap:12px;position:sticky;top:0;background:#fff;padding:12px 0;z-index:3}
+.roleta-simple .simple-photo-reference{background:#f0f3ef;padding:14px;border-radius:14px;border:1px solid #d8e1d8;overflow:auto;max-height:70vh}
+.roleta-simple .simple-photo-reference h3{margin:0 0 10px;font-size:15px}
+.roleta-simple .simple-reference-controls{display:flex;gap:8px;margin-bottom:12px}
+.roleta-simple .simple-reference-controls button{font-size:12px!important;min-height:40px!important;padding:8px 12px}
+.roleta-simple .simple-photo-reference img{display:block;width:100%;height:auto;max-width:none}
+.roleta-simple .simple-reference-zoom img{width:180%}
+.roleta-simple .simple-human-review{margin-top:0!important}
+.roleta-simple [data-simple-phase="2"] .simple-photo-card>[data-photo-review],.roleta-simple [data-simple-phase="3"] .simple-photo-card,.roleta-simple [data-simple-phase="4"] .simple-photo-card{display:none!important}
+.roleta-simple .rlt-line-verified{background:#eef8ef!important;border-color:#b6d7bd!important}
+.roleta-simple :is(a,button,input,select,summary):focus-visible{outline:3px solid #27835f;outline-offset:4px}
+@media(min-width:1000px){
+.roleta-simple .simple-with-reference [data-gemini-detail]{display:inline-block;vertical-align:top;width:calc(58% - 20px);margin-left:20px;max-height:75vh;overflow:auto;padding-right:8px}
+.roleta-simple .simple-with-reference .simple-photo-reference{display:inline-block;vertical-align:top;width:42%;position:sticky;top:80px;box-sizing:border-box}
+.roleta-simple .simple-with-reference .rlt-five-column-table{min-width:480px}
+}
+@media(max-width:700px){
+.roleta-simple .simple-shell{padding:22px 18px 42px}.roleta-simple .simple-header{flex-direction:row;align-items:center;margin-bottom:28px}.roleta-simple .simple-brand-name{font-size:27px}.roleta-simple .simple-header .simple-links{width:auto}.roleta-simple .simple-header .simple-back{font-size:11px;padding:8px 10px;min-height:40px}.roleta-simple .simple-entry{grid-template-columns:1fr;gap:28px;padding:10px 0 20px}.roleta-simple .simple-entry h1{font-size:43px}.roleta-simple .simple-entry-copy>p{font-size:16px;margin-bottom:24px}.roleta-simple .simple-primary{width:100%;box-sizing:border-box}.roleta-simple .simple-entry-guide{padding:25px;border-radius:18px}.roleta-simple .simple-entry-guide h2{font-size:25px}.roleta-simple .simple-activity-grid{grid-template-columns:1fr;gap:16px;margin-top:24px}.roleta-simple .simple-activity{padding:26px}.roleta-simple .simple-activity h2{font-size:25px;margin-top:16px}.roleta-simple .simple-activity-action{margin-top:22px}.roleta-simple .simple-review-tools{gap:7px}.roleta-simple .simple-review-tools button{font-size:12px!important;flex:1;padding:8px!important}.roleta-simple .simple-photo-reference{position:sticky;top:72px;max-height:34vh;z-index:2;margin-bottom:16px;box-shadow:0 8px 16px #173b5112}.roleta-simple .simple-photo-reference h3{display:none}.roleta-simple .simple-reference-controls{position:sticky;top:0;background:#f0f3ef;padding-bottom:6px}.roleta-simple .simple-footer{text-align:left}
+}
+@media(prefers-reduced-motion:reduce){.roleta-simple *{scroll-behavior:auto!important;transition:none!important}}
+.roleta-simple [data-simple-phase="4"] #rltv2ReviewCard{display:none!important}
+.roleta-simple #rltStatSubmit{grid-column:1/-1;margin-top:12px}
+.roleta-simple .simple-output-note{font-size:13px;line-height:1.6;color:#65796e}
+
+/* Auth is owned by the entry screen; workflow only consumes its session. */
+.roleta-simple [data-google-auth],.roleta-simple .simple-auth-controls{display:none!important}
+.roleta-simple .simple-progress{margin:0 0 20px}
+.roleta-simple .simple-progress p{font-size:13px;font-weight:650;color:#567062;margin:0 0 10px}
+.roleta-simple .simple-progress progress{display:block;width:100%;height:5px;border:none;border-radius:5px;accent-color:#39775f;overflow:hidden;background:#dce5df}
+.roleta-simple .simple-progress progress::-webkit-progress-bar{background:#dce5df;border-radius:5px}
+.roleta-simple .simple-progress progress::-webkit-progress-value{background:#39775f;border-radius:5px}
+.roleta-simple .simple-progress progress::-moz-progress-bar{background:#39775f;border-radius:5px}
+
+/* Shared architectural image: fictional atmosphere, no project representation. */
+.roleta-simple{background:linear-gradient(90deg,rgba(8,28,42,.91),rgba(8,28,42,.42)),url('/assets/real-estate-background.webp') center/cover fixed!important;min-height:100vh}
+.roleta-simple .simple-header .simple-kicker,.roleta-simple .simple-header .simple-brand,.roleta-simple .simple-header .simple-brand-name{color:#fff}
+.roleta-simple .simple-header .simple-back{color:#fff;border-color:#ffffff55;background:#ffffff0c}
+.roleta-simple .simple-brand-dot{color:#93d5b6}
+.roleta-simple .simple-entry-copy>.simple-kicker,.roleta-simple .simple-home>.simple-kicker,.roleta-simple .simple-workflow-heading>.simple-kicker{color:#b3dbc5}
+.roleta-simple .simple-entry h1,.roleta-simple .simple-home h1,.roleta-simple .simple-workflow-heading h1{color:#fff}
+.roleta-simple .simple-entry-copy>p,.roleta-simple .simple-home-subtitle,.roleta-simple .simple-home-note,.roleta-simple .simple-footer{color:#e1e9e9}
+.roleta-simple .simple-entry-copy>.simple-back{color:white;border-color:#ffffff66;background:#173b51b3}
+.roleta-simple .simple-entry-guide{background:#f4f6f0f5;border-color:#ffffffa0;box-shadow:0 24px 60px #06162633}
+.roleta-simple .simple-primary{background:#fff;color:#15384f}
+.roleta-simple .simple-progress p{color:#d5e7db}
+.roleta-simple .simple-progress progress{background:#ffffff30}
+@media(max-width:700px){.roleta-simple{background-attachment:scroll!important;background-position:62% center!important}.roleta-simple .simple-entry{gap:34px}.roleta-simple .simple-entry-copy{padding:14px 0 18px}}
+
+/* Familiar sign-in card, based on the operator's supplied reference. */
+.roleta-simple.simple-screen-entry .simple-shell{min-height:100svh;display:grid;place-items:center;padding:28px 20px}
+.roleta-simple.simple-screen-entry .simple-header,.roleta-simple.simple-screen-entry .simple-footer{display:none}
+.roleta-simple .simple-entry{display:block;width:100%;max-width:420px;margin:0 auto;padding:0}
+.roleta-simple .simple-login-card{background:#fff;border:1px solid #e4e9e5;border-radius:16px;padding:38px 34px 28px;box-shadow:0 24px 70px #061a2b55}
+.roleta-simple .simple-login-brand{display:block;font-size:31px;font-weight:850;letter-spacing:-.06em;color:#173b51;text-decoration:none;line-height:1.1;margin-bottom:9px}
+.roleta-simple .simple-login-brand span{color:#39775f}
+.roleta-simple .simple-login-location{display:block;font-size:10px;font-weight:750;letter-spacing:.12em;color:#698172}
+.roleta-simple .simple-entry .simple-login-card h1{color:#20352e;font-size:25px;font-weight:750;letter-spacing:-.035em;line-height:1.25;margin:30px 0 12px}
+.roleta-simple .simple-entry .simple-login-card>p{color:#64766b;font-size:14px;line-height:1.6;margin:0 0 28px}
+.roleta-simple .simple-login-card .simple-google-button{display:flex;align-items:center;width:100%;min-height:50px;padding:12px 16px;border:1px solid #bdc8c0;border-radius:6px;background:#fff;color:#283b30;font-size:14px;font-weight:600;text-decoration:none;box-shadow:none;gap:12px;box-sizing:border-box}
+.roleta-simple .simple-google-button img{width:22px;height:22px;flex-shrink:0;object-fit:contain}
+.roleta-simple .simple-google-button span{flex:1;text-align:center;padding-right:22px}
+.roleta-simple .simple-google-button:hover{background:#f6f9f5;border-color:#8aab96}
+.roleta-simple .simple-entry .simple-login-card .simple-access-note{font-size:12px;color:#6b7d70;margin:14px 0 0;line-height:1.5}
+.roleta-simple .simple-login-card>.simple-back{color:#355744;background:#f4f8f2;border-color:#d7e3d5;font-size:12px;margin-top:12px;width:100%}
+.roleta-simple .simple-login-bottom{border-top:1px solid #e5ebe2;color:#7a887d;font-size:11px;line-height:1.6;margin-top:28px;padding-top:18px}
+@media(max-width:700px){.roleta-simple.simple-screen-entry .simple-shell{padding:24px 18px}.roleta-simple .simple-login-card{padding:32px 25px 24px;border-radius:14px}.roleta-simple .simple-entry .simple-login-card h1{font-size:24px}}

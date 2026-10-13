@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0a1829">
+<meta name="theme-color" content="#173b51">
 <title>Sorteador | Roleta</title>
 <meta name="description" content="Sorteio transparente de bolinhas, sem repetição, com histórico local.">
 <link rel="stylesheet" href="/sorteador/style.css">
@@ -12,16 +12,16 @@
 <body>
 <div class="shell">
 <header class="header">
- <div class="brand"><div class="mark" aria-hidden="true">●</div><div><span class="eyebrow">ROLETA · SORTEADOR</span><h1>Sorteio de bolinhas</h1></div></div>
- <div class="header-actions"><a href="/" class="quiet menu-return" aria-label="Voltar ao menu principal do Roleta Intelligence">← Menu principal</a><button type="button" id="historyButton" class="quiet"><span aria-hidden="true">◷</span> Histórico local</button></div>
+ <div class="brand"><div><span class="eyebrow">CAMINHOS DA LAPA</span><h1>Roleta<span class="brand-dot">.</span> <span class="brand-section">Sorteador</span></h1></div></div>
+ <div class="header-actions"><a href="/simples/" class="quiet menu-return" aria-label="Voltar ao menu principal da Roleta">← Menu principal</a><button type="button" id="historyButton" class="quiet"><span aria-hidden="true">◷</span> Histórico de sorteios</button></div>
 </header>
 <main>
 <section class="setup card" id="setup">
- <div class="setup-copy"><span class="eyebrow">COMEÇAR</span><h2>Como deseja sortear?</h2><p>Escolha uma opção, informe os números e comece. Cada bolinha sai apenas uma vez.</p></div>
- <form id="startForm" class="setup-actions">
+ <div class="setup-copy"><span class="eyebrow">UM NÚMERO. UMA VEZ.</span><h2>O próximo número<br>começa aqui.</h2><p>Defina as bolinhas do seu sorteio. Depois, toque para revelar um número por vez.</p><p class="setup-assurance">Sem repetição · Sequência registrada neste navegador</p></div>
+ <form id="startForm" class="setup-actions"><h3>Prepare seu sorteio</h3><p class="setup-form-intro">Escolha como definir as bolinhas.</p>
   <fieldset class="mode-choices"><legend>Tipo de sorteio</legend>
    <label class="mode-option"><input type="radio" name="drawMode" value="count" checked><span><strong>Quantidade de corretores</strong><small>Exemplo: 25 corretores, bolinhas de 1 a 25</small></span></label>
-   <label class="mode-option"><input type="radio" name="drawMode" value="range"><span><strong>Escolher do número até o número</strong><small>Exemplo: de 50 até 80</small></span></label>
+   <label class="mode-option"><input type="radio" name="drawMode" value="range"><span><strong>Escolher um intervalo</strong><small>Exemplo: de 50 até 80</small></span></label>
   </fieldset>
   <div id="countFields" class="mode-fields">
    <label for="total">Quantos corretores?</label>
@@ -34,36 +34,36 @@
   </div>
   <p id="setupSummary" class="setup-summary" aria-live="polite">25 bolinhas, numeradas de 1 a 25.</p>
   <button type="submit" class="primary start-submit">Preparar bolinhas <span aria-hidden="true">→</span></button>
-  <small>Sem cadastro e sem envio de dados.</small>
+  <small>O resultado fica salvo neste navegador.</small>
  </form>
 </section>
 <section id="session" hidden>
  <div class="session-top">
-  <div><span class="eyebrow">SORTEIO EM ANDAMENTO</span><h2 id="sessionLabel">—</h2><p id="sessionTime" class="muted"></p></div>
+  <div><span class="eyebrow" id="sessionEyebrow">SORTEIO EM ANDAMENTO</span><h2 id="sessionLabel">—</h2><p id="sessionTime" class="muted"></p></div>
   <button type="button" id="newButton" class="quiet">Novo sorteio</button>
  </div>
  <div class="progress-card"><div class="progress-txt"><strong id="progressText">0 de 0 sorteadas</strong><span id="remainingText">—</span></div><div class="progress-bar" role="progressbar" aria-label="Bolinhas sorteadas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div id="progressFill"></div></div></div>
- <section class="draw-card card" aria-label="Área do sorteio">
-   <div class="draw-top"><span class="live-pill"><span class="live-dot"></span> Bolinhas em movimento</span><div class="draw-options"><button type="button" id="soundToggle" class="sound-toggle" aria-pressed="false" title="Ativar anúncio de voz dos números">🔇 Som desligado</button><span id="poolLabel">—</span></div></div>
+ <div class="draw-workspace"><section class="draw-card card" aria-label="Área do sorteio">
+   <div class="draw-top"><span class="live-pill"><span class="live-dot"></span> <span id="drawMotionLabel">Bolinhas em movimento</span></span><div class="draw-options"><button type="button" id="soundToggle" class="sound-toggle" aria-pressed="false" title="Ativar anúncio de voz dos números">🔇 Som desligado</button><span id="poolLabel">—</span></div></div>
    <div class="arena" id="arena" aria-label="Urna de bolinhas em movimento: o movimento é apenas ilustrativo"></div>
    <div id="winner" class="winner" role="status" aria-live="polite" aria-atomic="true"><div id="winnerCaption">Pronto para sortear</div><strong id="winnerNumber">?</strong><div id="winnerPosition">Aguardando a primeira posição</div></div>
-   <button id="drawButton" type="button" class="draw-button">Sortear bolinha <span aria-hidden="true">→</span></button>
-   <p class="draw-hint" id="drawHint">O número só é definido quando você toca em “Sortear bolinha”.</p>
-   <div id="finishBanner" class="finish-banner" role="status" aria-live="polite" aria-atomic="true" hidden><div class="finish-icon" aria-hidden="true">✓</div><strong>SORTEIO FINALIZADO!</strong><p>Todas as bolinhas foram sorteadas.</p><p class="finish-note">A sequência completa está logo abaixo e foi salva neste navegador.</p><a class="finish-home" href="/">← Voltar ao menu principal</a></div>
+   <div class="draw-controls"><button id="drawButton" type="button" class="draw-button">Sortear bolinha <span aria-hidden="true">→</span></button>
+   <p class="draw-hint" id="drawHint">Toque para revelar a primeira bolinha.</p></div>
+   <div id="finishBanner" class="finish-banner" role="status" aria-live="polite" aria-atomic="true" hidden><div class="finish-icon" aria-hidden="true">✓</div><strong>Sorteio finalizado</strong><p>Todas as bolinhas foram sorteadas.</p><p class="finish-note">A sequência completa está logo abaixo e foi salva neste navegador.</p><a class="finish-home" href="/simples/#digitalizar">Digitalizar a folha da roleta →</a><a class="finish-menu" href="/simples/">Voltar ao menu principal</a></div>
  </section>
  <section class="results card" aria-labelledby="resultsHeading">
-  <div class="results-head"><div><span class="eyebrow">CONFERÊNCIA</span><h2 id="resultsHeading">Sequência sorteada</h2></div><span id="resultCount">0 números</span></div>
+  <div class="results-head"><div><span class="eyebrow">CONFERÊNCIA</span><h2 id="resultsHeading">Números sorteados</h2></div><span id="resultCount">0 números</span></div>
   <p id="sequenceDescription">1ª bolinha para a posição física 1, 2ª para a posição física 2, e assim por diante.</p>
   <ol id="sequence" class="sequence" aria-label="Sequência cronológica"></ol>
   <p id="emptySequence" class="empty">Os números aparecerão aqui após cada sorteio.</p>
- </section>
+ </section></div>
 </section>
 <section class="method"><details><summary>Como garantimos a aleatoriedade?</summary>
  <p>Usamos <code>crypto.getRandomValues()</code> do navegador para escolher uniformemente entre as bolinhas restantes, com rejeição de viés matemático. A bolinha sorteada é removida, sem reposição. O movimento visual não determina o número. Em navegadores sem criptografia segura, o sorteio é bloqueado.</p>
  <p>Os resultados e horários são armazenados somente neste navegador. O histórico permite conferência posterior, mas armazenamento local pode ser apagado ou alterado: não é uma ata independente nem certificação antifraude.</p>
  </details></section>
 </main>
-<footer>Roleta · Sorteador local — nenhum resultado é enviado para servidores. <a href="/simples/">Abrir Roleta Simples</a></footer>
+<footer>Roleta · Sorteador local — nenhum resultado é enviado para servidores. <a href="/simples/">Digitalizar roleta</a></footer>
 </div>
 <dialog id="historyDialog" class="history-dialog" aria-labelledby="historyHeading">
  <div class="dialog-head"><div><span class="eyebrow">NESTE DISPOSITIVO</span><h2 id="historyHeading">Histórico de sorteios</h2></div><button type="button" class="close" id="closeHistory" aria-label="Fechar histórico">×</button></div>

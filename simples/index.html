@@ -1,23 +1,19 @@
 <!doctype html>
 <html lang="pt-BR"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b2543">
-<title>Roleta Simples | Caminhos da Lapa</title>
-<meta name="description" content="Fotografe, confira e compartilhe a roleta do empreendimento.">
+<meta name="theme-color" content="#102e47">
+<title>Roleta | Caminhos da Lapa</title>
+<meta name="description" content="Sorteie os números, digitalize a folha e confira sua roleta.">
 <link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/simples/simple.css">
-</head><body class="roleta-simple">
+</head><body class="roleta-simple simple-screen-entry">
 <main class="simple-shell">
-<header class="simple-header"><div><span class="simple-kicker">CAMINHOS DA LAPA</span><h1>Roleta Simples</h1><p>Fotografe, confira e compartilhe.</p></div><div class="simple-links"><a href="/sorteador/" class="simple-sort-link">● Abrir sorteador</a><a href="/" class="simple-back">Intelligence V3 ↗</a></div></header>
-<nav class="simple-steps" aria-label="Etapas"><span data-step="1" class="active">1 · Foto</span><span data-step="2">2 · Conferir</span><span data-step="3">3 · Finalizar</span></nav>
-<div id="simpleNotice" class="simple-notice" role="status" aria-live="polite">Comece tirando uma foto da roleta ou escolhendo uma imagem da galeria.</div>
-<section id="simpleIntake" aria-label="Preparar roleta"></section>
-<footer class="simple-footer">A conferência humana é obrigatória. Impressão e compartilhamento não enviam dados ao Supabase.</footer>
+<header class="simple-header"><a class="simple-brand" href="/simples/" aria-label="Roleta, início"><span class="simple-kicker">CAMINHOS DA LAPA</span><span class="simple-brand-name">Roleta<span class="simple-brand-dot">.</span></span></a><div class="simple-links"><a href="/" class="simple-back">Painel Intelligence</a><button type="button" id="simpleMenuButton" class="simple-back" hidden>Menu principal</button></div></header>
+<section id="simpleEntry" class="simple-entry" aria-labelledby="entryTitle">
+<div class="simple-entry-copy simple-login-card"><a class="simple-login-brand" href="/simples/" aria-label="Roleta, início">Roleta<span>.</span></a><span class="simple-login-location">CAMINHOS DA LAPA</span><h1 id="entryTitle">Bem-vindo à Roleta</h1><p>Sorteie os números e prepare a folha da sua equipe.</p><a id="simpleLogin" class="simple-primary simple-google-button" href="/api/auth/google/start?returnTo=%2Fsimples%2F"><img src="/assets/google-g.png" alt="" width="24" height="24"><span>Continuar com Google</span></a><p id="simpleSessionStatus" class="simple-access-note" role="status">Verificando seu acesso…</p><button id="simpleRetry" type="button" class="simple-back" hidden>Verificar acesso novamente</button><button id="simpleLocalTest" type="button" class="simple-back" hidden>Abrir interface para teste local</button><div class="simple-login-bottom">Seu acesso é feito com a conta Google autorizada.</div></div>
+</section>
+<section id="simpleHome" class="simple-home" hidden aria-labelledby="homeTitle"><span class="simple-kicker">SEU DIA, ORGANIZADO</span><h1 id="homeTitle">O que vamos fazer?</h1><p id="simpleUser" class="simple-home-subtitle"></p><div class="simple-activity-grid"><a class="simple-activity" href="/sorteador/"><span class="simple-activity-label">01 · SORTEIO</span><h2>Sortear números</h2><p>Defina a quantidade e sorteie as bolinhas, uma por vez.</p><span class="simple-activity-action">Abrir sorteador →</span></a><a class="simple-activity" href="#digitalizar"><span class="simple-activity-label">02 · FOLHA</span><h2>Digitalizar roleta</h2><p>Envie a foto, confira os participantes e prepare a folha final.</p><span class="simple-activity-action">Começar pela foto →</span></a></div><p class="simple-home-note">Já fez o sorteio na folha? Comece pela digitalização.</p></section>
+<div id="simpleWorkflow" hidden><div class="simple-workflow-heading"><span class="simple-kicker">DIGITALIZAR ROLETA</span><h1>Da foto à folha pronta.</h1></div><div class="simple-progress"><p id="simpleStepLabel">Etapa 1 de 4 · Foto da folha</p><progress id="simpleStepProgress" max="4" value="1" aria-labelledby="simpleStepLabel"></progress></div><div id="simpleNotice" class="simple-notice" role="status" aria-live="polite">Tire uma foto ou escolha uma imagem da galeria.</div><section id="simpleIntake" aria-label="Preparar roleta"></section></div>
+<footer class="simple-footer">Caminhos da Lapa · A conferência da folha é sempre feita por você.</footer>
 </main>
-<script src="/intake-normalization.js" defer></script>
-<script src="/gemini-intake-converter.js" defer></script>
-<script src="/gemini-review-bridge.js" defer></script>
-<script src="/photo-prepare.js" defer></script>
-<script src="/gemini-draft-ui.js" defer></script>
-<script src="/roulette-intake.js" defer></script>
-<script src="/simples/simple.js" defer></script>
+<script src="/intake-normalization.js" defer></script><script src="/gemini-intake-converter.js" defer></script><script src="/gemini-review-bridge.js" defer></script><script src="/photo-prepare.js" defer></script><script src="/gemini-draft-ui.js" defer></script><script src="/roulette-intake.js" defer></script><script src="/simples/simple.js" defer></script>
 </body></html>

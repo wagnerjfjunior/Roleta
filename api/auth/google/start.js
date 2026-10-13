@@ -7,7 +7,8 @@ module.exports=async(req,res)=>{
  const state=crypto.randomBytes(24).toString('base64url');
  const verifier=crypto.randomBytes(32).toString('base64url');
  const challenge=crypto.createHash('sha256').update(verifier).digest('base64url');
- const flow=a.seal({typ:'oauth',state,verifier,exp:Date.now()+a.MAX_FLOW*1000});
+ const returnTo=req.query?.returnTo==='/simples/'?'/simples/':'/#nova-roleta';
+ const flow=a.seal({typ:'oauth',state,verifier,returnTo,exp:Date.now()+a.MAX_FLOW*1000});
  res.setHeader('Set-Cookie',a.cookie(a.FLOW,flow,a.MAX_FLOW));
  const q=new URLSearchParams({client_id:cfg.clientId,redirect_uri:cfg.redirectUri,response_type:'code',scope:'openid email',state,code_challenge:challenge,code_challenge_method:'S256',prompt:'select_account'});
  return res.redirect(302,'https://accounts.google.com/o/oauth2/v2/auth?'+q.toString());
