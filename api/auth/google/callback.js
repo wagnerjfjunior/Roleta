@@ -17,6 +17,6 @@ module.exports=async(req,res)=>{
  if(u.email_verified!==true||!u.sub||!a.allowed().has(email))return res.status(403).send('Conta Google não autorizada para a Roleta.');
  const signed=a.seal({typ:'session',email,sub:u.sub,exp:Date.now()+a.MAX_SESSION*1000});
  res.setHeader('Set-Cookie',[a.clearFlow(),a.cookie(a.COOKIE,signed,a.MAX_SESSION)]);
- return res.redirect(302,a.site()+'/#nova-roleta');
+ return res.redirect(302,a.site()+(p.returnTo==='/simples/'?'/simples/':'/#nova-roleta'));
  }catch{return res.status(502).send('Não foi possível concluir o login Google. Tente novamente.');}
 };

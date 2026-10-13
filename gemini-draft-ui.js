@@ -69,9 +69,9 @@ async function mount(host){
  function canSend(){return !!selected&&confirmation.checked&&!!googleSession&&!busy&&!preparing;}
  function refreshSend(){
    send.disabled=!canSend();
-   remove.disabled=busy;
-   article.querySelector('[data-photo-camera]').disabled=busy;
-   article.querySelector('[data-photo-gallery]').disabled=busy;
+   remove.disabled=busy||preparing;
+   article.querySelector('[data-photo-camera]').disabled=busy||preparing;
+   article.querySelector('[data-photo-gallery]').disabled=busy||preparing;
  }
  function resetPhoto(){
    photoGeneration++;preparing=false;
@@ -127,6 +127,29 @@ async function mount(host){
      photoStatus.innerHTML='<strong>ENVIO NÃO CONCLUÍDO</strong><div>'+escapeHtml(e.message||e)+'</div>';
      progressBox.hidden=true;
    }finally{busy=false;refreshSend();}
+ });
+ // Rotation is requested by the simplified UX and changes the actual upload file.
+ article.addEventListener('click',async event=>{
+   const button=event.target.closest('[data-photo-rotate]');
+   if(!button||!selected||busy||preparing)return;
+   preparing=true;refreshSend();button.disabled=true;
+   const generation=photoGeneration;
+   let bitmap;
+   try{
+     bitmap=await createImageBitmap(selected);
+     const canvas=document.createElement('canvas');canvas.width=bitmap.height;canvas.height=bitmap.width;
+     const context=canvas.getContext('2d');if(!context)throw Error('Não foi possível girar a foto.');
+     context.translate(canvas.width,0);context.rotate(Math.PI/2);context.drawImage(bitmap,0,0);
+     const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.9));
+     if(!blob)throw Error('Não foi possível girar a foto.');
+     if(generation!==photoGeneration)return;
+     preparing=false;
+     await setPhoto(new File([blob],'roleta-girada.jpg',{type:'image/jpeg'}));
+   }catch(error){
+     if(generation===photoGeneration)photoStatus.textContent='Não foi possível girar a foto. Tente novamente ou escolha outra imagem.';
+   }finally{
+     bitmap?.close();if(generation===photoGeneration){preparing=false;refreshSend();}button.disabled=false;
+   }
  });
  remove.addEventListener('click',()=>{
    if(busy)return;

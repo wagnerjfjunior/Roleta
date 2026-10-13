@@ -71,3 +71,68 @@
 .roleta-simple .simple-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .roleta-simple .simple-sort-link{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;min-height:42px;border-radius:11px;text-decoration:none;background:#155da3;color:white;font-size:13px;font-weight:850}
 @media(max-width:640px){.roleta-simple .simple-links{width:100%}.roleta-simple .simple-links a{flex:1;text-align:center}}
+
+/* UX trial: scoped to /simples/, existing operational modules remain authoritative. */
+.roleta-simple{--simple-blue:#163d56;--simple-ink:#163348;background:#f5f6f3!important}
+.roleta-simple .simple-shell{max-width:1240px;padding:32px 40px 60px}
+.roleta-simple .simple-header{align-items:center;margin-bottom:54px}
+.roleta-simple .simple-brand{text-decoration:none;color:#163348}
+.roleta-simple .simple-brand-name{display:block;font-size:32px;letter-spacing:-.06em;font-weight:850;line-height:1}
+.roleta-simple .simple-brand-dot{color:#268064}
+.roleta-simple .simple-kicker{color:#517064;font-size:11px;letter-spacing:.12em}
+.roleta-simple .simple-back{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 15px;border-radius:10px;background:transparent;color:#314f61}
+.roleta-simple .simple-entry{display:grid;grid-template-columns:1.15fr 1fr;gap:64px;align-items:center;padding:28px 0 50px}
+.roleta-simple .simple-entry h1{font-size:clamp(38px,5vw,64px);font-weight:750;line-height:1.08;letter-spacing:-.055em;color:#15384f;margin:20px 0 24px}
+.roleta-simple .simple-entry-copy>p{font-size:18px;line-height:1.65;color:#5b6c71;max-width:470px;margin:0 0 30px}
+.roleta-simple .simple-primary{display:inline-flex;align-items:center;justify-content:center;padding:18px 28px;min-height:56px;border-radius:12px;background:#183f56;color:#fff;text-decoration:none;font-size:16px;font-weight:750;box-shadow:0 8px 18px #15384f15}
+.roleta-simple .simple-entry-copy .simple-access-note{font-size:13px;margin:15px 0;line-height:1.5}
+.roleta-simple .simple-entry-guide{background:#e8eeea;border:1px solid #dae4dc;border-radius:24px;padding:38px}
+.roleta-simple .simple-entry-guide h2{font-size:29px;line-height:1.22;letter-spacing:-.035em;margin:18px 0 30px;color:#15384f}
+.roleta-simple .simple-entry-guide ol{padding:0;margin:0;list-style:none;display:grid;gap:25px}
+.roleta-simple .simple-entry-guide li{display:flex;gap:20px;align-items:flex-start}
+.roleta-simple .simple-entry-guide li>span{color:#39775f;font-weight:750;font-size:13px;line-height:24px}
+.roleta-simple .simple-entry-guide strong{font-size:16px;color:#25473c}
+.roleta-simple .simple-entry-guide li p{margin:5px 0 0;font-size:14px;line-height:1.5;color:#61746a}
+.roleta-simple .simple-guide-note{font-size:12px;color:#61746a;border-top:1px solid #cedbd2;padding-top:20px;margin:30px 0 0}
+.roleta-simple .simple-home h1,.roleta-simple .simple-workflow-heading h1{font-size:clamp(30px,4vw,44px);letter-spacing:-.045em;line-height:1.15;color:#173b51;margin:14px 0}
+.roleta-simple .simple-home-subtitle{color:#697c85;font-size:14px;overflow-wrap:anywhere}
+.roleta-simple .simple-activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:34px}
+.roleta-simple .simple-activity{padding:34px;background:#fff;border:1px solid #dce5e2;border-radius:20px;text-decoration:none;color:#15384f;transition:border-color .15s,box-shadow .15s}
+.roleta-simple .simple-activity:hover{border-color:#8eb39f;box-shadow:0 8px 24px #15384f0d}
+.roleta-simple .simple-activity-label{font-size:11px;color:#437c65;font-weight:800;letter-spacing:.09em}
+.roleta-simple .simple-activity h2{font-size:28px;letter-spacing:-.04em;margin:23px 0 12px;color:#15384f}
+.roleta-simple .simple-activity p{line-height:1.6;color:#60747e;max-width:350px}
+.roleta-simple .simple-activity-action{display:block;font-size:14px;font-weight:750;color:#216549;margin-top:32px}
+.roleta-simple .simple-home-note{color:#677b74;font-size:13px;margin:22px 0 55px}
+.roleta-simple .simple-workflow-heading{margin-bottom:24px}
+.roleta-simple .simple-steps{grid-template-columns:repeat(4,minmax(0,1fr))}
+.roleta-simple .simple-steps .active{background:#173f56}
+.roleta-simple .simple-photo-card>.section-head:first-child .eyebrow,.roleta-simple [data-photo-meta],.roleta-simple .simple-photo-card>[data-photo-status]{display:none}
+.roleta-simple .simple-photo-card [data-photo-camera]::before,.roleta-simple .simple-photo-card [data-photo-gallery]::before{content:none}
+.roleta-simple .simple-show-manual .simple-manual-import,.roleta-simple .simple-show-manual .rlt-technical-backup{display:block!important}
+.roleta-simple #rltStatSubmit,.roleta-simple #rltStatStatus{display:revert!important}
+.roleta-simple #rltStatSubmit[hidden],.roleta-simple #rltStatStatus[hidden]{display:none!important}
+.roleta-simple .simple-photo-card>[data-photo-status].blocked{display:block}
+.roleta-simple .simple-review-tools{display:flex;justify-content:space-between;gap:12px;position:sticky;top:0;background:#fff;padding:12px 0;z-index:3}
+.roleta-simple .simple-photo-reference{background:#f0f3ef;padding:14px;border-radius:14px;border:1px solid #d8e1d8;overflow:auto;max-height:70vh}
+.roleta-simple .simple-photo-reference h3{margin:0 0 10px;font-size:15px}
+.roleta-simple .simple-reference-controls{display:flex;gap:8px;margin-bottom:12px}
+.roleta-simple .simple-reference-controls button{font-size:12px!important;min-height:40px!important;padding:8px 12px}
+.roleta-simple .simple-photo-reference img{display:block;width:100%;height:auto;max-width:none}
+.roleta-simple .simple-reference-zoom img{width:180%}
+.roleta-simple .simple-human-review{margin-top:0!important}
+.roleta-simple [data-simple-phase="2"] .simple-photo-card>[data-photo-review],.roleta-simple [data-simple-phase="3"] .simple-photo-card,.roleta-simple [data-simple-phase="4"] .simple-photo-card{display:none!important}
+.roleta-simple .rlt-line-verified{background:#eef8ef!important;border-color:#b6d7bd!important}
+.roleta-simple :is(a,button,input,select,summary):focus-visible{outline:3px solid #27835f;outline-offset:4px}
+@media(min-width:1000px){
+.roleta-simple .simple-with-reference [data-gemini-detail]{display:inline-block;vertical-align:top;width:calc(58% - 20px);margin-left:20px;max-height:75vh;overflow:auto;padding-right:8px}
+.roleta-simple .simple-with-reference .simple-photo-reference{display:inline-block;vertical-align:top;width:42%;position:sticky;top:80px;box-sizing:border-box}
+.roleta-simple .simple-with-reference .rlt-five-column-table{min-width:480px}
+}
+@media(max-width:700px){
+.roleta-simple .simple-shell{padding:22px 18px 42px}.roleta-simple .simple-header{flex-direction:row;align-items:center;margin-bottom:28px}.roleta-simple .simple-brand-name{font-size:27px}.roleta-simple .simple-header .simple-links{width:auto}.roleta-simple .simple-header .simple-back{font-size:11px;padding:8px 10px;min-height:40px}.roleta-simple .simple-entry{grid-template-columns:1fr;gap:28px;padding:10px 0 20px}.roleta-simple .simple-entry h1{font-size:43px}.roleta-simple .simple-entry-copy>p{font-size:16px;margin-bottom:24px}.roleta-simple .simple-primary{width:100%;box-sizing:border-box}.roleta-simple .simple-entry-guide{padding:25px;border-radius:18px}.roleta-simple .simple-entry-guide h2{font-size:25px}.roleta-simple .simple-activity-grid{grid-template-columns:1fr;gap:16px;margin-top:24px}.roleta-simple .simple-activity{padding:26px}.roleta-simple .simple-activity h2{font-size:25px;margin-top:16px}.roleta-simple .simple-activity-action{margin-top:22px}.roleta-simple .simple-steps{gap:5px}.roleta-simple .simple-steps span{font-size:11px;padding:11px 2px}.roleta-simple .simple-review-tools{gap:7px}.roleta-simple .simple-review-tools button{font-size:12px!important;flex:1;padding:8px!important}.roleta-simple .simple-photo-reference{position:sticky;top:72px;max-height:34vh;z-index:2;margin-bottom:16px;box-shadow:0 8px 16px #173b5112}.roleta-simple .simple-photo-reference h3{display:none}.roleta-simple .simple-reference-controls{position:sticky;top:0;background:#f0f3ef;padding-bottom:6px}.roleta-simple .simple-footer{text-align:left}
+}
+@media(prefers-reduced-motion:reduce){.roleta-simple *{scroll-behavior:auto!important;transition:none!important}}
+.roleta-simple [data-simple-phase="4"] #rltv2ReviewCard{display:none!important}
+.roleta-simple #rltStatSubmit{grid-column:1/-1;margin-top:12px}
+.roleta-simple .simple-output-note{font-size:13px;line-height:1.6;color:#65796e}
