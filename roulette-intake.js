@@ -599,6 +599,7 @@
       print.disabled=true;
       savePdf.disabled=true;sharePdf.disabled=true;
       if(confirm.checked&&reviewedPayload){
+        host.dispatchEvent(new CustomEvent('roleta-final-confirmed',{detail:clonePayload(reviewedPayload)}));
         pdfStatus.textContent='Gerando PDF...';
         preparePdf(pdfVersion);
       }else pdfStatus.textContent='Confirme a folha final para preparar o PDF.';

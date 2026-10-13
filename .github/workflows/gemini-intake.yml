@@ -7,6 +7,7 @@ on:
       - 'gemini-intake-converter.js'
       - 'gemini-draft-ui.js'
       - 'intake-normalization.js'
+      - 'ocr-learning.js'
       - 'reconciliation/identity.js'
       - 'photo-prepare.js'
       - 'styles.css'
@@ -39,6 +40,8 @@ jobs:
       - run: node --check scripts/local-pdf-server.cjs
       - run: npm install --no-package-lock --ignore-scripts
       - run: node --check gemini-intake-converter.js
+      - run: node --check ocr-learning.js
+      - run: node --test tests/ocr-learning.test.cjs tests/ocr-learning-ui.test.cjs
       - run: node tests/gemini-intake-converter.test.cjs
       - run: node tests/intake-normalization.test.cjs
       - run: node tests/roleta-ocr-relay.test.cjs
