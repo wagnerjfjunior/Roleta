@@ -1,0 +1,201 @@
+(function(){
+'use strict';
+const engine=window.RoletaSorteadorEngine;
+const $=id=>document.getElementById(id);
+const STORAGE='roleta-sorteador-historico-v1';
+const MAX_RECORDS=100;
+let records=[],current=null,busy=false,revealTimer=null;
+const fmt=new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'medium'});
+function formatDate(value){try{return fmt.format(new Date(value));}catch{return 'Data indisponível';}}
+function showError(message){$('drawHint').textContent=message;$('drawHint').classList.add('error');}
+function clearError(){$('drawHint').classList.remove('error');}
+function readRecords(){
+ try{
+  const raw=JSON.parse(localStorage.getItem(STORAGE)||'[]');
+  if(!Array.isArray(raw))throw Error('Formato inválido');
+  return raw.filter(r=>{
+   try{
+    if(typeof r.id!=='string'||typeof r.createdAt!=='string')return false;
+    engine.remaining(r.total,r.draws);
+    return r.draws.every((d,i)=>d.position===i+1&&Number.isFinite(Date.parse(d.at)));
+   }catch{return false;}
+  }).slice(0,MAX_RECORDS);
+ }catch{
+  return [];
+ }
+}
+function persist(nextRecords){
+ try{localStorage.setItem(STORAGE,JSON.stringify(nextRecords));records=nextRecords;return true;}
+ catch{
+  alert('O navegador não conseguiu salvar o histórico local. Verifique o armazenamento antes de sortear.');
+  return false;
+ }
+}
+function canRun(){
+ if(!engine||typeof crypto==='undefined'||typeof crypto.getRandomValues!=='function'){
+  $('startForm').querySelector('button[type=submit]').disabled=true;
+  $('total').disabled=true;
+  $('setup').querySelector('small').textContent='Este navegador não oferece aleatoriedade criptográfica segura. Utilize um navegador atualizado em localhost ou HTTPS.';
+  return false;
+ }
+ try{const key='roleta-sorteador-teste';localStorage.setItem(key,'1');localStorage.removeItem(key);return true;}
+ catch{
+  $('startForm').querySelector('button[type=submit]').disabled=true;
+  $('setup').querySelector('small').textContent='Histórico local indisponível. Autorize o armazenamento deste site no navegador.';
+  return false;
+ }
+}
+function countText(n){return n===1?'1 bolinha':n+' bolinhas';}
+function showSession(record){
+ if(revealTimer){clearTimeout(revealTimer);revealTimer=null;}
+ busy=false;current=record;
+ $('setup').hidden=true;$('session').hidden=false;
+ $('sessionLabel').textContent=record.total+' corretores · '+(record.draws.length===record.total?'Concluído':'Em andamento');
+ $('sessionTime').textContent='Iniciado em '+formatDate(record.createdAt);
+ renderSession(true);
+}
+function drawPool(){
+ const pool=engine.remaining(current.total,current.draws);
+ const arena=$('arena');
+ const fragment=document.createDocumentFragment();
+ for(const n of pool){
+  const b=document.createElement('span');
+  b.className='ball';
+  b.textContent=String(n);
+  b.setAttribute('aria-hidden','true');
+  const i=n-1,ring=Math.sqrt((i+.5)/current.total);
+  const angle=i*2.399963229728653;
+  // Distribuição visual fixa e reproduzível; não interfere no sorteio.
+  const x=50+ring*45*Math.cos(angle);
+  const y=50+ring*38*Math.sin(angle);
+  b.style.setProperty('--x',x.toFixed(3)+'%');
+  b.style.setProperty('--y',y.toFixed(3)+'%');
+  b.style.setProperty('--i',String(i%7));
+  fragment.appendChild(b);
+ }
+ arena.replaceChildren(fragment);
+ $('poolLabel').textContent=countText(pool.length)+' na urna';
+}
+function renderSession(resetWinner){
+ if(!current)return;
+ const drawn=current.draws.length,total=current.total;
+ $('sessionLabel').textContent=total+' corretores · '+(drawn===total?'Concluído':'Em andamento');
+ $('progressText').textContent=drawn+' de '+total+' sorteadas';
+ $('remainingText').textContent=countText(total-drawn)+' restantes';
+ $('progressFill').style.width=(100*drawn/total)+'%';
+ $('progressBar').setAttribute('aria-valuenow',String(Math.round(100*drawn/total)));
+ $('resultCount').textContent=drawn+' de '+total;
+ const list=$('sequence');const fragment=document.createDocumentFragment();
+ current.draws.forEach(entry=>{
+  const li=document.createElement('li');li.className='sequence-item';
+  const position=document.createElement('span');position.className='position';position.textContent=entry.position+'ª posição';
+  const number=document.createElement('strong');number.className='sequence-number';number.textContent=entry.number;
+  const time=document.createElement('time');time.dateTime=entry.at;time.textContent=new Date(entry.at).toLocaleTimeString('pt-BR');
+  li.append(position,number,time);fragment.appendChild(li);
+ });
+ list.replaceChildren(fragment);
+ $('emptySequence').hidden=drawn>0;
+ drawPool();
+ const button=$('drawButton');
+ button.disabled=busy||drawn===total;
+ button.textContent=drawn===total?'Sorteio concluído':'Sortear bolinha →';
+ if(resetWinner){
+  $('winner').classList.remove('revealing');
+  if(drawn){
+   const last=current.draws[drawn-1];
+   $('winnerCaption').textContent=drawn===total?'Última bolinha sorteada':'Bolinha sorteada';
+   $('winnerNumber').textContent=last.number;
+   $('winnerPosition').textContent=last.position+'ª posição física';
+  }else{
+   $('winnerCaption').textContent='Pronto para sortear';
+   $('winnerNumber').textContent='?';
+   $('winnerPosition').textContent='Aguardando a primeira posição';
+  }
+  clearError();
+  $('drawHint').textContent=drawn===total?'Sequência completa. O histórico foi salvo neste navegador.':'Cada clique revela uma bolinha ainda não sorteada.';
+ }
+}
+function draw(){
+ if(!current||busy||current.draws.length>=current.total)return;
+ const number=engine.next(current.total,current.draws,crypto);
+ const position=current.draws.length+1;
+ const entry={position,number,at:new Date().toISOString()};
+ const updated={...current,draws:[...current.draws,entry]};
+ const next=records.map(r=>r.id===updated.id?updated:r);
+ if(!persist(next))return;
+ current=updated;busy=true;
+ $('drawButton').disabled=true;
+ $('winner').classList.remove('revealing');
+ $('winnerCaption').textContent='Sorteando para a posição '+position;
+ $('winnerNumber').textContent='●';
+ $('winnerPosition').textContent='Aguarde a revelação';
+ $('drawHint').textContent='Bolinha selecionada com aleatoriedade criptográfica.';
+ $('arena').classList.add('speed-up');
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ revealTimer=setTimeout(()=>{
+  revealTimer=null;
+  $('arena').classList.remove('speed-up');
+  busy=false;
+  renderSession(false);
+  $('winner').classList.add('revealing');
+  $('winnerCaption').textContent='Bolinha sorteada';
+  $('winnerNumber').textContent=number;
+  $('winnerPosition').textContent=position+'ª posição física';
+  $('drawHint').textContent=current.draws.length===current.total?'Sorteio finalizado. Todos os números estão registrados abaixo.':'Clique novamente para a próxima posição.';
+  clearError();
+ },reduced?0:1100);
+}
+function start(total){
+ if(current&&current.draws.length<current.total){
+  if(!confirm('O sorteio atual ainda não terminou. Deseja iniciar outro? O parcial continuará no histórico local.'))return;
+ }
+ const record={id:crypto.randomUUID?crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint32Array(4))).join('-'),createdAt:new Date().toISOString(),total,draws:[]};
+ if(!persist([record,...records].slice(0,MAX_RECORDS)))return;
+ showSession(record);
+}
+function renderHistory(){
+ const host=$('historyList');host.replaceChildren();
+ if(records.length===0){const p=document.createElement('p');p.className='empty';p.textContent='Ainda não há sorteios neste navegador.';host.appendChild(p);return;}
+ for(const r of records){
+  const row=document.createElement('article');row.className='history-row';
+  const heading=document.createElement('div');heading.className='history-row-heading';
+  const label=document.createElement('strong');label.textContent=r.total+' corretores · '+r.draws.length+'/'+r.total+(r.draws.length===r.total?' concluído':' parcial');
+  const date=document.createElement('small');date.textContent=formatDate(r.createdAt);
+  heading.append(label,date);
+  const seq=document.createElement('p');seq.textContent=r.draws.length?r.draws.map(d=>d.position+'ª: '+d.number).join(' · '):'Nenhuma bolinha sorteada';
+  const action=document.createElement('button');action.type='button';action.className='history-open';action.textContent=r.draws.length===r.total?'Ver resultado':'Continuar sorteio';
+  action.addEventListener('click',()=>{if(busy)return;showSession(r);$('historyDialog').close();});
+  row.append(heading,seq,action);host.appendChild(row);
+ }
+}
+function openHistory(){renderHistory();$('historyDialog').showModal();}
+$('startForm').addEventListener('submit',event=>{
+ event.preventDefault();
+ if(!canRun())return;
+ try{start(engine.assertTotal(Number($('total').value)));}
+ catch(e){alert(e.message);}
+});
+$('drawButton').addEventListener('click',()=>{
+ try{draw();}catch(e){showError(e.message||'Não foi possível sortear.');}
+});
+$('newButton').addEventListener('click',()=>{
+ if(busy)return;
+ if(current&&current.draws.length<current.total&&!confirm('Deseja sair deste sorteio parcial? Ele ficará no histórico local.'))return;
+ current=null;$('session').hidden=true;$('setup').hidden=false;
+ $('total').focus();
+});
+$('historyButton').addEventListener('click',openHistory);
+$('closeHistory').addEventListener('click',()=>$('historyDialog').close());
+$('doneHistory').addEventListener('click',()=>$('historyDialog').close());
+$('clearHistory').addEventListener('click',()=>{
+ if(records.length===0)return;
+ if(!confirm('Apagar todos os sorteios armazenados neste navegador? Esta ação não pode ser desfeita.'))return;
+ if(!persist([]))return;
+ current=null;$('session').hidden=true;$('setup').hidden=false;renderHistory();
+});
+records=readRecords();
+if(canRun()){
+ const latest=records[0];
+ if(latest&&latest.draws.length<latest.total)showSession(latest);
+}
+})();
