@@ -4,8 +4,8 @@ const {Pool}=require('pg');
 const core=require('../server/secure-draw-core.cjs');
 let pool;
 function database(){
- if(!process.env.SORTEADOR_DATABASE_URL)throw Error('Banco do Sorteador Oficial não configurado.');
- if(!pool)pool=new Pool({connectionString:process.env.SORTEADOR_DATABASE_URL,max:3,connectionTimeoutMillis:4000,idleTimeoutMillis:10000,statement_timeout:8000});
+ if(!process.env.SORTEADOR_DATABASE_DATABASE_URL)throw Error('Banco do Sorteador Oficial não configurado.');
+ if(!pool)pool=new Pool({connectionString:process.env.SORTEADOR_DATABASE_DATABASE_URL,max:3,connectionTimeoutMillis:4000,idleTimeoutMillis:10000,statement_timeout:8000});
  return pool;
 }
 function key(){const value=process.env.SORTEADOR_ED25519_PRIVATE_KEY; if(!value)throw Error('Chave de assinatura não configurada.');return value.replace(/\\n/g,'\n');}
@@ -94,7 +94,7 @@ module.exports=async function handler(req,res){
    if(!receipt||typeof receipt!=='object'||!receipt.payload||typeof receipt.payload!=='object')return respond(res,400,{error:'Comprovante inválido.'});
    return respond(res,200,{valid:core.verify(receipt.payload,receipt.signature,core.publicKey(key())),algorithm:'Ed25519'});
   }
-  if(!process.env.SORTEADOR_DATABASE_URL||!process.env.SORTEADOR_ED25519_PRIVATE_KEY||!process.env.SORTEADOR_OPERATOR_KEYS_JSON)return respond(res,503,{error:'Sorteador Oficial ainda não ativado. Falta configuração segura no servidor.'});
+  if(!process.env.SORTEADOR_DATABASE_DATABASE_URL||!process.env.SORTEADOR_ED25519_PRIVATE_KEY||!process.env.SORTEADOR_OPERATOR_KEYS_JSON)return respond(res,503,{error:'Sorteador Oficial ainda não ativado. Falta configuração segura no servidor.'});
   const operator=core.identifyOperator(req.headers.authorization,process.env.SORTEADOR_OPERATOR_KEYS_JSON);
   if(!operator)return respond(res,401,{error:'Acesso negado.'});
   const client=await database().connect();
