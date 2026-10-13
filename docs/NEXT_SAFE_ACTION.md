@@ -1,3 +1,5 @@
+> **OCR.space ATIVO — 13/10/2026:** PR #110 / main funcional `83004c8`, Vercel READY, Make 6549955 ativo com 19 → 27 → 30 OCR → 31 JSON → 32/29 Resume → 13 resposta. 247 testes e LAB de dois erros aprovados. Próxima ação: observar fotografia real e conferência, sem provocar falhas em produção. Ler `sfjm/OCR_SPACE_THIRD_OPTION_2026-10-13.md`; pedidos anteriores de publicar/ativar são históricos.
+
 > **OCR.space terceira opção — 13/10/2026:** implementação/teste isolado aprovados (247 testes); ler `sfjm/OCR_SPACE_THIRD_OPTION_2026-10-13.md`. Publicar backend antes de ativar o novo handler. UX publicada na PR #109; iterações locais anteriores são históricas.
 
 > **FALLBACK TESTADO — 13/10/2026:** LAB 6610742 executou erro provocado no 3.8 → 3.6 → Resume → retorno JSON, sucesso em 16,6 s (execução 4c6f7035f2704f2daa099d88f08a53fc). LAB desativado para liberar vaga; produção segue ativa. Precisão e retorno HTTP no app continuam sujeitos à conferência/observação real. Ler `sfjm/MAKE_GEMINI_MODEL_FALLBACK_AND_OCR_LEARNING_2026-10-12.md`. Proposta de aprendizado OCR ainda não implementada.

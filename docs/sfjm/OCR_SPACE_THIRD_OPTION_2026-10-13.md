@@ -1,5 +1,7 @@
 # OCR.space como terceira opção — 13/10/2026
 
+**Estado atual: backend publicado e terceiro fallback ativo.** PR #110, main funcional `83004c8729968f86002a48d5dbcb0e3eedee004a`, deployment `dpl_DwmFiumd1R4yQAqtDqTCYR6TeJJD` READY. Make 6549955 ativo, lastEdit `2026-10-13T15:47:52.174Z`. A seção de implantação abaixo registra a ordem utilizada; não é uma pendência de ativação.
+
 ## Decisão e diagnóstico
 
 Operador autorizou Gemini 3.8 → Gemini 3.6 → OCR.space, sem Gemini interpretar o terceiro retorno. Base main `34cde4ee1474be3bdcc5a98c7046210d6e17a981` (UX publicada na PR #109, deployment `dpl_EAXPYDCvZCCSy9WEZXuGfjv3eKAo` READY).
@@ -27,3 +29,14 @@ Isso não é benchmark de manuscritos; fotos reais podem exigir correções exte
 ## Implantação
 
 Publicar backend compatível primeiro. Depois acrescentar Resume após 27 e handler OCR do 27, com serialização JSON e Resume do OCR para 27. Preservar shadow 26. Verificar cenário ativo/referências/retorno. Não injetar erros na produção nem gravar roleta fictícia. Primeiro envio real após ativação depende da observação do operador.
+
+## Estado final verificado
+
+- Código: 247 testes locais e 6 checks GitHub de segurança/regressão aprovados; parser incluído no CI Gemini intake safety.
+- Make: 19 → erro/27 → erro/30 OCR.space com overlay → 31 TransformToJSON → 32 Resume de 27 → 29 Resume de 19 → 13 Webhook Response. Resumo direto do 3.6: 27 → 29 → 13. Rota shadow 26 preservada, sem integração à base final.
+- Módulos 30/31/32 verificados após salvamento, reaproveitando a conexão OCR.space existente. O destino do upload e a chave permanecem no Make; nada foi exposto ao navegador.
+- Produção: UI publicada idêntica à main; endpoint OCR carregou o novo parser e recusou POST anônimo com 401. Nenhuma foto foi enviada ao Make por essa verificação de autenticação.
+- LAB 6610742 desativado após o teste para liberar vaga.
+- Próxima ação operacional: operador enviar uma fotografia real, conferir identificação da alternativa quando os Gemini falharem e revisar campos/participantes. Não se induziram falhas nos Gemini de produção nem se gravou evento fictício.
+
+Rollback: reverter a PR #110 exige antes desconectar o handler OCR do 27 (30/31/32), pois o backend antigo não aceita o envelope. Manter Resume 29 para preservar retorno do 3.6. Só depois reverter o código. Remover/alterar a rota shadow não faz parte desta entrega.
