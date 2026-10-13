@@ -23,7 +23,7 @@ function create(arena){
   // Coordenadas e velocidades apenas visuais; escolha real ocorre no engine separado.
   const a=((index*137.508+19)%360)*Math.PI/180;
   const ring=Math.sqrt((index+.6)/(count+.5));
-  const speed=125+(index%9)*12;
+  const speed=(125+(index%9)*12)*1.5; // 50% mais rápido durante toda a movimentação.
   return {n,x:width/2+Math.cos(a)*ring*(width/2-radius-4)*.86,
    y:height/2+Math.sin(a)*ring*(height/2-radius-4)*.86,
    vx:Math.cos(a+1.4)*speed,vy:Math.sin(a+1.4)*speed};
@@ -39,7 +39,7 @@ function create(arena){
   }
  }
  function step(dt){
-  const boost=fast?2.625:1; // 25% acima da aceleracao anterior (2.1).
+  const boost=fast?3.9375:1; // mais 50% na aceleracao ao clicar.
   // Integracao de pequeno passo previne atravessar paredes com velocidades altas.
   const steps=Math.min(4,Math.max(1,Math.ceil(dt/.012)));
   const h=dt/steps;
