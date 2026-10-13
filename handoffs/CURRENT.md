@@ -1,3 +1,7 @@
+## Estado atual 13/10/2026 — OCR.space terceira opção ativa
+
+PR #110 mergeada; main funcional `83004c8`; Vercel `dpl_DwmFiumd1R4yQAqtDqTCYR6TeJJD` READY. Make 6549955 ativo com fallback 3.8 → 3.6 → OCR.space e retornos Resume restaurados. 247 testes/checks verdes; LAB isolado com folha fictícia aprovado e desativado. Sem escrita estatística fictícia. Próxima ação: envio real e revisão pelo operador. Fonte: `docs/sfjm/OCR_SPACE_THIRD_OPTION_2026-10-13.md`. Registros abaixo são históricos.
+
 ## Atualização 13/10/2026 — UX e terceira opção OCR
 
 UX: PR #109 / main 34cde4e, Vercel READY. Trabalho autorizado: publicar integração OCR.space e corrigir continuidade do fallback no Make. LAB de dois erros → OCR validado, sem evento fictício. Ler `docs/sfjm/OCR_SPACE_THIRD_OPTION_2026-10-13.md`. Estados anteriores abaixo são históricos.
