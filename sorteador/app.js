@@ -177,7 +177,7 @@ function draw(){
   $('winnerCaption').textContent='Bolinha sorteada';
   $('winnerNumber').textContent=number;
   $('winnerPosition').textContent=position+'ª posição física';
-  speak('Posição '+position+'. Número '+number+'.');
+  speak(String(number));
   $('drawHint').textContent=current.draws.length===current.total?'Sorteio finalizado. Todos os números estão registrados abaixo.':'Clique novamente para a próxima posição.';
   clearError();
  },reduced?0:1100);
