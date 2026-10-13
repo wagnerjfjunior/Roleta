@@ -99,7 +99,7 @@ function drawPool(){
   const fragment=document.createDocumentFragment();
   for(const n of pool){
    const b=document.createElement('span');
-   b.className='ball';b.textContent=String(n);
+   b.className='ball';b.textContent='';
    b.setAttribute('aria-hidden','true');
    const i=n-1,ring=Math.sqrt((i+.5)/current.total),angle=i*2.399963229728653;
    b.style.setProperty('--x',(50+ring*45*Math.cos(angle)).toFixed(3)+'%');
