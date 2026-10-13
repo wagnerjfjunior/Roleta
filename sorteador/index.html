@@ -6,6 +6,7 @@
 <meta name="description" content="Sorteio transparente de bolinhas, sem repetição, com histórico local.">
 <link rel="stylesheet" href="/sorteador/style.css">
 <script src="/sorteador/engine.js" defer></script>
+<script src="/sorteador/balls.js" defer></script>
 <script src="/sorteador/app.js" defer></script>
 </head>
 <body>
@@ -30,8 +31,8 @@
  </div>
  <div class="progress-card"><div class="progress-txt"><strong id="progressText">0 de 0 sorteadas</strong><span id="remainingText">—</span></div><div class="progress-bar" role="progressbar" aria-label="Bolinhas sorteadas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div id="progressFill"></div></div></div>
  <section class="draw-card card" aria-label="Área do sorteio">
-   <div class="draw-top"><span class="live-pill"><span class="live-dot"></span> Bolinhas em movimento</span><span id="poolLabel">—</span></div>
-   <div class="arena" id="arena" aria-hidden="true"></div>
+   <div class="draw-top"><span class="live-pill"><span class="live-dot"></span> Bolinhas em movimento</span><div class="draw-options"><button type="button" id="soundToggle" class="sound-toggle" aria-pressed="false" title="Ativar anúncio de voz dos números">🔇 Som desligado</button><span id="poolLabel">—</span></div></div>
+   <div class="arena" id="arena" aria-label="Urna de bolinhas em movimento: o movimento é apenas ilustrativo"></div>
    <div id="winner" class="winner" role="status" aria-live="polite" aria-atomic="true"><div id="winnerCaption">Pronto para sortear</div><strong id="winnerNumber">?</strong><div id="winnerPosition">Aguardando a primeira posição</div></div>
    <button id="drawButton" type="button" class="draw-button">Sortear bolinha <span aria-hidden="true">→</span></button>
    <p class="draw-hint" id="drawHint">O número só é definido quando você toca em “Sortear bolinha”.</p>
