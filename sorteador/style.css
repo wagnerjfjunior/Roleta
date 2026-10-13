@@ -14,3 +14,18 @@ button:disabled{opacity:.45;cursor:not-allowed}.shell{max-width:1080px;margin:au
 .history-dialog{width:min(760px,calc(100vw - 24px));max-height:85vh;overflow:auto;background:#11253a;border:1px solid #3b607a;border-radius:20px;color:white;padding:23px;box-shadow:0 25px 100px #0009}.history-dialog::backdrop{background:#020810bb}.dialog-head h2{margin:5px 0;font-size:24px}.close{border:1px solid #527089;border-radius:10px;background:#203b52;color:#fff;font-size:28px;width:44px;height:44px}.history-list{display:grid;gap:11px;max-height:55vh;overflow:auto}.history-row{padding:14px;border:1px solid #3a5269;border-radius:13px;background:#0b1d31}.history-row-heading{display:flex;justify-content:space-between;gap:10px}.history-row small,.history-row p{color:#adc2d2;font-size:12px;line-height:1.55}.history-row p{word-break:break-word}.history-open{background:#d5f4ff;color:#0e395a;border:0;border-radius:9px;padding:9px 13px;font-weight:750}.dialog-bottom{margin-top:18px;flex-wrap:wrap}.danger{padding:11px 13px;border-radius:9px;background:transparent;color:#ffb5be;border:1px solid #9b5060}
 @media(max-width:650px){.shell{padding:14px 11px 32px}.header{gap:8px;padding-bottom:16px}.brand h1{font-size:16px}.mark{width:36px;height:36px}.header .quiet{font-size:12px;padding:7px 10px}.setup{grid-template-columns:1fr;gap:10px;padding:24px 17px}.setup h2{font-size:29px}.start-row input{width:92px;font-size:25px}.start-row .primary{padding:12px 9px;font-size:14px}.session-top h2{font-size:21px}.session-top .quiet{font-size:12px;padding:9px}.draw-card{padding:13px}.arena{height:285px;border-radius:18px}.ball{margin:-13px;width:26px;height:26px;font-size:10px}.winner{margin-top:-95px}.draw-button{min-height:65px}.results{padding:17px}.sequence{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.sequence-item{padding:10px}.sequence-number{font-size:29px}.history-dialog{padding:15px}.history-row-heading{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){.ball{animation:none!important;will-change:auto}.winner.revealing{animation:none}.progress-bar>div{transition:none}}
+
+/* Urna com colisões: desenho independente da escolha criptográfica. */
+.arena{overflow:hidden}
+.arena .balls-canvas{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none}
+.draw-options{display:flex;align-items:center;justify-content:flex-end;gap:13px;flex-wrap:wrap}
+.sound-toggle{min-height:40px;padding:8px 13px;border:1px solid #5294b5;border-radius:999px;background:#193c58;color:#eaf9ff;font-size:13px;font-weight:800;white-space:nowrap}
+.sound-toggle[aria-pressed="true"]{border-color:#60e2b5;background:#164e46;color:#dbffef}
+.sound-toggle:hover:not(:disabled){filter:brightness(1.15)}
+@media(max-width:650px){
+ .draw-top{align-items:flex-start}
+ .draw-options{gap:8px}
+ .sound-toggle{font-size:12px;min-height:38px;padding:7px 10px}
+ .draw-top #poolLabel{font-size:11px;white-space:nowrap}
+}
+@media(prefers-reduced-motion:reduce){.arena .balls-canvas{filter:none}}
