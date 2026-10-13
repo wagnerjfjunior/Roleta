@@ -42,3 +42,24 @@ test('seleção uniformemente mapeada em dominio divisivel',()=>{
   assert.equal(engine.secureIndex(5,source),i%5);
  }
 });
+
+test('modo do primeiro ao ultimo numero e inclusivo e nao repete',()=>{
+ for(const [first,last] of [[1,1],[50,80],[25,224]]){
+  const n=last-first+1,draws=[];
+  const source={getRandomValues(arr){arr[0]=((draws.length+1)*2654435761)>>>0;return arr;}};
+  for(let i=0;i<n;i++){
+   const result=engine.nextRange(first,last,draws,source);
+   assert.ok(result>=first&&result<=last);
+   draws.push({number:result,position:i+1});
+  }
+  assert.equal(new Set(draws.map(d=>d.number)).size,n);
+  assert.deepEqual(draws.map(d=>d.number).sort((a,b)=>a-b),Array.from({length:n},(_,i)=>first+i));
+  assert.throws(()=>engine.nextRange(first,last,draws,source));
+ }
+});
+test('modo intervalo bloqueia limites invalidos',()=>{
+ for(const [a,b] of [[80,50],[0,50],[1,201],[1.1,10]])assert.throws(()=>engine.assertRange(a,b));
+ assert.deepEqual(engine.assertRange(50,80),{first:50,last:80,total:31});
+ assert.throws(()=>engine.remainingRange(50,52,[{number:51},{number:51}]));
+ assert.throws(()=>engine.remainingRange(50,52,[{number:49}]));
+});
