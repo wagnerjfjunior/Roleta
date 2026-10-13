@@ -38,5 +38,26 @@
   if(pool.length===0)throw new Error('Todas as bolinhas já foram sorteadas.');
   return pool[secureIndex(pool.length,cryptoSource)];
  }
- return Object.freeze({MAX,assertTotal,secureIndex,remaining,next});
+ function assertRange(first,last){
+  if(!Number.isSafeInteger(first)||!Number.isSafeInteger(last)||first<1||last<first||last>999999)throw new RangeError('Informe o primeiro e o último número (a partir de 1).');
+  if(last-first+1>MAX)throw new RangeError('O intervalo pode ter até '+MAX+' números.');
+  return {first,last,total:last-first+1};
+ }
+ function remainingRange(first,last,draws){
+  const {total}=assertRange(first,last);
+  if(!Array.isArray(draws)||draws.length>total)throw new Error('Histórico inválido.');
+  const picked=new Set();
+  for(const entry of draws){
+   const n=Number(entry.number);
+   if(!Number.isSafeInteger(n)||n<first||n>last||picked.has(n))throw new Error('Histórico inconsistente.');
+   picked.add(n);
+  }
+  return Array.from({length:total},(_,i)=>first+i).filter(n=>!picked.has(n));
+ }
+ function nextRange(first,last,draws,cryptoSource){
+  const pool=remainingRange(first,last,draws);
+  if(!pool.length)throw new Error('Todas as bolinhas já foram sorteadas.');
+  return pool[secureIndex(pool.length,cryptoSource)];
+ }
+ return Object.freeze({MAX,assertTotal,assertRange,secureIndex,remaining,remainingRange,next,nextRange});
 });
