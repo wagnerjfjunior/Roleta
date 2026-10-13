@@ -50,4 +50,38 @@ function authorized(auth,secret){
  return crypto.timingSafeEqual(a,b);
 }
 function receipt(payload,key){return {payload,signature:sign(payload,key),algorithm:'Ed25519',version:1};}
-module.exports={MAX,bounds,canonical,sha256,sign,verify,publicKey,pick,requestId,isUuid,authorized,receipt};
+function identifyOperator(auth,json){
+ const match=/^Bearer ([^\\s]+)$/.exec(auth||'');
+ if(!match||!json)return null;
+ let operators;try{operators=JSON.parse(json);}catch{return null;}
+ if(!operators||typeof operators!=='object'||Array.isArray(operators))return null;
+ const incoming=crypto.createHash('sha256').update(match[1]).digest();
+ let matched=null;
+ for(const [id,secret] of Object.entries(operators)){
+  if(!/^[a-z0-9_-]{2,50}$/i.test(id)||typeof secret!=='string'||secret.length<32)continue;
+  const expected=crypto.createHash('sha256').update(secret).digest();
+  if(crypto.timingSafeEqual(incoming,expected))matched=id;
+ }
+ return matched;
+}
+function verifyLedger(session,pubKey){
+ if(!session||typeof session!=='object'||!session.startReceipt||!Array.isArray(session.draws))return false;
+ const start=session.startReceipt;
+ if(!verify(start.payload,start.signature,pubKey)||start.payload.type!=='start'||start.payload.sessionId!==session.id||
+    start.payload.total!==session.total||start.payload.first!==session.first||start.payload.last!==session.last||
+    start.payload.operatorId!==session.operatorId||start.payload.mode!==session.mode)return false;
+ let hash=start.payload.genesisHash;
+ const seen=new Set();
+ for(let i=0;i<session.draws.length;i++){
+  const item=session.draws[i],signed=item.receipt,p=signed?.payload;
+  if(!p||!verify(p,signed.signature,pubKey)||p.type!=='draw'||p.sessionId!==session.id||
+     p.position!==i+1||p.position!==item.position||p.number!==item.number||
+     !Number.isSafeInteger(p.number)||p.number<session.first||p.number>session.last||
+     p.previousHash!==hash||seen.has(p.number))return false;
+  const {eventHash,...unsigned}=p;
+  if(sha256(canonical(unsigned))!==eventHash)return false;
+  hash=eventHash;seen.add(p.number);
+ }
+ return session.draws.length<=session.total;
+}
+module.exports={identifyOperator,verifyLedger,MAX,bounds,canonical,sha256,sign,verify,publicKey,pick,requestId,isUuid,authorized,receipt};
