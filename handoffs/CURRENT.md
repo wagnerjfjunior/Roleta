@@ -1,3 +1,5 @@
+> **MAKE FALLBACK — 12/10/2026:** cenário 6549955 ativo com handler 19→27 (3.6)→28 (Resume), após falha do 3.8. Configuração verificada; teste forçado em LAB 6610742 não rodou por limite de cenários ativos. OCR.space segue shadow; aprendizado por pares OCR × revisão humana ainda é proposta. Ler `../docs/sfjm/MAKE_GEMINI_MODEL_FALLBACK_AND_OCR_LEARNING_2026-10-12.md` antes de retomar.
+
 > **DATA/NOME OCR — 12/10/2026:** normalização de ano 26 agora compartilhada por OCR e importação canônica; recomposição de grafia próxima no rascunho com candidato único e margem conservadora, preservando texto original e revisão humana. Ler `../docs/sfjm/INTAKE_DATE_NAME_NORMALIZATION_2026-10-12.md`. Retorno OCR no telefone da Sabrina confirmado pelo operador; próximo teste: ano abreviado e sobrina, depois gravação real Supabase.
 
 > **RETORNO OCR — 12/10/2026:** execução Make das 19h58 levou 143,8 s até responder, mas relay abortava em 55 s. Prazo ajustado para 175 s, duração Vercel 200 s e cliente 210 s. Ler `../docs/sfjm/OCR_RETURN_TIMEOUT_2026-10-12.md`. Próxima validação: retorno no telefone da Sabrina, mantendo a página aberta; depois primeiro salvamento real.
