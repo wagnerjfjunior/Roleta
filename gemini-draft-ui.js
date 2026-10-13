@@ -138,12 +138,13 @@ async function mount(host){
  article.querySelector('[data-gemini-check]').addEventListener('click',async()=>{
   status.className='intake-gate blocked';status.textContent='Validando leitura e cadastro…';details.replaceChildren();
   try{
-   const response=await fetch('/data/print-brokers.json',{cache:'no-store'});
+   const [response,aliasResponse]=await Promise.all([fetch('/data/print-brokers.json',{cache:'no-store'}),fetch('/data/broker-name-aliases.json',{cache:'no-store'}).catch(()=>null)]);
    if(!response.ok)throw Error('Cadastro oficial indisponível.');
    const dto=await response.json();
+   const aliases=aliasResponse?.ok?(await aliasResponse.json().catch(()=>({}))).aliases||{}:{};
    const original=JSON.parse(textarea.value);
    const value=original?.result?.linhas?original.result:original?.body?.linhas?original.body:original;
-   const draft=window.RoletaGeminiConverter.convertGeminiDraft(value,dto);
+   const draft=window.RoletaGeminiConverter.convertGeminiDraft(value,dto,{aliases});
    const lines=draft.sorteados;
    const extras=draft.sem_sorteio;
    status.className='intake-gate blocked';
@@ -177,7 +178,7 @@ async function mount(host){
      const body=sorted.map(l=>'<tr data-correction-row data-pos="'+escapeHtml(l.posicao_impressa)+'">'+
        '<td><input data-correct-position aria-label="Nº Escolhido (posição impressa)" type="number" inputmode="numeric" min="1" max="100" value="'+escapeHtml(l.posicao_impressa??'')+'"></td>'+
        '<td><input data-correct-number aria-label="Número sorteado na posição '+escapeHtml(l.posicao_impressa)+'" type="number" inputmode="numeric" min="1" value="'+escapeHtml(l.numero_sorteado??'')+'"></td>'+
-       '<td><input data-correct-name aria-label="Nome na posição '+escapeHtml(l.posicao_impressa)+'" list="geminiReviewBrokerNames" value="'+escapeHtml(l.nome||l.nome_lido)+'"></td>'+
+       '<td><input data-correct-name aria-label="Nome na posição '+escapeHtml(l.posicao_impressa)+'" list="geminiReviewBrokerNames" value="'+escapeHtml(l.nome||l.nome_lido)+'">'+(l.nome&&l.cadastro_resolucao!=='NOME_EXATO'?'<small>OCR: '+escapeHtml(l.nome_lido)+' → '+escapeHtml(l.nome)+' · conferir</small>':'')+'</td>'+
        '<td><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
        '<option value="'+(l.numero_sorteado===null?'':'salao')+'">'+(l.numero_sorteado===null?'Confirmar classe':'SALÃO')+'</option>'+
        (l.numero_sorteado===null?'<option value="salao">SALÃO</option>':'')+
@@ -187,7 +188,7 @@ async function mount(host){
        '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rltv2-review-wrap rlt-five-column-review" role="region" aria-label="Conferência de corretores"><table class="rltv2-review-table rlt-five-column-table"><thead><tr><th>Nº Escolhido</th><th>Nº Sorteado</th><th>Corretor</th><th>Classe</th><th>Check</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
        '<h3>Conferir cabeçalho operacional</h3>'+
        '<div class="rltv2-company-review">'+
-       '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(value.data||'')+'"></label>'+
+       '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(window.RoletaIntakeNormalization.dateInfo(value.data)?.data||value.data||'')+'"></label>'+
        '<label><span>Período</span><select data-review-period><option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="INTEGRAL">INTEGRAL</option></select></label>'+
        '<label><span>Helbor (quantidade na folha)</span><input data-review-helbor type="number" min="0" placeholder="Digitar e conferir na foto"></label>'+
        '<label><span>Tipo de sorteio de empresa</span><select data-review-share><option value="">Escolher regra</option><option value="tegra_share">Share Tegra (2 posições)</option><option value="none">Sem share</option><option value="helbor_share">Share Helbor (2 posições)</option></select></label>'+

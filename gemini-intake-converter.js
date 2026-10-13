@@ -1,19 +1,16 @@
 (function(root,factory){
-const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;
+const api=factory(typeof module==='object'&&module.exports?require('./intake-normalization.js'):root.RoletaIntakeNormalization);if(typeof module==='object'&&module.exports)module.exports=api;
 if(root)root.RoletaGeminiConverter=api;
-})(typeof globalThis==='object'?globalThis:null,function(){
+})(typeof globalThis==='object'?globalThis:null,function(normalization){
 'use strict';
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toUpperCase();
 const num=v=>v!==null&&v!==undefined&&/^\d+$/.test(String(v).trim())?Number(v):null;
-function iso(v){const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(v||''));if(!m)return null;
-const d=new Date(Date.UTC(+m[3],+m[2]-1,+m[1]));
-return d.getUTCFullYear()===+m[3]&&d.getUTCMonth()===+m[2]-1&&d.getUTCDate()===+m[1]?m[3]+'-'+m[2]+'-'+m[1]:null;}
-function convertGeminiDraft(input,dto){
+function iso(v){return normalization.dateInfo(v)?.iso??null;}
+function convertGeminiDraft(input,dto,{aliases={}}={}){
 const src=typeof input==='string'?JSON.parse(input):input;
 if(!src||!Array.isArray(src.linhas))throw Error('Gemini: linhas ausentes.');
 const brokers=Array.isArray(dto)?dto:dto?.brokers;
 if(!Array.isArray(brokers))throw Error('Cadastro print-brokers.json ausente.');
-const index=new Map();brokers.forEach(b=>{const k=norm(b.nome);if(k)index.set(k,[...(index.get(k)||[]),b]);});
 const pendencias=[],add=(code,message,posicao)=>pendencias.push({code,message,...(posicao===undefined?{}:{posicao})});
 const empreendimento=norm(src.empreendimento),data=iso(src.data),periodo=norm(src.periodo);
 if(empreendimento!=='CAMINHOS DA LAPA')add('EMPREENDIMENTO','Confirmar empreendimento CAMINHOS DA LAPA.');
@@ -24,17 +21,8 @@ const linhas=src.linhas.map(l=>{
 const pos=num(l?.posicao_impressa),sorteado=num(l?.numero_sorteado),nome_lido=String(l?.nome_lido||'').trim(),key=norm(nome_lido);
 if(pos===null||pos<1||seenPos.has(pos))add('POSICAO_FISICA','Posição ausente/duplicada.',pos);
 if(pos!==null)seenPos.add(pos);
-let matches=index.get(key)||[],resolucao='NOME_EXATO';
-// Restore a truncated OCR name using registry identity first; manager is only
-// a tie-breaker among matching names. Human comparison with the source remains mandatory.
-if(!matches.length&&key.length>=3){
- matches=brokers.filter(b=>norm(b.nome).startsWith(key));resolucao='PREFIXO_UNICO';
- const manager=norm(l?.gerente_lido??l?.gerente);
- if(matches.length>1&&manager.length>=3){
-  matches=matches.filter(b=>norm(b.gerente).startsWith(manager));resolucao='PREFIXO_GERENTE_UNICO';
- }
-}
-const b=matches.length===1?matches[0]:null;
+const resolved=normalization.resolveDraftName(nome_lido,brokers,{aliases,manager:l?.gerente_lido??l?.gerente});
+const b=resolved.broker,resolucao=resolved.method;
 const canonicalKey=b?norm(b.nome):key;
 if(!b)add('NOME_NAO_RESOLVIDO','Nome não confirmado no cadastro: '+nome_lido,pos);
 if(b&&seenNames.has(canonicalKey))add('NOME_DUPLICADO','Corretor duplicado.',pos);

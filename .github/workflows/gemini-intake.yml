@@ -5,6 +5,8 @@ on:
       - 'api/roleta-ocr.js'
       - 'gemini-intake-converter.js'
       - 'gemini-draft-ui.js'
+      - 'intake-normalization.js'
+      - 'reconciliation/identity.js'
       - 'photo-prepare.js'
       - 'styles.css'
       - 'roulette-intake.js'
@@ -36,6 +38,7 @@ jobs:
       - run: npm install --no-package-lock --ignore-scripts
       - run: node --check gemini-intake-converter.js
       - run: node tests/gemini-intake-converter.test.cjs
+      - run: node tests/intake-normalization.test.cjs
       - run: node tests/roleta-ocr-relay.test.cjs
       - run: node tests/roleta-ocr-timeout.test.cjs
       - run: node tests/photo-prepare.test.cjs

@@ -50,7 +50,7 @@ test('partial physical data does not become a complete positional event',()=>{
  delete payload.event.physical_mapping_complete;assert.throws(()=>mergeFinal([],[{event_id:c.eventId,version:1,payload}]));
 });
 test('canonical human correction keeps original physical positions when final order changes',()=>{
- const vm=require('node:vm'),fs=require('node:fs'),context={window:{}};
+ const vm=require('node:vm'),fs=require('node:fs'),context={window:{RoletaIntakeNormalization:require('../../intake-normalization.js')}};
  vm.runInNewContext(fs.readFileSync('roulette-intake.js','utf8'),context);
  const x=input(),positions=[10,3,5,8];
  const elements=x.reviewed.salao.map((r,i)=>({

@@ -142,7 +142,7 @@
   }
 
   global.RoletaIdentityReconciliation={
-    STATUS,normalize,similarity,buildRegistry,candidateList,reconcile,confirmHuman,assertCanonicalForStatistics,selfTest
+    STATUS,normalize,distance,similarity,buildRegistry,candidateList,reconcile,confirmHuman,assertCanonicalForStatistics,selfTest
   };
   if(typeof module!=='undefined'&&module.exports)module.exports=global.RoletaIdentityReconciliation;
 })(typeof globalThis!=='undefined'?globalThis:this);
