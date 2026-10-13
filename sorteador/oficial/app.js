@@ -7,8 +7,8 @@ function notify(message){$('globalStatus').textContent=message;}
 function setBusy(value){working=value;['start','draw','refresh'].forEach(id=>$(id).disabled=value);}
 function selectedMode(){return document.querySelector('input[name="drawMode"]:checked').value;}
 function adjustMode(){const range=selectedMode()==='range';$('countFields').hidden=range;$('rangeFields').hidden=!range;}
-async function request(method,body,sessionId){
- const url='/api/secure-draw'+(sessionId?'?sessionId='+encodeURIComponent(sessionId):'');
+async function request(method,body,sessionId,mode){
+ const url='/api/secure-draw'+(sessionId?'?sessionId='+encodeURIComponent(sessionId):mode==='list'?'?list=1':'');
  const options={method,cache:'no-store',headers:{Authorization:'Bearer '+token,Accept:'application/json'}};
  if(body){options.headers['Content-Type']='application/json';options.body=JSON.stringify(body);}
  let response;
@@ -60,6 +60,18 @@ $('start').addEventListener('click',()=>safe(async()=>{
  if(body.mode==='count')body.total=Number($('total').value);
  else{body.first=Number($('firstNumber').value);body.last=Number($('lastNumber').value);}
  const r=await request('POST',body);render(r.session);notify('Novo sorteio registrado no servidor.');
+}));
+$('showHistory').addEventListener('click',()=>safe(async()=>{
+ const r=await request('GET',null,null,'list');
+ const host=$('serverHistory');host.replaceChildren();host.hidden=false;
+ if(!r.sessions.length){host.textContent='Nenhum sorteio registrado para este operador.';return;}
+ for(const s of r.sessions){
+  const item=document.createElement('button');item.type='button';item.className='history-entry quiet';
+  item.textContent=(s.mode==='range'?'De '+s.first_number+' até '+s.last_number:s.total+' corretores')+
+   ' · '+new Date(s.created_at).toLocaleString('pt-BR')+(s.finished_at?' · Concluído':' · Em andamento');
+  item.addEventListener('click',()=>safe(async()=>{const result=await request('GET',null,s.id);render(result.session);notify('Histórico carregado do servidor.');}));
+  host.append(item);
+ }
 }));
 $('draw').addEventListener('click',()=>safe(async()=>{
  if(!session||session.draws.length===session.total)return;
