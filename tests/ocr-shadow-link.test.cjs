@@ -11,7 +11,7 @@ test('vinculo sombra calcula hash e exige versao final',()=>{
  assert.equal(x.image_bytes,4);
 });
 test('identificadores integrais sao permitidos',()=>{
- assert.equal(expectFinal({...good,eventId:'2026-10-14-I'}).event_id,'2026-10-14-I');
+ assert.equal(expectFinal({...good,eventId:'2026-10-14-I',reviewed:{...good.reviewed,evento:{...good.reviewed.evento,periodo:'INTEGRAL'}}}).event_id,'2026-10-14-I');
 });
 test('dados pendentes nao alimentam dicionario',()=>{
  for(const reviewed of [{...good.reviewed,status:'PENDENTE_REVISAO'},{...good.reviewed,pendencias:['numero']},null])
