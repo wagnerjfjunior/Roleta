@@ -41,3 +41,10 @@ Montar LAB com foto sintética não pessoal e conector Gemini/OCR.space em cená
 ## Segundo LAB — 14/10/2026
 
 Cenário Make 6637419 criado com seis módulos: inicializador, erro sintético, chamada HTTP OCR.space, serialização JSON, Resume e retorno. A configuração foi aceita pelo Make e a conexão OCR.space existente foi referenciada. Duas tentativas de enviar imagem de teste foram recusadas pela ferramenta antes de alcançar o Make. Conferência do histórico: zero execuções. LAB desativado após conferência. Resultado real OCR.space: **não testado**. O cenário produtivo 6549955 não foi alterado. Próximo passo: executar o LAB com uma imagem sintética pela interface Make e verificar o resultado HTTP e os módulos, antes de considerar promoção.
+
+
+## Testes com imagem real no LAB de upload direto (14/10)
+
+Cenário LAB **6637476**, ativo e isolado, recebeu três requisições em 14/10 às 22:36:59, 22:38:55 e 22:40:20 UTC (19h36/38/40 BRT). IDs de execução `596ddc9d4b7440b1b91d74f1d6057598`, `66c18fb0c8994c209a89077abec871d3`, `0ea55ae8486c473f9e1624a8e02ffbb7`. Em todos os casos, módulo 1 recebeu `roleta_whatsapp.jpeg` (264883 bytes), módulo 2 acionou o erro artificial e módulo 3 tentou chamar OCR.space. Resultado: **ModuleTimeoutError em 40 segundos** em todas as chamadas OCR.space; módulos 4/5/6 não executaram. Não houve retorno válido nem aprovação do fallback. Nunca copiar imagem/IMTBuffer para o GitHub.
+
+Após conferir logs e parâmetros, o timeout do **módulo 3 apenas no LAB 6637476** foi ampliado de `40` para `90` segundos via `scenario_patch`, com sucesso; versão do cenário de 14/10/2026 22:41:45Z, confirmada por nova leitura. Não se alterou engine=3, language=auto, isTable=true, scale=true, isOverlayRequired=true, conexão OCR.space ou produção Make 6549955. O LAB segue **ativo para reteste**. Um teste após o ajuste ainda é necessário; maior timeout não comprova disponibilidade do provedor. Limites síncronos do produto (175s backend) continuam inalterados.
