@@ -14,7 +14,7 @@ function validImage(bytes, mime) {
   if (!(mime==='image/jpeg'&&jpeg || mime==='image/png'&&png || mime==='image/webp'&&webp)) reject('Assinatura da imagem divergente.');
 }
 function expectFinal({eventId,version,operatorSub,reviewed,image,mime}) {
-  if (!/^\d{4}-\d{2}-\d{2}-(M|T)$/.test(eventId||'')) reject('Identificador do evento inválido.');
+  if (!/^\d{4}-\d{2}-\d{2}-(M|T|I)$/.test(eventId||'')) reject('Identificador do evento inválido.');
   if (!Number.isSafeInteger(version) || version<1) reject('Versão final inválida.');
   if (!/^[A-Za-z0-9_-]{1,128}$/.test(operatorSub||'')) reject('Operador inválido.');
   if (!reviewed || reviewed.status!=='VALIDADO' || !reviewed.evento || !Array.isArray(reviewed.salao) || reviewed.pendencias?.length) reject('Roleta sem conferência humana.');
