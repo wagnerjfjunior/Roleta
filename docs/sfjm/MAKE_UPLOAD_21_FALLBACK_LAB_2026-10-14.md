@@ -36,3 +36,8 @@ Em ambas as alternativas, preservar prioridade **Gemini 3.8 → Gemini 3.6 → O
 ## Próxima ação segura
 
 Montar LAB com foto sintética não pessoal e conector Gemini/OCR.space em cenário isolado, testar bifurcação com **resultado real até o ReturnData/WebhookRespond** sem utilizar produção; registrar todos os módulos executados e confirmar que 21 falho nunca força 19 a consumir `uri` inexistente. Se provado, preparar plano de rollback e aprovação antes de mudar 6549955.
+
+
+## Segundo LAB — 14/10/2026
+
+Cenário Make 6637419 criado com seis módulos: inicializador, erro sintético, chamada HTTP OCR.space, serialização JSON, Resume e retorno. A configuração foi aceita pelo Make e a conexão OCR.space existente foi referenciada. Duas tentativas de enviar imagem de teste foram recusadas pela ferramenta antes de alcançar o Make. Conferência do histórico: zero execuções. LAB desativado após conferência. Resultado real OCR.space: **não testado**. O cenário produtivo 6549955 não foi alterado. Próximo passo: executar o LAB com uma imagem sintética pela interface Make e verificar o resultado HTTP e os módulos, antes de considerar promoção.
