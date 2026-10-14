@@ -18,9 +18,9 @@ function expectFinal({eventId,version,operatorSub,reviewed,image,mime}) {
   if (!Number.isSafeInteger(version) || version<1) reject('Versão final inválida.');
   if (!/^[A-Za-z0-9_-]{1,128}$/.test(operatorSub||'')) reject('Operador inválido.');
   if (!reviewed || reviewed.status!=='VALIDADO' || !reviewed.evento || !Array.isArray(reviewed.salao) || reviewed.pendencias?.length) reject('Roleta sem conferência humana.');
-  const match = /^(\\d{2})\/(\\d{2})\/(\\d{4})$/.exec(String(reviewed.evento.data||''));
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(reviewed.evento.data||''));
   const map = {MANHA:'M',TARDE:'T',INTEGRAL:'I'};
-  const period = String(reviewed.evento.periodo||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toUpperCase();
+  const period = String(reviewed.evento.periodo||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
   if (!match || !map[period] || `${match[3]}-${match[2]}-${match[1]}-${map[period]}` !== eventId)
     reject('Evento divergente da folha conferida.');
   validImage(image,mime);
