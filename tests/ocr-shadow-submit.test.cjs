@@ -7,7 +7,7 @@ const base={event_id:'2026-10-14-T',version:2,digest,payload:{reviewed:{status:'
 const auth={requireSameOrigin:()=>true,session:()=>({sub:'google123',email:'allowed@example.com'}),csrfForSub:()=> 'TOKEN'};
 function context(overrides={}){
  const calls={read:0,db:0,upload:0};
- const env={ROLETA_OCR_SHADOW_ENABLED:'true',ROLETA_FINAL_OPERATOR_EMAILS:'allowed@example.com'};
+ const env={ROLETA_OCR_SHADOW_ENABLED:'true',ROLETA_FINAL_OPERATOR_EMAILS:'allowed@example.com',ROLETA_V2_DATABASE_URL:'postgresql://roleta_v2_writer.uobxxgzshrmbtjfdolxd:synthetic@aws-1-sa-east-1.pooler.supabase.com:5432/postgres?sslmode=verify-full'};
  const handler=createHandler({
    env,...{
     authenticate:auth,
@@ -30,11 +30,10 @@ test('flag fechada nao toca base nem foto',async()=>{
 });
 test('versao atual autentica e enfileira uma unica evidencia',async()=>{
  const c=context(),r=await run(c.handler);
- // Requires a valid test database URL; injected DB transport guard prevents
- // treating a mock pool as a real configured connection.
- assert.equal(r.code,503);
+ assert.equal(r.code,202);
+ assert.equal(r.payload.status,'QUEUED');
  assert.equal(c.calls.upload,1);
- assert.equal(c.calls.db,0);
+ assert.equal(c.calls.db,1);
 });
 test('rejeita csrf e versao stale ANTES de upload',async()=>{
  const c=context();
