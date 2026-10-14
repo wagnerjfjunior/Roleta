@@ -17,6 +17,10 @@ test('dados pendentes nao alimentam dicionario',()=>{
  for(const reviewed of [{...good.reviewed,status:'PENDENTE_REVISAO'},{...good.reviewed,pendencias:['numero']},null])
   assert.throws(()=>expectFinal({...good,reviewed}),/conferência humana/);
 });
+test('rejeita associacao entre foto e outro evento',()=>{
+ assert.throws(()=>expectFinal({...good,eventId:'2026-10-13-T'}),/Evento divergente/);
+ assert.throws(()=>expectFinal({...good,reviewed:{...good.reviewed,evento:{data:'14/10/2026',periodo:'MANHA'}}}),/Evento divergente/);
+});
 test('rejeita imagem, evento e versao inconsistentes',()=>{
  assert.throws(()=>expectFinal({...good,image:Buffer.from('falso')}),/Assinatura/);
  assert.throws(()=>expectFinal({...good,eventId:'outro'}),/evento/);
