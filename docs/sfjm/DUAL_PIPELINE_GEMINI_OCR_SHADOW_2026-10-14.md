@@ -47,3 +47,12 @@ Nada promove automaticamente regras para produção. Não criar duplicações de
 
 
 **Limpeza de LABs:** após os ajustes, o LAB de integração antigo `6637766` foi desativado. Conferência de estados no Make: **6549955 ativo** (Gemini operacional), **6637892 inativo** (Script 2 shadow preparado), **6637766 inativo** (LAB antigo). Nenhuma implantação do Script 2 em produção.
+
+
+## Gate de ponte foto ↔ revisão: contrato preparado (14/10)
+
+Auditoria do frontend: `gemini-draft-ui.js` guarda a fotografia preparada em `selected` (variável em memória, não persistente) e emite/escuta `roleta-final-confirmed`. Esse evento significa **conferência humana**, NÃO comprova versão persistida no Supabase. `api/final-roulette.js` realiza gravação separada e `server/final-roulette-store.cjs` devolve `event_id` e `version` com status `saved|replayed`. A API usa sessão Google e CSRF; não reutilizar o evento visual como permissão para gravação OCR.
+
+Criados na branch `server/ocr-shadow-link.cjs` e `tests/ocr-shadow-link.test.cjs`: contrato puro valida tipo, assinatura e limite da imagem, sujeito Google, status `VALIDADO`, evento canônico `YYYY-MM-DD-(M|T|I)`, versão positiva e calcula `SHA-256` dos bytes, sem gravar foto ou invocar serviço. Testes de aceitação/rejeição incluídos; execução CI ainda deve ser consultada. Contrato é **somente preparação, não ponte funcional ponta a ponta**. `expectFinal` explicitamente exige que o backend verifique novamente versão persistida e autoria no banco antes de enfileirar. Não enviar segredo DB/Supabase ou webhook Make ao cliente.
+
+**Bloqueio de promoção:** antes de acionar `learning_jobs` é necessário (a) captura privada temporária da foto com expiração/retenção, (b) vínculo robusto com a resposta `saved/replayed`, (c) endpoint server-only com sessão Google + CSRF + validação de operador e consulta autoritativa da versão, (d) fila idempotente pelo trio evento/versão/digest, (e) worker com permissões mínimas separadas para leitura Storage e escrita `roleta_ocr`, (f) políticas de expiração e revisão humana. O esquema já criado não representa execução nem retenção de foto; o operador não deve supor que a imagem foi salva no servidor.
