@@ -4,6 +4,7 @@ on:
     paths:
       - 'api/roleta-ocr.js'
       - 'api/ocr-shadow-submit.js'
+      - 'api/ocr-shadow-capability.js'
       - 'server/ocr-shadow-link.cjs'
       - 'server/ocr-shadow-retention.cjs'
       - 'server/ocr-shadow-cleanup.cjs'
@@ -47,10 +48,11 @@ jobs:
       - run: node --check ocr-learning.js
       - run: node --test tests/ocr-learning.test.cjs tests/ocr-learning-ui.test.cjs
       - run: node --check api/ocr-shadow-submit.js
+      - run: node --check api/ocr-shadow-capability.js
       - run: node --check server/ocr-shadow-link.cjs
       - run: node --check server/ocr-shadow-retention.cjs
       - run: node --check server/ocr-shadow-cleanup.cjs
-      - run: node --test tests/ocr-shadow-link.test.cjs tests/ocr-shadow-submit.test.cjs tests/ocr-shadow-retention.test.cjs tests/ocr-shadow-cleanup.test.cjs
+      - run: node --test tests/ocr-shadow-link.test.cjs tests/ocr-shadow-submit.test.cjs tests/ocr-shadow-retention.test.cjs tests/ocr-shadow-cleanup.test.cjs tests/ocr-shadow-capability.test.cjs
       - run: node tests/gemini-intake-converter.test.cjs
       - run: node tests/intake-normalization.test.cjs
       - run: node tests/roleta-ocr-relay.test.cjs
