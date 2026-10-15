@@ -79,3 +79,6 @@ Na PR #120 foram adicionados `api/ocr-shadow-submit.js`, `tests/ocr-shadow-submi
 A confirmação de persistência da folha é observada em `roulette-intake.js` no retorno `saved|replayed` de `/api/final-roulette`, com conferência de `current_version`. A tentativa de editar esse arquivo extenso nesta sessão foi bloqueada; nenhuma alteração de frontend foi aplicada. O evento `roleta-final-confirmed` permanece sendo apenas confirmação para impressão, não salvamento em banco. O upload não pode ser ligado a ele.
 
 A migration de enfileiramento no banco continua **não aplicada**, portanto a ponta de gravação do Script 2 não está funcional. CI da PR em nova execução, aguardando conclusão. Script 1 Gemini em produção sem alterações adicionais.
+
+
+**Auditoria extra do gate SQL:** função candidata endurecida para rejeitar parâmetros nulos e verificar que o caminho privado corresponde exatamente a `event_id/version/image_sha256.ext`. Sem essa checagem o padrão do caminho seria insuficiente para impedir associação cruzada de fotografias. Essa revisão está versionada na PR mas **não aplicada** no Supabase. A migração do Supabase permanece sujeita a revisão de segurança, especialmente privilégios `SECURITY DEFINER` e política de objetos órfãos. CI disparado novamente sobre a branch; ao registrar esta nota os seis checks estavam em andamento, não aprovados ainda.
