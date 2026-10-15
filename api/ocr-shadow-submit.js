@@ -34,10 +34,22 @@ async function storePhoto({env,bytes,mime,path,fetchFn=fetch}){
   return {created:true};
  }finally{clearTimeout(timeout);}
 }
+function capability(env,authenticate,req){
+ try {
+  if(!authenticate.session(req))return false;
+  return env.ROLETA_OCR_SHADOW_ENABLED==='true'
+   && env.ROLETA_OCR_RETENTION_READY==='true'
+   && !!env.ROLETA_OCR_STORAGE_SERVICE_KEY
+   && env.ROLETA_OCR_SUPABASE_URL==='https://uobxxgzshrmbtjfdolxd.supabase.co'
+   && env.ROLETA_FINAL_READS_ENABLED==='true'
+   && !!env.ROLETA_V2_DATABASE_URL;
+ }catch{return false;}
+}
 function createHandler({env=process.env,authenticate=auth,read=readFinal,authorize=authorizeFinalOperator,poolFn=getPool,storage=storePhoto}={}){
  return async(req,res)=>{
   res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');
-  if(req.method!=='POST'){res.setHeader('Allow','POST');return res.status(405).json({error:'Método não permitido.'});}
+  if(req.method==='GET')return res.status(200).json({enabled:capability(env,authenticate,req)});
+  if(req.method!=='POST'){res.setHeader('Allow','GET, POST');return res.status(405).json({error:'Método não permitido.'});}
   if(env.ROLETA_OCR_SHADOW_ENABLED!=='true')return res.status(503).json({error:'Aprendizagem OCR ainda não ativada.'});
   try{
    if(!authenticate.requireSameOrigin(req))return res.status(403).json({error:'Origem não autorizada.'});
@@ -80,3 +92,4 @@ module.exports=createHandler();
 module.exports.createHandler=createHandler;
 module.exports.SQL=SQL;
 module.exports.storePhoto=storePhoto;
+module.exports.capability=capability;

@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {createHandler}=require('../api/ocr-shadow-capability.js');
+const {createHandler}=require('../api/ocr-shadow-submit.js');
 async function run(env,session={sub:'s',email:'x@example.com'}){
  const fn=createHandler({env,authenticate:{session:()=>session}});
  const res={code:0,header:{},setHeader(k,v){this.header[k]=v;return this;},status(n){this.code=n;return this;},json(x){this.body=x;return this;}};
