@@ -6,6 +6,7 @@ on:
       - 'api/ocr-shadow-submit.js'
       - 'server/ocr-shadow-link.cjs'
       - 'server/ocr-shadow-retention.cjs'
+      - 'server/ocr-shadow-cleanup.cjs'
       - 'server/ocr-space-draft.cjs'
       - 'gemini-intake-converter.js'
       - 'gemini-draft-ui.js'
@@ -48,7 +49,8 @@ jobs:
       - run: node --check api/ocr-shadow-submit.js
       - run: node --check server/ocr-shadow-link.cjs
       - run: node --check server/ocr-shadow-retention.cjs
-      - run: node --test tests/ocr-shadow-link.test.cjs tests/ocr-shadow-submit.test.cjs tests/ocr-shadow-retention.test.cjs
+      - run: node --check server/ocr-shadow-cleanup.cjs
+      - run: node --test tests/ocr-shadow-link.test.cjs tests/ocr-shadow-submit.test.cjs tests/ocr-shadow-retention.test.cjs tests/ocr-shadow-cleanup.test.cjs
       - run: node tests/gemini-intake-converter.test.cjs
       - run: node tests/intake-normalization.test.cjs
       - run: node tests/roleta-ocr-relay.test.cjs
