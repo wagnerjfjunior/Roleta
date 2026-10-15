@@ -37,6 +37,7 @@ jobs:
       - run: node --check api/roleta-ocr.js
       - run: node --check server/ocr-space-draft.cjs
       - run: node --check gemini-draft-ui.js
+      - run: node --test tests/mobile-review-calendar-compact.test.cjs
       - run: node --check photo-prepare.js
       - run: node --check roulette-intake.js
       - run: node --check lib/roleta-pdf.js
