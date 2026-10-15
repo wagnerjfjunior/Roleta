@@ -20,7 +20,7 @@ function context(overrides={}){
  return {handler,calls};
 }
 async function run(handler,{headers={},body=jpeg,method='POST'}={}){
- const req={method,headers:{origin:'https://example.com','content-type':'image/jpeg','x-roleta-csrf':'TOKEN','x-roleta-event-id':base.event_id,'x-roleta-final-version':'2','x-roleta-final-digest':digest,...headers},body};
+ const req={method,headers:{origin:'https://example.com','content-type':'image/jpeg','x-roleta-csrf':'TOKEN','x-roleta-ocr-consent':'yes','x-roleta-event-id':base.event_id,'x-roleta-final-version':'2','x-roleta-final-digest':digest,...headers},body};
  const res={code:0,headers:{},setHeader(k,v){this.headers[k]=v;return this},status(n){this.code=n;return this},json(v){this.payload=v;return this}};
  await handler(req,res);return res;
 }
@@ -51,4 +51,10 @@ test('rejeita sessoes anonimas',async()=>{
  const c=context({authenticate:{...auth,session:()=>null}});
  assert.equal((await run(c.handler)).code,401);
  assert.equal(c.calls.upload,0);
+});
+
+test('nao enfileira imagem sem consentimento explicito',async()=>{
+ const c=context();
+ const r=await run(c.handler,{headers:{'x-roleta-ocr-consent':'no'}});
+ assert.equal(r.code,403);assert.equal(c.calls.upload,0);assert.equal(c.calls.db,0);
 });
