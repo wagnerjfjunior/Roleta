@@ -349,6 +349,7 @@
           throw Error('Resposta de gravação não validada.');
         if(data.current_version!==data.version)throw Error('Reenvio reconhecido, mas existe uma correção mais recente. Carregue a versão atual.');
         savedRecord={event_id:data.event_id,version:data.version,payload:{event:prepared,reviewed:checked}};
+        host.dispatchEvent(new CustomEvent('roleta-final-saved',{detail:{event_id:data.event_id,version:data.version,status:data.status}}));
         statStatus.textContent=(data.status==='replayed'?'Registro já salvo, sem duplicação. ':'Salvo no Supabase. ')+data.event_id+' · versão '+data.version+'. Atualize o painel para carregar a base.';
       }catch(err){statStatus.textContent=String(err.message||err)+' Nenhuma inclusão estatística foi confirmada.';}
       finally{statBusy=false;statSubmit.disabled=!reviewedPayload||!confirm.checked;}
