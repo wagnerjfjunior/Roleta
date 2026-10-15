@@ -253,17 +253,17 @@ async function mount(host){
        return (a.numero_sorteado===null?Infinity:x)-(b.numero_sorteado===null?Infinity:y);
      });
      const opts=dto.brokers.map(b=>'<option value="'+escapeHtml(b.nome)+'"></option>').join('');
-     const body=sorted.map((l,i)=>'<tr data-correction-row data-source-index="'+i+'" data-pos="'+escapeHtml(l.posicao_impressa)+'">'+
-       '<td><input data-correct-position aria-label="Posição impressa na folha" type="number" inputmode="numeric" min="1" max="100" value="'+escapeHtml(l.posicao_impressa??'')+'"></td>'+
-       '<td><input data-correct-number aria-label="Número sorteado na posição '+escapeHtml(l.posicao_impressa)+'" type="number" inputmode="numeric" min="1" value="'+escapeHtml(l.numero_sorteado??'')+'">'+(l.bolinha_ambigua?'<small>OCR: '+escapeHtml(l.numero_lido_original)+' · preencher pela foto</small>':'')+'</td>'+
-       '<td><input data-correct-name aria-label="Nome na posição '+escapeHtml(l.posicao_impressa)+'" list="geminiReviewBrokerNames" value="'+escapeHtml(l.nome||l.nome_lido)+'">'+(l.nome&&l.cadastro_resolucao!=='NOME_EXATO'?'<small>OCR: '+escapeHtml(l.nome_lido)+' → '+escapeHtml(l.nome)+' · conferir</small>':'')+'</td>'+
-       '<td><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
+     const body=sorted.map((l,i)=>'<div class="rlt-review-item" data-correction-row data-source-index="'+i+'" data-pos="'+escapeHtml(l.posicao_impressa)+'">'+
+       '<div class="rlt-review-field rlt-review-pos"><span class="rlt-field-title">Posição</span><input data-correct-position aria-label="Posição impressa na folha" type="number" inputmode="numeric" min="1" max="100" value="'+escapeHtml(l.posicao_impressa??'')+'"></div>'+
+       '<div class="rlt-review-field rlt-review-ball"><span class="rlt-field-title">Bolinha</span><input data-correct-number aria-label="Número sorteado na posição '+escapeHtml(l.posicao_impressa)+'" type="number" inputmode="numeric" min="1" value="'+escapeHtml(l.numero_sorteado??'')+'">'+(l.bolinha_ambigua?'<small>OCR: '+escapeHtml(l.numero_lido_original)+' · preencher pela foto</small>':'')+'</div>'+
+       '<div class="rlt-review-field rlt-review-name"><span class="rlt-field-title">Corretor</span><input data-correct-name aria-label="Nome na posição '+escapeHtml(l.posicao_impressa)+'" list="geminiReviewBrokerNames" value="'+escapeHtml(l.nome||l.nome_lido)+'">'+(l.nome&&l.cadastro_resolucao!=='NOME_EXATO'?'<small>OCR: '+escapeHtml(l.nome_lido)+' → '+escapeHtml(l.nome)+' · conferir</small>':'')+'</div>'+
+       '<div class="rlt-review-field rlt-review-class"><span class="rlt-field-title">Participação</span><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
        '<option value="'+(l.numero_sorteado===null?'':'salao')+'">'+(l.numero_sorteado===null?'Confirmar classe':'SALÃO')+'</option>'+
        (l.numero_sorteado===null?'<option value="salao">SALÃO</option>':'')+
-       '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></td><td><label class="rlt-line-check"><input data-correct-confirm type="checkbox"><span data-line-state>Revisar</span></label></td></tr>').join('');
+       '<option value="standby">STAND BY</option><option value="online">ON-LINE</option><option value="excluir">Excluir (após conferir)</option></select></div><div class="rlt-review-field rlt-review-confirm"><label class="rlt-line-check"><input data-correct-confirm type="checkbox"><span data-line-state>Revisar</span></label></div></div>').join('');
      human.innerHTML='<h3>Correção humana assistida</h3><p class="small muted">Confira os números com a fotografia. Corrija 01/10 e qualquer duplicidade. Os números são usados apenas nesta etapa e não aparecem na impressão.</p>'+
        '<datalist id="geminiReviewBrokerNames">'+opts+'</datalist>'+
-       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rltv2-review-wrap rlt-five-column-review" role="region" aria-label="Conferência de corretores"><table class="rltv2-review-table rlt-five-column-table"><thead><tr><th>Posição na folha</th><th>Bolinha sorteada</th><th>Corretor</th><th>Participação</th><th>Conferido</th></tr></thead><tbody>'+body+'</tbody></table></div>'+
+       '<div data-line-progress class="intake-gate blocked">0 linhas conferidas.</div><div class="rlt-review-list" data-review-rows role="group" aria-label="Conferência de corretores">'+body+'</div>'+
        '<div class="intake-actions"><button type="button" data-review-add-line class="simulation-run">Adicionar participante que falta</button></div>'+
        '<h3>Conferir cabeçalho operacional</h3>'+
        '<div class="rltv2-company-review">'+
@@ -347,7 +347,7 @@ async function mount(host){
        tr.querySelector('[data-correct-position]').setAttribute('aria-label','Posição na folha do participante acrescentado '+index);
        tr.querySelector('[data-correct-number]').setAttribute('aria-label','Número sorteado do participante acrescentado '+index);
        tr.querySelector('[data-correct-name]').setAttribute('aria-label','Nome do participante acrescentado '+index);
-       correctionRows.push(tr);human.querySelector('tbody').append(tr);bindCorrectionRow(tr);refreshChecks();
+       correctionRows.push(tr);human.querySelector('[data-review-rows]').append(tr);bindCorrectionRow(tr);refreshChecks();
        tr.querySelector('[data-correct-position]').focus();
      });
      refreshChecks();

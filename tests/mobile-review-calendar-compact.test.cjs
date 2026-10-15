@@ -21,6 +21,8 @@ test('date control uses native date picker and supplies BR to canonical bridge',
 });
 test('mobile operator review preserves all five controls',()=>{
  for(const attr of ['data-correct-position','data-correct-number','data-correct-name','data-correct-class','data-correct-confirm'])assert.ok(ui.includes(attr));
- assert.match(css,/rlt-five-column-table tbody tr\[data-correction-row\]/);
- assert.match(css,/min-height:44px!important;height:44px!important/);
+ assert.match(ui,/data-review-rows/);
+ assert.match(ui,/rlt-review-item/);
+ assert.match(css,/\.rlt-review-item\{/);
+ assert.match(css,/height:44px;min-height:44px/);
 });
