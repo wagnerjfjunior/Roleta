@@ -1,0 +1,107 @@
+# SFJM — Decisão: duas pipelines independentes, Gemini operacional e OCR.space em aprendizagem (14/10/2026)
+
+## Decisão do responsável
+Separar processamento operacional da Roleta do desenvolvimento OCR. **Script 1 / cenário Make operacional: somente Gemini** (primário 3.8 Flash, fallback 3.6 Flash), fotografia → JSON preliminar → recomposição por cadastro → conferência humana → folha final. **Script 2 / pipeline shadow:** recebe fotografia original associada à **mesma revisão final confirmada** e executa OCR.space e um motor Google comparativo (a definir: Google Cloud Vision OCR ou Gemini, dependendo de credenciais, política e custo), aplica pós-processamento determinístico, coteja com a verdade humana e alimenta dicionário auditável. Script 2 jamais condiciona a impressão, atendimento, salvamento ou disponibilidade do Script 1.
+
+## Estado comprovado vs. pretendido
+- 14/10: cenário Make de produção **6549955** ainda tem Gemini 19/27, OCR.space handler 30 e OCR.space paralelo 26, portanto **a separação ainda NÃO foi aplicada à produção**. Não apagar nada antes de aprovação/revisão de rollback.
+- LAB 6637766: sucesso com upload 21, Gemini 3.8 (19), resposta 13; **não testou erro 21**. LAB 6637476: OCR.space e entrega HTTP demonstrados independentemente. PR documental anterior **#119** permanece separada da main até decisão de destino; não confundir esse trabalho com autorização para merge ou implantação.
+- Código existente na main: `api/roleta-ocr.js` exige sessão Google, same-origin, CSRF, controla foto de até 900 KB, chama Make e valida resposta. `ocr-learning.js` guarda aprendizagem **local** após `roleta-final-confirmed`, sem foto nem sincronização no Supabase. O envio persistente da folha final ao Supabase é ação independente da impressão; não inferir que a foto original está disponível no banco.
+- Qualidade de entrada: manter ordenação física distinta da classificação por bolinhas; não aprender bolinhas/sorteios. As correções da folha final (inclusive pós-salvar) devem ter versionamento e motivo.
+- O nome oficial tem como autoridade `data/brokers-official.csv`. OCR ou Google secundário não pode, isoladamente, atribuir rótulo definitivo nem sobrescrever cadastro.
+
+## Pipeline 1 — produção, baixa complexidade
+1. Entrada fotografia pelo app autenticado, proteção de origem, CSRF e tamanho.
+2. Make operacional obtém CSV, faz upload Gemini 21, roda 3.8 19, fallback 3.6 27, retorna JSON preliminar pelo módulo 13.
+3. Aplicativo reconcilia com CSV, preserva posições físicas, mostra inconsistências e exige revisão do próprio operador; roleta final, PDF/impressão e envio explícito ao Supabase continuam independentes.
+4. Separação planejada: desabilitar/remover **OCR.space 30/31/32 e rota shadow 26 somente após testes isolados do Script 1 Gemini-only**; falha conjunta 3.8/3.6 deve gerar erro explícito e recuperável na interface, sem resposta inventada. Não mudar conexões/credenciais Gemini e manter cópia/rollback do cenário.
+
+## Pipeline 2 — shadow, desacoplada e assíncrona
+**Gatilho preferido:** confirmação da roleta final pelo operador, após gerar `roleta-final-confirmed`, seguida de submissão explícita de evidência para aprendizagem; não depende do envio estatístico da folha ao Supabase. Inicialmente ativar opt-in claro para imagem; posteriormente considerar captura automatizada no momento da confirmação com consentimento operacional e política de retenção.
+- No processamento inicial, conservar fotografia preparada **temporariamente** em sessão autorizada para fins de conferência e posterior envio; não presumir que a foto já está armazenada de forma persistente. Preferir token efêmero de upload para storage privado. Nunca expor API key ou webhook Make no frontend, nem usar URL pública de foto.
+- Registrar `event_id`, versão/revisão da roleta validada, digest SHA-256 do conteúdo da imagem, `physical_position`, texto OCR bruto por motor, coordenadas quando disponíveis, nome canônico final conferido, origem/método e data de consentimento/recebimento.
+- Persistir tarefas idempotentes com estados `queued|processing|needs_review|confirmed|rejected|failed`; retry com backoff, isolamento RLS e autorização Google. Trabalho assíncrono NÃO prende resposta HTTP nem bloqueia confirmação ou impressão.
+- Worker Make separado recebe **referência curta autenticada** à foto de storage privado e versão final (ou ação backend a serviço sob credenciais), nunca segredo/webhook diretamente no cliente. Usa OCR.space (overlay coordenado, leitura crua), opcional Google secundário para comparativo, pós-processador do app e proposta de pares de nomes. Nada altera `roleta_final` nem ranking/histórico.
+- Revisão humana é o rótulo de verdade: alinhamento por posição física + evento/revisão + confirmação humana, preservação de incerteza, tokens conflitantes e homônimos. Sem pares seguros o dicionário não muda.
+
+## Dicionário cumulativo proposto
+Tabela de grafias alternativas vinculadas a `broker_official_id`/CRECI oficial, nunca correspondência somente por string de nome. Uma grafia nova válida é **agregada**, não substitui outras. Suporte mínimo inicial: duas folhas independentes confirmadas por humano, salvo entrada manual com evidência explícita; ausência de conflitos; prioridade de correspondência exata oficial. `PAQLA→Paola`, `VALEMA→Valeria` como exemplos históricos a revalidar no pipeline; `PATLA` e `VALERA` são apenas exemplos, não evidência observada. `Valerio` não se torna `Valeria` automaticamente. Não alimentar sequência de bolinhas nem usar lista de corretor para inventar sorteios.
+- Auditoria: source raw → candidato → decisão humana → regra → testes, histórico de alterações, rollback individual, autoria e contagem independente por folha, sem contaminar regras com testes LAB.
+- Avaliação em holdout de folhas não usadas para ensinar, métricas de precisão por nome, taxa de falsos positivos, taxa de revisão humana, alinhamento correto por posição, custo/latência, conflito entre motores, nenhuma regressão em bolinhas (continuam manuais).
+
+## Migração com gates
+**Gate A:** aprovar esta divisão/contratos, verificar eventos atuais `roleta-final-confirmed`, armazenamento/fluxo do Supabase e segurança do envio da foto. **Gate B:** implementar Script 1 Gemini-only isolado em LAB, testes de sucesso Gemini 3.8, fallback 3.6, falha dupla → erro recuperável; só então gate de promoção com rollback do cenário produtivo 6549955. **Gate C:** armazenamento de evidências foto+revisão validada no Supabase compartilhado com schema isolado e RLS, idempotência, retenção e consentimento/ação explícita. **Gate D:** Script 2 Make isolado, OCR.space e comparação Google opcionais, processamento pós-OCR, nenhuma alteração ao aplicativo ao vivo. **Gate E:** monitorar histórico e relatório de qualidade; troca de motor **somente por decisão explícita** após benchmark de precisão sem perda de segurança.
+
+## Invariantes operacionais
+Nada promove automaticamente regras para produção. Não criar duplicações de roletas existentes, não alterar a semana congelada nem 86 eventos da base histórica. Não publicar fotos, nomes de corretores em lote, tokens, webhook ou chave em GitHub. Revisão final humana é obrigatória em **ambas** pipelines. Nenhuma modificação de Make/Vercel/Supabase foi realizada por este documento; implementações exigem testes, evidência e aprovação do gate.
+
+## Implementação executada em 14/10 — estado real, posterior à decisão
+
+**Make produção 6549955:** em 14/10/2026 às 22:59:54Z foi aplicado patch atômico sobre `lastEdit=2026-10-14T21:22:46.553Z` com operações `arm_set` (router 24, rota 1, `disabled=true`) e remoção dos módulos **32, 31, 30**, nessa ordem. Patch aceito sem erros; releitura confirma cenário **active** com rota operacional **1→24→23(CSV)→21(upload Gemini)→19(Gemini 3.8)→13(resposta)**, fallback **19 error→27(Gemini 3.6)→29(Resume)→13**. Módulo 26 OCR.space permanece configurado mas em **rota inteira desativada**, para rollback; não executa nessa configuração. Conexão Google 11711372 ok, OCR.space 11569872 somente na rota desativada. **Não executar automaticamente OCR.space no cenário operacional.** A mudança produtiva está aplicada; não houve execução com foto após a mudança que comprove funcionamento de ponta a ponta. Falha em 21 ou falha dupla Gemini ainda pode não produzir resposta útil; considerar mensagem de erro recuperável no frontend em melhoria subsequente.
+
+**Supabase Discador-MesaCliente** `uobxxgzshrmbtjfdolxd` (sa-east-1): migrations aplicadas com sucesso `create_roleta_ocr_private_learning_dictionary_20261014` e `grant_roleta_ocr_backend_service_role_only_20261014`. Criado esquema privado `roleta_ocr` e cinco tabelas vazias com RLS habilitado: `learning_jobs`, `readings`, `name_evidence`, `dictionary`, `dictionary_revisions`. `anon` e `authenticated` sem grants no esquema ou tabelas; `service_role` com grants explícitos para backend mediado (não expor segredo). `event_id+final_version_id+image_sha256` único em jobs; versões e revisões rastreáveis. DDL foi registrado em `database/production-review/20261014_roleta_ocr_private_dictionary_applied.sql`. Foto não foi carregada em Storage; nenhuma política de Storage nem worker foi ativado; nenhuma regra do dicionário foi preenchida.
+
+**Make Script 2**: criado cenário **6637892**, `Roleta Script 2 · OCR shadow + evidência final (LAB)`, **on-demand, INATIVO**, validado pelo Make sem erros de configuração. Campos obrigatórios de entrada: `event_id`, `final_version_id`, `image_base64`, `final_json`. Cadeia: 1 `StartSubscenario` → 2 `http:MakeRequest` OCR.space com conexão protegida 11569872, `OCREngine=3`, `language=auto`, `isTable=true`, `scale=true`, `isOverlayRequired=true`, timeout 90 s, imagem JPEG em base64 → 3 `json:TransformToJSON` → 4 `ReturnData`. Saídas declaradas: `event_id`, `final_version_id`, `final_json`, `ocr_json`, `engine=ocr_space`. O cenário **não grava em Supabase**, **não aciona Gemini/Google comparativo** e **não normaliza nem promove regras**; são gates posteriores. Imagem PNG/WEBP exigirá parametrização MIME ao ligar ao backend. Nenhuma fotografia foi enviada ao novo cenário, nem teste real concluído.
+
+**Próximos gates:** teste real Gemini-only em produção com operador (sem interromper atendimento), tratamento de falhas sem OCR no Script 1, backend autenticado para captura temporária da imagem com vínculo à revisão final, storage privado com retenção e autorização, worker assíncrono para o Script 2, comparação Google opcional, revisão humana das propostas e alimentação auditada do dicionário. **Não marcar integração end-to-end como concluída.**
+
+
+**Limpeza de LABs:** após os ajustes, o LAB de integração antigo `6637766` foi desativado. Conferência de estados no Make: **6549955 ativo** (Gemini operacional), **6637892 inativo** (Script 2 shadow preparado), **6637766 inativo** (LAB antigo). Nenhuma implantação do Script 2 em produção.
+
+
+## Gate de ponte foto ↔ revisão: contrato preparado (14/10)
+
+Auditoria do frontend: `gemini-draft-ui.js` guarda a fotografia preparada em `selected` (variável em memória, não persistente) e emite/escuta `roleta-final-confirmed`. Esse evento significa **conferência humana**, NÃO comprova versão persistida no Supabase. `api/final-roulette.js` realiza gravação separada e `server/final-roulette-store.cjs` devolve `event_id` e `version` com status `saved|replayed`. A API usa sessão Google e CSRF; não reutilizar o evento visual como permissão para gravação OCR.
+
+Criados na branch `server/ocr-shadow-link.cjs` e `tests/ocr-shadow-link.test.cjs`: contrato puro valida tipo, assinatura e limite da imagem, sujeito Google, status `VALIDADO`, evento canônico `YYYY-MM-DD-(M|T|I)`, versão positiva e calcula `SHA-256` dos bytes, sem gravar foto ou invocar serviço. Testes de aceitação/rejeição incluídos; execução CI ainda deve ser consultada. Contrato é **somente preparação, não ponte funcional ponta a ponta**. `expectFinal` explicitamente exige que o backend verifique novamente versão persistida e autoria no banco antes de enfileirar. Não enviar segredo DB/Supabase ou webhook Make ao cliente.
+
+**Bloqueio de promoção:** antes de acionar `learning_jobs` é necessário (a) captura privada temporária da foto com expiração/retenção, (b) vínculo robusto com a resposta `saved/replayed`, (c) endpoint server-only com sessão Google + CSRF + validação de operador e consulta autoritativa da versão, (d) fila idempotente pelo trio evento/versão/digest, (e) worker com permissões mínimas separadas para leitura Storage e escrita `roleta_ocr`, (f) políticas de expiração e revisão humana. O esquema já criado não representa execução nem retenção de foto; o operador não deve supor que a imagem foi salva no servidor.
+
+
+## Preparação do armazenamento privado verificada
+
+Foi criada no Supabase a migration `create_roleta_ocr_private_storage_bucket_20261014`: bucket privado `roleta-ocr-shadow`, `public=false`, limite por objeto `900000` bytes e tipos MIME JPEG, PNG e WebP. Consulta posterior ao catálogo `storage.buckets` confirmou essas configurações. DDL espelhado em `database/production-review/20261014_roleta_ocr_private_storage_bucket_applied.sql`. Nenhuma política de acesso pública foi criada. **Bucket vazio; nenhum upload de foto testado nem endpoint conectado.** Política e execução de exclusão após prazo de retenção são **pendentes**; não afirmar que fotos expiram sozinhas. O contrato de arquivo usa o mesmo limite de `photo-prepare.js` (900000 bytes).
+
+O vínculo seguro não pode ser fechado apenas pelo evento visual `roleta-final-confirmed`: a gravação é independente no endpoint `/api/final-roulette`. A consulta autoritativa `roleta_audit.read_final_roulettes_v1()` devolve o evento, a versão corrente e o digest de cada folha final, e a função de gravação pode retornar `replayed` de versão antiga. O backend shadow deverá rejeitar uma versão que não seja a corrente, conferir operador autorizado, digest do conteúdo e associação da foto antes de upload. **Não habilitar UI nem worker até implementação e testes de autenticação, autorização, retenção e transação/idempotência.**
+
+
+## Ponte OCR shadow: gate de enfileiramento candidato (14/10)
+
+Na PR #120 foram adicionados `api/ocr-shadow-submit.js`, `tests/ocr-shadow-submit.test.cjs` e `database/production-review/20261014_roleta_ocr_enqueue_v1_candidate.sql`. Endpoint POST protegido por flag desativada por padrão (`ROLETA_OCR_SHADOW_ENABLED`), sessão Google autorizada, same-origin, CSRF, fotografia até 900 KB, MIME/assinatura, verificação de versão corrente da folha final e SHA-256. O serviço planeja upload privado ao bucket e enfileiramento mediante função SQL restrita ao writer dedicado. Testes de fronteira foram adicionados.
+
+**Migração SQL NÃO aplicada:** ferramenta bloqueou a operação. **Endpoint NÃO implantado nem habilitado:** flag permanece desativada, nenhuma foto ou job gravado. Falta auditoria e aplicação da função SQL, configuração server-only de Storage, tratamento de objetos órfãos e retenção, vínculo com a resposta de salvamento da folha final, worker assíncrono e testes reais. Nenhuma alteração do Script 1 após a separação. Manter PR draft.
+
+
+## Endurecimento do endpoint candidato (14/10, segundo gate)
+
+`api/ocr-shadow-submit.js` exige agora o cabeçalho de consentimento explícito `x-roleta-ocr-consent: yes`, além de sessão Google, same-origin, CSRF e checagem da versão final. Sem esse consentimento, retorna 403 antes de ler/gravar a fotografia. A função `databaseUrl` é chamada antes de qualquer tentativa de upload; uma configuração de banco ausente/inválida não deve criar foto órfã. `tests/ocr-shadow-submit.test.cjs` cobre a nova negativa sem consentimento. Código ainda só na PR #120; **não implantado**.
+
+A confirmação de persistência da folha é observada em `roulette-intake.js` no retorno `saved|replayed` de `/api/final-roulette`, com conferência de `current_version`. A tentativa de editar esse arquivo extenso nesta sessão foi bloqueada; nenhuma alteração de frontend foi aplicada. O evento `roleta-final-confirmed` permanece sendo apenas confirmação para impressão, não salvamento em banco. O upload não pode ser ligado a ele.
+
+A migration de enfileiramento no banco continua **não aplicada**, portanto a ponta de gravação do Script 2 não está funcional. CI da PR em nova execução, aguardando conclusão. Script 1 Gemini em produção sem alterações adicionais.
+
+
+**Auditoria extra do gate SQL:** função candidata endurecida para rejeitar parâmetros nulos e verificar que o caminho privado corresponde exatamente a `event_id/version/image_sha256.ext`. Sem essa checagem o padrão do caminho seria insuficiente para impedir associação cruzada de fotografias. Essa revisão está versionada na PR mas **não aplicada** no Supabase. A migração do Supabase permanece sujeita a revisão de segurança, especialmente privilégios `SECURITY DEFINER` e política de objetos órfãos. CI disparado novamente sobre a branch; ao registrar esta nota os seis checks estavam em andamento, não aprovados ainda.
+
+
+## Retentativa de 14/10 — migration aplicada e integração preparada
+
+A primeira nova aplicação da migration falhou por erro SQL: o candidato anterior havia sido corrompido por alterações parciais, com blocos duplicados. O arquivo defeituoso `20261014_roleta_ocr_enqueue_v1_candidate.sql` foi excluído da branch. Substituído por `database/production-review/20261014_roleta_ocr_enqueue_v1_corrected.sql`, conferido com uma definição de função e um par de delimitadores. **Migration `roleta_ocr_enqueue_confirmed_photo_v1_corrected_20261014` aplicada com sucesso** ao Supabase `uobxxgzshrmbtjfdolxd`. Auditoria posterior: função `roleta_ocr.enqueue_confirmed_photo_v1` existente, SECURITY DEFINER, dono postgres; EXECUTE para `anon=false`, `authenticated=false`, `roleta_v2_writer=true`. A função verifica identidade habilitada, evento, versão atual, digest, autoria da versão, SHA-256 e caminho correspondente; aplica idempotência na fila. Não houve execução de enqueue real.
+
+**Cliente preparado somente na PR #120:** `roulette-intake.js` emite `roleta-final-saved` exclusivamente após retorno `saved|replayed` com `current_version==version`. `gemini-draft-ui.js` adiciona opt-in explícito de aprendizagem, conserva a imagem preparada da leitura e a associa à folha transferida, remetendo-a de forma assíncrona ao endpoint com `event_id` e versão quando o evento de gravação ocorre. O endpoint extrai o digest **do ledger server-side**, e nunca confia em digest informado pelo cliente. Nenhuma alteração desse novo frontend foi publicada; `ROLETA_OCR_SHADOW_ENABLED` continua sem habilitação comprovada. O worker Make Script 2 continua inativo. Envio real, limpeza por TTL de imagens e reconciliação de órfãos ainda pendentes antes de ativação.
+
+
+## Gate de retenção e CI (14/10, execução subsequente)
+
+Criados `server/ocr-shadow-retention.cjs` e `tests/ocr-shadow-retention.test.cjs`: planejador **puro e não destrutivo** de limpeza de imagens privadas. Política candidata: órfãos do Storage com mais de **24h** e sem referência em jobs; imagem de job em estado final `confirmed|rejected|failed` após **30 dias** contados do evento/última atualização. Jobs `queued|processing|needs_review`, estados desconhecidos, caminhos inválidos ou timestamp incerto não são excluídos. O plano não chama Supabase e **não executa DELETE**; inventários, exclusões e retenção precisam de executor de backend autenticado com auditoria, dry-run e gate separado. Não anunciar que fotos já expiram automaticamente.
+
+Atualizado `.github/workflows/gemini-intake.yml` para executar `node --check` dos novos arquivos e testes `ocr-shadow-link`, `ocr-shadow-submit`, `ocr-shadow-retention` sob o job node-safety. Até a conclusão do CI não afirmar que os testes específicos passaram. A PR permanece draft, Script 2 inativo e nenhuma nova alteração do Script 1 operacional.
+
+
+## Gate de retenção segura e visibilidade do recurso — 14/10
+
+Implantação de código em draft: `server/ocr-shadow-cleanup.cjs` executa plano de limpeza em modo `dry-run` por padrão. Exige snapshots completos de jobs/objetos, refaz o inventário por objeto imediatamente antes de eventual exclusão, aborta sobre inventário incompleto e envia resultado ao callback de auditoria. O executor concreto agendado de Storage **não foi ligado**; nenhuma exclusão foi executada. Cobertura em `tests/ocr-shadow-cleanup.test.cjs` e workflow de segurança Node.
+
+Auditoria Vercel `roleta` (somente nomes dos envs): as credenciais `ROLETA_OCR_STORAGE_SERVICE_KEY`, `ROLETA_OCR_SUPABASE_URL` e flags do shadow/retention **ainda não estão configuradas**. Para fail-closed foi criado `api/ocr-shadow-capability.js` e alterado `gemini-draft-ui.js`: controle de opt-in permanece escondido quando não houver sessão, credenciais backend, acesso à folha e flags explícitas `ROLETA_OCR_SHADOW_ENABLED=true` e `ROLETA_OCR_RETENTION_READY=true`. Testado via `tests/ocr-shadow-capability.test.cjs`. Não provisionar/registrar credenciais privadas na PR. Não declarar retenção automática operativa ou pipeline de aprendizagem ativado.
+
+**Gate de promoção:** CI integral verde; merge autorizado pelo operador em 14/10, mas ativação separada depende de provisionamento protegido da credencial Storage, executor de retenção auditado e teste real não destrutivo. Sem esses controles, preservar flag desativada e Make Script 2 inativo.

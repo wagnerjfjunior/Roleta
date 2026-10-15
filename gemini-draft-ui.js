@@ -11,7 +11,7 @@ async function mount(host){
  '<div class="intake-actions"><button type="button" class="simulation-run" data-photo-camera>Tirar foto</button><button type="button" class="simulation-run" data-photo-gallery>Escolher da galeria</button></div>'+
  '<input data-photo-camera-file type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden>'+
  '<input data-photo-gallery-file type="file" accept="image/jpeg,image/png,image/webp" hidden>'+
- '<div data-photo-review hidden><img data-photo-preview alt="Pré-visualização da roleta selecionada" style="width:100%;max-height:420px;object-fit:contain;border-radius:8px;margin-top:12px"><p class="small muted" data-photo-meta></p><label class="intake-confirm"><input data-photo-confirm type="checkbox"> Conferi orientação, legibilidade e enquadramento da fotografia.</label><div class="intake-actions"><button type="button" data-photo-send class="simulation-run" disabled>Enviar para leitura automática</button><button type="button" data-photo-remove class="simulation-run">Substituir fotografia</button></div></div>'+
+ '<div data-photo-review hidden><img data-photo-preview alt="Pré-visualização da roleta selecionada" style="width:100%;max-height:420px;object-fit:contain;border-radius:8px;margin-top:12px"><p class="small muted" data-photo-meta></p><label class="intake-confirm"><input data-photo-confirm type="checkbox"> Conferi orientação, legibilidade e enquadramento da fotografia.</label><label class="intake-confirm" data-shadow-consent-wrap hidden><input data-shadow-consent type="checkbox"> Autorizo usar esta foto e a roleta final conferida no aprendizado privado do OCR.space, após salvar no Supabase.</label><div class="intake-actions"><button type="button" data-photo-send class="simulation-run" disabled>Enviar para leitura automática</button><button type="button" data-photo-remove class="simulation-run">Substituir fotografia</button></div></div>'+
  '<div data-google-auth class="intake-gate blocked"><strong>ACESSO À LEITURA AUTOMÁTICA</strong><div>Verificando login Google…</div></div>'+
  '<div class="intake-actions"><a data-google-login href="/api/auth/google/start" class="simulation-run" style="text-decoration:none">Entrar com Google</a><button data-google-logout type="button" class="simulation-run" hidden>Sair do Google</button></div>'+
  '<div data-photo-status class="intake-gate blocked"><strong>CONFERÊNCIA PENDENTE</strong><div>Faça login com Google, selecione uma foto e confirme o enquadramento.</div></div><div data-upload-progress class="rlt-upload-progress" role="status" aria-live="polite" hidden><span data-upload-label></span><progress data-upload-meter max="100" value="0"></progress></div>'+
@@ -47,6 +47,26 @@ async function mount(host){
  const logoutButton=article.querySelector('[data-google-logout]');
  let googleSession=null;
  let learningCandidate=null;
+ let photoEvidence=null;
+ const shadowConsent=article.querySelector('[data-shadow-consent]');
+ const shadowConsentWrap=article.querySelector('[data-shadow-consent-wrap]');
+ fetch('/api/ocr-shadow-capability',{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.json():{enabled:false}).then(v=>{shadowConsentWrap.hidden=v.enabled!==true;if(v.enabled!==true)shadowConsent.checked=false;}).catch(()=>{shadowConsent.checked=false;shadowConsentWrap.hidden=true;});
+ host.addEventListener('roleta-final-saved',event=>{
+   const evidence=photoEvidence;
+   if(!shadowConsent.checked||!evidence?.eventKey||!evidence.file||!googleSession?.authenticated)return;
+   const detail=event.detail||{};
+   if(window.RoletaOcrLearning?.key(evidence.reviewed)!==evidence.eventKey)return;
+   const e=evidence.reviewed?.evento||{};
+   const date=String(e.data||'').split('/');
+   const suffix={MANHA:'M',TARDE:'T',INTEGRAL:'I'}[String(e.periodo||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()];
+   if(date.length!==3||detail.event_id!==date[2]+'-'+date[1]+'-'+date[0]+'-'+suffix)return;
+   if(!['saved','replayed'].includes(detail.status)||!Number.isSafeInteger(detail.version)||detail.version<1)return;
+   const headers={'Content-Type':evidence.file.type,'X-Roleta-CSRF':googleSession.csrfToken,'X-Roleta-OCR-Consent':'yes','X-Roleta-Event-Id':detail.event_id,'X-Roleta-Final-Version':String(detail.version)};
+   const note=details.querySelector('[data-learning-status]');
+   fetch('/api/ocr-shadow-submit',{method:'POST',headers,body:evidence.file,cache:'no-store',credentials:'same-origin'}).then(async response=>{
+     if(note)note.textContent=response.status===202?'Evidência enviada para aprendizagem privada. A revisão humana continua obrigatória.':'A folha foi salva; a aprendizagem paralela ainda não está disponível.';
+   }).catch(()=>{if(note)note.textContent='Folha salva. Falha na aprendizagem paralela, sem impacto no resultado.';});
+ });
  host.addEventListener('roleta-final-confirmed',event=>{
    const learning=window.RoletaOcrLearning,candidate=learningCandidate;
    if(!learning||!candidate||!googleSession?.authenticated||googleSession.email!==candidate.account)return;
@@ -89,7 +109,7 @@ async function mount(host){
  function resetPhoto(){
    photoGeneration++;preparing=false;
    if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;}
-   selected=null;camera.value='';gallery.value='';review.hidden=true;
+   selected=null;photoEvidence=null;camera.value='';gallery.value='';review.hidden=true;
    preview.removeAttribute('src');confirmation.checked=false;send.disabled=true;
  }
  async function setPhoto(file){
@@ -130,6 +150,7 @@ async function mount(host){
      const data=json?.result;
      if(!data||!Array.isArray(data.linhas))throw Error('O Make retornou resposta incompleta.');
      textarea.value=JSON.stringify(data,null,2);
+     photoEvidence={file:selected,draftJson:JSON.stringify(data),eventKey:null,reviewed:null};
      progress('Leitura recebida. Preparando conferência…',null);
      await renderDraft();
      photoStatus.className='intake-gate blocked';
@@ -389,6 +410,10 @@ async function mount(host){
            return original?.posicao_impressa!=null&&sourcePositions.get(Number(original.posicao_impressa))===1&&Number(tr.querySelector('[data-correct-position]').value)===Number(original.posicao_impressa)?[original]:[];
          });
          learningCandidate={account:googleSession.email,eventKey:learning.key(checked.payload),source:{...value,linhas:safeLines},directory:dto};
+       }
+       if(photoEvidence){
+         photoEvidence.eventKey=JSON.stringify(value)===photoEvidence.draftJson?window.RoletaOcrLearning?.key(checked.payload):null;
+         photoEvidence.reviewed=checked.payload;
        }
        canonicalInput.value=JSON.stringify(checked.payload,null,2);
        canonicalButton.click();
