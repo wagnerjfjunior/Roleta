@@ -1,5 +1,19 @@
 (function(){
 'use strict';
+function reviewDateISO(value){
+ const raw=String(value??'').trim();
+ const br=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(raw);
+ const iso=/^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+ const y=br?br[3]:iso?.[1],m=br?br[2]:iso?.[2],d=br?br[1]:iso?.[3];
+ if(!y||!m||!d)return '';
+ const date=new Date(Date.UTC(+y,+m-1,+d));
+ if(date.getUTCFullYear()!==+y||date.getUTCMonth()!==+m-1||date.getUTCDate()!==+d)return '';
+ return y+'-'+m+'-'+d;
+}
+function reviewDateBR(iso){
+ const x=reviewDateISO(iso);
+ return x?x.slice(8,10)+'/'+x.slice(5,7)+'/'+x.slice(0,4):'';
+}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function mount(host){
  if(!host||!window.RoletaGeminiConverter)return;
@@ -253,7 +267,7 @@ async function mount(host){
        '<div class="intake-actions"><button type="button" data-review-add-line class="simulation-run">Adicionar participante que falta</button></div>'+
        '<h3>Conferir cabeçalho operacional</h3>'+
        '<div class="rltv2-company-review">'+
-       '<label><span>Data</span><input data-review-date type="text" value="'+escapeHtml(window.RoletaIntakeNormalization.dateInfo(value.data)?.data||value.data||'')+'"></label>'+
+       '<label><span>Data</span><input data-review-date type="date" lang="pt-BR" required aria-label="Selecionar dia, mês e ano" value="'+escapeHtml(reviewDateISO(window.RoletaIntakeNormalization.dateInfo(value.data)?.data||value.data||''))+'"></label>'+
        '<label><span>Período</span><select data-review-period><option value="MANHÃ">MANHÃ</option><option value="TARDE">TARDE</option><option value="INTEGRAL">INTEGRAL</option></select></label>'+
        '<label><span>Helbor (quantidade na folha)</span><input data-review-helbor type="number" min="0" placeholder="Digitar e conferir na foto"></label>'+
        '<label><span>Tipo de sorteio de empresa</span><select data-review-share><option value="">Escolher regra</option><option value="tegra_share">Share Tegra (2 posições)</option><option value="none">Sem share</option><option value="helbor_share">Share Helbor (2 posições)</option></select></label>'+
@@ -380,7 +394,7 @@ async function mount(host){
        }));
        const header={
          confirmEnterprise:human.querySelector('[data-review-enterprise]').checked,
-         data:human.querySelector('[data-review-date]').value,
+         data:reviewDateBR(human.querySelector('[data-review-date]').value),
          periodo:human.querySelector('[data-review-period]').value,
          helbor:human.querySelector('[data-review-helbor]').value,
          share:human.querySelector('[data-review-share]').value,
