@@ -52,12 +52,12 @@ function createHandler({env=process.env,authenticate=auth,read=readFinal,authori
    if(Number(req.headers['content-length']||0)>MAX_IMAGE_BYTES)return res.status(413).json({error:'Imagem excessiva.'});
    const eventId=String(req.headers['x-roleta-event-id']||'');
    const version=Number(req.headers['x-roleta-final-version']);
-   const digest=String(req.headers['x-roleta-final-digest']||'');
-   if(!/^[a-f0-9]{64}$/.test(digest)||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}-[MTI]$/.test(eventId)||!Number.isSafeInteger(version)||version<1)return res.status(422).json({error:'Evento/versão inválidos.'});
+   if(!/^[0-9]{4}-[0-9]{2}-[0-9]{2}-[MTI]$/.test(eventId)||!Number.isSafeInteger(version)||version<1)return res.status(422).json({error:'Evento/versão inválidos.'});
    await authorize(session,{env});
    const records=await read({env});
    const current=records.find(r=>r.event_id===eventId);
-   if(!current||current.version!==version||current.digest!==digest)return res.status(409).json({error:'A versão atual confirmada não corresponde à solicitação.'});
+   if(!current||current.version!==version||!/^[a-f0-9]{64}$/.test(current.digest||''))return res.status(409).json({error:'A versão atual confirmada não corresponde à solicitação.'});
+   const digest=current.digest;
    const bytes=await bytesFromRequest(req);
    const verified=expectFinal({eventId,version,operatorSub:session.sub,reviewed:current.payload?.reviewed,image:bytes,mime});
    // Preflight and atomic enqueue independently check the current version.
