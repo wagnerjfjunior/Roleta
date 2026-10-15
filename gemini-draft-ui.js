@@ -50,7 +50,7 @@ async function mount(host){
  let photoEvidence=null;
  const shadowConsent=article.querySelector('[data-shadow-consent]');
  const shadowConsentWrap=article.querySelector('[data-shadow-consent-wrap]');
- fetch('/api/ocr-shadow-capability',{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.json():{enabled:false}).then(v=>{shadowConsentWrap.hidden=v.enabled!==true;if(v.enabled!==true)shadowConsent.checked=false;}).catch(()=>{shadowConsent.checked=false;shadowConsentWrap.hidden=true;});
+ fetch('/api/ocr-shadow-submit',{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.json():{enabled:false}).then(v=>{shadowConsentWrap.hidden=v.enabled!==true;if(v.enabled!==true)shadowConsent.checked=false;}).catch(()=>{shadowConsent.checked=false;shadowConsentWrap.hidden=true;});
  host.addEventListener('roleta-final-saved',event=>{
    const evidence=photoEvidence;
    if(!shadowConsent.checked||!evidence?.eventKey||!evidence.file||!googleSession?.authenticated)return;
