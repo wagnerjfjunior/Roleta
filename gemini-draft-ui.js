@@ -54,7 +54,6 @@ async function mount(host){
    if(!shadowConsent.checked||!evidence?.eventKey||!evidence.file||!googleSession?.authenticated)return;
    const detail=event.detail||{};
    if(window.RoletaOcrLearning?.key(evidence.reviewed)!==evidence.eventKey)return;
-   if(evidence.eventKey!==window.RoletaOcrLearning?.key(evidence.reviewed))return;
    const e=evidence.reviewed?.evento||{};
    const date=String(e.data||'').split('/');
    const suffix={MANHA:'M',TARDE:'T',INTEGRAL:'I'}[String(e.periodo||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()];
