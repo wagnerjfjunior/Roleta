@@ -105,3 +105,14 @@ Implantação de código em draft: `server/ocr-shadow-cleanup.cjs` executa plano
 Auditoria Vercel `roleta` (somente nomes dos envs): as credenciais `ROLETA_OCR_STORAGE_SERVICE_KEY`, `ROLETA_OCR_SUPABASE_URL` e flags do shadow/retention **ainda não estão configuradas**. Para fail-closed foi criado `api/ocr-shadow-capability.js` e alterado `gemini-draft-ui.js`: controle de opt-in permanece escondido quando não houver sessão, credenciais backend, acesso à folha e flags explícitas `ROLETA_OCR_SHADOW_ENABLED=true` e `ROLETA_OCR_RETENTION_READY=true`. Testado via `tests/ocr-shadow-capability.test.cjs`. Não provisionar/registrar credenciais privadas na PR. Não declarar retenção automática operativa ou pipeline de aprendizagem ativado.
 
 **Gate de promoção:** CI integral verde; merge autorizado pelo operador em 14/10, mas ativação separada depende de provisionamento protegido da credencial Storage, executor de retenção auditado e teste real não destrutivo. Sem esses controles, preservar flag desativada e Make Script 2 inativo.
+
+
+## Publicação controlada em produção — 14/10/2026 (SFJM fechamento do gate)
+
+PR #120 mergeada na main em `f93cafdbf68e08e34dad85044e01f01d90434f8c`, após 6/6 checks verdes, mas deploy Vercel `dpl_CvmvJB3jLgZG4sKDt3M18FLMhcrk` ficou ERROR: excedeu 12 serverless functions no plano Hobby (13 rotas `api/`). Essa implantação NÃO foi bem-sucedida.
+
+PR #121 corretiva mergeada na main em `7ab112724debc42bbe475ecf1600f7bcb629b7db`, após 6/6 checks verdes. Consolidou a consulta GET de capacidade e POST de envio OCR no único endpoint `api/ocr-shadow-submit.js`, removeu `api/ocr-shadow-capability.js` e ajustou UI e testes. Contagem verificada: exatamente 12 funções. Deployment de produção Vercel `dpl_Hu71nwG8Rkmebvs2Dwuj1ibLVEh7` observado READY no SHA exato `7ab11272`. Domínio de referência: `roleta-tgv.vercel.app`.
+
+**Ativação permanece FECHADA.** Consulta ao catálogo de nomes de variáveis Vercel confirmou ausência de `ROLETA_OCR_STORAGE_SERVICE_KEY`, `ROLETA_OCR_SUPABASE_URL`, `ROLETA_OCR_SHADOW_ENABLED` e `ROLETA_OCR_RETENTION_READY`; nenhum segredo foi exposto. GET de capacidade deve ficar false; checkbox opt-in oculto; POST protegido pela flag ausente; Make Script 2 `6637892` inativo. O dicionário continua vazio; planejamento e executor interno de retenção são testados, mas nenhum agendamento/executor concreto de exclusão de Storage foi ativado. Não afirmar fotos armazenadas/apagadas automaticamente, processamento shadow operacional ou aprendizado real.
+
+**Rollback:** reverter o código de PR #121 e/ou PR #120 via PR de reversão, com checks e limite de 12 funções observado, ou restaurar deployment READY anterior no Vercel se necessário. Reversão de código não elimina schema `roleta_ocr`, função SQL ou bucket: operações destrutivas exigem auditoria e autorização específicas. O fluxo Gemini primário (Make `6549955`) não foi modificado nesse gate.
