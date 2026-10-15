@@ -1009,3 +1009,49 @@ body{overflow-x:hidden}
 @media screen and (max-width:600px){
  .workspace-nav a.workspace-nav-link{font-size:16px}
 }
+
+
+/* RLT mobile review: compact two-tier broker cards, retaining every editable field. */
+@media (max-width:600px){
+ .rlt-five-column-review{overflow:visible!important;background:transparent;border:0}
+ .rlt-five-column-table{display:block!important;width:100%!important;min-width:0!important;table-layout:auto}
+ .rlt-five-column-table thead{display:none}
+ .rlt-five-column-table tbody{display:grid;gap:9px}
+ .rlt-five-column-table tbody tr[data-correction-row]{
+   display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.3fr);
+   gap:8px;padding:10px;border:1px solid #2a405a;border-radius:13px;background:#111d2c;
+ }
+ .rlt-five-column-table tbody tr[data-correction-row] td{
+   display:flex!important;flex-direction:column;align-items:stretch;gap:4px;
+   box-sizing:border-box;width:auto!important;min-width:0!important;
+   border:0!important;padding:0!important;background:transparent;
+ }
+ .rlt-five-column-table tbody tr[data-correction-row] td::before{
+   display:block;color:#a5b7ca;letter-spacing:.02em;font-size:10px;
+   font-weight:700;line-height:1.2;
+ }
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(1){grid-area:1/1}
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(2){grid-area:1/2}
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(5){grid-area:1/3}
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(3){grid-area:2/1/span 1/span 2}
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(4){grid-area:2/3}
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(1)::before{content:"Posição"}
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(2)::before{content:"Bolinha"}
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(3)::before{content:"Corretor"}
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(4)::before{content:"Participação"}
+ .rlt-five-column-table tbody tr[data-correction-row] td:nth-child(5)::before{content:"Conferência"}
+ .rlt-five-column-table tbody tr[data-correction-row] input:not([type=checkbox]),
+ .rlt-five-column-table tbody tr[data-correction-row] select[data-correct-class]{
+   box-sizing:border-box;width:100%!important;min-width:0!important;max-width:100%!important;
+   min-height:44px!important;height:44px!important;padding:5px 6px!important;
+   font-size:16px!important;line-height:1.25;
+ }
+ .rlt-five-column-table tbody tr[data-correction-row] select[data-correct-class]{font-size:13px!important}
+ .rlt-five-column-table tbody tr[data-correction-row] .rlt-line-check{
+   flex-direction:row!important;justify-content:flex-start;align-items:center;gap:5px;min-height:44px;
+ }
+ .rlt-five-column-table tbody tr[data-correction-row] .rlt-line-check input{width:24px;height:24px;flex-shrink:0}
+ .rlt-five-column-table tbody tr[data-correction-row] [data-line-state]{font-size:10px;line-height:1.15}
+ .rlt-five-column-table tbody tr[data-correction-row] td small{font-size:10px;line-height:1.2;overflow-wrap:anywhere}
+ .rltv2-company-review input[data-review-date]{font-size:16px;min-height:48px;max-width:100%;box-sizing:border-box}
+}
