@@ -70,3 +70,12 @@ O vínculo seguro não pode ser fechado apenas pelo evento visual `roleta-final-
 Na PR #120 foram adicionados `api/ocr-shadow-submit.js`, `tests/ocr-shadow-submit.test.cjs` e `database/production-review/20261014_roleta_ocr_enqueue_v1_candidate.sql`. Endpoint POST protegido por flag desativada por padrão (`ROLETA_OCR_SHADOW_ENABLED`), sessão Google autorizada, same-origin, CSRF, fotografia até 900 KB, MIME/assinatura, verificação de versão corrente da folha final e SHA-256. O serviço planeja upload privado ao bucket e enfileiramento mediante função SQL restrita ao writer dedicado. Testes de fronteira foram adicionados.
 
 **Migração SQL NÃO aplicada:** ferramenta bloqueou a operação. **Endpoint NÃO implantado nem habilitado:** flag permanece desativada, nenhuma foto ou job gravado. Falta auditoria e aplicação da função SQL, configuração server-only de Storage, tratamento de objetos órfãos e retenção, vínculo com a resposta de salvamento da folha final, worker assíncrono e testes reais. Nenhuma alteração do Script 1 após a separação. Manter PR draft.
+
+
+## Endurecimento do endpoint candidato (14/10, segundo gate)
+
+`api/ocr-shadow-submit.js` exige agora o cabeçalho de consentimento explícito `x-roleta-ocr-consent: yes`, além de sessão Google, same-origin, CSRF e checagem da versão final. Sem esse consentimento, retorna 403 antes de ler/gravar a fotografia. A função `databaseUrl` é chamada antes de qualquer tentativa de upload; uma configuração de banco ausente/inválida não deve criar foto órfã. `tests/ocr-shadow-submit.test.cjs` cobre a nova negativa sem consentimento. Código ainda só na PR #120; **não implantado**.
+
+A confirmação de persistência da folha é observada em `roulette-intake.js` no retorno `saved|replayed` de `/api/final-roulette`, com conferência de `current_version`. A tentativa de editar esse arquivo extenso nesta sessão foi bloqueada; nenhuma alteração de frontend foi aplicada. O evento `roleta-final-confirmed` permanece sendo apenas confirmação para impressão, não salvamento em banco. O upload não pode ser ligado a ele.
+
+A migration de enfileiramento no banco continua **não aplicada**, portanto a ponta de gravação do Script 2 não está funcional. CI da PR em nova execução, aguardando conclusão. Script 1 Gemini em produção sem alterações adicionais.
