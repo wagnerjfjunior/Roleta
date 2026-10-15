@@ -46,6 +46,7 @@ function createHandler({env=process.env,authenticate=auth,read=readFinal,authori
    const allowed=String(env.ROLETA_FINAL_OPERATOR_EMAILS||'').split(',').map(v=>v.trim().toLowerCase()).filter(Boolean);
    if(!allowed.includes(session.email)||!/^[A-Za-z0-9_-]{1,128}$/.test(session.sub))return res.status(403).json({error:'Operador não autorizado.'});
    if(!constantEqual(req.headers['x-roleta-csrf'],authenticate.csrfForSub(session.sub)))return res.status(403).json({error:'Confirmação de segurança inválida.'});
+   if(req.headers['x-roleta-ocr-consent']!=='yes')return res.status(403).json({error:'Autorização explícita para aprendizagem OCR necessária.'});
    const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
    if(!Object.hasOwn(TYPES,mime))return res.status(415).json({error:'Formato não permitido.'});
    if(Number(req.headers['content-length']||0)>MAX_IMAGE_BYTES)return res.status(413).json({error:'Imagem excessiva.'});
@@ -62,8 +63,9 @@ function createHandler({env=process.env,authenticate=auth,read=readFinal,authori
    // Preflight and atomic enqueue independently check the current version.
    // The database function also checks final version authorship.
    const path=eventId+'/'+version+'/'+verified.image_sha256+'.'+TYPES[mime];
-   await storage({env,bytes,mime,path});
+   // Fail closed before upload when the dedicated database credential is missing.
    databaseUrl(env);
+   await storage({env,bytes,mime,path});
    const saved=await poolFn({env}).query(SQL,[eventId,version,digest,session.sub,verified.image_sha256,path]);
    const result=saved.rows?.[0]?.result;
    if(result?.status!=='queued'||result.event_id!==eventId||result.final_version_id!==String(version))throw Object.assign(Error('Resposta do enfileiramento inválida'),{status:503});
