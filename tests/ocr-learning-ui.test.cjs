@@ -16,7 +16,8 @@ test('real review UI learns only on final confirmation and never from a moved ph
    assert.equal(doc.querySelector('[data-correct-confirm]').checked,false);
    doc.querySelector('[data-correct-position]').value=position;
    doc.querySelector('[data-correct-name]').value='Paola';
-   doc.querySelector('[data-review-date]').value=date;
+   // The native date picker accepts ISO; the UI converts back to BR for the canonical bridge.
+   doc.querySelector('[data-review-date]').value=date.split('/').reverse().join('-');
    doc.querySelector('[data-review-period]').value='TARDE';
    doc.querySelector('[data-review-helbor]').value='17';
    const share=doc.querySelector('[data-review-share]');share.value='tegra_share';share.dispatchEvent(new w.Event('change'));
