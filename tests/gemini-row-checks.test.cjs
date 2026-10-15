@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const s=fs.readFileSync('gemini-draft-ui.js','utf8');
-for(const k of ['data-correct-confirm','data-line-progress','transferButton.disabled','rlt-line-verified','rlt-line-attention','Posição na folha','Bolinha sorteada','data-correct-position','numericPosition','positions.get(parsedPhysical)','invalidPhysical','posicao_impressa:tr.querySelector'])assert.ok(s.includes(k),k);
+for(const k of ['data-correct-confirm','data-line-progress','transferButton.disabled','rlt-line-verified','rlt-line-attention','rlt-review-pos','rlt-review-ball','rlt-review-confirm','data-correct-position','numericPosition','positions.get(parsedPhysical)','invalidPhysical','posicao_impressa:tr.querySelector'])assert.ok(s.includes(k),k);
 console.log('PASS: review checklist guards');
 
 // Verify that physical positions are compared as canonical integers.
