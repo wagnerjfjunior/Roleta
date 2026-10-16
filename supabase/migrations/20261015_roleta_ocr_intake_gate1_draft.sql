@@ -43,6 +43,12 @@ BEGIN
     OR NEW.created_at IS DISTINCT FROM OLD.created_at THEN
    RAISE EXCEPTION 'immutable job identity';
  END IF;
+ IF NEW.state = 'READY_FOR_REVIEW' AND NOT EXISTS (SELECT 1 FROM roleta_intake.results WHERE job_id=NEW.id) THEN
+   RAISE EXCEPTION 'ready state requires persisted Gemini result';
+ END IF;
+ IF NEW.state = 'FAILED' AND EXISTS (SELECT 1 FROM roleta_intake.results WHERE job_id=NEW.id) THEN
+   RAISE EXCEPTION 'cannot fail a job with persisted Gemini result';
+ END IF;
  IF NEW.state IS DISTINCT FROM OLD.state THEN
    IF NOT ((OLD.state='QUEUED' AND NEW.state IN ('PROCESSING','FAILED'))
         OR (OLD.state='PROCESSING' AND NEW.state IN ('READY_FOR_REVIEW','FAILED'))) THEN
@@ -55,6 +61,20 @@ END $$;
 DROP TRIGGER IF EXISTS trg_enforce_job_transition ON roleta_intake.jobs;
 CREATE TRIGGER trg_enforce_job_transition BEFORE UPDATE ON roleta_intake.jobs
  FOR EACH ROW EXECUTE FUNCTION roleta_intake.enforce_job_transition();
+
+-- So aceita resultado quando a solicitacao esta PROCESSING. O callback F2 deve
+-- inserir resultado e concluir o job na MESMA transacao; nenhuma falha parcial.
+CREATE OR REPLACE FUNCTION roleta_intake.require_processing_for_result()
+RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $
+BEGIN
+ IF NOT EXISTS (SELECT 1 FROM roleta_intake.jobs WHERE id=NEW.job_id AND state='PROCESSING' FOR UPDATE) THEN
+   RAISE EXCEPTION 'Gemini result requires PROCESSING job';
+ END IF;
+ RETURN NEW;
+END $;
+DROP TRIGGER IF EXISTS trg_require_processing_for_result ON roleta_intake.results;
+CREATE TRIGGER trg_require_processing_for_result BEFORE INSERT ON roleta_intake.results
+ FOR EACH ROW EXECUTE FUNCTION roleta_intake.require_processing_for_result();
 
 -- Impede alteracao ou exclusao do JSON bruto por caminhos comuns.
 CREATE OR REPLACE FUNCTION roleta_intake.reject_result_mutation()
@@ -71,6 +91,7 @@ ALTER TABLE roleta_intake.jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE roleta_intake.results ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON ALL TABLES IN SCHEMA roleta_intake FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA roleta_intake FROM PUBLIC, anon, authenticated;
+-- RLS nao substitui GRANT; ausencia de politicas = acesso negado a roles comuns.
 -- ATENCAO: o proprietario das tabelas contorna RLS; a API nao deve usar credencial proprietaria
 -- irrestrita. F2 criara funcoes SECURITY DEFINER com search_path fixo, grants EXPLICITAMENTE
 -- limitados ao writer dedicado, callback autenticado, transacao atomica e idempotencia.
