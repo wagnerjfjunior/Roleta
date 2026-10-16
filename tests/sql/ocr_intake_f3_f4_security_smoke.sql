@@ -46,6 +46,10 @@ BEGIN
  EXCEPTION WHEN insufficient_privilege THEN blocked:=true;
  END;
  IF NOT blocked THEN RAISE EXCEPTION 'API direct table read succeeded'; END IF;
+ -- An already completed job must not be marked failed by a late dispatch error.
+ IF roleta_intake.fail_dispatch(j,'operator-A') THEN
+  RAISE EXCEPTION 'late dispatch failure overwrote READY';
+ END IF;
 END $tests$;
 RESET ROLE;
 ROLLBACK;
