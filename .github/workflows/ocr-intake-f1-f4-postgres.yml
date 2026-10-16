@@ -51,4 +51,4 @@ jobs:
       - name: Install Node dependencies
         run: npm install --ignore-scripts --no-audit --no-fund
       - name: Node unit tests
-        run: node --test tests/ocr-callback-hmac.test.cjs tests/ocr-callback-endpoint.test.cjs tests/ocr-async-contract.test.cjs
+        run: node --test tests/ocr-callback-hmac.test.cjs tests/ocr-callback-endpoint.test.cjs tests/ocr-async-contract.test.cjs tests/ocr-job-submit.test.cjs
