@@ -64,4 +64,5 @@ function createHandler({env=process.env,authenticate=auth,db=getIntakePool,dispa
   }catch(e){return res.status(e.status===413?413:e.status===415?415:503).json({error:'OCR submission unavailable'});}
  };
 }
-module.exports=createHandler();module.exports.createHandler=createHandler;
+module.exports=createHandler();
+module.exports.config={api:{bodyParser:false}};module.exports.createHandler=createHandler;
