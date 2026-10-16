@@ -8,7 +8,28 @@ DECLARE
  j uuid := gen_random_uuid();
  j2 uuid := gen_random_uuid();
  failed boolean;
+ state_test record;
 BEGIN
+ -- A new job must start QUEUED: direct INSERT cannot bypass transition checks.
+ FOR state_test IN SELECT unnest(ARRAY['PROCESSING','READY_FOR_REVIEW','FAILED']) AS state LOOP
+   failed := false;
+   BEGIN
+     INSERT INTO roleta_intake.jobs(id,operator_sub,image_sha256,state,finished_at,error_code)
+     VALUES(gen_random_uuid(),'operator-A',repeat('f',64),state_test.state,
+       CASE WHEN state_test.state IN ('READY_FOR_REVIEW','FAILED') THEN now() ELSE NULL END,
+       CASE WHEN state_test.state='FAILED' THEN 'TEST_ERROR' ELSE NULL END);
+   EXCEPTION WHEN OTHERS THEN failed := true;
+   END;
+   IF NOT failed THEN RAISE EXCEPTION 'direct INSERT accepted forbidden initial state %',state_test.state; END IF;
+ END LOOP;
+ -- QUEUED with terminal metadata is also forbidden.
+ failed := false;
+ BEGIN
+   INSERT INTO roleta_intake.jobs(id,operator_sub,image_sha256,error_code)
+   VALUES(gen_random_uuid(),'operator-A',repeat('f',64),'PREMATURE_ERROR');
+ EXCEPTION WHEN OTHERS THEN failed := true;
+ END;
+ IF NOT failed THEN RAISE EXCEPTION 'QUEUED with terminal metadata accepted'; END IF;
  INSERT INTO roleta_intake.jobs(id,operator_sub,image_sha256)
  VALUES(j,'operator-A',repeat('a',64));
  -- READY cannot precede persisted result.
