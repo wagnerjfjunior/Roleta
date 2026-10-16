@@ -1,6 +1,5 @@
 'use strict';
 // Separate credential: NEVER use postgres, service_role, or existing roleta_v2_writer.
-const {Pool}=require('pg');
 let pool;
 function getIntakePool(env=process.env){
  if(env.ROLETA_INTAKE_ENABLED!=='true')throw Error('intake disabled');
@@ -15,8 +14,8 @@ function getIntakePool(env=process.env){
    u.searchParams.get('sslmode')!=='verify-full')throw Error('unapproved intake database target');
  if(!/^-----BEGIN CERTIFICATE-----\r?\n[\s\S]+-----END CERTIFICATE-----\s*$/.test(ca))throw Error('intake CA missing');
  u.searchParams.delete('sslmode');
- if(!pool)pool=new Pool({connectionString:u.toString(),ssl:{ca,rejectUnauthorized:true,servername:u.hostname},max:2,
-   connectionTimeoutMillis:5000,statement_timeout:8000,query_timeout:10000,application_name:'roleta-intake'});
+ if(!pool){const {Pool}=require('pg');pool=new Pool({connectionString:u.toString(),ssl:{ca,rejectUnauthorized:true,servername:u.hostname},max:2,
+   connectionTimeoutMillis:5000,statement_timeout:8000,query_timeout:10000,application_name:'roleta-intake'});}
  return pool;
 }
 module.exports={getIntakePool};
