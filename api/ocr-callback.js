@@ -27,7 +27,7 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
    const validated=verify({method:req.method,path:'/api/ocr-callback',timestamp,nonce,jobId,body,signature},{secret:env.ROLETA_INTAKE_HMAC_SECRET});
    const parsed=JSON.parse(body.toString('utf8'));
    if(!parsed||Array.isArray(parsed)||typeof parsed!=='object'||
-      typeof parsed.model_id!=='string'||!parsed.model_id||
+      typeof parsed.model_id!=='string'||!parsed.model_id||parsed.model_id.length>128||
       !parsed.result||Array.isArray(parsed.result)||!['object','string'].includes(typeof parsed.result))
       return res.status(422).json({error:'Invalid result envelope'});
    // Gemini module returns JSON as a string in Make; accept both JSON string and object.
@@ -36,7 +36,7 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
     if(Buffer.byteLength(result,'utf8')>MAX)return res.status(413).json({error:'Result too large'});
     result=JSON.parse(result);
    }
-   if(!result||Array.isArray(result)||typeof result!=='object')return res.status(422).json({error:'Invalid Gemini JSON'});
+   if(!result||Array.isArray(result)||typeof result!=='object'||!Array.isArray(result.linhas))return res.status(422).json({error:'Invalid Gemini JSON'});
    // Derive digest from the same canonical jsonb representation inside PostgreSQL.
    const r=await db(env).query(
     'SELECT roleta_intake.complete_signed_callback($1,$2,$3,$4::jsonb,encode(sha256(convert_to($4::jsonb::text,\'UTF8\')),\'hex\')) AS outcome',
