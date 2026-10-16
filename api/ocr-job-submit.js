@@ -18,7 +18,7 @@ function createHandler({env=process.env,authenticate=auth,db=getIntakePool,dispa
   try{
    const s=authenticate.session(req);
    const allowed=String(env.ROLETA_FINAL_OPERATOR_EMAILS||'').split(',').map(x=>x.trim().toLowerCase());
-   if(!s||!allowed.includes(s.email))return res.status(403).json({error:'Unauthorized'});
+   if(!s||!allowed.includes(String(s.email).toLowerCase()))return res.status(403).json({error:'Unauthorized'});
    if(!authenticate.requireSameOrigin(req))return res.status(403).json({error:'Origin rejected'});
    const expected=Buffer.from(authenticate.csrfForSub(s.sub));
    const supplied=typeof req.headers['x-roleta-csrf']==='string'?Buffer.from(req.headers['x-roleta-csrf']):Buffer.alloc(0);
@@ -33,7 +33,7 @@ function createHandler({env=process.env,authenticate=auth,db=getIntakePool,dispa
    if(!((mime==='image/jpeg'&&jpeg)||(mime==='image/png'&&png)||(mime==='image/webp'&&webp)))return res.status(415).json({error:'Image signature mismatch'});
    // Validate dispatch configuration before transitioning a job to PROCESSING.
    const target=new URL(env.ROLETA_INTAKE_MAKE_WEBHOOK_URL||'');
-   if(target.protocol!=='https:'||!target.hostname.endsWith('.make.com'))throw Error('Invalid Make endpoint');
+   if(target.protocol!=='https:'||target.username||target.password||target.port||target.hash||!/^([a-z0-9-]+\.)+make\.com$/i.test(target.hostname))throw Error('Invalid Make endpoint');
    const digest=crypto.createHash('sha256').update(bytes).digest('hex');
    const pool=db(env);
    const created=await pool.query('SELECT roleta_intake.create_job($1,$2) AS id',[s.sub,digest]);
