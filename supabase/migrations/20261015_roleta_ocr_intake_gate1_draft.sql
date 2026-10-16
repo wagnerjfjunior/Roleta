@@ -65,13 +65,13 @@ CREATE TRIGGER trg_enforce_job_transition BEFORE UPDATE ON roleta_intake.jobs
 -- So aceita resultado quando a solicitacao esta PROCESSING. O callback F2 deve
 -- inserir resultado e concluir o job na MESMA transacao; nenhuma falha parcial.
 CREATE OR REPLACE FUNCTION roleta_intake.require_processing_for_result()
-RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $
+RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $gemini_result$
 BEGIN
  IF NOT EXISTS (SELECT 1 FROM roleta_intake.jobs WHERE id=NEW.job_id AND state='PROCESSING' FOR UPDATE) THEN
    RAISE EXCEPTION 'Gemini result requires PROCESSING job';
  END IF;
  RETURN NEW;
-END $;
+END $gemini_result$;
 DROP TRIGGER IF EXISTS trg_require_processing_for_result ON roleta_intake.results;
 CREATE TRIGGER trg_require_processing_for_result BEFORE INSERT ON roleta_intake.results
  FOR EACH ROW EXECUTE FUNCTION roleta_intake.require_processing_for_result();
