@@ -10,7 +10,7 @@ function createHandler({env=process.env,authenticate=auth,db=getIntakePool}={}){
   try{
    const session=authenticate.session(req);
    const emails=String(env.ROLETA_FINAL_OPERATOR_EMAILS||'').split(',').map(x=>x.trim().toLowerCase());
-   if(!session||!emails.includes(session.email))return res.status(403).json({error:'Not authorized'});
+   if(!session||!emails.includes(String(session.email).toLowerCase()))return res.status(403).json({error:'Not authorized'});
    const id=new URL(req.url,'https://roleta.invalid').searchParams.get('job_id');
    assertJobId(id);
    const r=await db(env).query('SELECT roleta_intake.read_job($1,$2) AS job',[id,session.sub]);
