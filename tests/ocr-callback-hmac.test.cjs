@@ -23,3 +23,13 @@ test('Make Functions HMAC canonical envelope matches independently verified gold
  // The Make test key is deliberately short and cannot pass production's >=32-byte secret gate.
  assert.throws(()=>verifyCallback({...args,signature:'v1='+actual},{secret:'test-key-only-not-production',now:1792170000000}));
 });
+
+test('Make Functions production-length test secret passes Roleta verification',()=>{
+ const args={method:'POST',path:'/api/ocr-callback',timestamp:'1792170000000',
+  nonce:'uniqueNonce1234567890',jobId:'550e8400-e29b-41d4-a716-446655440000',
+  body:Buffer.from('{"model_id":"gemini-test","result":{"linhas":[]}}','utf8')};
+ const secret='test-only-32-byte-secret-2026-roleta-abcdef';
+ const fromMake='v1=971d2488370604c0d569e6ceade7037a114e451ca5c06292733b56d58e27460a';
+ assert.equal(crypto.createHmac('sha256',secret).update(canonical(args)).digest('hex'),fromMake.slice(3));
+ assert.equal(verifyCallback({...args,signature:fromMake},{secret,now:1792170000000}).jobId,args.jobId);
+});
