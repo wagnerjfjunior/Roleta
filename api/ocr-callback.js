@@ -28,9 +28,15 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
    const parsed=JSON.parse(body.toString('utf8'));
    if(!parsed||Array.isArray(parsed)||typeof parsed!=='object'||
       typeof parsed.model_id!=='string'||!parsed.model_id||
-      !parsed.result||Array.isArray(parsed.result)||typeof parsed.result!=='object')
+      !parsed.result||Array.isArray(parsed.result)||!['object','string'].includes(typeof parsed.result))
       return res.status(422).json({error:'Invalid result envelope'});
-   const result=parsed.result;
+   // Gemini module returns JSON as a string in Make; accept both JSON string and object.
+   let result=parsed.result;
+   if(typeof result==='string'){
+    if(Buffer.byteLength(result,'utf8')>MAX)return res.status(413).json({error:'Result too large'});
+    result=JSON.parse(result);
+   }
+   if(!result||Array.isArray(result)||typeof result!=='object')return res.status(422).json({error:'Invalid Gemini JSON'});
    // Derive digest from the same canonical jsonb representation inside PostgreSQL.
    const r=await db(env).query(
     'SELECT roleta_intake.complete_signed_callback($1,$2,$3,$4::jsonb,encode(sha256(convert_to($4::jsonb::text,\'UTF8\')),\'hex\')) AS outcome',
