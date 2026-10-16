@@ -52,3 +52,12 @@ Six workflows completed successfully, including OCR intake F1–F4 PostgreSQL 17
 
 ## Unresolved release blocker — signing architecture
 Current active Make scenario 6549955 returns `{{19.result}}` synchronously; no signed HTTP callback step exists. The v1 HMAC signature requires exact byte-level canonicalization over the final callback body, timestamp, nonce and job id. No Make module with proven correct HMAC support has been established. An untrusted public signer would defeat the authentication. Next implementation must prove either (a) a trusted Make signer module with secret storage and deterministic bytes, or (b) an authenticated server-side relay/queue architecture that does not expose callback secrets. **Do not switch on the flag or merge until this is demonstrated and reviewed.**
+
+## Make HMAC compatibility verified — 2026-10-16
+- The native **Make Functions / Hash functions** module `make-functions:CryptoFunctions` (v1) supports `operation=sha256`, `key`, `keyEncoding=utf8`, `outputEncoding=hex` and computes keyed HMAC-SHA256.
+- Scenario 6660554 (webhook test) created separately and left INACTIVE; production 6549955 unchanged.
+- Scenario 6660591 (on-demand deterministic test) created, temporarily activated, executed, then DEACTIVATED (active scenario quota preserved).
+- Run `14863a70abc5401b98de714bb36f5fba`: HMAC for `roleta-hmac-homologacao` under test key `test-key-only-not-production` = `0462b4e1c4c7435ca122c1d260424f247db7e26c77800d786e7117f5e1122587`, matching independent Python hashlib/hmac.
+- Run `cc01de92f98f465dad9f24023d83be73`: HMAC of the actual **callback canonical envelope format**, with body `{"model_id":"gemini-test","result":{"linhas":[]}}` (49 UTF-8 bytes), job UUID `550e8400-e29b-41d4-a716-446655440000`, nonce `uniqueNonce1234567890`, timestamp `1792170000000`, path `/api/ocr-callback`, produced `ddb6304743f9af134f85aa6679a11e8cd28a82ddc56b6dd6c7987b6da1424b86`; independent Python hmac matched byte-for-byte.
+- These are cryptographic compatibility tests, **not** production callbacks; test timestamp is a deterministic fixture, not an accepted live timestamp. Do not reuse test secret.
+- Next: construct canonical JSON and byte length deterministically in Make, supply nonce+current millisecond timestamp, use dedicated secret, POST exact signed JSON and headers to shadow backend, test callback replay and operator-scoped read, and verify Vercel/Supabase live. This requires separate inactive shadow OCR pipeline and real secrets; no production release until complete.
