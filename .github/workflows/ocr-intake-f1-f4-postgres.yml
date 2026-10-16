@@ -1,0 +1,54 @@
+name: OCR intake F1-F4 disposable PostgreSQL
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/2026101*_roleta_intake*'
+      - 'supabase/migrations/20261015_roleta_ocr_intake_gate1_draft.sql'
+      - 'tests/sql/ocr_intake_*'
+      - '.github/workflows/ocr-intake-f1-f4-postgres.yml'
+  workflow_dispatch:
+jobs:
+  disposable-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: local-ci-only
+          POSTGRES_DB: roleta_disposable
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d roleta_disposable"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: local-ci-only
+      PGDATABASE: roleta_disposable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Disposable Supabase-compatible roles
+        run: |
+          psql -v ON_ERROR_STOP=1 -c "CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN; CREATE ROLE service_role NOLOGIN;"
+      - name: F1 schema and smoke
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261015_roleta_ocr_intake_gate1_draft.sql
+          psql -v ON_ERROR_STOP=1 -f tests/sql/ocr_intake_f1_smoke.sql
+      - name: F2 atomic completion and smoke
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016_roleta_intake_f2_atomic_draft.sql
+          psql -v ON_ERROR_STOP=1 -f tests/sql/ocr_intake_f2_atomic_smoke.sql
+      - name: F3 F4 roles, nonce and scoped RPCs
+        run: |
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016_roleta_intake_f3_security_draft.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016_roleta_intake_f4_api_draft.sql
+          psql -v ON_ERROR_STOP=1 -f tests/sql/ocr_intake_f3_f4_security_smoke.sql
+      - name: Install Node dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Node unit tests
+        run: node --test tests/ocr-callback-hmac.test.cjs tests/ocr-callback-endpoint.test.cjs tests/ocr-async-contract.test.cjs tests/ocr-job-submit.test.cjs
