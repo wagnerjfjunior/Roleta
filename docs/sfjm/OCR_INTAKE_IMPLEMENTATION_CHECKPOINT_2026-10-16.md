@@ -29,3 +29,16 @@
 - Migration is **not** automatic on merge; never infer deploy success from GitHub CI.
 - Before production: verify backup, additive migrations, credential setup, endpoint HMAC, real job lifecycle, A/B isolation, rollback, post-merge checks.
 - If any security gate fails, retain draft PR and NO-GO.
+
+## Make 6549955 — observed configuration (read-only inspection, 2026-10-16)
+- Active original flow: webhook 1 -> official CSV HTTP 23 -> Gemini file upload 21 -> Gemini 3.8 Flash 19; error handler Gemini 3.6 Flash 27 -> Resume 29; synchronous WebhookRespond 13 returns `{{19.result}}`.
+- Upload mapping `{{1.file.data}}` and `{{1.file.name}}`; async submit draft sends multipart `file` and `job_id`, so input compatibility is plausible but **not tested**.
+- A future shadow scenario must preserve fallback mapping and operator validation. Callback must include `job_id` from `{{1.job_id}}`, model id from resolved Gemini result, and result JSON. Its HMAC v1 must be calculated over the **exact UTF-8 HTTP body bytes** and the canonical method/path/timestamp/nonce/job-id tuple. No claim that Make natively computes this signature has been established.
+- Existing Make scenario has **no callback HTTP module** and its synchronous webhook response cannot be treated as durable persistence.
+- Do not modify scenario 6549955 until an inactive shadow copy, signing capability, end-to-end test and rollback are proven.
+
+## CI regression fix and progress
+- `0ce2031`: lazy PostgreSQL driver loading; `9467131`: install Node dependencies in CI.
+- Workflow `OCR intake F1-F4 disposable PostgreSQL` succeeded on `9467131`; PostgreSQL F1-F4 and Node tests passed.
+- Later draft improvements: parse Make Gemini result when supplied as JSON text, validate dispatch target before PROCESSING; added callback regression test. Await newest CI before release gate.
+- **Open risk**: a Make dispatch failure or uncertain ACK after marking PROCESSING can strand a job. Need recovery policy (deadline, retry, callback race) before activation.
