@@ -19,7 +19,7 @@ test('signed callback persists and acknowledges only DB success',async()=>{
  assert.equal(res.code,200);assert.equal(called,1);
 });
 test('tampered callback never reaches database',async()=>{
- const body=Buffer.from('{"model_id":"x","result":{}}');
+ const body=Buffer.from('{"model_id":"x","result":{"linhas":[]}}');
  let called=0;
  const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_HMAC_SECRET:secret},
   db:()=>({query:async()=>{called++;return {rows:[{outcome:'SAVED'}]};}})});
@@ -28,7 +28,7 @@ test('tampered callback never reaches database',async()=>{
  assert.equal(res.code,401);assert.equal(called,0);
 });
 test('DB failure never acknowledges success',async()=>{
- const body=Buffer.from('{"model_id":"x","result":{}}');
+ const body=Buffer.from('{"model_id":"x","result":{"linhas":[]}}');
  const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_HMAC_SECRET:secret},
   db:()=>({query:async()=>{throw Error('offline');}})});
  const res=response();await handler(signed(body),res);assert.equal(res.code,503);
