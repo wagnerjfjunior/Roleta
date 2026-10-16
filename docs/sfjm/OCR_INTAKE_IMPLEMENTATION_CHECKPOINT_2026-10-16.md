@@ -70,3 +70,10 @@ Current active Make scenario 6549955 returns `{{19.result}}` synchronously; no s
 - Callback JSON body must be built **once**, byte-for-byte, before HMAC and HTTP POST; compute UTF-8 byte length (not Unicode character count). Use the same body bytes in the HTTP module; nonce must be unique and timestamp milliseconds. Ensure Make does not silently reserialize JSON. Verify against the golden vector with non-ASCII names and production-length test secret.
 - Quota: Make refused concurrent activation of the two test scenarios; both test scenarios 6660554 and 6660591 were deactivated after tests. Preserve live scenario 6549955 and available active slot.
 - Next safe action: implement the shadow OCR pipeline only through an authorized tool/path and after securing secret storage; then E2E signed callback, durable replay rejection, operator-scoped read, manual review and rollback. PR remains draft and feature flag OFF.
+
+## Make HMAC 32-byte minimum verification — 2026-10-16 16:26 local
+- Scenario 6660591 temporarily activated with a **public, disposable test key** `test-only-32-byte-secret-2026-roleta-abcdef` (not a production credential).
+- Execution `1fde5beb40544b5b86fd38e6f8085d6c` produced `971d2488370604c0d569e6ceade7037a114e451ca5c06292733b56d58e27460a` for canonical callback fixture. Exact expected signature is pinned in `tests/ocr-callback-hmac.test.cjs` and validated through `verifyCallback`, including the minimum-secret-length gate.
+- Scenario 6660591 DEACTIVATED after execution. Production 6549955 unchanged.
+- Architecture decision: **Do not put production HMAC key directly in the Make Functions mapper**, because the scenario blueprint exposes that configuration to privileged readers. An approved secret-storage mechanism is required, or use an authenticated HTTP connection with scoped revocable credential and backend auth; both approaches require AppSec review of execution-log visibility and credential handling.
+- Automated CI triggered on commit 26b264a; await final outcomes before treating regression gate as passed.
