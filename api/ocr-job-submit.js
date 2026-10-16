@@ -52,6 +52,13 @@ function createHandler({env=process.env,authenticate=auth,db=getIntakePool,dispa
    try{
     const upstream=await dispatch(target.toString(),{method:'POST',body:form,signal:controller.signal,redirect:'error'});
     if(!upstream.ok)throw Error('Make dispatch rejected');
+   }catch(dispatchError){
+    // The database RPC checks PROCESSING under row lock; never overwrite READY.
+    // An uncertain timeout may still have reached Make; a later signed callback
+    // will be rejected after FAILED. Explicit retry/reconciliation remains a gate.
+    try{await pool.query('SELECT roleta_intake.fail_dispatch($1,$2)',[id,s.sub]);}
+    catch{throw Error('Make dispatch failed; reconciliation unavailable');}
+    throw dispatchError;
    }finally{clearTimeout(timeout);}
    return res.status(202).json({job_id:id,status:'PROCESSING',poll_url:'/api/ocr-job-status?job_id='+id});
   }catch(e){return res.status(e.status===413?413:e.status===415?415:503).json({error:'OCR submission unavailable'});}
