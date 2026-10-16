@@ -48,5 +48,7 @@ jobs:
           psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016_roleta_intake_f3_security_draft.sql
           psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261016_roleta_intake_f4_api_draft.sql
           psql -v ON_ERROR_STOP=1 -f tests/sql/ocr_intake_f3_f4_security_smoke.sql
+      - name: Install Node dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
       - name: Node unit tests
         run: node --test tests/ocr-callback-hmac.test.cjs tests/ocr-callback-endpoint.test.cjs tests/ocr-async-contract.test.cjs
