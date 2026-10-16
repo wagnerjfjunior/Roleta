@@ -17,7 +17,11 @@ CREATE TABLE IF NOT EXISTS roleta_intake.jobs (
  updated_at timestamptz NOT NULL DEFAULT now(),
  finished_at timestamptz,
  CONSTRAINT failed_has_error CHECK (state <> 'FAILED' OR error_code IS NOT NULL),
- CONSTRAINT terminal_has_finished_at CHECK (state NOT IN ('READY_FOR_REVIEW','FAILED') OR finished_at IS NOT NULL)
+ CONSTRAINT terminal_has_finished_at CHECK (state NOT IN ('READY_FOR_REVIEW','FAILED') OR finished_at IS NOT NULL),
+ CONSTRAINT initial_or_terminal_timestamps CHECK (
+   (state IN ('QUEUED','PROCESSING') AND finished_at IS NULL)
+   OR state IN ('READY_FOR_REVIEW','FAILED')
+ )
 );
 COMMENT ON TABLE roleta_intake.jobs IS 'Solicitacoes OCR Gemini preliminares, nunca roletas finais.';
 CREATE INDEX IF NOT EXISTS jobs_operator_created_idx ON roleta_intake.jobs(operator_sub, created_at DESC);
@@ -35,9 +39,17 @@ CREATE TABLE IF NOT EXISTS roleta_intake.results (
 COMMENT ON TABLE roleta_intake.results IS 'JSON bruto integral retornado pelo Gemini; imutavel e separado da revisao humana.';
 
 -- Restringe transicoes; estados terminais nao retornam ao processamento.
+-- O gatilho cobre INSERT e UPDATE: um INSERT direto nao pode iniciar um job
+-- em PROCESSING, READY_FOR_REVIEW ou FAILED.
 CREATE OR REPLACE FUNCTION roleta_intake.enforce_job_transition()
-RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $$
+RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $job_transition$
 BEGIN
+ IF TG_OP = 'INSERT' THEN
+   IF NEW.state <> 'QUEUED' OR NEW.finished_at IS NOT NULL OR NEW.error_code IS NOT NULL THEN
+     RAISE EXCEPTION 'new job must start QUEUED without terminal metadata';
+   END IF;
+   RETURN NEW;
+ END IF;
  IF NEW.id IS DISTINCT FROM OLD.id OR NEW.operator_sub IS DISTINCT FROM OLD.operator_sub
     OR NEW.image_sha256 IS DISTINCT FROM OLD.image_sha256
     OR NEW.created_at IS DISTINCT FROM OLD.created_at THEN
@@ -57,9 +69,9 @@ BEGIN
  END IF;
  NEW.updated_at := now();
  RETURN NEW;
-END $$;
+END $job_transition$;
 DROP TRIGGER IF EXISTS trg_enforce_job_transition ON roleta_intake.jobs;
-CREATE TRIGGER trg_enforce_job_transition BEFORE UPDATE ON roleta_intake.jobs
+CREATE TRIGGER trg_enforce_job_transition BEFORE INSERT OR UPDATE ON roleta_intake.jobs
  FOR EACH ROW EXECUTE FUNCTION roleta_intake.enforce_job_transition();
 
 -- So aceita resultado quando a solicitacao esta PROCESSING. O callback F2 deve
@@ -78,10 +90,10 @@ CREATE TRIGGER trg_require_processing_for_result BEFORE INSERT ON roleta_intake.
 
 -- Impede alteracao ou exclusao do JSON bruto por caminhos comuns.
 CREATE OR REPLACE FUNCTION roleta_intake.reject_result_mutation()
-RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $$
+RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $reject_mutation$
 BEGIN
  RAISE EXCEPTION 'raw Gemini results are immutable';
-END $$;
+END $reject_mutation$;
 DROP TRIGGER IF EXISTS trg_reject_result_mutation ON roleta_intake.results;
 CREATE TRIGGER trg_reject_result_mutation BEFORE UPDATE OR DELETE ON roleta_intake.results
  FOR EACH ROW EXECUTE FUNCTION roleta_intake.reject_result_mutation();
