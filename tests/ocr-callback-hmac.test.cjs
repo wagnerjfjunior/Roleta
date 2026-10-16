@@ -20,5 +20,6 @@ test('Make Functions HMAC canonical envelope matches independently verified gold
  const actual=crypto.createHmac('sha256','test-key-only-not-production').update(canonical(args)).digest('hex');
  // Make scenario 6660591 execution cc01de92f98f465dad9f24023d83be73.
  assert.equal(actual,'ddb6304743f9af134f85aa6679a11e8cd28a82ddc56b6dd6c7987b6da1424b86');
- assert.equal(verifyCallback({...args,signature:'v1='+actual},{secret:'test-key-only-not-production',now:1792170000000}).jobId,args.jobId);
+ // The Make test key is deliberately short and cannot pass production's >=32-byte secret gate.
+ assert.throws(()=>verifyCallback({...args,signature:'v1='+actual},{secret:'test-key-only-not-production',now:1792170000000}));
 });
