@@ -1,5 +1,6 @@
 -- SFJM F2 DRAFT: atomic Gemini callback. Isolated branch only; NOT DEPLOYED.
 -- SECURITY INVOKER: requires explicitly granted privileges; none are granted here.
+-- raw_sha256 is SHA-256 of PostgreSQL jsonb::text encoded UTF-8, NOT HTTP bytes.
 CREATE OR REPLACE FUNCTION roleta_intake.complete_gemini_job(
  p_job_id uuid, p_model_id text, p_raw_json jsonb, p_raw_sha256 text
 ) RETURNS text
@@ -17,6 +18,9 @@ BEGIN
     OR p_raw_sha256 !~ '^[0-9a-f]{64}$'
     OR jsonb_typeof(p_raw_json) <> 'object' THEN
    RAISE EXCEPTION 'invalid Gemini completion payload';
+ END IF;
+ IF p_raw_sha256 <> encode(sha256(convert_to(p_raw_json::text,'UTF8')),'hex') THEN
+   RAISE EXCEPTION 'Gemini result digest mismatch';
  END IF;
  -- Row lock serializes concurrent callbacks for this job.
  SELECT state INTO v_state FROM roleta_intake.jobs WHERE id=p_job_id FOR UPDATE;
