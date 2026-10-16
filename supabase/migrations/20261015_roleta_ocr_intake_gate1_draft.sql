@@ -88,7 +88,9 @@ CREATE TRIGGER trg_reject_result_mutation BEFORE UPDATE OR DELETE ON roleta_inta
 
 -- RLS deny-by-default. Nenhum grant ao browser, Make ou roles compartilhadas.
 ALTER TABLE roleta_intake.jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE roleta_intake.jobs FORCE ROW LEVEL SECURITY;
 ALTER TABLE roleta_intake.results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE roleta_intake.results FORCE ROW LEVEL SECURITY;
 REVOKE ALL ON ALL TABLES IN SCHEMA roleta_intake FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON ALL FUNCTIONS IN SCHEMA roleta_intake FROM PUBLIC, anon, authenticated;
 -- RLS nao substitui GRANT; ausencia de politicas = acesso negado a roles comuns.
@@ -96,3 +98,7 @@ REVOKE ALL ON ALL FUNCTIONS IN SCHEMA roleta_intake FROM PUBLIC, anon, authentic
 -- irrestrita. F2 criara funcoes SECURITY DEFINER com search_path fixo, grants EXPLICITAMENTE
 -- limitados ao writer dedicado, callback autenticado, transacao atomica e idempotencia.
 -- Nao habilitar operacao real ate F2/F3 e aprovacao de migracao.
+-- IMPORTANT: this draft does NOT grant writer access or create SECURITY DEFINER RPCs.
+-- FORCE RLS protects non-superuser owners; privileged postgres/BYPASSRLS still bypasses.
+-- F2 must use a scoped, non-BYPASSRLS execution path with audited function grants.
+-- Do not infer RLS effectiveness from the postgres superuser connection.
