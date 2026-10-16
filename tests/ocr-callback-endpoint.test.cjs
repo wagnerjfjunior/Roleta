@@ -33,3 +33,13 @@ test('DB failure never acknowledges success',async()=>{
   db:()=>({query:async()=>{throw Error('offline');}})});
  const res=response();await handler(signed(body),res);assert.equal(res.code,503);
 });
+
+test('accepts Make Gemini JSON string without losing payload',async()=>{
+ const result='{"linhas":[{"nome_lido":"Paola"}]}';
+ const body=Buffer.from(JSON.stringify({model_id:'gemini-3.8-flash',result}));
+ let params;
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_HMAC_SECRET:secret},db:()=>({query:async(sql,p)=>{params=p;return {rows:[{outcome:'SAVED'}]};}})});
+ const res=response();await handler(signed(body),res);
+ assert.equal(res.code,200);
+ assert.deepEqual(JSON.parse(params[3]),JSON.parse(result));
+});
