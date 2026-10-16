@@ -55,3 +55,20 @@ END $fn$;
 ALTER FUNCTION roleta_intake.read_job(uuid,text) OWNER TO roleta_intake_executor;
 REVOKE ALL ON FUNCTION roleta_intake.read_job(uuid,text) FROM PUBLIC,anon,authenticated,service_role;
 GRANT EXECUTE ON FUNCTION roleta_intake.read_job(uuid,text) TO roleta_intake_api;
+
+-- Record a confirmed dispatch failure without overwriting a concurrent completed callback.
+CREATE OR REPLACE FUNCTION roleta_intake.fail_dispatch(p_job_id uuid,p_operator_sub text)
+RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $fn$
+DECLARE v_state text;
+BEGIN
+ SELECT state INTO v_state FROM roleta_intake.jobs
+ WHERE id=p_job_id AND operator_sub=p_operator_sub FOR UPDATE;
+ IF NOT FOUND OR v_state <> 'PROCESSING' THEN RETURN false; END IF;
+ UPDATE roleta_intake.jobs
+ SET state='FAILED',error_code='MAKE_DISPATCH_FAILED',finished_at=now()
+ WHERE id=p_job_id;
+ RETURN true;
+END $fn$;
+ALTER FUNCTION roleta_intake.fail_dispatch(uuid,text) OWNER TO roleta_intake_executor;
+REVOKE ALL ON FUNCTION roleta_intake.fail_dispatch(uuid,text) FROM PUBLIC,anon,authenticated,service_role;
+GRANT EXECUTE ON FUNCTION roleta_intake.fail_dispatch(uuid,text) TO roleta_intake_api;
