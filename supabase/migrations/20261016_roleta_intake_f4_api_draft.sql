@@ -30,7 +30,7 @@ BEGIN
  SELECT state INTO v_state FROM roleta_intake.jobs
  WHERE id=p_job_id AND operator_sub=p_operator_sub FOR UPDATE;
  IF NOT FOUND THEN RETURN false; END IF;
- IF v_state='PROCESSING' THEN RETURN true; END IF;
+ IF v_state='PROCESSING' THEN RETURN false; END IF;
  IF v_state<>'QUEUED' THEN RETURN false; END IF;
  UPDATE roleta_intake.jobs SET state='PROCESSING' WHERE id=p_job_id;
  RETURN true;
