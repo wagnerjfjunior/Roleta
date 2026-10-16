@@ -31,6 +31,9 @@ function createHandler({env=process.env,authenticate=auth,db=getIntakePool,dispa
    const png=bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
    const webp=bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP';
    if(!((mime==='image/jpeg'&&jpeg)||(mime==='image/png'&&png)||(mime==='image/webp'&&webp)))return res.status(415).json({error:'Image signature mismatch'});
+   // Validate dispatch configuration before transitioning a job to PROCESSING.
+   const target=new URL(env.ROLETA_INTAKE_MAKE_WEBHOOK_URL||'');
+   if(target.protocol!=='https:'||!target.hostname.endsWith('.make.com'))throw Error('Invalid Make endpoint');
    const digest=crypto.createHash('sha256').update(bytes).digest('hex');
    const pool=db(env);
    const created=await pool.query('SELECT roleta_intake.create_job($1,$2) AS id',[s.sub,digest]);
@@ -40,8 +43,6 @@ function createHandler({env=process.env,authenticate=auth,db=getIntakePool,dispa
    if(started.rows?.[0]?.ok!==true){
     return res.status(202).json({job_id:id,status:'EXISTING',poll_url:'/api/ocr-job-status?job_id='+id});
    }
-   const target=new URL(env.ROLETA_INTAKE_MAKE_WEBHOOK_URL||'');
-   if(target.protocol!=='https:'||!target.hostname.endsWith('.make.com'))throw Error('Invalid Make endpoint');
    const form=new FormData();
    form.append('file',new Blob([bytes],{type:mime}),'roleta.'+(mime==='image/png'?'png':mime==='image/webp'?'webp':'jpg'));
    form.append('job_id',id);
