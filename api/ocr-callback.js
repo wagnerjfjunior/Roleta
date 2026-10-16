@@ -1,6 +1,5 @@
 'use strict';
 // Server-to-server Make callback. Disabled unless dedicated credentials and flag exist.
-const crypto=require('node:crypto');
 const {verifyCallback}=require('../server/ocr-callback-hmac.cjs');
 const {getIntakePool}=require('../server/ocr-intake-db.cjs');
 const MAX=1024*1024;
@@ -32,13 +31,10 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
       !parsed.result||Array.isArray(parsed.result)||typeof parsed.result!=='object')
       return res.status(422).json({error:'Invalid result envelope'});
    const result=parsed.result;
-   // Hash is defined by PostgreSQL jsonb::text, computed and checked in the DB.
-   // Never trust a digest provided by the callback alone.
-   const hash=parsed.raw_sha256;
-   if(typeof hash!=='string'||! /^[a-f0-9]{64}$/.test(hash))return res.status(422).json({error:'Invalid digest'});
+   // Derive digest from the same canonical jsonb representation inside PostgreSQL.
    const r=await db(env).query(
-    'SELECT roleta_intake.complete_signed_callback($1,$2,$3,$4::jsonb,$5) AS outcome',
-    [validated.jobId,validated.nonce,parsed.model_id,JSON.stringify(result),hash]);
+    'SELECT roleta_intake.complete_signed_callback($1,$2,$3,$4::jsonb,encode(sha256(convert_to($4::jsonb::text,\'UTF8\')),\'hex\')) AS outcome',
+    [validated.jobId,validated.nonce,parsed.model_id,JSON.stringify(result)]);
    const outcome=r.rows?.[0]?.outcome;
    if(!['SAVED','ALREADY_SAVED'].includes(outcome))throw Error('Unexpected persistence response');
    return res.status(200).json({status:outcome});
