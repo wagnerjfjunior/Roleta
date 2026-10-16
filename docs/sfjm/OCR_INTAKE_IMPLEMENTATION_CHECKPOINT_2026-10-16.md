@@ -42,3 +42,13 @@
 - Workflow `OCR intake F1-F4 disposable PostgreSQL` succeeded on `9467131`; PostgreSQL F1-F4 and Node tests passed.
 - Later draft improvements: parse Make Gemini result when supplied as JSON text, validate dispatch target before PROCESSING; added callback regression test. Await newest CI before release gate.
 - **Open risk**: a Make dispatch failure or uncertain ACK after marking PROCESSING can strand a job. Need recovery policy (deadline, retry, callback race) before activation.
+
+## CI checkpoint 98de2b2
+Six workflows completed successfully, including OCR intake F1–F4 PostgreSQL 17 and Node callback/submit tests.
+- `api/ocr-callback.js` and `api/ocr-job-submit.js`: Vercel body parser disabled so signature verification and image digest operate on original request bytes.
+- Submit: allowlisted Make host, CSRF and Google session, duplicate suppression, bounded failed-dispatch RPC; tests cover failure/SSRF/CSRF.
+- Callback: JSON string or object result, `linhas` array required, HMAC, durable nonce via SQL.
+- Production remains OFF; tests are isolated and do not establish real Make signed-callback capability or mobile recovery.
+
+## Unresolved release blocker — signing architecture
+Current active Make scenario 6549955 returns `{{19.result}}` synchronously; no signed HTTP callback step exists. The v1 HMAC signature requires exact byte-level canonicalization over the final callback body, timestamp, nonce and job id. No Make module with proven correct HMAC support has been established. An untrusted public signer would defeat the authentication. Next implementation must prove either (a) a trusted Make signer module with secret storage and deterministic bytes, or (b) an authenticated server-side relay/queue architecture that does not expose callback secrets. **Do not switch on the flag or merge until this is demonstrated and reviewed.**
