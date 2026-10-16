@@ -17,6 +17,7 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
   if(env.ROLETA_INTAKE_ENABLED!=='true')return res.status(503).json({error:'Disabled'});
   try{
+   // Vercel must not pre-parse JSON: HMAC is over the exact request bytes.
    const body=await readRaw(req);
    if(body.length===0||body.length>MAX)return res.status(413).json({error:'Invalid payload size'});
    if(String(req.headers['content-type']||'').split(';')[0]!=='application/json')return res.status(415).json({error:'JSON required'});
@@ -52,4 +53,5 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
  };
 }
 module.exports=createHandler();
+module.exports.config={api:{bodyParser:false}};
 module.exports.createHandler=createHandler;
