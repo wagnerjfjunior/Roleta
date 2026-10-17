@@ -4,6 +4,8 @@ Status: CANÔNICO
 Version: RLT-PRINT-V2  
 Última revisão material: 07/10/2026
 
+> **Adendo de implementação homologado em 09/10/2026:** o contrato de revisão humana abaixo permanece obrigatório; a folha final agora é exportada via PDF A4 e pode ser compartilhada também como **foto JPG** derivada do PDF. O botão de foto não substitui impressão/download nem faz ingestão estatística. Veja `docs/OPERATIONAL_SNAPSHOT_2026-10-09.md` para SHA, deployment, segurança, iPhone, testes e rollback.
+
 ## 1. Objetivo
 
 RLT-PRINT-V2 é o fluxo operacional canônico para transformar uma transcrição inicial da roleta Tegra em uma folha final imprimível ou salvável em PDF.
