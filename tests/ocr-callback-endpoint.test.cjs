@@ -79,3 +79,31 @@ test('no explicitly configured auth mode rejects even old signed requests',async
  const res=response();await handler(signed(Buffer.from('{"model_id":"x","result":{"linhas":[]}}')),res);
  assert.equal(res.code,401);assert.equal(called,0);
 });
+
+for(const outcome of ['FAILED_SAVED','ALREADY_FAILED','ALREADY_SAVED']){
+ test('terminal failure callback acknowledges only persisted outcome '+outcome,async()=>{
+  let params,query;
+  const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',ROLETA_INTAKE_CALLBACK_API_KEY:managedSecret},
+   db:()=>({query:async(sql,p)=>{query=sql;params=p;return {rows:[{outcome}]};}})});
+  const res=response();await handler(managed(Buffer.from(JSON.stringify({status:'FAILED',error_code:'GEMINI_503_EXHAUSTED'}))),res);
+  assert.equal(res.code,200);assert.match(query,/fail_callback/);
+  assert.deepEqual(params,[jobId,'uniqueNonce1234567890','GEMINI_503_EXHAUSTED']);
+ });
+}
+for(const payload of [
+ {status:'FAILED',error_code:'upstream secret-bearing error'},
+ {status:'FAILED',error_code:'GEMINI_503_EXHAUSTED',result:{linhas:[]}}
+]){
+ test('invalid failure envelope rejected without database access '+JSON.stringify(payload),async()=>{
+  let calls=0;const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',ROLETA_INTAKE_CALLBACK_API_KEY:managedSecret},db:()=>({query:async()=>{calls++;}})});
+  const res=response();await handler(managed(Buffer.from(JSON.stringify(payload))),res);
+  assert.equal(res.code,422);assert.equal(calls,0);
+ });
+}
+for(const code of ['23505','offline']){
+ test('failure callback persistence error '+code+' is not acknowledged',async()=>{
+  const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',ROLETA_INTAKE_CALLBACK_API_KEY:managedSecret},db:()=>({query:async()=>{throw Object.assign(Error('private database detail'),{code});}})});
+  const res=response();await handler(managed(Buffer.from('{"status":"FAILED","error_code":"GEMINI_503_EXHAUSTED"}')),res);
+  assert.equal(res.code,code==='23505'?409:503);assert.ok(!JSON.stringify(res.body).includes('private database detail'));
+ });
+}

@@ -50,6 +50,31 @@ BEGIN
  IF roleta_intake.fail_dispatch(j,'operator-A') THEN
   RAISE EXCEPTION 'late dispatch failure overwrote READY';
  END IF;
+ -- Failure is terminal, replay-protected, and does not overwrite success.
+ IF roleta_intake.fail_callback(j,'lateFailureNonce12345','GEMINI_503_EXHAUSTED')<>'ALREADY_SAVED' THEN
+  RAISE EXCEPTION 'late failure overwrote success';
+ END IF;
+ j:=roleta_intake.create_job('operator-A',repeat('f',64));
+ PERFORM roleta_intake.start_job(j,'operator-A');
+ IF roleta_intake.fail_callback(j,'failureNonce12345678','GEMINI_503_EXHAUSTED')<>'FAILED_SAVED' THEN
+  RAISE EXCEPTION 'failure not saved';
+ END IF;
+ v:=roleta_intake.read_job(j,'operator-A');
+ IF v->>'state'<>'FAILED' OR v->>'error_code'<>'GEMINI_503_EXHAUSTED' THEN
+  RAISE EXCEPTION 'failure metadata missing';
+ END IF;
+ blocked:=false;
+ BEGIN
+  PERFORM roleta_intake.fail_callback(j,'failureNonce12345678','GEMINI_503_EXHAUSTED');
+ EXCEPTION WHEN unique_violation THEN blocked:=true;
+ END;
+ IF NOT blocked THEN RAISE EXCEPTION 'replayed failure nonce accepted'; END IF;
+ IF roleta_intake.fail_callback(j,'failureNonce23456789','GEMINI_503_EXHAUSTED')<>'ALREADY_FAILED' THEN
+  RAISE EXCEPTION 'failure retry not idempotent';
+ END IF;
+ IF roleta_intake.create_job('operator-A',repeat('f',64))=j THEN
+  RAISE EXCEPTION 'explicit resubmission did not create new job';
+ END IF;
 END $tests$;
 RESET ROLE;
 ROLLBACK;

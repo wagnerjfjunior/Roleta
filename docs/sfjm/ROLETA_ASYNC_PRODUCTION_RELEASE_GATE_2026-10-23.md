@@ -27,3 +27,6 @@ Status: **NO-GO PARA ATIVAÇÃO**. Autorização de intenção de liberação co
 
 ## Próxima ação segura
 Homologar conexão HTTP v4 de credencial protegida, callback e retry em cenário shadow; persistência real exige migrations após backup. Reavaliar gates e só depois ativar produção.
+
+## Homologação complementar desta sessão
+Consultar `ROLETA_ASYNC_HOMOLOGATION_2026-10-23.md`: callback de falha e testes adicionados; conexão gerenciada aguardando cadastro seguro; retries Make e E2E real ainda pendentes. NO-GO mantido.

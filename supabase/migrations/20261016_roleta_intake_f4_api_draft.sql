@@ -44,7 +44,7 @@ RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $f
 DECLARE v_payload jsonb;
 BEGIN
  SELECT jsonb_build_object('job_id',j.id,'state',j.state,
-    'created_at',j.created_at,'updated_at',j.updated_at,
+    'created_at',j.created_at,'updated_at',j.updated_at,'error_code',j.error_code,
     'model_id',r.model_id,'result',r.raw_json)
  INTO v_payload
  FROM roleta_intake.jobs j
@@ -72,3 +72,30 @@ END $fn$;
 ALTER FUNCTION roleta_intake.fail_dispatch(uuid,text) OWNER TO roleta_intake_executor;
 REVOKE ALL ON FUNCTION roleta_intake.fail_dispatch(uuid,text) FROM PUBLIC,anon,authenticated,service_role;
 GRANT EXECUTE ON FUNCTION roleta_intake.fail_dispatch(uuid,text) TO roleta_intake_api;
+
+-- Authenticated terminal failure, after bounded provider retries are exhausted.
+-- Row locking serializes failure against success. Nonce + state commit atomically.
+CREATE OR REPLACE FUNCTION roleta_intake.fail_callback(p_job_id uuid,p_nonce text,p_error_code text)
+RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog AS $fn$
+DECLARE v_state text; v_error text;
+BEGIN
+ IF p_nonce IS NULL OR p_nonce !~ '^[a-zA-Z0-9_-]{16,128}$'
+ OR p_error_code IS NULL OR p_error_code NOT IN
+ ('GEMINI_503_EXHAUSTED','GEMINI_RATE_LIMIT_EXHAUSTED','GEMINI_REQUEST_FAILED') THEN
+  RAISE EXCEPTION 'invalid failure payload';
+ END IF;
+ SELECT state,error_code INTO v_state,v_error FROM roleta_intake.jobs WHERE id=p_job_id FOR UPDATE;
+ IF NOT FOUND THEN RAISE EXCEPTION 'unknown Gemini job'; END IF;
+ INSERT INTO roleta_intake.callback_nonces(job_id,nonce) VALUES(p_job_id,p_nonce);
+ IF v_state='READY_FOR_REVIEW' THEN RETURN 'ALREADY_SAVED'; END IF;
+ IF v_state='FAILED' THEN
+  IF v_error=p_error_code THEN RETURN 'ALREADY_FAILED'; END IF;
+  RAISE EXCEPTION 'conflicting Gemini completion';
+ END IF;
+ IF v_state<>'PROCESSING' THEN RAISE EXCEPTION 'job is not PROCESSING'; END IF;
+ UPDATE roleta_intake.jobs SET state='FAILED',error_code=p_error_code,finished_at=now() WHERE id=p_job_id;
+ RETURN 'FAILED_SAVED';
+END $fn$;
+ALTER FUNCTION roleta_intake.fail_callback(uuid,text,text) OWNER TO roleta_intake_executor;
+REVOKE ALL ON FUNCTION roleta_intake.fail_callback(uuid,text,text) FROM PUBLIC,anon,authenticated,service_role;
+GRANT EXECUTE ON FUNCTION roleta_intake.fail_callback(uuid,text,text) TO roleta_intake_api;

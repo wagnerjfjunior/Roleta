@@ -36,6 +36,17 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
        {secret:env.ROLETA_INTAKE_HMAC_SECRET})
      :(()=>{throw Error('callback secret unavailable');})();
    const parsed=JSON.parse(body.toString('utf8'));
+   if(parsed && !Array.isArray(parsed) && parsed.status==='FAILED'){
+    // Only bounded codes, never upstream error messages or credentials.
+    const codes=['GEMINI_503_EXHAUSTED','GEMINI_RATE_LIMIT_EXHAUSTED','GEMINI_REQUEST_FAILED'];
+    if(!codes.includes(parsed.error_code)||parsed.result!==undefined)
+     return res.status(422).json({error:'Invalid failure envelope'});
+    const r=await db(env).query('SELECT roleta_intake.fail_callback($1,$2,$3) AS outcome',
+     [validated.jobId,validated.nonce,parsed.error_code]);
+    const outcome=r.rows?.[0]?.outcome;
+    if(!['FAILED_SAVED','ALREADY_FAILED','ALREADY_SAVED'].includes(outcome))throw Error('Unexpected persistence response');
+    return res.status(200).json({status:outcome});
+   }
    if(!parsed||Array.isArray(parsed)||typeof parsed!=='object'||
       typeof parsed.model_id!=='string'||!parsed.model_id||parsed.model_id.length>128||
       !parsed.result||Array.isArray(parsed.result)||!['object','string'].includes(typeof parsed.result))
