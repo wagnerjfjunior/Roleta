@@ -1,0 +1,116 @@
+-- SFJM F1 / PR #126: schema Gemini OCR persistente (RASCUNHO; NAO APLICAR EM PRODUCAO).
+-- Isolado de roleta_ocr.* (aprendizado) e roleta_audit.* (roleta final).
+-- Requer PostgreSQL 15+ e pgcrypto/gen_random_uuid. Revisar grants, RLS, backup e retencao antes do Gate de aplicacao.
+CREATE SCHEMA IF NOT EXISTS roleta_intake;
+REVOKE ALL ON SCHEMA roleta_intake FROM PUBLIC;
+REVOKE ALL ON SCHEMA roleta_intake FROM anon, authenticated;
+
+CREATE TABLE IF NOT EXISTS roleta_intake.jobs (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ operator_sub text NOT NULL CHECK (length(operator_sub) BETWEEN 1 AND 128),
+ image_sha256 text NOT NULL CHECK (image_sha256 ~ '^[0-9a-f]{64}$'),
+ image_storage_path text,
+ state text NOT NULL DEFAULT 'QUEUED'
+   CHECK (state IN ('QUEUED','PROCESSING','READY_FOR_REVIEW','FAILED')),
+ error_code text,
+ created_at timestamptz NOT NULL DEFAULT now(),
+ updated_at timestamptz NOT NULL DEFAULT now(),
+ finished_at timestamptz,
+ CONSTRAINT failed_has_error CHECK (state <> 'FAILED' OR error_code IS NOT NULL),
+ CONSTRAINT terminal_has_finished_at CHECK (state NOT IN ('READY_FOR_REVIEW','FAILED') OR finished_at IS NOT NULL),
+ CONSTRAINT initial_or_terminal_timestamps CHECK (
+   (state IN ('QUEUED','PROCESSING') AND finished_at IS NULL)
+   OR state IN ('READY_FOR_REVIEW','FAILED')
+ )
+);
+COMMENT ON TABLE roleta_intake.jobs IS 'Solicitacoes OCR Gemini preliminares, nunca roletas finais.';
+CREATE INDEX IF NOT EXISTS jobs_operator_created_idx ON roleta_intake.jobs(operator_sub, created_at DESC);
+CREATE INDEX IF NOT EXISTS jobs_operator_digest_idx ON roleta_intake.jobs(operator_sub, image_sha256, created_at DESC);
+CREATE INDEX IF NOT EXISTS jobs_state_updated_idx ON roleta_intake.jobs(state, updated_at);
+
+CREATE TABLE IF NOT EXISTS roleta_intake.results (
+ job_id uuid PRIMARY KEY REFERENCES roleta_intake.jobs(id) ON DELETE RESTRICT,
+ provider text NOT NULL DEFAULT 'gemini' CHECK (provider = 'gemini'),
+ model_id text NOT NULL CHECK (length(model_id) BETWEEN 1 AND 128),
+ raw_json jsonb NOT NULL CHECK (jsonb_typeof(raw_json) = 'object'),
+ raw_sha256 text NOT NULL CHECK (raw_sha256 ~ '^[0-9a-f]{64}$'),
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+COMMENT ON TABLE roleta_intake.results IS 'JSON bruto integral retornado pelo Gemini; imutavel e separado da revisao humana.';
+
+-- Restringe transicoes; estados terminais nao retornam ao processamento.
+-- O gatilho cobre INSERT e UPDATE: um INSERT direto nao pode iniciar um job
+-- em PROCESSING, READY_FOR_REVIEW ou FAILED.
+CREATE OR REPLACE FUNCTION roleta_intake.enforce_job_transition()
+RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $job_transition$
+BEGIN
+ IF TG_OP = 'INSERT' THEN
+   IF NEW.state <> 'QUEUED' OR NEW.finished_at IS NOT NULL OR NEW.error_code IS NOT NULL THEN
+     RAISE EXCEPTION 'new job must start QUEUED without terminal metadata';
+   END IF;
+   RETURN NEW;
+ END IF;
+ IF NEW.id IS DISTINCT FROM OLD.id OR NEW.operator_sub IS DISTINCT FROM OLD.operator_sub
+    OR NEW.image_sha256 IS DISTINCT FROM OLD.image_sha256
+    OR NEW.created_at IS DISTINCT FROM OLD.created_at THEN
+   RAISE EXCEPTION 'immutable job identity';
+ END IF;
+ IF NEW.state = 'READY_FOR_REVIEW' AND NOT EXISTS (SELECT 1 FROM roleta_intake.results WHERE job_id=NEW.id) THEN
+   RAISE EXCEPTION 'ready state requires persisted Gemini result';
+ END IF;
+ IF NEW.state = 'FAILED' AND EXISTS (SELECT 1 FROM roleta_intake.results WHERE job_id=NEW.id) THEN
+   RAISE EXCEPTION 'cannot fail a job with persisted Gemini result';
+ END IF;
+ IF NEW.state IS DISTINCT FROM OLD.state THEN
+   IF NOT ((OLD.state='QUEUED' AND NEW.state IN ('PROCESSING','FAILED'))
+        OR (OLD.state='PROCESSING' AND NEW.state IN ('READY_FOR_REVIEW','FAILED'))) THEN
+     RAISE EXCEPTION 'invalid job transition';
+   END IF;
+ END IF;
+ NEW.updated_at := now();
+ RETURN NEW;
+END $job_transition$;
+DROP TRIGGER IF EXISTS trg_enforce_job_transition ON roleta_intake.jobs;
+CREATE TRIGGER trg_enforce_job_transition BEFORE INSERT OR UPDATE ON roleta_intake.jobs
+ FOR EACH ROW EXECUTE FUNCTION roleta_intake.enforce_job_transition();
+
+-- So aceita resultado quando a solicitacao esta PROCESSING. O callback F2 deve
+-- inserir resultado e concluir o job na MESMA transacao; nenhuma falha parcial.
+CREATE OR REPLACE FUNCTION roleta_intake.require_processing_for_result()
+RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $gemini_result$
+BEGIN
+ IF NOT EXISTS (SELECT 1 FROM roleta_intake.jobs WHERE id=NEW.job_id AND state='PROCESSING' FOR UPDATE) THEN
+   RAISE EXCEPTION 'Gemini result requires PROCESSING job';
+ END IF;
+ RETURN NEW;
+END $gemini_result$;
+DROP TRIGGER IF EXISTS trg_require_processing_for_result ON roleta_intake.results;
+CREATE TRIGGER trg_require_processing_for_result BEFORE INSERT ON roleta_intake.results
+ FOR EACH ROW EXECUTE FUNCTION roleta_intake.require_processing_for_result();
+
+-- Impede alteracao ou exclusao do JSON bruto por caminhos comuns.
+CREATE OR REPLACE FUNCTION roleta_intake.reject_result_mutation()
+RETURNS trigger LANGUAGE plpgsql SET search_path = pg_catalog AS $reject_mutation$
+BEGIN
+ RAISE EXCEPTION 'raw Gemini results are immutable';
+END $reject_mutation$;
+DROP TRIGGER IF EXISTS trg_reject_result_mutation ON roleta_intake.results;
+CREATE TRIGGER trg_reject_result_mutation BEFORE UPDATE OR DELETE ON roleta_intake.results
+ FOR EACH ROW EXECUTE FUNCTION roleta_intake.reject_result_mutation();
+
+-- RLS deny-by-default. Nenhum grant ao browser, Make ou roles compartilhadas.
+ALTER TABLE roleta_intake.jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE roleta_intake.jobs FORCE ROW LEVEL SECURITY;
+ALTER TABLE roleta_intake.results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE roleta_intake.results FORCE ROW LEVEL SECURITY;
+REVOKE ALL ON ALL TABLES IN SCHEMA roleta_intake FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON ALL FUNCTIONS IN SCHEMA roleta_intake FROM PUBLIC, anon, authenticated;
+-- RLS nao substitui GRANT; ausencia de politicas = acesso negado a roles comuns.
+-- ATENCAO: o proprietario das tabelas contorna RLS; a API nao deve usar credencial proprietaria
+-- irrestrita. F2 criara funcoes SECURITY DEFINER com search_path fixo, grants EXPLICITAMENTE
+-- limitados ao writer dedicado, callback autenticado, transacao atomica e idempotencia.
+-- Nao habilitar operacao real ate F2/F3 e aprovacao de migracao.
+-- IMPORTANT: this draft does NOT grant writer access or create SECURITY DEFINER RPCs.
+-- FORCE RLS protects non-superuser owners; privileged postgres/BYPASSRLS still bypasses.
+-- F2 must use a scoped, non-BYPASSRLS execution path with audited function grants.
+-- Do not infer RLS effectiveness from the postgres superuser connection.

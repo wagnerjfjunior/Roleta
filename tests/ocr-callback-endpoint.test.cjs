@@ -1,0 +1,109 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto');
+const {createHandler}=require('../server/ocr-callback-handler.cjs');
+const {canonical}=require('../server/ocr-callback-hmac.cjs');
+const secret='a-very-long-secret-key-with-at-least-32-bytes';
+const jobId='550e8400-e29b-41d4-a716-446655440000';
+function response(){return {code:0,status(n){this.code=n;return this;},setHeader(){},json(x){this.body=x;return this;}};}
+function signed(body,{now=Date.now(),nonce='uniqueNonce1234567890'}={}){
+ const a={method:'POST',path:'/api/ocr-callback',timestamp:String(now),nonce,jobId,body};
+ const signature='v1='+crypto.createHmac('sha256',secret).update(canonical(a)).digest('hex');
+ return {method:'POST',body,headers:{'content-type':'application/json','x-roleta-job-id':jobId,'x-roleta-nonce':nonce,'x-roleta-timestamp':a.timestamp,'x-roleta-signature':signature}};
+}
+test('signed callback persists and acknowledges only DB success',async()=>{
+ const body=Buffer.from(JSON.stringify({model_id:'gemini-test',result:{linhas:[{nome_lido:'Paola'}]}}));
+ let called=0;
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_HMAC_SECRET:secret,ROLETA_INTAKE_CALLBACK_AUTH:'hmac'},
+  db:()=>({query:async()=>{called++;return {rows:[{outcome:'SAVED'}]};}})});
+ const res=response();await handler(signed(body),res);
+ assert.equal(res.code,200);assert.equal(called,1);
+});
+test('tampered callback never reaches database',async()=>{
+ const body=Buffer.from('{"model_id":"x","result":{"linhas":[]}}');
+ let called=0;
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_HMAC_SECRET:secret,ROLETA_INTAKE_CALLBACK_AUTH:'hmac'},
+  db:()=>({query:async()=>{called++;return {rows:[{outcome:'SAVED'}]};}})});
+ const req=signed(body);req.body=Buffer.from('{"model_id":"x","result":{"changed":true}}');
+ const res=response();await handler(req,res);
+ assert.equal(res.code,401);assert.equal(called,0);
+});
+test('DB failure never acknowledges success',async()=>{
+ const body=Buffer.from('{"model_id":"x","result":{"linhas":[]}}');
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_HMAC_SECRET:secret,ROLETA_INTAKE_CALLBACK_AUTH:'hmac'},
+  db:()=>({query:async()=>{throw Error('offline');}})});
+ const res=response();await handler(signed(body),res);assert.equal(res.code,503);
+});
+
+test('accepts Make Gemini JSON string without losing payload',async()=>{
+ const result='{"linhas":[{"nome_lido":"Paola"}]}';
+ const body=Buffer.from(JSON.stringify({model_id:'gemini-3.8-flash',result}));
+ let params;
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_HMAC_SECRET:secret,ROLETA_INTAKE_CALLBACK_AUTH:'hmac'},db:()=>({query:async(sql,p)=>{params=p;return {rows:[{outcome:'SAVED'}]};}})});
+ const res=response();await handler(signed(body),res);
+ assert.equal(res.code,200);
+ assert.deepEqual(JSON.parse(params[3]),JSON.parse(result));
+});
+
+const managedSecret='managed-make-secret-must-be-32-plus-bytes-only';
+function managed(body,overrides={}){
+ return {method:'POST',body,headers:{'content-type':'application/json',
+ 'x-roleta-job-id':jobId,'x-roleta-nonce':'uniqueNonce1234567890',
+ 'x-roleta-timestamp':String(Date.now()),
+ 'x-roleta-callback-key':managedSecret,...overrides}};
+}
+test('managed key: valid token and envelope persist result',async()=>{
+ const body=Buffer.from('{"model_id":"gemini","result":{"linhas":[]}}');
+ let called=0;
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',
+ ROLETA_INTAKE_CALLBACK_API_KEY:managedSecret},db:()=>({query:async()=>{called++;return {rows:[{outcome:'SAVED'}]};}})});
+ const res=response();await handler(managed(body),res);
+ assert.equal(res.code,200);assert.equal(called,1);
+});
+test('managed key: invalid key never reaches database',async()=>{
+ let called=0;
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',
+ ROLETA_INTAKE_CALLBACK_API_KEY:managedSecret},db:()=>({query:async()=>{called++;return {rows:[{outcome:'SAVED'}]};}})});
+ const res=response();await handler(managed(Buffer.from('{"model_id":"x","result":{"linhas":[]}}'),{'x-roleta-callback-key':'wrong'}),res);
+ assert.equal(res.code,401);assert.equal(called,0);
+});
+test('managed key: stale timestamp rejected before DB',async()=>{
+ let called=0;
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',
+ ROLETA_INTAKE_CALLBACK_API_KEY:managedSecret},db:()=>({query:async()=>{called++;return {rows:[{outcome:'SAVED'}]};}})});
+ const res=response();await handler(managed(Buffer.from('{"model_id":"x","result":{"linhas":[]}}'),{'x-roleta-timestamp':String(Date.now()-600000)}),res);
+ assert.equal(res.code,401);assert.equal(called,0);
+});
+test('no explicitly configured auth mode rejects even old signed requests',async()=>{
+ let called=0;
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_HMAC_SECRET:secret},db:()=>({query:async()=>{called++;return {rows:[{outcome:'SAVED'}]};}})});
+ const res=response();await handler(signed(Buffer.from('{"model_id":"x","result":{"linhas":[]}}')),res);
+ assert.equal(res.code,401);assert.equal(called,0);
+});
+
+for(const outcome of ['FAILED_SAVED','ALREADY_FAILED','ALREADY_SAVED']){
+ test('terminal failure callback acknowledges only persisted outcome '+outcome,async()=>{
+  let params,query;
+  const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',ROLETA_INTAKE_CALLBACK_API_KEY:managedSecret},
+   db:()=>({query:async(sql,p)=>{query=sql;params=p;return {rows:[{outcome}]};}})});
+  const res=response();await handler(managed(Buffer.from(JSON.stringify({status:'FAILED',error_code:'GEMINI_503_EXHAUSTED'}))),res);
+  assert.equal(res.code,200);assert.match(query,/fail_callback/);
+  assert.deepEqual(params,[jobId,'uniqueNonce1234567890','GEMINI_503_EXHAUSTED']);
+ });
+}
+for(const payload of [
+ {status:'FAILED',error_code:'upstream secret-bearing error'},
+ {status:'FAILED',error_code:'GEMINI_503_EXHAUSTED',result:{linhas:[]}}
+]){
+ test('invalid failure envelope rejected without database access '+JSON.stringify(payload),async()=>{
+  let calls=0;const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',ROLETA_INTAKE_CALLBACK_API_KEY:managedSecret},db:()=>({query:async()=>{calls++;}})});
+  const res=response();await handler(managed(Buffer.from(JSON.stringify(payload))),res);
+  assert.equal(res.code,422);assert.equal(calls,0);
+ });
+}
+for(const code of ['23505','offline']){
+ test('failure callback persistence error '+code+' is not acknowledged',async()=>{
+  const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'true',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',ROLETA_INTAKE_CALLBACK_API_KEY:managedSecret},db:()=>({query:async()=>{throw Object.assign(Error('private database detail'),{code});}})});
+  const res=response();await handler(managed(Buffer.from('{"status":"FAILED","error_code":"GEMINI_503_EXHAUSTED"}')),res);
+  assert.equal(res.code,code==='23505'?409:503);assert.ok(!JSON.stringify(res.body).includes('private database detail'));
+ });
+}

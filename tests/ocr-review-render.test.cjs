@@ -9,6 +9,7 @@ async function setup({directoryError=false,missingBridge=false}={}){
  const ready=new Promise(resolve=>{releaseDirectory=resolve;});
  w.fetch=async url=>{
   if(url==='/api/auth/session')return {ok:true,json:async()=>({authenticated:true,email:'test@example.test',csrfToken:'test-only'})};
+  if(url==='/api/ocr-job-submit')return {ok:true,json:async()=>({enabled:false})};
   if(url==='/data/print-brokers.json')await ready;
   return {ok:!(directoryError&&url==='/data/print-brokers.json'),json:async()=>JSON.parse(fs.readFileSync('.'+url,'utf8'))};
  };
