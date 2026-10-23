@@ -63,3 +63,15 @@ test('ambiguous network failure preserves job rather than recording a false FAIL
  assert.equal(res.code,202);assert.equal(res.body.status,'DISPATCH_UNCONFIRMED');
  assert.equal(sql.length,2);
 });
+
+test('status flags stale PROCESSING without overwriting the job',async()=>{
+ const {createHandler:statusHandler}=require('../api/ocr-job-status');
+ const queries=[];
+ const db=()=>({query:async(sql,args)=>{queries.push({sql,args});return {rows:[{job:{state:'PROCESSING',updated_at:new Date(Date.now()-600000).toISOString()}}]};}});
+ const handler=statusHandler({env,authenticate:auth,db});
+ const res=response();await handler({method:'GET',url:'/api/ocr-job-status?job_id='+id},res);
+ assert.equal(res.code,200);assert.equal(res.body.state,'PROCESSING');
+ assert.equal(res.body.reconciliation_required,true);
+ assert.equal(queries.length,1);
+ assert.equal(queries[0].args[1],sub);
+});
