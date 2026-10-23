@@ -13,6 +13,7 @@ async function bytesOf(req){
 function createHandler({env=process.env,authenticate=auth,db=getIntakePool,dispatch=fetch}={}){
  return async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
+  if(req.method==='GET')return res.status(200).json({enabled:env.ROLETA_INTAKE_ENABLED==='true'});
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
   if(env.ROLETA_INTAKE_ENABLED!=='true')return res.status(503).json({error:'Disabled'});
   try{
