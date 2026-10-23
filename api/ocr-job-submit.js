@@ -53,9 +53,13 @@ function createHandler({env=process.env,authenticate=auth,db=getIntakePool,dispa
     const upstream=await dispatch(target.toString(),{method:'POST',body:form,signal:controller.signal,redirect:'error'});
     if(!upstream.ok)throw Error('Make dispatch rejected');
    }catch(dispatchError){
-    // The database RPC checks PROCESSING under row lock; never overwrite READY.
-    // An uncertain timeout may still have reached Make; a later signed callback
-    // will be rejected after FAILED. Explicit retry/reconciliation remains a gate.
+    // Network errors/timeouts do not prove that Make rejected the upload.
+    // Preserve PROCESSING so an authenticated callback can still complete it.
+    // An operational timeout/reconciliation worker is required before go-live.
+    if(dispatchError?.name==='AbortError'||dispatchError?.name==='TypeError'){
+     return res.status(202).json({job_id:id,status:'DISPATCH_UNCONFIRMED',poll_url:'/api/ocr-job-status?job_id='+id});
+    }
+    // A definite non-2xx response is rejected; the RPC cannot overwrite READY.
     try{await pool.query('SELECT roleta_intake.fail_dispatch($1,$2)',[id,s.sub]);}
     catch{throw Error('Make dispatch failed; reconciliation unavailable');}
     throw dispatchError;
