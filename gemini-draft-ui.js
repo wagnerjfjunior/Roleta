@@ -62,7 +62,6 @@ async function mount(host){
      if(!r.ok)throw Error('Não foi possível consultar a leitura. Reabra a Roleta com a mesma conta para recuperar o resultado.');
      const job=await r.json();
      if(job.state==='READY_FOR_REVIEW'&&job.result&&Array.isArray(job.result.linhas)){
-       try{if(pendingKey())localStorage.removeItem(pendingKey());}catch{}
        return {result:job.result,source:'make-gemini'};
      }
      if(job.state==='FAILED')throw Error('O processamento falhou. Confira a fotografia e tente novamente.');
@@ -92,6 +91,7 @@ async function mount(host){
      textarea.value=JSON.stringify(json.result,null,2);
      photoEvidence=null; // The original photo is not stored in browser storage.
      await renderDraft();
+     try{if(key)localStorage.removeItem(key);}catch{}
      photoStatus.innerHTML='<strong>LEITURA RECUPERADA</strong><div>Confira todos os participantes. A foto original não foi armazenada neste navegador.</div>';
      progress('Leitura recuperada · confira os participantes',100);
    }catch(e){
@@ -224,6 +224,7 @@ async function mount(host){
      photoEvidence={file:selected,draftJson:JSON.stringify(data),eventKey:null,reviewed:null};
      progress('Leitura recebida. Preparando conferência…',null);
      await renderDraft();
+     if(json.source==='make-gemini'){try{if(pendingKey())localStorage.removeItem(pendingKey());}catch{}}
      photoStatus.className='intake-gate blocked';
      photoStatus.innerHTML=json.source==='make-ocr-space'?'<strong>LEITURA ALTERNATIVA RECEBIDA</strong><div>Confira a foto com atenção. Acrescente participantes ausentes e complete os campos que ficaram vazios.</div>':'<strong>LEITURA RECEBIDA</strong><div>Confira nomes e números na tabela; a conferência humana continua obrigatória.</div>';
      progress('Leitura concluída · pronto para revisão',100);
