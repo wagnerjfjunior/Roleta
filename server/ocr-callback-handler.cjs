@@ -4,9 +4,12 @@ const {verifyCallback}=require('../server/ocr-callback-hmac.cjs');
 const {verifyManagedKey}=require('../server/ocr-callback-api-key.cjs');
 const {getIntakePool}=require('../server/ocr-intake-db.cjs');
 const MAX=1024*1024;
-async function readRaw(req){
+async function readRaw(req,allowParsedJson=false){
  if(Buffer.isBuffer(req.body))return req.body;
  if(typeof req.body==='string')return Buffer.from(req.body,'utf8');
+ // Vercel's Node runtime may parse JSON before invoking a rewritten function.
+ // API-key authentication does not sign body bytes; HMAC must still fail closed.
+ if(allowParsedJson&&req.body!==null&&typeof req.body==='object')return Buffer.from(JSON.stringify(req.body),'utf8');
  if(req.body!==undefined)throw Object.assign(Error('raw body required'),{status:415});
  let n=0;const chunks=[];
  for await(const part of req){n+=part.length;if(n>MAX)throw Object.assign(Error('too large'),{status:413});chunks.push(part);}
@@ -22,7 +25,7 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
    return res.status(503).json({error:'Disabled'});
   try{
    // Vercel must not pre-parse JSON: HMAC is over the exact request bytes.
-   const body=await readRaw(req);
+   const body=await readRaw(req,env.ROLETA_INTAKE_CALLBACK_AUTH==='managed_api_key');
    if(body.length===0||body.length>MAX)return res.status(413).json({error:'Invalid payload size'});
    if(String(req.headers['content-type']||'').split(';')[0]!=='application/json')return res.status(415).json({error:'JSON required'});
    const jobId=req.headers['x-roleta-job-id'];
