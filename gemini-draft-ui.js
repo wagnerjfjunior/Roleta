@@ -46,8 +46,15 @@ async function mount(host){
  const pendingKey=()=>googleSession?.email?'roleta:ocr-pending:'+googleSession.email.toLowerCase():null;
  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  async function asyncAvailable(){
-   try{const r=await fetch('/api/ocr-job-submit',{cache:'no-store',credentials:'same-origin'});
-     return r.ok&&(await r.json()).enabled===true;}catch{return false;}
+   // An unavailable capability endpoint is NOT evidence that the old synchronous
+   // endpoint is safe to use. Fail closed instead of silently resubmitting.
+   let r;
+   try{r=await fetch('/api/ocr-job-submit',{cache:'no-store',credentials:'same-origin'});}
+   catch{throw Error('Não foi possível verificar o serviço OCR. Nenhuma fotografia foi enviada; tente novamente.');}
+   if(!r.ok)throw Error('Serviço OCR temporariamente indisponível. Nenhuma fotografia foi enviada.');
+   const capability=await r.json().catch(()=>null);
+   if(typeof capability?.enabled!=='boolean')throw Error('Não foi possível confirmar o modo de processamento OCR.');
+   return capability.enabled;
  }
  async function waitForResult(jobId){
    for(let i=0;i<140;i++){
@@ -76,7 +83,8 @@ async function mount(host){
  async function resumePending(){
    const key=pendingKey();if(!key||busy)return;
    let id;try{id=localStorage.getItem(key);}catch{return;}
-   if(!id||!/^[0-9a-f-]{36}$/i.test(id)||!(await asyncAvailable()))return;
+   if(!id||!/^[0-9a-f-]{36}$/i.test(id))return;
+   try{if(!(await asyncAvailable()))return;}catch{return;}
    busy=true;refreshSend();
    try{
      progress('Recuperando leitura anterior…',null);
@@ -206,7 +214,7 @@ async function mount(host){
    if(!canSend())return;
    busy=true;refreshSend();
    photoStatus.className='intake-gate blocked';
-   photoStatus.innerHTML='<strong>PROCESSANDO FOTOGRAFIA</strong><div>Aguardando resposta do Make e do Gemini. A leitura pode levar até 3 minutos; mantenha esta página aberta.</div>';
+   photoStatus.innerHTML='<strong>PROCESSANDO FOTOGRAFIA</strong><div>A fotografia será enviada para processamento. Se o modo assíncrono estiver ativo, você poderá voltar mais tarde com a mesma conta.</div>';
    progress('Iniciando envio: 0%',0);
    try{
      const json=await (await asyncAvailable()?uploadAsync(selected,googleSession.csrfToken):upload(selected,googleSession.csrfToken));
