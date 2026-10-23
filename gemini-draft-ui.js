@@ -46,7 +46,7 @@ async function mount(host){
  const pendingKey=()=>googleSession?.email?'roleta:ocr-pending:'+googleSession.email.toLowerCase():null;
  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  async function asyncAvailable(){
-   try{const r=await fetch('/api/ocr-intake-capabilities',{cache:'no-store',credentials:'same-origin'});
+   try{const r=await fetch('/api/ocr-job-submit',{cache:'no-store',credentials:'same-origin'});
      return r.ok&&(await r.json()).enabled===true;}catch{return false;}
  }
  async function waitForResult(jobId){
