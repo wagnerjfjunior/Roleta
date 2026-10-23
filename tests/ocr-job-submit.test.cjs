@@ -44,3 +44,22 @@ test('rejects wrong CSRF before any database write',async()=>{
  const res=response();await handler(r,res);
  assert.equal(res.code,403);assert.equal(called,0);
 });
+
+test('ambiguous transport timeout preserves job for a late signed callback',async()=>{
+ const sql=[];
+ const db=()=>({query:async(q)=>{sql.push(q);return {rows:[q.includes('create_job')?{id}:{ok:true}]};}});
+ const handler=createHandler({env,authenticate:auth,db,dispatch:async()=>{const e=new Error('timeout');e.name='AbortError';throw e;}});
+ const res=response();await handler(req(),res);
+ assert.equal(res.code,202);assert.equal(res.body.status,'DISPATCH_UNCONFIRMED');
+ assert.equal(res.body.job_id,id);
+ assert.equal(sql.length,2);
+ assert.ok(!sql.some(q=>q.includes('fail_dispatch')));
+});
+test('ambiguous network failure preserves job rather than recording a false FAILED',async()=>{
+ const sql=[];
+ const db=()=>({query:async(q)=>{sql.push(q);return {rows:[q.includes('create_job')?{id}:{ok:true}]};}});
+ const handler=createHandler({env,authenticate:auth,db,dispatch:async()=>{throw new TypeError('fetch failed');}});
+ const res=response();await handler(req(),res);
+ assert.equal(res.code,202);assert.equal(res.body.status,'DISPATCH_UNCONFIRMED');
+ assert.equal(sql.length,2);
+});
