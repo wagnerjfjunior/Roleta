@@ -16,7 +16,10 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
  return async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
   if(req.method!=='POST')return res.status(405).json({error:'Method not allowed'});
-  if(env.ROLETA_INTAKE_ENABLED!=='true')return res.status(503).json({error:'Disabled'});
+  // Authentication-only laboratory probe: never opens the persistence path.
+  const probe=req.headers['x-roleta-probe']==='auth';
+  if(probe ? env.ROLETA_INTAKE_CALLBACK_PROBE_ENABLED!=='true' : env.ROLETA_INTAKE_ENABLED!=='true')
+   return res.status(503).json({error:'Disabled'});
   try{
    // Vercel must not pre-parse JSON: HMAC is over the exact request bytes.
    const body=await readRaw(req);
@@ -36,6 +39,12 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
        {secret:env.ROLETA_INTAKE_HMAC_SECRET})
      :(()=>{throw Error('callback secret unavailable');})();
    const parsed=JSON.parse(body.toString('utf8'));
+   if(probe){
+    if(!parsed||Array.isArray(parsed)||parsed.probe!=='auth'||Object.keys(parsed).length!==1)
+     return res.status(422).json({error:'Invalid probe payload'});
+    // This proves only credential/envelope verification, not durable nonce or job handling.
+    return res.status(200).json({status:'AUTHENTICATED_NO_WRITE'});
+   }
    if(parsed && !Array.isArray(parsed) && parsed.status==='FAILED'){
     // Only bounded codes, never upstream error messages or credentials.
     const codes=['GEMINI_503_EXHAUSTED','GEMINI_RATE_LIMIT_EXHAUSTED','GEMINI_REQUEST_FAILED'];
