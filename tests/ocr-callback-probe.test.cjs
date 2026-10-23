@@ -9,6 +9,13 @@ async function run(req,changes={}){let dbCalls=0;const res=response();await crea
 test('auth probe works with intake OFF and never opens DB',async()=>{
  const r=await run(request());assert.equal(r.code,200);assert.deepEqual(r.body,{status:'AUTHENTICATED_NO_WRITE'});assert.ok(!JSON.stringify(r.body).includes(secret));
 });
+test('Vercel parsed JSON is supported only for API-key mode, with payload and size gates intact',async()=>{
+ const req=request();req.body={probe:'auth'};assert.equal((await run(req)).code,200);
+ assert.equal((await run(req,{ROLETA_INTAKE_CALLBACK_AUTH:'hmac'})).code,415);
+ req.headers['x-roleta-callback-key']='invalid';assert.equal((await run(req)).code,401);
+ req.headers['x-roleta-callback-key']=secret;req.body={probe:'auth',result:{}};assert.equal((await run(req)).code,422);
+ req.body={probe:'auth',large:'x'.repeat(1024*1024)};assert.equal((await run(req)).code,413);
+});
 test('probe is disabled by default',async()=>{assert.equal((await run(request(),{ROLETA_INTAKE_CALLBACK_PROBE_ENABLED:undefined})).code,503);});
 test('probe does not enable regular result or failure persistence',async()=>{
  for(const payload of [{status:'FAILED',error_code:'GEMINI_503_EXHAUSTED'},{model_id:'fixture',result:{linhas:[]}}]){
