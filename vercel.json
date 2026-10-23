@@ -30,5 +30,19 @@
     "api/final-roulette.js": {
       "includeFiles": "data/**"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/ocr-job-submit",
+      "destination": "/api/ocr-shadow-submit?__intake=submit"
+    },
+    {
+      "source": "/api/ocr-job-status",
+      "destination": "/api/ocr-shadow-submit?__intake=status"
+    },
+    {
+      "source": "/api/ocr-callback",
+      "destination": "/api/ocr-shadow-submit?__intake=callback"
+    }
+  ]
 }

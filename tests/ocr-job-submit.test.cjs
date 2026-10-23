@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {createHandler}=require('../api/ocr-job-submit');
+const {createHandler}=require('../server/ocr-job-submit-handler.cjs');
 const sub='google-sub-A',email='operator@example.com',id='550e8400-e29b-41d4-a716-446655440000';
 const png=Buffer.from([137,80,78,71,13,10,26,10,1,2,3]);
 const env={ROLETA_INTAKE_ENABLED:'true',ROLETA_FINAL_OPERATOR_EMAILS:email,ROLETA_INTAKE_MAKE_WEBHOOK_URL:'https://hook.us2.make.com/example'};
@@ -65,7 +65,7 @@ test('ambiguous network failure preserves job rather than recording a false FAIL
 });
 
 test('status flags stale PROCESSING without overwriting the job',async()=>{
- const {createHandler:statusHandler}=require('../api/ocr-job-status');
+ const {createHandler:statusHandler}=require('../server/ocr-job-status-handler.cjs');
  const queries=[];
  const db=()=>({query:async(sql,args)=>{queries.push({sql,args});return {rows:[{job:{state:'PROCESSING',updated_at:new Date(Date.now()-600000).toISOString()}}]};}});
  const handler=statusHandler({env,authenticate:auth,db});
@@ -94,7 +94,7 @@ test('POST remains disabled when feature flag is absent',async()=>{
  const res=response();await handler(req(),res);assert.equal(res.code,503);
 });
 test('fresh status and completed status do not require reconciliation',async()=>{
- const {createHandler:statusHandler}=require('../api/ocr-job-status');
+ const {createHandler:statusHandler}=require('../server/ocr-job-status-handler.cjs');
  for(const state of ['PROCESSING','READY_FOR_REVIEW']){
   const date=new Date(Date.now()-(state==='PROCESSING'?1000:600000)).toISOString();
   const handler=statusHandler({env,authenticate:auth,
@@ -104,7 +104,7 @@ test('fresh status and completed status do not require reconciliation',async()=>
  }
 });
 test('status query refuses nonexistent job without exposing result',async()=>{
- const {createHandler:statusHandler}=require('../api/ocr-job-status');
+ const {createHandler:statusHandler}=require('../server/ocr-job-status-handler.cjs');
  const handler=statusHandler({env,authenticate:auth,db:()=>({query:async()=>({rows:[{job:null}]})})});
  const res=response();await handler({method:'GET',url:'/api/ocr-job-status?job_id='+id},res);
  assert.equal(res.code,404);

@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {createHandler}=require('../api/ocr-callback');
+const {createHandler}=require('../server/ocr-callback-handler.cjs');
 const secret='fixture-only-auth-probe-secret-at-least-32-bytes';
 const env={ROLETA_INTAKE_ENABLED:'false',ROLETA_INTAKE_CALLBACK_AUTH:'managed_api_key',ROLETA_INTAKE_CALLBACK_API_KEY:secret,ROLETA_INTAKE_CALLBACK_PROBE_ENABLED:'true'};
 const response=()=>({setHeader(){},status(code){this.code=code;return this;},json(body){this.body=body;return this;}});

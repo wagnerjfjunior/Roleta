@@ -1,6 +1,6 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),crypto=require('node:crypto');
-const {createHandler}=require('../api/ocr-callback');
+const {createHandler}=require('../server/ocr-callback-handler.cjs');
 const {canonical}=require('../server/ocr-callback-hmac.cjs');
 const secret='a-very-long-secret-key-with-at-least-32-bytes';
 const jobId='550e8400-e29b-41d4-a716-446655440000';
