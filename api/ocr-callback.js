@@ -1,6 +1,7 @@
 'use strict';
 // Server-to-server Make callback. Disabled unless dedicated credentials and flag exist.
 const {verifyCallback}=require('../server/ocr-callback-hmac.cjs');
+const {verifyManagedKey}=require('../server/ocr-callback-api-key.cjs');
 const {getIntakePool}=require('../server/ocr-intake-db.cjs');
 const MAX=1024*1024;
 async function readRaw(req){
@@ -25,7 +26,15 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
    const nonce=req.headers['x-roleta-nonce'];
    const timestamp=req.headers['x-roleta-timestamp'];
    const signature=req.headers['x-roleta-signature'];
-   const validated=verify({method:req.method,path:'/api/ocr-callback',timestamp,nonce,jobId,body,signature},{secret:env.ROLETA_INTAKE_HMAC_SECRET});
+   // Exactly one active callback authentication mode. No opportunistic fallback.
+   const managed=env.ROLETA_INTAKE_CALLBACK_AUTH==='managed_api_key';
+   const validated=managed
+    ?verifyManagedKey({method:req.method,path:'/api/ocr-callback',timestamp,nonce,jobId,
+       credential:req.headers['x-roleta-callback-key']},{secret:env.ROLETA_INTAKE_CALLBACK_API_KEY})
+    :env.ROLETA_INTAKE_CALLBACK_AUTH==='hmac'
+     ?verify({method:req.method,path:'/api/ocr-callback',timestamp,nonce,jobId,body,signature},
+       {secret:env.ROLETA_INTAKE_HMAC_SECRET})
+     :(()=>{throw Error('callback secret unavailable');})();
    const parsed=JSON.parse(body.toString('utf8'));
    if(!parsed||Array.isArray(parsed)||typeof parsed!=='object'||
       typeof parsed.model_id!=='string'||!parsed.model_id||parsed.model_id.length>128||
@@ -46,7 +55,7 @@ function createHandler({env=process.env,db=getIntakePool,verify=verifyCallback}=
    if(!['SAVED','ALREADY_SAVED'].includes(outcome))throw Error('Unexpected persistence response');
    return res.status(200).json({status:outcome});
   }catch(e){
-   const authError=/signature|timestamp|nonce|envelope|secret/i.test(e.message);
+   const authError=/signature|timestamp|nonce|envelope|secret|credential|callback method/i.test(e.message);
    const conflict=e.code==='23505'||/conflicting Gemini completion/i.test(e.message);
    return res.status(authError?401:conflict?409:e.status===413?413:e.status===415?415:503).json({error:authError?'Invalid callback':conflict?'Conflicting or repeated callback':'Callback not persisted'});
   }
