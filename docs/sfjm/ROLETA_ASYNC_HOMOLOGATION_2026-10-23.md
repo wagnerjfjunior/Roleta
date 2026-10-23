@@ -94,3 +94,32 @@ Inspeção: https://vercel.com/wagnerjfjunior-3025s-projects/roleta/6ZHJiwppNu8L
 - Recursos disponíveis consultados: share link temporário usa URL secreta/cookie; automation bypass é configurado no escopo do projeto. Nenhum desses segredos foi criado ou colocado no cenário nesta continuação. Não substituir silenciosamente a exceção autorizada por bypass de projeto.
 - Próximo ponto de decisão: escolher transporte com credencial adicional protegida/revogável para atravessar a Vercel Authentication, ou hostname dedicado de homologação com estratégia de proteção validada. Antes da escolha, preparar armazenamento seguro compatível com HTTP v4, escopo, expiração e remoção; nunca armazenar bypass em mapper/blueprint.
 - A tentativa não produziu evidência positiva Make→callback. Permanecem pendentes chave correta, rotação/revogação e redaction, além dos gates OCR/retries/mobile descritos acima. NO-GO para liberação produtiva. Não houve migrations, merge, promoção, alteração do cenário6549955 ou ativação do intake nesta continuação.
+
+## Decisão operacional do responsável — validar na produção existente
+O responsável determinou explicitamente o uso da produção existente, assumindo o risco e exigindo rollback estruturado. Não há novo ambiente QA/homologação nem Preview. Esta autorização cobre publicar o candidato com intake OFF para testes no domínio atual; não foi interpretada como autorização para migrations, merge ou ativar intake sem os gates.
+
+### Publicação e correção comprovadas
+- Candidato18dbd4f promovido via CLI65.2.0 ao domínio produtivo. GET / retornou200; GET /api/ocr-job-submit200 {"enabled":false}; status503 Disabled; callbackGET405. Nenhuma escrita DB.
+- Primeira execução Make a1394c5a54c34b3e9a8ce32d9fbc6478 retornou415. Não foi PASS: runtime Node entregou JSON pré-parseado, recusado pela leitura raw.
+- Correção aceita objeto JSON pré-parseado SOMENTE em managed_api_key, cujo contrato não assina bytes do corpo. HMAC continua exigindo raw; limite1MiB, envelope, autenticação e corpo exclusivo do probe preservados. 26 testes locais PASS,0FAIL/skipped, incluindo modoHMAC415, chave inválida401, payload extra422 e excesso413 sem DB.
+- Correção remota a736a139 + testes e91f5a64bf45c2bae5a80f6790c78e62827fea04. O push CLI falhou por falta de credencialGit; arquivos publicados via conectorGitHub. Commit local9bf0436 e remotoe91f5a6 têm MESMA árvore0102a5aab85a09c514672224baecbde4afef16d9, verificada via git rev-parse após fetch.
+- Deployment final dpl_ChwNXysTcDnuZkDS7RDash2YgKN5, https://roleta-4ihgb5ib7-wagnerjfjunior-3025s-projects.vercel.app, Production READY, build~10s. list_deployment_aliases confirma roleta-tgv.vercel.app e roleta-six-lime.vercel.app. intake=false e probe=true no deployment.
+- Seis workflows SUCCESS no SHA remotoe91f5a6: intake40020019199; storage17 40020019034; security40020019022; Gemini40020019084; audit40020019015; guardrails40020019238. CI não substitui E2E.
+- Make6752690: configuração confidential=true aceita; conexão11902957 preservada. Corpo agora {"probe":"auth"} e X-Roleta-Probe: auth. Sem segredo literal em mapper. Não alterada a allowlist de origens porque domínio produtivo já autorizado.
+- Execução e76ff0fbda6b4d2a84440a872e48ec1d: HTTP200 no probe com chave gerenciada. Prova positiva de autenticação e envelope, com intakeOFF, sem escritaDB; não prova persistência/nonce durável/OCR.
+- Execução76a4940f74a4435faab5324c50eb68f4: mesmo transporte gerenciado, timestamp expirado10min =>401. Chave fictícia inválida via HTTP público =>401 {"error":"Invalid callback"}. GET público/200 e intakeGET200 {"enabled":false} repetidos no deployment final.
+- Cenário6752690 devolvido INACTIVE, confirmado scenario_get. Make6549955 não editado. Nenhuma migration, merge ou escrita nos schemas existentes. ProteçãoVercel global não desabilitada. Google login não alterado em código; sessãoOAuth real/mobile ainda não revalidada nesta publicação.
+
+### Rollback executável
+Destino estável anterior: dpl_9dw2CSm3yNkEpAZtuaRUNbfukXHU, URL roleta-pksgarqtq-wagnerjfjunior-3025s-projects.vercel.app, main68feb2a73d1e4c66f3477dad1ba08d1d8f387e10. READY reconfirmado após publicação. Não destruir esse deployment.
+
+Gatilhos: falha de loginGoogle, erro na roleta síncrona/conferência/impressão, 5xx inesperado nas rotas atuais ou quebra mobile. Os503 Disabled dos endpoints intakeOFF são esperados, não gatilhos isolados.
+1. Desativar cenário6752690 se estiver rodando; não alterar6549955.
+2. Executar: npx --yes vercel@65.2.0 rollback dpl_9dw2CSm3yNkEpAZtuaRUNbfukXHU --scope wagnerjfjunior-3025s-projects --yes
+3. Verificar o destino de CADA alias usado e GET da página. Caso alias não acompanhe rollback, usar para esse alias: npx --yes vercel@65.2.0 alias set roleta-pksgarqtq-wagnerjfjunior-3025s-projects.vercel.app NOME_DO_ALIAS --scope wagnerjfjunior-3025s-projects. Inventário: roleta-tgv.vercel.app; roleta-six-lime.vercel.app; roleta-wagnerjfjunior-3025s-projects.vercel.app; roleta-git-main-wagnerjfjunior-3025s-projects.vercel.app.
+4. Confirmar loginGoogle e operação síncrona no aparelho. Registrar horário, motivo e respostas; não fazer rollbackSQL, pois nenhuma migration foi aplicada.
+5. RollbackVercel pode suspender autoatribuição de futuros deploysGit; promoção posterior deve ser deliberada. Chave callback pode ser revogada/rotacionada separadamente, sem jamais registrar seu valor.
+Comando preparado e destinoREADY verificado; rollback de volta não foi executado nesta etapa e não é declarado testado.
+
+### Decisão atual
+GO para validação controlada na produção existente; autenticação Make→callback comprovada. NO-GO para ativação assíncrona. Pendem OCR/retries503/429 completos, persistênciaF1–F4 após backup e autorização específica, reconciliação/recuperação, revogação real, redaction de runtime comprovada, OAuth/mobile reais. Probe=true permanece temporário para os testes; retirar esse override ao fechar a validação. PR126 continua sem merge. PublicaçãoCLI antecede main: antes de qualquer próximo deployMain, reconciliar o candidato para evitar substituição inadvertida.
