@@ -75,3 +75,37 @@ test('status flags stale PROCESSING without overwriting the job',async()=>{
  assert.equal(queries.length,1);
  assert.equal(queries[0].args[1],sub);
 });
+
+test('feature discovery reports disabled without database or dispatch',async()=>{
+ let calls=0;
+ const handler=createHandler({env:{ROLETA_INTAKE_ENABLED:'false'},authenticate:auth,
+  db:()=>{calls++;throw Error('unexpected DB');},dispatch:async()=>{calls++;throw Error('unexpected Make');}});
+ const res=response();await handler({method:'GET',url:'/api/ocr-job-submit',headers:{}},res);
+ assert.equal(res.code,200);assert.deepEqual(res.body,{enabled:false});assert.equal(calls,0);
+});
+test('feature discovery enabled does not disclose secrets',async()=>{
+ const handler=createHandler({env:{...env,ROLETA_INTAKE_CALLBACK_API_KEY:'never-expose-me'},authenticate:auth});
+ const res=response();await handler({method:'GET',url:'/api/ocr-job-submit',headers:{}},res);
+ assert.equal(res.code,200);assert.deepEqual(res.body,{enabled:true});
+});
+test('POST remains disabled when feature flag is absent',async()=>{
+ const handler=createHandler({env:{...env,ROLETA_INTAKE_ENABLED:undefined},authenticate:auth,
+  db:()=>{throw Error('DB should not be called');}});
+ const res=response();await handler(req(),res);assert.equal(res.code,503);
+});
+test('fresh status and completed status do not require reconciliation',async()=>{
+ const {createHandler:statusHandler}=require('../api/ocr-job-status');
+ for(const state of ['PROCESSING','READY_FOR_REVIEW']){
+  const date=new Date(Date.now()-(state==='PROCESSING'?1000:600000)).toISOString();
+  const handler=statusHandler({env,authenticate:auth,
+    db:()=>({query:async()=>({rows:[{job:{state,updated_at:date}}]})})});
+  const res=response();await handler({method:'GET',url:'/api/ocr-job-status?job_id='+id},res);
+  assert.equal(res.code,200);assert.equal(res.body.reconciliation_required,false);
+ }
+});
+test('status query refuses nonexistent job without exposing result',async()=>{
+ const {createHandler:statusHandler}=require('../api/ocr-job-status');
+ const handler=statusHandler({env,authenticate:auth,db:()=>({query:async()=>({rows:[{job:null}]})})});
+ const res=response();await handler({method:'GET',url:'/api/ocr-job-status?job_id='+id},res);
+ assert.equal(res.code,404);
+});
