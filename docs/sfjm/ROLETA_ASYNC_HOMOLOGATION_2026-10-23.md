@@ -43,3 +43,8 @@ Ainda NÃO instalado/testado no shadow: retries dos modelos, callback de sucesso
 
 ## Rollback preservado
 ROLETA_INTAKE_ENABLED ausente/false mantém caminho síncrono e importação JSON. Não destruir jobs/resultados para rollback; conservar cenário 6549955. Antes da publicação registrar deployment/commit de retorno, confirmar env efetiva no build e provar desativação. Login Google, impressão, PDF, estatística e schemas existentes não foram alterados.
+
+## Confirmação remota do SHA funcional 717a9a7
+Seis workflows SUCCESS: OCR intake F1–F4 40009794426; Gemini intake safety 40009794517; F2–11 security 40009794552; F2–12 storage PostgreSQL 17 40009794628; audit regression 40009794531; guardrails 40009794560. Job 120606920034 confirma SUCCESS nas etapas F1, F2, F3/F4 e Node. O ensaio PostgreSQL 17 pendente acima está concluído para este SHA; gates de produção/E2E permanecem abertos.
+Evidência: https://github.com/wagnerjfjunior/Roleta/actions/runs/40009794426
+Nenhuma autorização de migrations, merge ou ativação foi solicitada/concedida nesta sessão. A conexão Make continua PENDING.
