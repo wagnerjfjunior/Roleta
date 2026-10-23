@@ -15,7 +15,10 @@ function createHandler({env=process.env,authenticate=auth,db=getIntakePool}={}){
    assertJobId(id);
    const r=await db(env).query('SELECT roleta_intake.read_job($1,$2) AS job',[id,session.sub]);
    if(!r.rows?.[0]?.job)return res.status(404).json({error:'Job not found'});
-   return res.status(200).json(r.rows[0].job);
+   const job=r.rows[0].job;
+   const last=Date.parse(job.updated_at||job.created_at||'');
+   const stalled=job.state==='PROCESSING'&&Number.isFinite(last)&&Date.now()-last>360000;
+   return res.status(200).json({...job,reconciliation_required:stalled});
   }catch(e){return res.status(503).json({error:'Unable to retrieve job'});}
  };
 }
