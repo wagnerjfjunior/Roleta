@@ -256,6 +256,10 @@ async function mount(host){
    if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;preview.removeAttribute('src');}
    photoEvidence=null;refreshSend();
  }
+ host.addEventListener('roleta-discard-local',event=>{
+   // Only the existing account-scoped IndexedDB and pending pointer are affected.
+   event.detail.promise=discardEvidence();
+ });
  // Final confirmation is not persistence. Keep evidence until the server acknowledges save.
  const shadowConsent=article.querySelector('[data-shadow-consent]');
  const shadowConsentWrap=article.querySelector('[data-shadow-consent-wrap]');
