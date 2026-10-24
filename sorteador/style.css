@@ -166,3 +166,6 @@ footer{color:#d3e1da;font-size:11px;line-height:1.6;margin-top:32px}footer a{col
  .draw-card{padding-left:12px;padding-right:12px}
 }
 @media(prefers-reduced-motion:reduce){.winner.winner-ball.is-rolling,.winner.winner-ball.revealing{animation:none}}
+
+/* Initial placeholder: avoid clipping the question mark glyph; drawn numbers retain their size. */
+.winner.winner-ball #winnerNumber:not(.has-drawn-number){overflow:visible;font-size:clamp(105px,22vw,180px);letter-spacing:0;padding-inline:.09em;line-height:1.18}
