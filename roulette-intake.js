@@ -577,7 +577,7 @@
     host.addEventListener('roleta-load-saved',event=>{
       event.detail.promise=(async()=>{
         const record=event.detail.record;
-        if(!record||!record.payload?.reviewed||!/^\\d{4}-\\d{2}-\\d{2}-[MTI]$/.test(record.event_id||''))throw Error('Registro salvo inválido.');
+        if(!record||!record.payload?.reviewed||!/^\d{4}-\d{2}-\d{2}-[MTI]$/.test(record.event_id||''))throw Error('Registro salvo inválido.');
         savedRecord=record;
         ta.value=JSON.stringify(record.payload.reviewed,null,2);
         await validateAndPrepareReview();
