@@ -121,7 +121,7 @@ host.addEventListener('roleta-final-saved',event=>{
 });
 async function endCurrent(discard){
  if(ending)return;
- if(!preview.hidden&&saveHistory?.disabled&&saveHistory?.textContent==='Salvando roleta no histórico')return;
+ if(host.querySelector('#rltStatStatus')?.textContent==='Salvando a folha conferida no Supabase.')return;
  const message=finalSaved
    ?(discard?'Descartar apenas os dados temporários deste dispositivo? A roleta salva no histórico será preservada.':'Iniciar uma nova roleta? A roleta salva no histórico será preservada.')
    :'Esta roleta ainda não foi salva no histórico. Descartar definitivamente a fotografia e as correções locais deste dispositivo? O processamento no Make e os registros do Supabase não serão apagados.';
