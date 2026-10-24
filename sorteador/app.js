@@ -174,7 +174,7 @@ function renderSession(resetWinner){
  $('winnerCta').textContent=drawn===total?'Sorteio concluído':'Toque para sortear';
  button.setAttribute('aria-label',drawn===total?'Sorteio concluído':'Sortear próxima bolinha');
  if(resetWinner){
-  $('winner').classList.remove('revealing');
+  $('drawButton').classList.remove('revealing');
   if(drawn){
    const last=current.draws[drawn-1];
    $('winnerCaption').textContent=drawn===total?'Última bolinha sorteada':'Bolinha sorteada';
@@ -200,8 +200,8 @@ function draw(){
  if(!persist(next))return;
  current=updated;busy=true;
  $('drawButton').disabled=true;
- $('winner').classList.remove('revealing');
- $('winner').classList.add('is-rolling');
+ $('drawButton').classList.remove('revealing');
+ $('drawButton').classList.add('is-rolling');
  $('winnerCta').textContent='Sorteando…';
  $('winnerCaption').textContent=isRange(current)?'Sorteando bolinha':'Sorteando para a posição '+position;
  $('winnerNumber').textContent='—';
@@ -226,12 +226,12 @@ function draw(){
  revealTimer=setTimeout(()=>{
   revealTimer=null;
   if(rollTimer){clearTimeout(rollTimer);rollTimer=null;}
-  $('winner').classList.remove('is-rolling');
+  $('drawButton').classList.remove('is-rolling');
   $('arena').classList.remove('speed-up');
   if(visualBalls)visualBalls.setFast(false);
   busy=false;
   renderSession(false);
-  $('winner').classList.add('revealing');
+  $('drawButton').classList.add('revealing');
   $('winnerCaption').textContent='Bolinha sorteada';
   $('winnerNumber').textContent=number;
   $('winnerCta').textContent=current.draws.length===current.total?'Sorteio concluído':'Toque para sortear';
