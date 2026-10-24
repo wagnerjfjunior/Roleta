@@ -169,3 +169,7 @@ footer{color:#d3e1da;font-size:11px;line-height:1.6;margin-top:32px}footer a{col
 
 /* Initial placeholder: avoid clipping the question mark glyph; drawn numbers retain their size. */
 .winner.winner-ball #winnerNumber:not(.has-drawn-number){overflow:visible;font-size:clamp(105px,22vw,180px);letter-spacing:0;padding-inline:.09em;line-height:1.18}
+
+/* Avoid clipping rounded numerals at their glyph bounds. */
+.winner.winner-ball #winnerNumber.has-drawn-number{overflow:visible;max-width:none;letter-spacing:0;padding-inline:.08em;line-height:1.18;font-size:clamp(96px,23vw,190px)}
+@media(max-width:620px){.winner.winner-ball #winnerNumber.has-drawn-number{font-size:clamp(72px,20vw,150px)}}
