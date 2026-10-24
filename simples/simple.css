@@ -187,3 +187,10 @@
 .roleta-simple .rlt-five-column-table tr.rlt-line-verified td{background:#eef8ef!important}
 .roleta-simple .rlt-line-attention [data-line-state]{color:#755013!important}
 .roleta-simple .rlt-five-column-table input:not([type=checkbox]),.roleta-simple .rlt-five-column-table select{min-height:40px;font-size:14px!important;border-radius:7px!important}
+
+/* Distinct, accessible final-screen exit actions; preserve existing button behavior. */
+#simpleIntake .simple-end-new { background:#e6f6ea; color:#1f6b3a; border:1px solid #b7dfc3; }
+#simpleIntake .simple-end-new:hover { background:#d7efde; color:#1f6b3a; }
+#simpleIntake .simple-end-discard { background:#fde8e8; color:#9b1c1c; border:1px solid #f5b5b5; }
+#simpleIntake .simple-end-discard:hover { background:#fbd5d5; color:#9b1c1c; }
+#simpleIntake .simple-end-new:focus-visible, #simpleIntake .simple-end-discard:focus-visible { outline:3px solid currentColor; outline-offset:2px; }
