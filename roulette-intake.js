@@ -365,6 +365,10 @@
         statStatus.textContent='Rascunho local indisponível. A leitura OCR permanece recuperável.';
       }
     });
+    host.addEventListener('roleta-discard-canonical',event=>{
+      // Never delete server history; only discard this device's recoverable draft.
+      event.detail.promise=recoveryJob?draftStore('readwrite',store=>store.delete(recoveryJob)):Promise.resolve();
+    });
     host.addEventListener('roleta-final-saved',event=>{
       if(!recoveryJob||!['saved','replayed'].includes(event.detail?.status))return;
       draftStore('readwrite',store=>store.delete(recoveryJob)).catch(()=>{});
