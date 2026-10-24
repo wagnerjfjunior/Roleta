@@ -249,8 +249,8 @@ async function mount(host){
    const id=activeEvidenceId;
    if(!id)return;
    await checkpointWrites.catch(()=>{});
-   try{await checkpointTxn('readwrite',store=>store.delete(id));}catch{return;}
-   try{await evidenceTxn('readwrite',store=>store.delete(id));}catch{return;}
+   await checkpointTxn('readwrite',store=>store.delete(id));
+   await evidenceTxn('readwrite',store=>store.delete(id));
    activeEvidenceId=null;
    try{if(pendingKey()&&localStorage.getItem(pendingKey())===id)localStorage.removeItem(pendingKey());}catch{}
    if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;preview.removeAttribute('src');}
