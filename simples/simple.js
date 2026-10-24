@@ -153,7 +153,7 @@ const abandonReview=document.createElement('button');
 abandonReview.type='button';abandonReview.className='simulation-run simple-end-discard';abandonReview.textContent='Cancelar e descartar';
 reviewExit.append(backToMenu,abandonReview);
 const heading=workflow.querySelector('.simple-workflow-heading');
-if(heading)heading.insertAdjacentElement('afterend',reviewExit);
+if(heading)heading.insertAdjacentElement('afterend',reviewExit);else workflow.prepend(reviewExit);
 backToMenu.addEventListener('click',()=>{
  location.hash='';
 });
@@ -164,7 +164,7 @@ if(apply)apply.textContent='Validar folha final';
 let phase=0;
 function update(){
  const isFinal=!preview.hidden;
- reviewExit.hidden=!(!!host.querySelector('[data-correction-row]')&&!preview.hidden);
+ // Keep navigation actions available throughout the workflow, even before OCR completes.
  const isCanonical=!review.hidden;
  const isHuman=!!transfer();
  const next=isFinal?4:isCanonical?3:isHuman?2:1;
