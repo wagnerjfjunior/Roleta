@@ -24,7 +24,8 @@ test('real sealed Google session determines actor, never client claims',()=>{
   assert.equal(value.actor_subject,'google:google-ci-sub');
   assert.equal(value.body.event_id,body.event_id);
   assert.throws(()=>prepareEvidenceFromHttp({...request(valid),body:{...body,actor_subject:'google:admin'}}),/unexpected/);
-  assert.throws(()=>prepareEvidenceFromHttp(request(valid.slice(0,-2)+'zz')),/authentication/);
+  const chunks=valid.split('.');const changedSignature=(chunks[1][0]==='A'?'B':'A')+chunks[1].slice(1);
+  assert.throws(()=>prepareEvidenceFromHttp(request(chunks[0]+'.'+changedSignature)),/authentication/);
   const forbidden=google.seal({typ:'session',sub:'google-ci-sub',email:'denied@example.test',exp:Date.now()+60000});
   assert.throws(()=>prepareEvidenceFromHttp(request(forbidden)),/authentication/);
   const expired=google.seal({typ:'session',sub:'google-ci-sub',email:'allowed@example.test',exp:Date.now()-60000});

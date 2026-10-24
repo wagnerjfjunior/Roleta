@@ -105,6 +105,45 @@ if(share)share.textContent='Compartilhar JPEG';
 const saveHistory=host.querySelector('#rltStatSubmit');
 if(saveHistory)saveHistory.textContent='Salvar roleta no histórico';
 const outputsNote=document.createElement('p');outputsNote.className='simple-output-note';outputsNote.textContent='Imprimir, baixar e compartilhar não salvam a roleta no histórico. Use a ação de salvar quando quiser registrar a folha conferida.';preview.append(outputsNote);
+
+// Explicit end-of-work controls. No Make or Supabase deletion.
+const endActions=document.createElement('div');
+endActions.className='intake-actions';
+const newRoleta=document.createElement('button');
+newRoleta.type='button';newRoleta.className='simulation-run';newRoleta.textContent='Nova Roleta';
+const discardRoleta=document.createElement('button');
+discardRoleta.type='button';discardRoleta.className='simulation-run';discardRoleta.textContent='Descartar Roleta';
+endActions.append(newRoleta,discardRoleta);
+preview.append(endActions);
+let finalSaved=false,ending=false;
+host.addEventListener('roleta-final-saved',event=>{
+ if(['saved','replayed'].includes(event.detail?.status))finalSaved=true;
+});
+async function endCurrent(discard){
+ if(ending)return;
+ if(host.querySelector('#rltStatStatus')?.textContent==='Salvando a folha conferida no Supabase.')return;
+ const message=finalSaved
+   ?(discard?'Descartar apenas os dados temporários deste dispositivo? A roleta salva no histórico será preservada.':'Iniciar uma nova roleta? A roleta salva no histórico será preservada.')
+   :'Esta roleta ainda não foi salva no histórico. Descartar definitivamente a fotografia e as correções locais deste dispositivo? O processamento no Make e os registros do Supabase não serão apagados.';
+ if(!window.confirm(message))return;
+ ending=true;newRoleta.disabled=true;discardRoleta.disabled=true;
+ try{
+   const local={promise:Promise.resolve()};
+   host.dispatchEvent(new CustomEvent('roleta-discard-local',{detail:local}));
+   await local.promise;
+   const canonical={promise:Promise.resolve()};
+   host.dispatchEvent(new CustomEvent('roleta-discard-canonical',{detail:canonical}));
+   await canonical.promise;
+   // Reload only after deletion; otherwise recovery remains possible.
+   location.reload();
+ }catch(error){
+   notice.textContent='Não foi possível encerrar o rascunho local com segurança. Tente novamente.';
+   ending=false;newRoleta.disabled=false;discardRoleta.disabled=false;
+ }
+}
+newRoleta.addEventListener('click',()=>endCurrent(false));
+discardRoleta.addEventListener('click',()=>endCurrent(true));
+
 const apply=host.querySelector('#rltv2ApplyReview');
 if(apply)apply.textContent='Validar folha final';
 let phase=0;
