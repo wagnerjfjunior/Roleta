@@ -4,10 +4,10 @@
 <meta name="theme-color" content="#173b51">
 <title>Sorteador | Roleta</title>
 <meta name="description" content="Sorteio transparente de bolinhas, sem repetição, com histórico local.">
-<link rel="stylesheet" href="/sorteador/style.css">
+<link rel="stylesheet" href="/sorteador/style.css?v=20261024-ball-numerals">
 <script src="/sorteador/engine.js" defer></script>
 <script src="/sorteador/balls.js" defer></script>
-<script src="/sorteador/app.js" defer></script>
+<script src="/sorteador/app.js?v=20261024-ball-qmark" defer></script>
 </head>
 <body>
 <div class="shell">
@@ -46,8 +46,8 @@
  <div class="draw-workspace"><section class="draw-card card" aria-label="Área do sorteio">
    <div class="draw-top"><span class="live-pill"><span class="live-dot"></span> <span id="drawMotionLabel">Bolinhas em movimento</span></span><div class="draw-options"><button type="button" id="soundToggle" class="sound-toggle" aria-pressed="false" title="Ativar anúncio de voz dos números">🔇 Som desligado</button><span id="poolLabel">—</span></div></div>
    <div class="arena" id="arena" aria-label="Urna de bolinhas em movimento: o movimento é apenas ilustrativo"></div>
-   <div id="winner" class="winner" role="status" aria-live="polite" aria-atomic="true"><div id="winnerCaption">Pronto para sortear</div><strong id="winnerNumber">?</strong><div id="winnerPosition">Aguardando a primeira posição</div></div>
-   <div class="draw-controls"><button id="drawButton" type="button" class="draw-button">Sortear bolinha <span aria-hidden="true">→</span></button>
+   <button id="drawButton" data-winner-ball="true" class="winner winner-ball" type="button" aria-label="Sortear a próxima bolinha"><div id="winnerCaption">Pronto para sortear</div><strong id="winnerNumber">?</strong><div id="winnerPosition">Aguardando a primeira posição</div><span class="winner-cta" id="winnerCta">Toque para sortear</span></button>
+   <div class="draw-controls">
    <p class="draw-hint" id="drawHint">Toque para revelar a primeira bolinha.</p></div>
    <div id="finishBanner" class="finish-banner" role="status" aria-live="polite" aria-atomic="true" hidden><div class="finish-icon" aria-hidden="true">✓</div><strong>Sorteio finalizado</strong><p>Todas as bolinhas foram sorteadas.</p><p class="finish-note">A sequência completa está logo abaixo e foi salva neste navegador.</p><a class="finish-home" href="/simples/#digitalizar">Digitalizar a folha da roleta →</a><a class="finish-menu" href="/simples/">Voltar ao menu principal</a></div>
  </section>

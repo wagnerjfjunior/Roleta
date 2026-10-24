@@ -4,7 +4,7 @@ const engine=window.RoletaSorteadorEngine;
 const $=id=>document.getElementById(id);
 const STORAGE='roleta-sorteador-historico-v1';
 const MAX_RECORDS=100;
-let records=[],current=null,busy=false,revealTimer=null,visualBalls=null,completionAudio=null;
+let records=[],current=null,busy=false,revealTimer=null,rollTimer=null,visualBalls=null,completionAudio=null;
 const SOUND_KEY='roleta-sorteador-voz-v1';
 let soundOn=false;
 const speechAvailable=typeof window.speechSynthesis!=='undefined'&&typeof window.SpeechSynthesisUtterance!=='undefined';
@@ -108,6 +108,7 @@ function nextFor(r){return isRange(r)?engine.nextRange(r.first,r.last,r.draws,cr
 function description(r){return isRange(r)?'Do número '+r.first+' até '+r.last:r.total+' corretores';}
 function showSession(record){
  if(revealTimer){clearTimeout(revealTimer);revealTimer=null;}
+ if(rollTimer){clearTimeout(rollTimer);rollTimer=null;}
  if(visualBalls){visualBalls.destroy();visualBalls=null;}
  $('arena').classList.remove('speed-up');
  if(speechAvailable)window.speechSynthesis.cancel();
@@ -117,7 +118,7 @@ function showSession(record){
  $('sequenceDescription').textContent=isRange(record)?'Cada retirada entra na sequência abaixo, com seu horário.':'1ª bolinha para a posição física 1, 2ª para a posição física 2, e assim por diante.';
  $('sessionTime').textContent='Iniciado em '+formatDate(record.createdAt);
  renderSession(true);
- if(!$('drawButton').disabled)$('drawButton').focus({preventScroll:true});
+ // Ball remains keyboard-accessible; avoid stealing scroll/focus on session recovery.
 }
 function drawPool(){
  const pool=remainingFor(current);
@@ -170,17 +171,20 @@ function renderSession(resetWinner){
  drawPool();
  const button=$('drawButton');
  button.disabled=busy||drawn===total;
- button.textContent=drawn===total?'Sorteio concluído':'Sortear bolinha →';
+ $('winnerCta').textContent=drawn===total?'Sorteio concluído':'Toque para sortear';
+ button.setAttribute('aria-label',drawn===total?'Sorteio concluído':'Sortear próxima bolinha');
  if(resetWinner){
-  $('winner').classList.remove('revealing');
+  $('drawButton').classList.remove('revealing');
   if(drawn){
    const last=current.draws[drawn-1];
    $('winnerCaption').textContent=drawn===total?'Última bolinha sorteada':'Bolinha sorteada';
    $('winnerNumber').textContent=last.number;
+   $('winnerNumber').classList.add('has-drawn-number');
    $('winnerPosition').textContent=last.position+(isRange(current)?'ª retirada':'ª posição física');
   }else{
    $('winnerCaption').textContent='Pronto para sortear';
    $('winnerNumber').textContent='?';
+   $('winnerNumber').classList.remove('has-drawn-number');
    $('winnerPosition').textContent=isRange(current)?'Aguardando a primeira bolinha':'Aguardando a primeira posição';
   }
   clearError();
@@ -198,29 +202,48 @@ function draw(){
  if(!persist(next))return;
  current=updated;busy=true;
  $('drawButton').disabled=true;
- $('winner').classList.remove('revealing');
+ $('drawButton').classList.remove('revealing');
+ $('drawButton').classList.add('is-rolling');
+ $('winnerCta').textContent='Sorteando…';
  $('winnerCaption').textContent=isRange(current)?'Sorteando bolinha':'Sorteando para a posição '+position;
- $('winnerNumber').textContent='●';
+ $('winnerNumber').textContent='—';
+ $('winnerNumber').classList.add('has-drawn-number');
  $('winnerPosition').textContent='Aguarde a revelação';
  $('drawHint').textContent='Preparando a próxima bolinha…';
  $('arena').classList.add('speed-up');
  if(visualBalls)visualBalls.setFast(true);
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const duration=reduced?0:1100;
+ const preview=remainingFor({...current,draws:current.draws.slice(0,-1)});
+ const begun=performance.now();
+ function roll(){
+  if(!busy)return;
+  const elapsed=performance.now()-begun;
+  if(elapsed>=duration)return;
+  const sample=preview[Math.floor(Math.random()*preview.length)];
+  $('winnerNumber').textContent=String(sample);
+  const ratio=elapsed/duration;
+  rollTimer=setTimeout(roll,ratio<.60?42:ratio<.82?85:140);
+ }
+ if(duration>0)roll();
  revealTimer=setTimeout(()=>{
   revealTimer=null;
+  if(rollTimer){clearTimeout(rollTimer);rollTimer=null;}
+  $('drawButton').classList.remove('is-rolling');
   $('arena').classList.remove('speed-up');
   if(visualBalls)visualBalls.setFast(false);
   busy=false;
   renderSession(false);
-  $('winner').classList.add('revealing');
+  $('drawButton').classList.add('revealing');
   $('winnerCaption').textContent='Bolinha sorteada';
   $('winnerNumber').textContent=number;
+  $('winnerCta').textContent=current.draws.length===current.total?'Sorteio concluído':'Toque para sortear';
   $('winnerPosition').textContent=position+(isRange(current)?'ª retirada':'ª posição física');
   if(current.draws.length===current.total)speak(String(number),playFinishChime);
   else speak(String(number));
   $('drawHint').textContent=current.draws.length===current.total?'Sorteio finalizado. Todos os números estão registrados abaixo.':'Clique novamente para a próxima posição.';
   clearError();
- },reduced?0:1100);
+ },duration);
 }
 function start(config){
  if(current&&current.draws.length<current.total){
