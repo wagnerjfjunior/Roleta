@@ -48,8 +48,8 @@ async function mount(host){
  // Local-only temporary evidence. No network, storage credentials or new API.
  const evidenceDB=()=>new Promise((resolve,reject)=>{
    if(!window.indexedDB)return reject(Error('Armazenamento local indisponível'));
-   const req=indexedDB.open('roleta-ocr-evidence',2);
-   req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('photos'))req.result.createObjectStore('photos',{keyPath:'id'});if(!req.result.objectStoreNames.contains('drafts'))req.result.createObjectStore('drafts',{keyPath:'id'});};
+   const req=indexedDB.open('roleta-ocr-evidence',3);
+   req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('photos'))req.result.createObjectStore('photos',{keyPath:'id'});if(!req.result.objectStoreNames.contains('drafts'))req.result.createObjectStore('drafts',{keyPath:'id'});if(!req.result.objectStoreNames.contains('line-checkpoints'))req.result.createObjectStore('line-checkpoints',{keyPath:'id'});};
    req.onsuccess=()=>resolve(req.result);
    req.onerror=()=>reject(req.error||Error('Falha no armazenamento local'));
  });
@@ -64,6 +64,79 @@ async function mount(host){
      tx.onabort=()=>reject(tx.error||Error('Operação cancelada'));
    });}finally{db.close();}
  };
+ // IndexedDB line checkpoint: no HTTP, no untrusted markup, one key per OCR job.
+ const checkpointTxn=async(mode,operation)=>{
+   const db=await evidenceDB();
+   try{return await new Promise((resolve,reject)=>{
+     const tx=db.transaction('line-checkpoints',mode),request=operation(tx.objectStore('line-checkpoints'));
+     let value;request.onsuccess=()=>{value=request.result;};
+     tx.oncomplete=()=>resolve(value);
+     tx.onerror=()=>reject(tx.error||Error('Checkpoint local indisponível'));
+     tx.onabort=()=>reject(tx.error||Error('Checkpoint interrompido'));
+   });}finally{db.close();}
+ };
+ let checkpointWrites=Promise.resolve(),restoringLines=false;
+ const lineFields=['position','number','name','class'];
+ function lineSnapshot(){
+   const rows=[...article.querySelectorAll('[data-correction-row]')];
+   if(!rows.length)return null;
+   const data=rows.map(row=>{
+     const values={};
+     for(const name of lineFields)values[name]=row.querySelector('[data-correct-'+name+']')?.value??'';
+     return {values,checked:!!row.querySelector('[data-correct-confirm]')?.checked,sourceIndex:row.dataset.sourceIndex??null};
+   });
+   const header={};
+   for(const name of ['date','period','helbor','share','primary','secondary'])
+     header[name]=article.querySelector('[data-review-'+name+']')?.value??'';
+   header.enterprise=!!article.querySelector('[data-review-enterprise]')?.checked;
+   return {rows:data,header};
+ }
+ function checkpointLines(){
+   if(restoringLines||!activeEvidenceId||!googleSession?.email)return;
+   const snapshot=lineSnapshot();if(!snapshot)return;
+   const entry={id:activeEvidenceId,account:googleSession.email.toLowerCase(),schema:1,
+     snapshot,savedAt:Date.now()};
+   checkpointWrites=checkpointWrites.catch(()=>{}).then(()=>checkpointTxn('readwrite',store=>store.put(entry)));
+   checkpointWrites.catch(()=>{photoStatus.textContent='Aviso: conferência local não pôde ser preservada. Não feche o aplicativo.';});
+ }
+ async function restoreLines(id){
+   await checkpointWrites.catch(()=>{});
+   const record=await checkpointTxn('readonly',store=>store.get(id)).catch(()=>null);
+   if(!record||record.schema!==1||record.account!==googleSession?.email?.toLowerCase())return false;
+   const snap=record.snapshot;
+   if(!snap||!Array.isArray(snap.rows)||snap.rows.length>100||!snap.rows.length)return false;
+   const container=article.querySelector('[data-review-rows]');
+   const add=article.querySelector('[data-review-add-line]');
+   if(!container||!add)return false;
+   restoringLines=true;
+   try{
+     // Persisted data is untrusted; populate input.value, never HTML.
+     while(container.querySelectorAll('[data-correction-row]').length<snap.rows.length)add.click();
+     const rows=[...container.querySelectorAll('[data-correction-row]')];
+     if(rows.length!==snap.rows.length)return false;
+     rows.forEach((row,i)=>{
+       const stored=snap.rows[i];
+       if(!stored||!stored.values)return;
+       for(const name of lineFields){
+         const element=row.querySelector('[data-correct-'+name+']');
+         if(element&&typeof stored.values[name]==='string')element.value=stored.values[name].slice(0,180);
+       }
+       row.querySelector('[data-correct-confirm]').checked=stored.checked===true;
+     });
+     for(const name of ['date','period','helbor','share','primary','secondary']){
+       const element=article.querySelector('[data-review-'+name+']');
+       if(element&&typeof snap.header?.[name]==='string'){
+         element.value=snap.header[name];
+         element.dispatchEvent(new Event('change',{bubbles:false}));
+       }
+     }
+     const ent=article.querySelector('[data-review-enterprise]');
+     if(ent)ent.checked=snap.header?.enterprise===true;
+     // Reevaluate all duplicates and mandatory fields, clearing invalid checks.
+     rows[0].querySelector('[data-correct-confirm]').dispatchEvent(new Event('change'));
+     return true;
+   }finally{restoringLines=false;}
+ }
  const evidenceHash=async(blob)=>{
    if(!crypto?.subtle)throw Error('Verificação de integridade indisponível');
    const digest=await crypto.subtle.digest('SHA-256',await blob.arrayBuffer());
@@ -141,6 +214,8 @@ async function mount(host){
      const restored=await recoverEvidence(id).catch(()=>false);
      if(!restored)photoEvidence=null;
      await renderDraft();
+     const checkpointRestored=await restoreLines(id);
+     if(checkpointRestored)progress('Conferência parcial restaurada · revise as marcações',100);
      host.dispatchEvent(new CustomEvent('roleta-ocr-recovered',{detail:{job_id:id,account:googleSession.email}}));
      photoStatus.innerHTML=restored?'<strong>LEITURA E FOTO RECUPERADAS</strong><div>Compare a fotografia bloqueada com os dados reconhecidos.</div>':'<strong>LEITURA RECUPERADA SEM FOTO</strong><div>Não há fotografia íntegra neste navegador; consulte a folha original em papel.</div>';
      progress('Leitura recuperada · confira os participantes',100);
@@ -173,6 +248,8 @@ async function mount(host){
  async function discardEvidence(){
    const id=activeEvidenceId;
    if(!id)return;
+   await checkpointWrites.catch(()=>{});
+   try{await checkpointTxn('readwrite',store=>store.delete(id));}catch{return;}
    try{await evidenceTxn('readwrite',store=>store.delete(id));}catch{return;}
    activeEvidenceId=null;
    try{if(pendingKey()&&localStorage.getItem(pendingKey())===id)localStorage.removeItem(pendingKey());}catch{}
@@ -452,6 +529,9 @@ async function mount(host){
        lineProgress.className='intake-gate '+(confirmed===correctionRows.length?'clear':'blocked');
        transferButton.disabled=confirmed!==correctionRows.length;
      }
+     // Write immediately on changes, including checkbox confirmations and header edits.
+     human.addEventListener('input',checkpointLines);
+     human.addEventListener('change',checkpointLines);
      function bindCorrectionRow(tr){
        tr.querySelector('[data-correct-confirm]').addEventListener('change',refreshChecks);
        ['[data-correct-position]','[data-correct-number]','[data-correct-name]','[data-correct-class]'].forEach(sel=>{
@@ -474,7 +554,7 @@ async function mount(host){
        tr.querySelector('[data-correct-position]').setAttribute('aria-label','Posição na folha do participante acrescentado '+index);
        tr.querySelector('[data-correct-number]').setAttribute('aria-label','Número sorteado do participante acrescentado '+index);
        tr.querySelector('[data-correct-name]').setAttribute('aria-label','Nome do participante acrescentado '+index);
-       correctionRows.push(tr);human.querySelector('[data-review-rows]').append(tr);bindCorrectionRow(tr);refreshChecks();
+       correctionRows.push(tr);human.querySelector('[data-review-rows]').append(tr);bindCorrectionRow(tr);refreshChecks();checkpointLines();
        tr.querySelector('[data-correct-position]').focus();
      });
      refreshChecks();
