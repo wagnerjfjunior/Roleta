@@ -45,6 +45,17 @@ recoveryMessage.className='simple-access-note';
 recoveryMessage.setAttribute('role','status');
 recoveryMessage.hidden=true;
 home.append(recoverSaved,recoveryMessage);
+const recoverDuringDigitization=recoverSaved.cloneNode(true);
+recoverDuringDigitization.removeAttribute('id');
+recoverDuringDigitization.textContent='Recuperar roleta salva';
+recoverDuringDigitization.hidden=true;
+const recoveryInWorkflow=document.createElement('p');
+recoveryInWorkflow.className='simple-access-note';
+recoveryInWorkflow.setAttribute('role','status');
+recoveryInWorkflow.hidden=true;
+const workflowHeading=workflow.querySelector('.simple-workflow-heading');
+workflowHeading?.insertAdjacentElement('afterend',recoverDuringDigitization);
+recoverDuringDigitization.insertAdjacentElement('afterend',recoveryInWorkflow);
 async function fetchSavedFinals(){
  const response=await fetch('/api/final-roulette',{credentials:'same-origin',cache:'no-store'});
  const data=await response.json().catch(()=>({}));
@@ -52,14 +63,15 @@ async function fetchSavedFinals(){
  return data.records.filter(r=>r&&r.payload&&r.payload.reviewed&&Number.isSafeInteger(r.version)).sort((a,b)=>Date.parse(b.recorded_at||0)-Date.parse(a.recorded_at||0));
 }
 async function refreshSavedOption(){
- if(!authenticated){recoverSaved.hidden=true;return;}
+ if(!authenticated){recoverSaved.hidden=true;recoverDuringDigitization.hidden=true;return;}
  try{
   const records=await fetchSavedFinals();
   recoverSaved.hidden=!records.length;
+  recoverDuringDigitization.hidden=!records.length;
   recoverSaved.dataset.available=String(records.length);
- }catch{recoverSaved.hidden=true;}
+ }catch(e){recoverSaved.hidden=false;recoverDuringDigitization.hidden=false;recoveryMessage.textContent='Não foi possível consultar o histórico: '+String(e.message||e);recoveryMessage.hidden=false;}
 }
-recoverSaved.addEventListener('click',async()=>{
+async function openSavedFinal(){
  recoverSaved.disabled=true;recoveryMessage.hidden=false;
  recoveryMessage.textContent='Abrindo a última folha já conferida...';
  try{
@@ -72,9 +84,12 @@ recoverSaved.addEventListener('click',async()=>{
   await transfer.promise;
   location.hash='#digitalizar';
   recoveryMessage.textContent='Folha final recuperada.';
- }catch(e){recoveryMessage.textContent=String(e.message||e);}
- finally{recoverSaved.disabled=false;}
-});
+  recoveryInWorkflow.textContent='Folha final recuperada.';
+ }catch(e){recoveryMessage.textContent=String(e.message||e);recoveryInWorkflow.textContent=String(e.message||e);recoveryInWorkflow.hidden=false;}
+ finally{recoverSaved.disabled=false;recoverDuringDigitization.disabled=false;}
+}
+recoverSaved.addEventListener('click',openSavedFinal);
+recoverDuringDigitization.addEventListener('click',openSavedFinal);
 
 const notice=document.getElementById('simpleNotice');
 if(!host||!window.RouletteIntake){
