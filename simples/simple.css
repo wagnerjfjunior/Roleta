@@ -194,3 +194,9 @@
 #simpleIntake .simple-end-discard { background:#fde8e8; color:#9b1c1c; border:1px solid #f5b5b5; }
 #simpleIntake .simple-end-discard:hover { background:#fbd5d5; color:#9b1c1c; }
 #simpleIntake .simple-end-new:focus-visible, #simpleIntake .simple-end-discard:focus-visible { outline:3px solid currentColor; outline-offset:2px; }
+
+/* Review-stage navigation stays visible without affecting the final controls. */
+.simple-review-exit[hidden] { display:none !important; }
+.simple-review-exit { margin:12px 0 16px; display:flex; gap:10px; flex-wrap:wrap; }
+.simple-review-exit .simple-back-menu { background:#f2f5f8; color:#25465b; border:1px solid #bdcdd9; }
+.simple-review-exit .simple-back-menu:hover { background:#e5eef5; }
