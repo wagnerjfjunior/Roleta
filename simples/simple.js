@@ -31,7 +31,50 @@ async function checkAccess(){
   retry.hidden=false;
  }
  localButton.hidden=!isLocal;loginEntry.hidden=authenticated;route();
+ if(authenticated)refreshSavedOption();
 }
+
+// The cloud ledger already contains fully confirmed sheets; open them directly as outputs.
+const recoverSaved=document.createElement('button');
+recoverSaved.type='button';
+recoverSaved.className='simple-primary simple-recover-saved';
+recoverSaved.textContent='Recuperar última roleta salva';
+recoverSaved.hidden=true;
+const recoveryMessage=document.createElement('p');
+recoveryMessage.className='simple-access-note';
+recoveryMessage.setAttribute('role','status');
+recoveryMessage.hidden=true;
+home.append(recoverSaved,recoveryMessage);
+async function fetchSavedFinals(){
+ const response=await fetch('/api/final-roulette',{credentials:'same-origin',cache:'no-store'});
+ const data=await response.json().catch(()=>({}));
+ if(!response.ok||!Array.isArray(data.records))throw Error(data.error||'Histórico indisponível.');
+ return data.records.filter(r=>r&&r.payload&&r.payload.reviewed&&Number.isSafeInteger(r.version)).sort((a,b)=>Date.parse(b.recorded_at||0)-Date.parse(a.recorded_at||0));
+}
+async function refreshSavedOption(){
+ if(!authenticated){recoverSaved.hidden=true;return;}
+ try{
+  const records=await fetchSavedFinals();
+  recoverSaved.hidden=!records.length;
+  recoverSaved.dataset.available=String(records.length);
+ }catch{recoverSaved.hidden=true;}
+}
+recoverSaved.addEventListener('click',async()=>{
+ recoverSaved.disabled=true;recoveryMessage.hidden=false;
+ recoveryMessage.textContent='Abrindo a última folha já conferida...';
+ try{
+  const records=await fetchSavedFinals();
+  // Sort by recorded_at; server ledger itself is ordered by event identifier.
+  if(!records.length)throw Error('Não há roletas salvas no histórico.');
+  const latest=records[0];
+  const transfer={record:latest,promise:Promise.resolve()};
+  host.dispatchEvent(new CustomEvent('roleta-open-saved-final',{detail:transfer}));
+  await transfer.promise;
+  location.hash='#digitalizar';
+  recoveryMessage.textContent='Folha final recuperada.';
+ }catch(e){recoveryMessage.textContent=String(e.message||e);}
+ finally{recoverSaved.disabled=false;}
+});
 
 const notice=document.getElementById('simpleNotice');
 if(!host||!window.RouletteIntake){
