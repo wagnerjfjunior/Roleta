@@ -315,10 +315,11 @@
     let recoveryJob=null,recoveryAccount=null;
     const draftDb=()=>new Promise((resolve,reject)=>{
       if(!window.indexedDB)return reject(Error('IndexedDB indisponível'));
-      const request=indexedDB.open('roleta-ocr-evidence',2);
+      const request=indexedDB.open('roleta-ocr-evidence',3);
       request.onupgradeneeded=()=>{
         if(!request.result.objectStoreNames.contains('photos'))request.result.createObjectStore('photos',{keyPath:'id'});
         if(!request.result.objectStoreNames.contains('drafts'))request.result.createObjectStore('drafts',{keyPath:'id'});
+        if(!request.result.objectStoreNames.contains('line-checkpoints'))request.result.createObjectStore('line-checkpoints',{keyPath:'id'});
       };
       request.onsuccess=()=>resolve(request.result);
       request.onerror=()=>reject(request.error||Error('Não foi possível abrir o rascunho local'));
