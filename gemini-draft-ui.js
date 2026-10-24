@@ -48,8 +48,8 @@ async function mount(host){
  // Local-only temporary evidence. No network, storage credentials or new API.
  const evidenceDB=()=>new Promise((resolve,reject)=>{
    if(!window.indexedDB)return reject(Error('Armazenamento local indisponível'));
-   const req=indexedDB.open('roleta-ocr-evidence',1);
-   req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('photos'))req.result.createObjectStore('photos',{keyPath:'id'});};
+   const req=indexedDB.open('roleta-ocr-evidence',2);
+   req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('photos'))req.result.createObjectStore('photos',{keyPath:'id'});if(!req.result.objectStoreNames.contains('drafts'))req.result.createObjectStore('drafts',{keyPath:'id'});};
    req.onsuccess=()=>resolve(req.result);
    req.onerror=()=>reject(req.error||Error('Falha no armazenamento local'));
  });
@@ -141,6 +141,7 @@ async function mount(host){
      const restored=await recoverEvidence(id).catch(()=>false);
      if(!restored)photoEvidence=null;
      await renderDraft();
+     host.dispatchEvent(new CustomEvent('roleta-ocr-recovered',{detail:{job_id:id,account:googleSession.email}}));
      photoStatus.innerHTML=restored?'<strong>LEITURA E FOTO RECUPERADAS</strong><div>Compare a fotografia bloqueada com os dados reconhecidos.</div>':'<strong>LEITURA RECUPERADA SEM FOTO</strong><div>Não há fotografia íntegra neste navegador; consulte a folha original em papel.</div>';
      progress('Leitura recuperada · confira os participantes',100);
    }catch(e){
@@ -178,11 +179,17 @@ async function mount(host){
    if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;preview.removeAttribute('src');}
    photoEvidence=null;refreshSend();
  }
- host.addEventListener('roleta-final-confirmed',()=>{if(!shadowConsent.checked)discardEvidence().catch(()=>{});});
+ // Final confirmation is not persistence. Keep evidence until the server acknowledges save.
  const shadowConsent=article.querySelector('[data-shadow-consent]');
  const shadowConsentWrap=article.querySelector('[data-shadow-consent-wrap]');
  fetch('/api/ocr-shadow-submit',{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.json():{enabled:false}).then(v=>{shadowConsentWrap.hidden=v.enabled!==true;if(v.enabled!==true)shadowConsent.checked=false;}).catch(()=>{shadowConsent.checked=false;shadowConsentWrap.hidden=true;});
  host.addEventListener('roleta-final-saved',event=>{
+   const receipt=event.detail||{};
+   if(['saved','replayed'].includes(receipt.status)&&Number.isSafeInteger(receipt.version)&&receipt.version>0){
+     const id=activeEvidenceId;
+     if(id)evidenceDB().then(db=>{const tx=db.transaction('drafts','readwrite');tx.objectStore('drafts').delete(id);tx.oncomplete=()=>db.close();tx.onerror=()=>db.close();}).catch(()=>{});
+     if(!shadowConsent.checked)discardEvidence().catch(()=>{});
+   }
    const evidence=photoEvidence;
    if(!shadowConsent.checked||!evidence?.eventKey||!evidence.file||!googleSession?.authenticated)return;
    const detail=event.detail||{};
@@ -285,6 +292,7 @@ async function mount(host){
      photoEvidence={file:selected,draftJson:JSON.stringify(data),eventKey:null,reviewed:null};
      progress('Leitura recebida. Preparando conferência…',null);
      await renderDraft();
+     if(activeEvidenceId)host.dispatchEvent(new CustomEvent('roleta-ocr-recovered',{detail:{job_id:activeEvidenceId,account:googleSession.email}}));
      photoStatus.className='intake-gate blocked';
      photoStatus.innerHTML=json.source==='make-ocr-space'?'<strong>LEITURA ALTERNATIVA RECEBIDA</strong><div>Confira a foto com atenção. Acrescente participantes ausentes e complete os campos que ficaram vazios.</div>':'<strong>LEITURA RECEBIDA</strong><div>Confira nomes e números na tabela; a conferência humana continua obrigatória.</div>';
      progress('Leitura concluída · pronto para revisão',100);
