@@ -44,6 +44,51 @@ async function mount(host){
 
  // The new asynchronous path is strictly opt-in server-side. No secrets reach the browser.
  const pendingKey=()=>googleSession?.email?'roleta:ocr-pending:'+googleSession.email.toLowerCase():null;
+
+ // Local-only temporary evidence. No network, storage credentials or new API.
+ const evidenceDB=()=>new Promise((resolve,reject)=>{
+   if(!window.indexedDB)return reject(Error('Armazenamento local indisponível'));
+   const req=indexedDB.open('roleta-ocr-evidence',1);
+   req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('photos'))req.result.createObjectStore('photos',{keyPath:'id'});};
+   req.onsuccess=()=>resolve(req.result);
+   req.onerror=()=>reject(req.error||Error('Falha no armazenamento local'));
+ });
+ const evidenceTxn=async(mode,operation)=>{
+   const db=await evidenceDB();
+   try{return await new Promise((resolve,reject)=>{
+     const tx=db.transaction('photos',mode),request=operation(tx.objectStore('photos'));
+     let result;
+     request.onsuccess=()=>{result=request.result;};
+     tx.oncomplete=()=>resolve(result);
+     tx.onerror=()=>reject(tx.error||Error('Falha ao acessar fotografia'));
+     tx.onabort=()=>reject(tx.error||Error('Operação cancelada'));
+   });}finally{db.close();}
+ };
+ const evidenceHash=async(blob)=>{
+   if(!crypto?.subtle)throw Error('Verificação de integridade indisponível');
+   const digest=await crypto.subtle.digest('SHA-256',await blob.arrayBuffer());
+   return Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
+ };
+ const saveEvidence=async(id,file)=>{
+   if(!/^[a-f0-9-]{36}$/i.test(id)||!googleSession?.email)throw Error('Job não identificado');
+   if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>900000)throw Error('Formato ou tamanho de fotografia inválido');
+   const account=googleSession.email.toLowerCase(),hash=await evidenceHash(file);
+   const existing=await evidenceTxn('readonly',store=>store.get(id));
+   if(existing)throw Error('Fotografia já vinculada a este processamento');
+   await evidenceTxn('readwrite',store=>store.add({id,account,file,hash,savedAt:Date.now()}));
+ };
+ const recoverEvidence=async(id)=>{
+   const item=await evidenceTxn('readonly',store=>store.get(id));
+   if(!item||item.account!==googleSession?.email?.toLowerCase())return false;
+   if(!['image/jpeg','image/png','image/webp'].includes(item.file?.type)||item.file.size>900000||await evidenceHash(item.file)!==item.hash)throw Error('Integridade da fotografia local inválida. Consulte a folha original em papel.');
+   if(objectURL)URL.revokeObjectURL(objectURL);
+   objectURL=URL.createObjectURL(item.file);
+   preview.src=objectURL;review.hidden=false;confirmation.checked=false;confirmation.disabled=true;
+   meta.textContent='Fotografia recuperada do dispositivo · somente leitura · vinculada ao processamento';
+   photoEvidence={file:item.file,draftJson:textarea.value,eventKey:null,reviewed:null};
+   return true;
+ };
+
  const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
  async function asyncAvailable(){
    // An unavailable capability endpoint is NOT evidence that the old synchronous
@@ -62,7 +107,6 @@ async function mount(host){
      if(!r.ok)throw Error('Não foi possível consultar a leitura. Reabra a Roleta com a mesma conta para recuperar o resultado.');
      const job=await r.json();
      if(job.state==='READY_FOR_REVIEW'&&job.result&&Array.isArray(job.result.linhas)){
-       try{if(pendingKey())localStorage.removeItem(pendingKey());}catch{}
        return {result:job.result,source:'make-gemini'};
      }
      if(job.state==='FAILED')throw Error('O processamento falhou. Confira a fotografia e tente novamente.');
@@ -76,6 +120,9 @@ async function mount(host){
      headers:{'Content-Type':image.type,'X-Roleta-Filename':image.name,'X-Roleta-CSRF':csrf},body:image});
    const data=await r.json().catch(()=>({}));
    if(!r.ok||!data.job_id)throw Error(data.error||'Não foi possível iniciar a leitura assíncrona.');
+   // Persist before polling: closing the tab must not lose the photograph.
+   activeEvidenceId=data.job_id;
+   try{await saveEvidence(data.job_id,image);}catch(e){console.warn('Foto temporária indisponível:',e.message);}
    try{if(pendingKey())localStorage.setItem(pendingKey(),data.job_id);}catch{}
    progress('Imagem recebida. O resultado será preservado para sua conta…',null);
    return waitForResult(data.job_id);
@@ -88,11 +135,13 @@ async function mount(host){
    busy=true;refreshSend();
    try{
      progress('Recuperando leitura anterior…',null);
+     activeEvidenceId=id;refreshSend();
      const json=await waitForResult(id);
      textarea.value=JSON.stringify(json.result,null,2);
-     photoEvidence=null; // The original photo is not stored in browser storage.
+     const restored=await recoverEvidence(id).catch(()=>false);
+     if(!restored)photoEvidence=null;
      await renderDraft();
-     photoStatus.innerHTML='<strong>LEITURA RECUPERADA</strong><div>Confira todos os participantes. A foto original não foi armazenada neste navegador.</div>';
+     photoStatus.innerHTML=restored?'<strong>LEITURA E FOTO RECUPERADAS</strong><div>Compare a fotografia bloqueada com os dados reconhecidos.</div>':'<strong>LEITURA RECUPERADA SEM FOTO</strong><div>Não há fotografia íntegra neste navegador; consulte a folha original em papel.</div>';
      progress('Leitura recuperada · confira os participantes',100);
    }catch(e){
      photoStatus.innerHTML='<strong>LEITURA PENDENTE</strong><div>'+escapeHtml(e.message||e)+'</div>';
@@ -119,6 +168,17 @@ async function mount(host){
  let googleSession=null;
  let learningCandidate=null;
  let photoEvidence=null;
+ let activeEvidenceId=null;
+ async function discardEvidence(){
+   const id=activeEvidenceId;
+   if(!id)return;
+   try{await evidenceTxn('readwrite',store=>store.delete(id));}catch{return;}
+   activeEvidenceId=null;
+   try{if(pendingKey()&&localStorage.getItem(pendingKey())===id)localStorage.removeItem(pendingKey());}catch{}
+   if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;preview.removeAttribute('src');}
+   photoEvidence=null;refreshSend();
+ }
+ host.addEventListener('roleta-final-confirmed',()=>{if(!shadowConsent.checked)discardEvidence().catch(()=>{});});
  const shadowConsent=article.querySelector('[data-shadow-consent]');
  const shadowConsentWrap=article.querySelector('[data-shadow-consent-wrap]');
  fetch('/api/ocr-shadow-submit',{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.json():{enabled:false}).then(v=>{shadowConsentWrap.hidden=v.enabled!==true;if(v.enabled!==true)shadowConsent.checked=false;}).catch(()=>{shadowConsent.checked=false;shadowConsentWrap.hidden=true;});
@@ -136,6 +196,7 @@ async function mount(host){
    const note=details.querySelector('[data-learning-status]');
    fetch('/api/ocr-shadow-submit',{method:'POST',headers,body:evidence.file,cache:'no-store',credentials:'same-origin'}).then(async response=>{
      if(note)note.textContent=response.status===202?'Evidência enviada para aprendizagem privada. A revisão humana continua obrigatória.':'A folha foi salva; a aprendizagem paralela ainda não está disponível.';
+     if(response.status===202)await discardEvidence();
    }).catch(()=>{if(note)note.textContent='Folha salva. Falha na aprendizagem paralela, sem impacto no resultado.';});
  });
  host.addEventListener('roleta-final-confirmed',event=>{
@@ -173,9 +234,9 @@ async function mount(host){
  function canSend(){return !!selected&&confirmation.checked&&!!googleSession&&!busy&&!preparing;}
  function refreshSend(){
    send.disabled=!canSend();
-   remove.disabled=busy||preparing;
-   article.querySelector('[data-photo-camera]').disabled=busy||preparing;
-   article.querySelector('[data-photo-gallery]').disabled=busy||preparing;
+   remove.disabled=busy||preparing||!!activeEvidenceId;
+   article.querySelector('[data-photo-camera]').disabled=busy||preparing||!!activeEvidenceId;
+   article.querySelector('[data-photo-gallery]').disabled=busy||preparing||!!activeEvidenceId;
  }
  function resetPhoto(){
    photoGeneration++;preparing=false;
@@ -184,7 +245,7 @@ async function mount(host){
    preview.removeAttribute('src');confirmation.checked=false;send.disabled=true;
  }
  async function setPhoto(file){
-   if(busy)return;
+   if(busy||activeEvidenceId)return;
    resetPhoto();
    if(!file)return;
    const generation=photoGeneration;
@@ -195,7 +256,7 @@ async function mount(host){
      if(!window.RoletaPhotoPrepare)throw Error('Recarregue a página para preparar a fotografia.');
      const prepared=await window.RoletaPhotoPrepare.prepare(file);
      if(generation!==photoGeneration)return;
-     selected=prepared.file;objectURL=URL.createObjectURL(selected);preview.src=objectURL;
+     selected=prepared.file;confirmation.disabled=false;objectURL=URL.createObjectURL(selected);preview.src=objectURL;
      meta.textContent=file.name+' · original: '+(file.size/1024/1024).toFixed(2)+' MB · envio: '+Math.ceil(selected.size/1000)+' KB · '+prepared.width+' × '+prepared.height+' px';
      review.hidden=false;
      photoStatus.innerHTML='<strong>FOTOGRAFIA PRONTA</strong><div>Esta é a imagem que será enviada. Confira orientação, nomes e números antes de confirmar.</div>';
@@ -236,7 +297,7 @@ async function mount(host){
  // Rotation is requested by the simplified UX and changes the actual upload file.
  article.addEventListener('click',async event=>{
    const button=event.target.closest('[data-photo-rotate]');
-   if(!button||!selected||busy||preparing)return;
+   if(!button||!selected||busy||preparing||activeEvidenceId)return;
    preparing=true;refreshSend();button.disabled=true;
    const generation=photoGeneration;
    let bitmap;
