@@ -144,11 +144,27 @@ async function endCurrent(discard){
 newRoleta.addEventListener('click',()=>endCurrent(false));
 discardRoleta.addEventListener('click',()=>endCurrent(true));
 
+// Review-stage controls: returning to menu preserves local work; discard is explicit.
+const reviewExit=document.createElement('div');
+reviewExit.className='intake-actions simple-review-exit';
+const backToMenu=document.createElement('button');
+backToMenu.type='button';backToMenu.className='simulation-run simple-back-menu';backToMenu.textContent='Voltar ao menu';
+const abandonReview=document.createElement('button');
+abandonReview.type='button';abandonReview.className='simulation-run simple-end-discard';abandonReview.textContent='Cancelar e descartar';
+reviewExit.append(backToMenu,abandonReview);
+const heading=workflow.querySelector('.simple-workflow-heading');
+if(heading)heading.insertAdjacentElement('afterend',reviewExit);
+backToMenu.addEventListener('click',()=>{
+ location.hash='';
+});
+abandonReview.addEventListener('click',()=>endCurrent(true));
+
 const apply=host.querySelector('#rltv2ApplyReview');
 if(apply)apply.textContent='Validar folha final';
 let phase=0;
 function update(){
  const isFinal=!preview.hidden;
+ reviewExit.hidden=!(!!host.querySelector('[data-correction-row]')&&!preview.hidden);
  const isCanonical=!review.hidden;
  const isHuman=!!transfer();
  const next=isFinal?4:isCanonical?3:isHuman?2:1;
