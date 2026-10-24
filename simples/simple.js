@@ -35,19 +35,11 @@ async function checkAccess(){
 }
 
 // The cloud ledger already contains fully confirmed sheets; open them directly as outputs.
-const recoverSaved=document.createElement('button');
-recoverSaved.type='button';
-recoverSaved.className='simple-primary simple-recover-saved';
-recoverSaved.textContent='Recuperar última roleta salva';
-recoverSaved.hidden=true;
-const recoveryMessage=document.createElement('p');
-recoveryMessage.className='simple-access-note';
-recoveryMessage.setAttribute('role','status');
-recoveryMessage.hidden=true;
-home.append(recoverSaved,recoveryMessage);
-const recoverDuringDigitization=recoverSaved.cloneNode(true);
-recoverDuringDigitization.removeAttribute('id');
-recoverDuringDigitization.textContent='Recuperar roleta salva';
+// Saved final sheets are part of Digitalizar, never the application home menu.
+const recoverDuringDigitization=document.createElement('button');
+recoverDuringDigitization.type='button';
+recoverDuringDigitization.className='simulation-run simple-recover-saved';
+recoverDuringDigitization.textContent='Recuperar última roleta salva';
 recoverDuringDigitization.hidden=true;
 const recoveryInWorkflow=document.createElement('p');
 recoveryInWorkflow.className='simple-access-note';
@@ -63,17 +55,15 @@ async function fetchSavedFinals(){
  return data.records.filter(r=>r&&r.payload&&r.payload.reviewed&&Number.isSafeInteger(r.version)).sort((a,b)=>Date.parse(b.recorded_at||0)-Date.parse(a.recorded_at||0));
 }
 async function refreshSavedOption(){
- if(!authenticated){recoverSaved.hidden=true;recoverDuringDigitization.hidden=true;return;}
+ if(!authenticated){recoverDuringDigitization.hidden=true;return;}
  try{
   const records=await fetchSavedFinals();
-  recoverSaved.hidden=!records.length;
   recoverDuringDigitization.hidden=!records.length;
-  recoverSaved.dataset.available=String(records.length);
- }catch(e){recoverSaved.hidden=false;recoverDuringDigitization.hidden=false;recoveryMessage.textContent='Não foi possível consultar o histórico: '+String(e.message||e);recoveryMessage.hidden=false;}
+ }catch(e){recoverDuringDigitization.hidden=false;recoveryInWorkflow.textContent='Não foi possível consultar o histórico: '+String(e.message||e);recoveryInWorkflow.hidden=false;}
 }
 async function openSavedFinal(){
- recoverSaved.disabled=true;recoveryMessage.hidden=false;
- recoveryMessage.textContent='Abrindo a última folha já conferida...';
+ recoverDuringDigitization.disabled=true;recoveryInWorkflow.hidden=false;
+ recoveryInWorkflow.textContent='Abrindo a última folha já conferida...';
  try{
   const records=await fetchSavedFinals();
   // Sort by recorded_at; server ledger itself is ordered by event identifier.
@@ -83,12 +73,10 @@ async function openSavedFinal(){
   host.dispatchEvent(new CustomEvent('roleta-open-saved-final',{detail:transfer}));
   await transfer.promise;
   location.hash='#digitalizar';
-  recoveryMessage.textContent='Folha final recuperada.';
   recoveryInWorkflow.textContent='Folha final recuperada.';
- }catch(e){recoveryMessage.textContent=String(e.message||e);recoveryInWorkflow.textContent=String(e.message||e);recoveryInWorkflow.hidden=false;}
- finally{recoverSaved.disabled=false;recoverDuringDigitization.disabled=false;}
+ }catch(e){recoveryInWorkflow.textContent=String(e.message||e);recoveryInWorkflow.hidden=false;}
+ finally{recoverDuringDigitization.disabled=false;}
 }
-recoverSaved.addEventListener('click',openSavedFinal);
 recoverDuringDigitization.addEventListener('click',openSavedFinal);
 
 const notice=document.getElementById('simpleNotice');
