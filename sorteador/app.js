@@ -179,10 +179,12 @@ function renderSession(resetWinner){
    const last=current.draws[drawn-1];
    $('winnerCaption').textContent=drawn===total?'Última bolinha sorteada':'Bolinha sorteada';
    $('winnerNumber').textContent=last.number;
+   $('winnerNumber').classList.add('has-drawn-number');
    $('winnerPosition').textContent=last.position+(isRange(current)?'ª retirada':'ª posição física');
   }else{
    $('winnerCaption').textContent='Pronto para sortear';
    $('winnerNumber').textContent='?';
+   $('winnerNumber').classList.remove('has-drawn-number');
    $('winnerPosition').textContent=isRange(current)?'Aguardando a primeira bolinha':'Aguardando a primeira posição';
   }
   clearError();
@@ -205,6 +207,7 @@ function draw(){
  $('winnerCta').textContent='Sorteando…';
  $('winnerCaption').textContent=isRange(current)?'Sorteando bolinha':'Sorteando para a posição '+position;
  $('winnerNumber').textContent='—';
+ $('winnerNumber').classList.add('has-drawn-number');
  $('winnerPosition').textContent='Aguarde a revelação';
  $('drawHint').textContent='Preparando a próxima bolinha…';
  $('arena').classList.add('speed-up');
