@@ -311,6 +311,65 @@
     let pdfBlob=null,photoBlob=null,pdfVersion=0;
     const printHost=host.querySelector('#rltv2PrintHost');
     let savedRecord=null,statBusy=false;
+    // Local-only recoverable human review; no new HTTP endpoints or privileges.
+    let recoveryJob=null,recoveryAccount=null;
+    const draftDb=()=>new Promise((resolve,reject)=>{
+      if(!window.indexedDB)return reject(Error('IndexedDB indisponível'));
+      const request=indexedDB.open('roleta-ocr-evidence',2);
+      request.onupgradeneeded=()=>{
+        if(!request.result.objectStoreNames.contains('photos'))request.result.createObjectStore('photos',{keyPath:'id'});
+        if(!request.result.objectStoreNames.contains('drafts'))request.result.createObjectStore('drafts',{keyPath:'id'});
+      };
+      request.onsuccess=()=>resolve(request.result);
+      request.onerror=()=>reject(request.error||Error('Não foi possível abrir o rascunho local'));
+    });
+    async function draftStore(mode,action){
+      const db=await draftDb();
+      try{return await new Promise((resolve,reject)=>{
+        const tx=db.transaction('drafts',mode),req=action(tx.objectStore('drafts'));
+        let value;
+        req.onsuccess=()=>{value=req.result;};
+        tx.oncomplete=()=>resolve(value);
+        tx.onerror=()=>reject(tx.error||Error('Erro ao gravar rascunho'));
+        tx.onabort=()=>reject(tx.error||Error('Gravação interrompida'));
+      });}finally{db.close();}
+    }
+    async function keepReviewedDraft(approved){
+      if(!recoveryJob||!recoveryAccount||!reviewedPayload)return;
+      const reviewed=clonePayload(reviewedPayload);
+      await draftStore('readwrite',store=>store.put({
+        id:recoveryJob,account:recoveryAccount,reviewed,approved:!!approved,
+        savedAt:Date.now(),schema:1
+      }));
+    }
+    host.addEventListener('roleta-ocr-recovered',async event=>{
+      const id=event.detail?.job_id,account=String(event.detail?.account||'').toLowerCase();
+      if(!/^[0-9a-f-]{36}$/i.test(id||'')||!account)return;
+      recoveryJob=id;recoveryAccount=account;
+      let draft;
+      try{draft=await draftStore('readonly',store=>store.get(id));}catch{return;}
+      if(!draft||draft.account!==account||draft.schema!==1||!draft.reviewed)return;
+      // The canonical validator is always rerun: local data is not trusted.
+      try{
+        ta.value=JSON.stringify(draft.reviewed);
+        await validateAndPrepareReview();
+        reviewBtn.click();
+        if(!card.hidden){
+          confirm.checked=false;
+          statSubmit.disabled=true;
+          statStatus.textContent='Conferência anterior recuperada do dispositivo. Confira a folha e confirme novamente antes de salvar.';
+          card.scrollIntoView({behavior:'auto',block:'start'});
+        }
+      }catch{
+        statStatus.textContent='Rascunho local indisponível. A leitura OCR permanece recuperável.';
+      }
+    });
+    host.addEventListener('roleta-final-saved',event=>{
+      if(!recoveryJob||!['saved','replayed'].includes(event.detail?.status))return;
+      draftStore('readwrite',store=>store.delete(recoveryJob)).catch(()=>{});
+      recoveryJob=null;
+    });
+
     const statSubmit=host.querySelector('#rltStatSubmit');
     const statStatus=host.querySelector('#rltStatStatus');
     function resetStatisticalReview(){
@@ -531,6 +590,7 @@
         resetStatisticalReview();reviewedPayload=null;card.hidden=true;return;
       }
       reviewedPayload=result.payload;
+      keepReviewedDraft(false).catch(()=>{statStatus.textContent='Aviso: não foi possível preservar a conferência neste dispositivo.';});
       prepareStatisticalReview();
       pdfBlob=null;photoBlob=null;pdfVersion++;print.disabled=true;sharePdf.disabled=true;pdfStatus.textContent='Confirme a folha final para preparar o PDF.';
       reviewGate.className='intake-gate clear';
@@ -600,6 +660,7 @@
       print.disabled=true;
       savePdf.disabled=true;sharePdf.disabled=true;
       if(confirm.checked&&reviewedPayload){
+        keepReviewedDraft(true).catch(()=>{statStatus.textContent='Aviso: rascunho local indisponível; confirme a gravação definitiva.';});
         host.dispatchEvent(new CustomEvent('roleta-final-confirmed',{detail:clonePayload(reviewedPayload)}));
         pdfStatus.textContent='Gerando PDF...';
         preparePdf(pdfVersion);
