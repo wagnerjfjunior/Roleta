@@ -85,7 +85,7 @@ async function mount(host){
    objectURL=URL.createObjectURL(item.file);
    preview.src=objectURL;review.hidden=false;confirmation.checked=false;confirmation.disabled=true;
    meta.textContent='Fotografia recuperada do dispositivo · somente leitura · vinculada ao processamento';
-   photoEvidence={file:item.file,draftJson:null,eventKey:null,reviewed:null};
+   photoEvidence={file:item.file,draftJson:textarea.value,eventKey:null,reviewed:null};
    return true;
  };
 
@@ -121,6 +121,7 @@ async function mount(host){
    const data=await r.json().catch(()=>({}));
    if(!r.ok||!data.job_id)throw Error(data.error||'Não foi possível iniciar a leitura assíncrona.');
    // Persist before polling: closing the tab must not lose the photograph.
+   activeEvidenceId=data.job_id;
    try{await saveEvidence(data.job_id,image);}catch(e){console.warn('Foto temporária indisponível:',e.message);}
    try{if(pendingKey())localStorage.setItem(pendingKey(),data.job_id);}catch{}
    progress('Imagem recebida. O resultado será preservado para sua conta…',null);
@@ -134,12 +135,12 @@ async function mount(host){
    busy=true;refreshSend();
    try{
      progress('Recuperando leitura anterior…',null);
+     activeEvidenceId=id;refreshSend();
      const json=await waitForResult(id);
      textarea.value=JSON.stringify(json.result,null,2);
      const restored=await recoverEvidence(id).catch(()=>false);
      if(!restored)photoEvidence=null;
      await renderDraft();
-     try{if(key)localStorage.removeItem(key);}catch{}
      photoStatus.innerHTML=restored?'<strong>LEITURA E FOTO RECUPERADAS</strong><div>Compare a fotografia bloqueada com os dados reconhecidos.</div>':'<strong>LEITURA RECUPERADA SEM FOTO</strong><div>Não há fotografia íntegra neste navegador; consulte a folha original em papel.</div>';
      progress('Leitura recuperada · confira os participantes',100);
    }catch(e){
@@ -167,6 +168,17 @@ async function mount(host){
  let googleSession=null;
  let learningCandidate=null;
  let photoEvidence=null;
+ let activeEvidenceId=null;
+ async function discardEvidence(){
+   const id=activeEvidenceId;
+   if(!id)return;
+   try{await evidenceTxn('readwrite',store=>store.delete(id));}catch{return;}
+   activeEvidenceId=null;
+   try{if(pendingKey()&&localStorage.getItem(pendingKey())===id)localStorage.removeItem(pendingKey());}catch{}
+   if(objectURL){URL.revokeObjectURL(objectURL);objectURL=null;preview.removeAttribute('src');}
+   photoEvidence=null;refreshSend();
+ }
+ host.addEventListener('roleta-final-confirmed',()=>{if(!shadowConsent.checked)discardEvidence().catch(()=>{});});
  const shadowConsent=article.querySelector('[data-shadow-consent]');
  const shadowConsentWrap=article.querySelector('[data-shadow-consent-wrap]');
  fetch('/api/ocr-shadow-submit',{cache:'no-store',credentials:'same-origin'}).then(r=>r.ok?r.json():{enabled:false}).then(v=>{shadowConsentWrap.hidden=v.enabled!==true;if(v.enabled!==true)shadowConsent.checked=false;}).catch(()=>{shadowConsent.checked=false;shadowConsentWrap.hidden=true;});
@@ -184,6 +196,7 @@ async function mount(host){
    const note=details.querySelector('[data-learning-status]');
    fetch('/api/ocr-shadow-submit',{method:'POST',headers,body:evidence.file,cache:'no-store',credentials:'same-origin'}).then(async response=>{
      if(note)note.textContent=response.status===202?'Evidência enviada para aprendizagem privada. A revisão humana continua obrigatória.':'A folha foi salva; a aprendizagem paralela ainda não está disponível.';
+     if(response.status===202)await discardEvidence();
    }).catch(()=>{if(note)note.textContent='Folha salva. Falha na aprendizagem paralela, sem impacto no resultado.';});
  });
  host.addEventListener('roleta-final-confirmed',event=>{
@@ -221,9 +234,9 @@ async function mount(host){
  function canSend(){return !!selected&&confirmation.checked&&!!googleSession&&!busy&&!preparing;}
  function refreshSend(){
    send.disabled=!canSend();
-   remove.disabled=busy||preparing;
-   article.querySelector('[data-photo-camera]').disabled=busy||preparing;
-   article.querySelector('[data-photo-gallery]').disabled=busy||preparing;
+   remove.disabled=busy||preparing||!!activeEvidenceId;
+   article.querySelector('[data-photo-camera]').disabled=busy||preparing||!!activeEvidenceId;
+   article.querySelector('[data-photo-gallery]').disabled=busy||preparing||!!activeEvidenceId;
  }
  function resetPhoto(){
    photoGeneration++;preparing=false;
@@ -232,7 +245,7 @@ async function mount(host){
    preview.removeAttribute('src');confirmation.checked=false;send.disabled=true;
  }
  async function setPhoto(file){
-   if(busy)return;
+   if(busy||activeEvidenceId)return;
    resetPhoto();
    if(!file)return;
    const generation=photoGeneration;
@@ -272,7 +285,6 @@ async function mount(host){
      photoEvidence={file:selected,draftJson:JSON.stringify(data),eventKey:null,reviewed:null};
      progress('Leitura recebida. Preparando conferência…',null);
      await renderDraft();
-     if(json.source==='make-gemini'){try{if(pendingKey())localStorage.removeItem(pendingKey());}catch{}}
      photoStatus.className='intake-gate blocked';
      photoStatus.innerHTML=json.source==='make-ocr-space'?'<strong>LEITURA ALTERNATIVA RECEBIDA</strong><div>Confira a foto com atenção. Acrescente participantes ausentes e complete os campos que ficaram vazios.</div>':'<strong>LEITURA RECEBIDA</strong><div>Confira nomes e números na tabela; a conferência humana continua obrigatória.</div>';
      progress('Leitura concluída · pronto para revisão',100);
@@ -285,7 +297,7 @@ async function mount(host){
  // Rotation is requested by the simplified UX and changes the actual upload file.
  article.addEventListener('click',async event=>{
    const button=event.target.closest('[data-photo-rotate]');
-   if(!button||!selected||busy||preparing)return;
+   if(!button||!selected||busy||preparing||activeEvidenceId)return;
    preparing=true;refreshSend();button.disabled=true;
    const generation=photoGeneration;
    let bitmap;
