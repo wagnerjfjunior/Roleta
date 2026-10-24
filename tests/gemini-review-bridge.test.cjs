@@ -27,7 +27,7 @@ assert.equal(excluded.payload.evento.tegra_qtd,2);
 const duplicateExcluded=toCanonicalReview({rows:[...rows,{...blankExcluded,posicao_impressa:'16',nome:'Desconhecido'}],directory,header});
 assert.deepEqual(duplicateExcluded.errors,[]);
 const duplicateActive=toCanonicalReview({rows:[...rows,{...rows[0],nome:'Monara',numero_sorteado:'03'}],directory,header});
-assert.ok(duplicateActive.errors.some(e=>e.includes('Posição impressa')));
+assert.ok(duplicateActive.errors.some(e=>e.includes('Posição inválida ou duplicada')));
 const missingActive=toCanonicalReview({rows:[...rows,{...blankExcluded,classe:'salao'}],directory,header});
 assert.ok(missingActive.errors.length>0);
 console.log('PASS excluded rows bypass physical registry only when explicitly classified excluir');
@@ -44,3 +44,13 @@ for(const invalid of ['31/02/26','32/10/26','02/13/26','02/10/2']){
  assert.ok(result.errors.includes('Data inválida.'),invalid);
 }
 console.log('PASS calendar normalization for short/long/ISO dates; impossible dates blocked');
+
+// SALÃO / STAND BY / ON-LINE have independent physical sequences; auxiliary positions are optional.
+const groupDirectory={brokers:[...directory.brokers,{nome:'Telma',creci:'118.559-F',gerente:'Wislane',diretor:'Renan',status_creci:'Definitivo'},{nome:'Leonor',creci:'101-F',gerente:'Danilo',diretor:'Renan',status_creci:'Definitivo'}]};
+const independent=toCanonicalReview({rows:[...rows,{posicao_impressa:16,nome:'Telma',numero_sorteado:'',classe:'standby'},{posicao_impressa:'',nome:'Leonor',numero_sorteado:'',classe:'online'}],directory:groupDirectory,header});
+assert.deepEqual(independent.errors,[]);
+assert.deepEqual(independent.payload.standby.map(x=>x.nome),['Telma','Globz']);
+assert.deepEqual(independent.payload.online.map(x=>x.nome),['Leonor']);
+const duplicateStandby=toCanonicalReview({rows:[...rows,{posicao_impressa:29,nome:'Telma',numero_sorteado:'',classe:'standby'}],directory:groupDirectory,header});
+assert.ok(duplicateStandby.errors.some(e=>e.includes('duplicada dentro de STANDBY')));
+console.log('PASS independent auxiliary numbering and optional positions');

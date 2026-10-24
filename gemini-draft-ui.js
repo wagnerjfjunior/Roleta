@@ -380,7 +380,7 @@ async function mount(host){
      });
      const opts=dto.brokers.map(b=>'<option value="'+escapeHtml(b.nome)+'"></option>').join('');
      const body=sorted.map((l,i)=>'<div class="rlt-review-item" data-correction-row data-source-index="'+i+'" data-pos="'+escapeHtml(l.posicao_impressa)+'">'+
-       '<div class="rlt-review-field rlt-review-pos"><span class="rlt-field-title">Posição</span><input data-correct-position aria-label="Posição impressa na folha" type="number" inputmode="numeric" min="1" max="100" value="'+escapeHtml(l.posicao_impressa??'')+'"></div>'+
+       '<div class="rlt-review-field rlt-review-pos"><span class="rlt-field-title">Posição (opcional fora do SALÃO)</span><input data-correct-position aria-label="Posição impressa na folha" type="number" inputmode="numeric" min="1" max="100" value="'+escapeHtml(l.posicao_impressa??'')+'"></div>'+
        '<div class="rlt-review-field rlt-review-ball"><span class="rlt-field-title">Bolinha</span><input data-correct-number aria-label="Número sorteado na posição '+escapeHtml(l.posicao_impressa)+'" type="number" inputmode="numeric" min="1" value="'+escapeHtml(l.numero_sorteado??'')+'">'+(l.bolinha_ambigua?'<small>OCR: '+escapeHtml(l.numero_lido_original)+' · preencher pela foto</small>':'')+'</div>'+
        '<div class="rlt-review-field rlt-review-name"><span class="rlt-field-title">Corretor</span><input data-correct-name aria-label="Nome na posição '+escapeHtml(l.posicao_impressa)+'" list="geminiReviewBrokerNames" value="'+escapeHtml(l.nome||l.nome_lido)+'">'+(l.nome&&l.cadastro_resolucao!=='NOME_EXATO'?'<small>OCR: '+escapeHtml(l.nome_lido)+' → '+escapeHtml(l.nome)+' · conferir</small>':'')+'</div>'+
        '<div class="rlt-review-field rlt-review-class"><span class="rlt-field-title">Participação</span><select data-correct-class aria-label="Classe na posição '+escapeHtml(l.posicao_impressa)+'">'+
@@ -428,7 +428,8 @@ async function mount(host){
          const p=numericPosition(tr.querySelector('[data-correct-position]').value);
          if(tr.querySelector('[data-correct-class]').value==='excluir')return;
          if(n)tallies.set(Number(n),(tallies.get(Number(n))||0)+1);
-         if(p!==null)positions.set(p,(positions.get(p)||0)+1);
+         const category=tr.querySelector('[data-correct-class]').value;
+         if(p!==null&&category) {const key=category+':'+p;positions.set(key,(positions.get(key)||0)+1);}
        });
        let confirmed=0;
        correctionRows.forEach(tr=>{
@@ -438,7 +439,7 @@ async function mount(host){
          const name=tr.querySelector('[data-correct-name]').value.trim();
          const category=tr.querySelector('[data-correct-class]').value;
          const parsedPhysical=numericPosition(physical);
-         const invalidPhysical=parsedPhysical===null||(positions.get(parsedPhysical)>1);
+         const invalidPhysical=(category==='salao'&&parsedPhysical===null)||(parsedPhysical!==null&&positions.get(category+':'+parsedPhysical)>1);
          // Exclusion requires explicit human confirmation, not a broker/position match.
          const warning=category==='excluir'?false:(invalidPhysical||!name||!category||(category==='salao'&&(!n||!/^\d+$/.test(n)||Number(n)<1||/^0\d{2,}$/.test(n)))||(n&&tallies.get(Number(n))>1));
          if(warning&&check.checked)check.checked=false;

@@ -16,29 +16,31 @@ const date=dateInfo(header?.data);if(!date)fail('Data inválida.');
 const periodo=norm(header?.periodo);if(!['MANHA','MANHÃ','TARDE','INTEGRAL'].includes(periodo))fail('Período inválido.');
 const helbor=integer(header?.helbor);if(helbor===null)fail('Confirme numericamente a quantidade Helbor.');
 const draw=companyDraw(header?.share,header?.position1,header?.position2);if(!draw)fail('Confirme posições do sorteio de empresa.');
-const active=[],standby=[],online=[],seenPhysical=new Set(),seenBroker=new Set();
+const active=[],standby=[],online=[],seenPhysical={salao:new Set(),standby:new Set(),online:new Set()},seenBroker=new Set();
 for(const [i,r] of rows.entries()){
 const pos=integer(r.posicao_impressa),n=integer(r.numero_sorteado),classification=r.classe;
 if(!['salao','standby','online','excluir'].includes(classification)){fail('Classifique a linha impressa '+pos+'.');continue;}
 // Excluded source rows were explicitly reviewed and do not enter canonical data.
 // Missing names, positions and duplicate source positions are permitted only here.
 if(classification==='excluir')continue;
-if(pos===null||pos<1||pos>100||seenPhysical.has(pos)){fail('Posição impressa duplicada/ausente na linha '+(i+1)+'.');continue;}
-seenPhysical.add(pos);
+if((classification==='salao'&&pos===null)||(pos!==null&&(pos<1||pos>100||seenPhysical[classification].has(pos)))){fail('Posição inválida ou duplicada dentro de '+classification.toUpperCase()+' na linha '+(i+1)+'.');continue;}
+if(pos!==null)seenPhysical[classification].add(pos);
 const matches=registry.get(norm(r.nome))||[];if(matches.length!==1){fail('Corretor não confirmado unicamente no cadastro: '+r.nome+' (posição '+pos+').');continue;}
 const broker=matches[0],key=norm(broker.nome);
 if(seenBroker.has(key))fail('Corretor duplicado: '+broker.nome+'.');seenBroker.add(key);
 const record={nome:broker.nome,creci:broker.creci,gerente:broker.gerente,diretor:broker.diretor,status_creci:broker.status_creci};
 if(classification==='salao'){if(n===null||n<1)fail('Número sorteado obrigatório no SALÃO: '+broker.nome+'.');record.physical_position=pos;active.push({record,n});}
-else if(classification==='standby'){if(n!==null)fail('STAND BY com número sorteado: '+broker.nome+'.');standby.push(record);}
-else if(classification==='online'){if(n!==null)fail('ON-LINE com número sorteado: '+broker.nome+'.');online.push(record);}
+else if(classification==='standby'){if(n!==null)fail('STAND BY com número sorteado: '+broker.nome+'.');standby.push({record,pos,order:i});}
+else if(classification==='online'){if(n!==null)fail('ON-LINE com número sorteado: '+broker.nome+'.');online.push({record,pos,order:i});}
 }
 const N=active.length,nums=active.map(r=>r.n);
 if(!N)fail('SALÃO vazio.');
 if(nums.length!==new Set(nums).size||nums.some(n=>n===null)||!Array.from({length:N},(_,i)=>i+1).every(n=>nums.includes(n)))fail('Ordem do sorteio deve formar 1..'+N+' sem repetição ou lacunas.');
 if(errors.length)return {errors:[...new Set(errors)],payload:null};
 const ordered=active.sort((a,b)=>a.n-b.n).map(({record,n})=>({...record,ordem_final:n}));
-const payload={status:'VALIDADO',evento:{empreendimento:'CAMINHOS DA LAPA',data:date.data,dia_semana:date.dia_semana,periodo:periodo==='MANHA'?'MANHÃ':periodo,tegra_qtd:N,helbor_qtd:helbor,resultado:{empresa:'TEGRA',numero:null,numero_exposto:false},company_draw:draw},salao:ordered,standby,online,pendencias:[]};
+// Each ancillary list is independent. Missing positions retain sheet order.
+const ancillary=list=>list.sort((a,b)=>a.pos===null&&b.pos===null?a.order-b.order:a.pos===null?1:b.pos===null?-1:a.pos-b.pos).map(x=>x.record);
+const payload={status:'VALIDADO',evento:{empreendimento:'CAMINHOS DA LAPA',data:date.data,dia_semana:date.dia_semana,periodo:periodo==='MANHA'?'MANHÃ':periodo,tegra_qtd:N,helbor_qtd:helbor,resultado:{empresa:'TEGRA',numero:null,numero_exposto:false},company_draw:draw},salao:ordered,standby:ancillary(standby),online:ancillary(online),pendencias:[]};
 return {errors:[],payload};
 }
 return {toCanonicalReview,companyDraw};
