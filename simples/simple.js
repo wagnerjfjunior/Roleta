@@ -135,7 +135,7 @@ async function endCurrent(discard){
    host.dispatchEvent(new CustomEvent('roleta-discard-canonical',{detail:canonical}));
    await canonical.promise;
    // Reload only after deletion; otherwise recovery remains possible.
-   location.reload();
+   location.replace(location.pathname+location.search);
  }catch(error){
    notice.textContent='Não foi possível encerrar o rascunho local com segurança. Tente novamente.';
    ending=false;newRoleta.disabled=false;discardRoleta.disabled=false;
