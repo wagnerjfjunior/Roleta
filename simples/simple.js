@@ -49,7 +49,7 @@ async function fetchSavedFinals(){
  const response=await fetch('/api/final-roulette',{credentials:'same-origin',cache:'no-store'});
  const data=await response.json().catch(()=>({}));
  if(!response.ok||!Array.isArray(data.records))throw Error(data.error||'Histórico indisponível.');
- return data.records.filter(r=>r&&r.payload&&r.payload.reviewed&&Number.isSafeInteger(r.version));
+ return data.records.filter(r=>r&&r.payload&&r.payload.reviewed&&Number.isSafeInteger(r.version)).sort((a,b)=>Date.parse(b.recorded_at||0)-Date.parse(a.recorded_at||0));
 }
 async function refreshSavedOption(){
  if(!authenticated){recoverSaved.hidden=true;return;}
@@ -64,7 +64,7 @@ recoverSaved.addEventListener('click',async()=>{
  recoveryMessage.textContent='Abrindo a última folha já conferida...';
  try{
   const records=await fetchSavedFinals();
-  // The server ledger is ordered by latest saved version (newest first).
+  // Sort by recorded_at; server ledger itself is ordered by event identifier.
   if(!records.length)throw Error('Não há roletas salvas no histórico.');
   const latest=records[0];
   const transfer={record:latest,promise:Promise.resolve()};
