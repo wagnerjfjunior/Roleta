@@ -573,18 +573,30 @@
       }
     });
 
-    // Public UI recovery reuses the same server-validated record and review pipeline.
-    host.addEventListener('roleta-load-saved',event=>{
+    // A saved, operator-authorized final sheet is reopened as final output,
+    // without re-running OCR or requesting human review again.
+    host.addEventListener('roleta-open-saved-final',event=>{
       event.detail.promise=(async()=>{
         const record=event.detail.record;
-        if(!record||!record.payload?.reviewed||!/^\d{4}-\d{2}-\d{2}-[MTI]$/.test(record.event_id||''))throw Error('Registro salvo inválido.');
+        if(!record||!record.payload?.reviewed||!/^\d{4}-\d{2}-\d{2}-[MTI]$/.test(record.event_id||''))
+          throw Error('Registro salvo inválido.');
+        const checked=clonePayload(record.payload.reviewed);
+        if(validatePayload(checked).length)throw Error('Registro salvo não passou na validação de leitura.');
+        if(!Number.isSafeInteger(record.version)||record.version<1)throw Error('Versão inválida no histórico.');
         savedRecord=record;
-        ta.value=JSON.stringify(record.payload.reviewed,null,2);
-        await validateAndPrepareReview();
-        if(reviewCard.hidden)throw Error('Não foi possível preparar a conferência da folha salva.');
-        reviewCard.scrollIntoView({behavior:'smooth',block:'start'});
+        reviewedPayload=checked;
+        payload=checked;
+        counts.innerHTML=previewSummary(checked);
+        renderCanonical(preview,checked);
+        card.hidden=false;
+        reviewCard.hidden=true;
+        statStatus.textContent='Roleta recuperada do Supabase. '+record.event_id+' · versão '+record.version+'.';
+        confirm.checked=true;
+        confirm.dispatchEvent(new Event('change',{bubbles:true}));
+        card.scrollIntoView({behavior:'smooth',block:'start'});
       })();
     });
+
     loadButton.addEventListener('click',async()=>{
       loadButton.disabled=true;
       try{
