@@ -110,9 +110,9 @@ const outputsNote=document.createElement('p');outputsNote.className='simple-outp
 const endActions=document.createElement('div');
 endActions.className='intake-actions';
 const newRoleta=document.createElement('button');
-newRoleta.type='button';newRoleta.className='simulation-run';newRoleta.textContent='Nova Roleta';
+newRoleta.type='button';newRoleta.className='simulation-run simple-end-new';newRoleta.textContent='Nova Roleta';
 const discardRoleta=document.createElement('button');
-discardRoleta.type='button';discardRoleta.className='simulation-run';discardRoleta.textContent='Descartar Roleta';
+discardRoleta.type='button';discardRoleta.className='simulation-run simple-end-discard';discardRoleta.textContent='Descartar Roleta';
 endActions.append(newRoleta,discardRoleta);
 preview.append(endActions);
 let finalSaved=false,ending=false;
